@@ -12,5 +12,6 @@
 !.dir-locals.el
 !Makefile
 !config.org
+!readme.org
 !early-init.el
 !init.el
