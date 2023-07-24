@@ -1,0 +1,16 @@
+*
+!/eln-cache/*
+!lib
+!lib/**
+!etc
+!etc/**
+
+!.gitmodules
+!.gitremotes
+!.gitignore
+!.borgconfig
+!.dir-locals.el
+!Makefile
+!config.org
+!early-init.el
+!init.el
