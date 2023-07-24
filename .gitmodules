@@ -1,0 +1,147 @@
+[include]
+	path = .gitremotes
+	path = .borgconfig
+[submodule "all-the-icons"]
+	path = lib/all-the-icons
+	url = https://github.com/domtronn/all-the-icons.el
+[submodule "all-the-icons-dired"]
+	path = lib/all-the-icons-dired
+	url = https://github.com/wyuenho/all-the-icons-dired
+[submodule "annalist"]
+	path = lib/annalist
+	url = https://github.com/noctuid/annalist.el
+[submodule "auto-compile"]
+	path = lib/auto-compile
+	url = https://github.com/emacscollective/auto-compile
+[submodule "borg"]
+	path = lib/borg
+	url = https://github.com/emacscollective/borg
+[submodule "centaur-tabs"]
+	path = lib/centaur-tabs
+	url = https://github.com/ema2159/centaur-tabs
+[submodule "closql"]
+	path = lib/closql
+	url = https://github.com/magit/closql
+[submodule "compat"]
+	path = lib/compat
+	url = https://github.com/emacs-compat/compat
+[submodule "dash"]
+	path = lib/dash
+	url = https://github.com/magnars/dash.el
+[submodule "dashboard"]
+	path = lib/dashboard
+	url = https://github.com/emacs-dashboard/emacs-dashboard
+[submodule "diff-hl"]
+	path = lib/diff-hl
+	url = https://github.com/dgutov/diff-hl
+[submodule "diminish"]
+	path = lib/diminish
+	url = https://github.com/myrjola/diminish.el
+[submodule "dirvish"]
+	path = lib/dirvish
+	url = https://github.com/alexluigit/dirvish
+[submodule "doom-modeline"]
+	path = lib/doom-modeline
+	url = https://github.com/seagle0128/doom-modeline
+[submodule "doom-themes"]
+	path = lib/doom-themes
+	url = https://github.com/doomemacs/themes
+[submodule "eaf"]
+	path = lib/eaf
+	url = https://github.com/emacs-eaf/emacs-application-framework
+[submodule "elisp-refs"]
+	path = lib/elisp-refs
+	url = https://github.com/Wilfred/elisp-refs
+[submodule "emacsql"]
+	path = lib/emacsql
+	url = https://github.com/magit/emacsql
+[submodule "epkg"]
+	path = lib/epkg
+	url = https://github.com/emacscollective/epkg
+[submodule "evil"]
+	path = lib/evil
+	url = https://github.com/emacs-evil/evil
+[submodule "evil-collection"]
+	path = lib/evil-collection
+	url = https://github.com/emacs-evil/evil-collection
+[submodule "evil-org"]
+	path = lib/evil-org
+	url = https://github.com/Somelauw/evil-org-mode
+[submodule "evil-tutor"]
+	path = lib/evil-tutor
+	url = https://github.com/syl20bnr/evil-tutor
+[submodule "f"]
+	path = lib/f
+	url = https://github.com/rejeep/f.el
+[submodule "general"]
+	path = lib/general
+	url = https://github.com/noctuid/general.el
+[submodule "git-modes"]
+	path = lib/git-modes
+	url = https://github.com/magit/git-modes
+[submodule "helpful"]
+	path = lib/helpful
+	url = https://github.com/Wilfred/helpful
+[submodule "llama"]
+	path = lib/llama
+	url = git@github.com:emacsmirror/llama.git
+[submodule "lsp-bridge"]
+	path = lib/lsp-bridge
+	url = https://github.com/manateelazycat/lsp-bridge
+[submodule "magit"]
+	path = lib/magit
+	url = https://github.com/magit/magit
+[submodule "markdown-mode"]
+	path = lib/markdown-mode
+	url = https://github.com/jrblevin/markdown-mode
+[submodule "nerd-icons"]
+	path = lib/nerd-icons
+	url = https://github.com/rainstormstudio/nerd-icons.el
+[submodule "org-agenda-property"]
+	path = lib/org-agenda-property
+	url = https://github.com/Malabarba/org-agenda-property
+[submodule "org-edna"]
+	path = lib/org-edna
+	url = git@github.com:emacsmirror/org-edna.git
+[submodule "org-fancy-priorities"]
+	path = lib/org-fancy-priorities
+	url = https://github.com/harrybournis/org-fancy-priorities
+[submodule "org-gtd"]
+	path = lib/org-gtd
+	url = https://github.com/Trevoke/org-gtd.el
+[submodule "org-roam"]
+	path = lib/org-roam
+	url = https://github.com/org-roam/org-roam
+[submodule "org-superstar"]
+	path = lib/org-superstar
+	url = https://github.com/integral-dw/org-superstar-mode
+[submodule "powerline"]
+	path = lib/powerline
+	url = https://github.com/milkypostman/powerline
+[submodule "projectile"]
+	path = lib/projectile
+	url = https://github.com/bbatsov/projectile
+[submodule "s"]
+	path = lib/s
+	url = https://github.com/magnars/s.el
+[submodule "shrink-path"]
+	path = lib/shrink-path
+	url = https://gitlab.com/bennya/shrink-path.el
+[submodule "sqlite3"]
+	path = lib/sqlite3
+	url = https://github.com/pekingduck/emacs-sqlite3-api
+[submodule "transient"]
+	path = lib/transient
+	url = https://github.com/magit/transient
+[submodule "treepy"]
+	path = lib/treepy
+	url = https://github.com/volrath/treepy.el
+[submodule "use-package"]
+	path = lib/use-package
+	url = git@github.com:jwiegley/use-package.git
+[submodule "which-key"]
+	path = lib/which-key
+	url = https://github.com/justbur/emacs-which-key
+[submodule "with-editor"]
+	path = lib/with-editor
+	url = https://github.com/magit/with-editor
