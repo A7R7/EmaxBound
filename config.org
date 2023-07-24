@@ -9,7 +9,7 @@
 
 #+TITLE: The Emacs Configuration Org File
 #+AUTHOR: A7R7
-https://img.shields.io/github/repo-size/A7R7/EmaxBound
+[[https://img.shields.io/github/repo-size/A7R7/EmaxBound][Repo Size]]
 
 All the necessary Emacs config files (early-init.el, init.el) are generated from this org file,
 by using [[elisp:org-babel-tangle][M-x org-babel-tangle (C-c C-v t)]] in Emacs org-mode.
@@ -44,7 +44,7 @@ Check [[https://emacsmirror.net/manual/borg/Bootstrapping-using-a-seed.html][Boo
 ** References
 -  [[https://gitlab.com/dwt1/configuring-emacs][DistroTube's Configuring Emacs]] (2023)
 -  [[https://github.com/seagle0128/.emacs.d][seagle0128's Centaur Emacs]] (2023)
--  [[  https://github.com/daviwil/emacs-from-scratch][Daviwell's Emacs from scratch]] (2021)
+-  [[https://github.com/daviwil/emacs-from-scratch][Daviwell's Emacs from scratch]] (2021)
 -  [[https://github.com/lccambiaghi/vanilla-emacs][Luca's vanilla-emacs]] (2023)
 *NOTE*: the year number after each line equals to
 - =min (last time the config get's updated, last time I refered to the config)=
