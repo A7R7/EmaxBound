@@ -9,30 +9,53 @@
 
 #+TITLE: The Emacs Configuration Org File
 #+AUTHOR: A7R7
+https://img.shields.io/github/repo-size/A7R7/EmaxBound
 
 All the necessary Emacs config files (early-init.el, init.el) are generated from this org file,
 by using [[elisp:org-babel-tangle][M-x org-babel-tangle (C-c C-v t)]] in Emacs org-mode.
 
 * Introduction
+** How to deploy this config
+To play around with my config files, clone this repo anywhere you like on your system.
+#+begin_src bash
+git clone --depth=1 https://github.com/A7R7/EmaxBound.git
+#+end_src
+
+Then, simply execute these make rules inside the repo directory.
+#+begin_src bash
+make bootstrap-borg  # bootstrap borg itself
+make bootstrap       # bootstrap collective or new drones
+#+end_src
+
+If you're using emacs29 or above, run ~emacs --init-directory=<path-of-the-repo>~ (remember to replace the path).
+
+Else, you can have a look at [[https://github.com/plexus/chemacs2][chemacs2]], which makes it easy to run multiple Emacs configurations side by side.
+
 ** How I built this config
 The whole config structure is built upon [[https://github.com/emacscollective/emacs.g][emacscollective/emacs.g]]. It is a starter-kit using borg as the package manager, which utilizes git submodules to maintain all its packages.
 Check [[https://emacsmirror.net/manual/borg/Bootstrapping-using-a-seed.html][Bootstrapping-using-a-seed]] from its [[https://emacsmirror.net/manual/borg/][manual]] to see how to build the config structure.
 
-Firstly, I generated the structure from the seed.
-Then, I copied and pasted all the original code from init.el and early-init.el to this org file.
-Last, any further config does not go beyond the following 2 steps:
-1. Run [[elisp: borg-assimilate][M-x borg-assimilate]] and input the name of the package to install this package.
-2. Write config codes into this org file, then run [[elisp:org-babel-tangle][M-x org-babel-tangle]] so that emacs writes the codes into the corresponding file.
+- Firstly, I generated the structure from the seed.
+- Then, I copied and pasted all the original code from init.el and early-init.el to this org file.
+- Last, any further config does not go beyond the following 2 steps:
++ Run [[elisp: borg-assimilate][M-x borg-assimilate]] and input the name of the package to install this package.
++ Write config codes into this org file, then run [[elisp:org-babel-tangle][M-x org-babel-tangle]] so that emacs writes the codes into the corresponding file.
 
 ** References
-[[https://gitlab.com/dwt1/configuring-emacs][DistroTube's Configuring Emacs]] (2023)
-[[https://github.com/seagle0128/.emacs.d][seagle0128's Centaur Emacs]] (2023)
-[[  https://github.com/daviwil/emacs-from-scratch][Daviwell's Emacs from scratch]] (2021)
-[[https://github.com/lccambiaghi/vanilla-emacs][Luca's vanilla-emacs]] (2023)
+-  [[https://gitlab.com/dwt1/configuring-emacs][DistroTube's Configuring Emacs]] (2023)
+-  [[https://github.com/seagle0128/.emacs.d][seagle0128's Centaur Emacs]] (2023)
+-  [[  https://github.com/daviwil/emacs-from-scratch][Daviwell's Emacs from scratch]] (2021)
+-  [[https://github.com/lccambiaghi/vanilla-emacs][Luca's vanilla-emacs]] (2023)
 *NOTE*: the year number after each line equals to
-~min (last time the config get's updated, last time I refered to the config)~
+- =min (last time the config get's updated, last time I refered to the config)=
 
 * Early Init
+File header, disable byte-compile
+#+begin_src elisp :tangle early-init.el
+;;; early-init.el --- early bird      -*- no-byte-compile: t -*-
+;;; early-init.el --- earliest birds  -*- lexical-binding: t -*-
+#+end_src
+
 Disable tool-bar, menu-bar and scroll-bar before they're loaded.
 #+begin_src elisp :tangle early-init.el
 (tool-bar-mode -1)
@@ -42,7 +65,6 @@ Disable tool-bar, menu-bar and scroll-bar before they're loaded.
 
 Borg seed generated configs.
 #+begin_src elisp :tangle early-init.el
-;;; early-init.el --- earliest birds               -*- lexical-binding: t -*-
 (setq load-prefer-newer t)
 
 (let ((dir (file-name-directory (or load-file-name buffer-file-name))))
@@ -66,11 +88,11 @@ Borg seed generated configs.
 
 * Init
 ** Header
-Disable byte compile for init.el, according to the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html][emacs manual]].
+Init.el file header, disable byte compile for init.el, according to the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html][emacs manual]].
 #+begin_src elisp
 ;;; init.el --- user-init-file
-;; -*-lexical-binding: t; -*-
-;; -*-no-byte-compile: t; -*-
+;;; -*- no-byte-compile: t -*-
+;;; -*- lexical-binding: t -*-
 #+end_src
 ** Loading message
 #+begin_src elisp
@@ -91,6 +113,12 @@ Disable byte compile for init.el, according to the [[https://www.gnu.org/softwar
   (setq initial-buffer-choice t)
   (setq initial-scratch-message "")
 )
+#+end_src
+
+** Performance
+Dial the GC threshold back down so that garbage collection happens more frequently but in less time.
+#+begin_src elisp
+(setq gc-cons-threshold (* 2 1000 1000))
 #+end_src
 
 ** Borg
@@ -570,12 +598,12 @@ This package implements hiding or abbreviation of the modeline displays (lighter
 :config
   ;; (general-evil-setup)
   ;; set up 'SPC' as the global leader key
-  (general-create-definer leader-bind
+  (general-create-definer bind-leader-to
     :states '(normal insert visual emacs)
     :keymaps 'override
     :prefix "SPC" ;; set leader
     :global-prefix "M-SPC") ;; access leader in insert mode
-  (leader-bind
+  (bind-leader-to
       "b"  '(:ignore t                          :wk "Buffer")
       "bb" '(switch-to-buffer                   :wk "Switch buffer")
       "bd" '(kill-this-buffer                   :wk "Delete buffer")
@@ -604,19 +632,20 @@ This package implements hiding or abbreviation of the modeline displays (lighter
   :init
   (which-key-mode 1)
   :config
-  (setq which-key-side-window-location 'bottom
-        which-key-sort-order #'which-key-key-order-alpha
-        which-key-sort-uppercase-first nil
-        which-key-add-column-padding 1
-        which-key-max-display-columns nil
-        which-key-min-display-lines 6
-        which-key-side-window-slot -10
-        which-key-side-window-max-height 0.25
-        which-key-idle-delay 0.8
-        which-key-idle-secondary-delay 0.05
-        which-key-max-description-length 25
-        which-key-allow-imprecise-window-fit t
-        which-key-separator " → "
+  (setq
+    which-key-side-window-location 'bottom
+    which-key-sort-order #'which-key-key-order-alpha
+    which-key-sort-uppercase-first nil
+    which-key-add-column-padding 1
+    which-key-max-display-columns nil
+    which-key-min-display-lines 6
+    which-key-side-window-slot -10
+    which-key-side-window-max-height 0.25
+    which-key-idle-delay 0.8
+    which-key-idle-secondary-delay 0.03
+    which-key-max-description-length 25
+    which-key-allow-imprecise-window-fit t
+    which-key-separator " → "
   )
 )
 #+end_src
@@ -682,14 +711,8 @@ This package implements hiding or abbreviation of the modeline displays (lighter
 #+end_src
 
 #+begin_src elisp
-(use-package eaf-browser)       ;;M-x eaf-file-browser-qrcode
+;; (use-package eaf-browser)       ;;M-x eaf-file-browser-qrcode
 (use-package eaf-git)       ;;M-x eaf-file-browser-qrcode
-(use-package eaf-file-manager)  ;;M-x eaf-open-in-file-manager
+;; (use-package eaf-file-manager)  ;;M-x eaf-open-in-file-manager
 (use-package eaf-pdf-viewer)
 #+end_src
-* Performance
-Dial the GC threshold back down so that garbage collection happens more frequently but in less time.
-#+begin_src elisp
-(setq gc-cons-threshold (* 2 1000 1000))
-#+end_src
-
