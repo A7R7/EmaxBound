@@ -10,7 +10,8 @@
 #+TITLE: The Emacs Configuration Org File
 #+AUTHOR: A7R7
 [[https://img.shields.io/github/repo-size/A7R7/EmaxBound][https://img.shields.io/github/repo-size/A7R7/EmaxBound.svg?style=svg]]
-[[https://www.gnu.org/software/emacs/][https://img.shields.io/badge/emacs--29-8A2BE2.svg?style=svg]]
+[[https://www.gnu.org/software/emacs/][https://img.shields.io/badge/emacs--29.1-8A2BE2.svg?style=svg]]
+[[https://github.com/emacscollective/borg][https://img.shields.io/badge/package--manager-borg-FFFF00.svg?style=svg]]
 
 All the necessary Emacs config files (early-init.el, init.el) are generated from this org file,
 by using [[elisp:org-babel-tangle][M-x org-babel-tangle (C-c C-v t)]] in Emacs org-mode.
@@ -28,7 +29,7 @@ make bootstrap-borg  # bootstrap borg itself
 make bootstrap       # bootstrap collective or new drones
 #+end_src
 
-If you're using emacs29 or above, run ~emacs --init-directory=<path-of-the-repo>~ (remember to replace the path).
+If you're using emacs29 or above, run ~emacs --init-directory=<path-of-the-repo>~ (replace the path).
 
 Else, you can have a look at [[https://github.com/plexus/chemacs2][chemacs2]], which makes it easy to run multiple Emacs configurations side by side.
 
@@ -51,6 +52,8 @@ Check [[https://emacsmirror.net/manual/borg/Bootstrapping-using-a-seed.html][Boo
 - =min (last time the config get's updated, last time I refered to the config)=
 
 * Early Init
+*NOTE*: codes under this heading is tangled to early-init.el
+
 File header, disable byte-compile
 #+begin_src elisp :tangle early-init.el
 ;;; early-init.el --- early bird      -*- no-byte-compile: t -*-
