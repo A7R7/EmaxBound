@@ -12,7 +12,7 @@
 [[https://img.shields.io/github/repo-size/A7R7/EmaxBound][https://img.shields.io/github/repo-size/A7R7/EmaxBound.svg?style=svg]]
 [[https://github.com/emacscollective/borg][https://img.shields.io/badge/package--manager-borg-00BB00.svg?style=svg]]
 [[https://www.gnu.org/software/emacs/][https://img.shields.io/badge/emacs--29.1-8A2BE2.svg?style=svg]]
-[[https://img.shields.io/badge/-Linux-blue?logo=Linux&style=flat&logoColor=white][https://img.shields.io/badge/-Linux-blue?logo=Linux&style=flat&logoColor=white]]
+[[https://img.shields.io/badge/-Linux-blue?logo=Linux&style=flat&logoColor=white][https://img.shields.io/badge/-Linux-blue?logo=Linux&style=flat&logoColor=white.svg?style=svg]]
 All the necessary Emacs config files (early-init.el, init.el) are generated from this org file,
 by using [[elisp:org-babel-tangle][M-x org-babel-tangle (C-c C-v t)]] in Emacs org-mode.
 
