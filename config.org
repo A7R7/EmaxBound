@@ -10,9 +10,9 @@
 #+TITLE: The Emacs Configuration Org File
 #+AUTHOR: A7R7
 [[https://img.shields.io/github/repo-size/A7R7/EmaxBound][https://img.shields.io/github/repo-size/A7R7/EmaxBound.svg?style=svg]]
+[[https://github.com/emacscollective/borg][https://img.shields.io/badge/package--manager-borg-00BB00.svg?style=svg]]
 [[https://www.gnu.org/software/emacs/][https://img.shields.io/badge/emacs--29.1-8A2BE2.svg?style=svg]]
-[[https://github.com/emacscollective/borg][https://img.shields.io/badge/package--manager-borg-FFFF00.svg?style=svg]]
-
+[[https://img.shields.io/badge/-Linux-blue?logo=Linux&style=flat&logoColor=white][https://img.shields.io/badge/-Linux-blue?logo=Linux&style=flat&logoColor=white]]
 All the necessary Emacs config files (early-init.el, init.el) are generated from this org file,
 by using [[elisp:org-babel-tangle][M-x org-babel-tangle (C-c C-v t)]] in Emacs org-mode.
 
@@ -40,8 +40,9 @@ Check [[https://emacsmirror.net/manual/borg/Bootstrapping-using-a-seed.html][Boo
 - Firstly, I generated the structure from the seed.
 - Then, I copied and pasted all the original code from init.el and early-init.el to this org file.
 - Last, any further config does not go beyond the following 2 steps:
-+ Run [[elisp: borg-assimilate][M-x borg-assimilate]] and input the name of the package to install this package.
-+ Write config codes into this org file, then run [[elisp:org-babel-tangle][M-x org-babel-tangle]] so that emacs writes the codes into the corresponding file.
+
+  + Run [[elisp: borg-assimilate][M-x borg-assimilate]] and input the name of the package to install this package.
+  + Write config codes into this org file, then run [[elisp:org-babel-tangle][M-x org-babel-tangle]] so that emacs writes the codes into the corresponding file.
 
 ** References
 -  [[https://gitlab.com/dwt1/configuring-emacs][DistroTube's Configuring Emacs]] (2023)
@@ -50,14 +51,20 @@ Check [[https://emacsmirror.net/manual/borg/Bootstrapping-using-a-seed.html][Boo
 -  [[https://github.com/lccambiaghi/vanilla-emacs][Luca's vanilla-emacs]] (2023)
 *NOTE*: the year number after each line equals to
 - =min (last time the config get's updated, last time I refered to the config)=
-
+  
+* TODO
+** lsp-bridge
+** completion
+** org-mode indent
+** Zoxide path
+** vertico, frame, 
+** helpful error
 * Early Init
 *NOTE*: codes under this heading is tangled to early-init.el
 
 File header, disable byte-compile
 #+begin_src elisp :tangle early-init.el
-;;; early-init.el --- early bird      -*- no-byte-compile: t -*-
-;;; early-init.el --- earliest birds  -*- lexical-binding: t -*-
+;;; early-init.el --- earliest birds  -*- lexical-binding: t; -*- no-byte-compile: t -*-
 #+end_src
 
 Disable tool-bar, menu-bar and scroll-bar before they're loaded.
@@ -95,8 +102,7 @@ Borg seed generated configs.
 Init.el file header, disable byte compile for init.el, according to the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html][emacs manual]].
 #+begin_src elisp
 ;;; init.el --- user-init-file
-;;; -*- no-byte-compile: t -*-
-;;; -*- lexical-binding: t -*-
+;;; -*- lexical-binding: t; no-byte-compile: t -*-
 #+end_src
 ** Loading message
 #+begin_src elisp
@@ -364,25 +370,24 @@ Define a function to assimilate multiple packages at a time
 ;; End:
 ;;; init.el ends here
 #+end_src
-
 * UI Configs
 ** Basics
 ** Fonts
 
 Defining the various fonts that Emacs will use.
 #+begin_src elisp
-  (set-face-attribute 'default nil
-    :font "JetBrainsMono Nerd Font"
-    :height 150
-    :weight 'medium)
-  (set-face-attribute 'variable-pitch nil
-    :font "Ubuntu Nerd Font"
-    :height 160
-    :weight 'medium)
-  (set-face-attribute 'fixed-pitch nil
-    :font "JetBrainsMono Nerd Font"
-    :height 150
-    :weight 'medium)
+(set-face-attribute 'default nil
+  :font "JetBrainsMono Nerd Font"
+  :height 150
+  :weight 'medium)
+(set-face-attribute 'variable-pitch nil
+  :font "Ubuntu Nerd Font"
+  :height 160
+  :weight 'medium)
+(set-face-attribute 'fixed-pitch nil
+  :font "JetBrainsMono Nerd Font"
+  :height 150
+  :weight 'medium)
 
 
 
@@ -390,10 +395,10 @@ Defining the various fonts that Emacs will use.
 
 Makes commented text and keywords italics. Working in emacsclient but not emacs.
 #+begin_src elisp
-  (set-face-attribute 'font-lock-comment-face nil
-    :slant 'italic)
-  (set-face-attribute 'font-lock-keyword-face nil
-    :slant 'italic)
+(set-face-attribute 'font-lock-comment-face nil
+  :slant 'italic)
+(set-face-attribute 'font-lock-keyword-face nil
+  :slant 'italic)
 #+end_src
 
 Uncomment the following line if line spacing needs adjusting.
@@ -404,11 +409,14 @@ Uncomment the following line if line spacing needs adjusting.
 *** Zooming In/Out
 You can use the bindings CTRL plus =/- for zooming in/out.  You can also use CTRL plus the mouse wheel for zooming in/out.
 
-#+begin_src emacs-lisp
-(global-set-key (kbd "C-=") 'text-scale-increase)
-(global-set-key (kbd "C--") 'text-scale-decrease)
-(global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
-(global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
+#+begin_src elisp
+ (use-package emacs
+   :init 
+     (global-set-key (kbd "C-=")            'text-scale-increase)
+     (global-set-key (kbd "C--")            'text-scale-decrease)
+     (global-set-key (kbd "<C-wheel-up>")   'text-scale-increase)
+     (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
+ )
 #+end_src
 
 ** Icons
@@ -466,23 +474,6 @@ Set background alpha to 5%
 
 *NOTE2:* [[All-the-icons]] hasn't been supported since 4.0.0. If you prefer all-the-icons, please use release 3.4.0, then run [[elisp:all-the-icons-install-fonts][M-x all-the-icons-install-fonts]] to install necessary icons.
 
-** Helpful Help cmds
-
-[[https://github.com/Wilfred/helpful][Helpful]] adds a lot of very helpful (get it?) information to Emacs' =describe-= command buffers.  For example, if you use =describe-function=, you will not only get the documentation about the function, you will also see the source code of the function and where it gets used in other places in the Emacs configuration.  It is very useful for figuring out how things work in Emacs.
-
-#+begin_src elisp
-(use-package helpful
-  :commands (helpful-callable helpful-variable helpful-command helpful-key)
-  :custom
-  (counsel-describe-function-function #'helpful-callable)
-  (counsel-describe-variable-function #'helpful-variable)
-  :bind
-  ([remap describe-function] . counsel-describe-function)
-  ([remap describe-command] . helpful-command)
-  ([remap describe-variable] . counsel-describe-variable)
-  ([remap describe-key] . helpful-key))
-#+end_src
-
 ** Dashboard
 Emacs Dashboard is an extensible startup screen showing you recent files, bookmarks, agenda items and an Emacs banner.
 #+begin_src emacs-lisp
@@ -538,39 +529,29 @@ This package implements hiding or abbreviation of the modeline displays (lighter
       (centaur-tabs-group-by-projectile-project)
   )
 #+end_src
-** Shrink path
-[[https://github.com/zbelial/shrink-path.el][Shrink path]] is a small utility functions that allow for fish-style trunctated directories in eshell and for example modeline.
-#+begin_src elisp
-(use-package shrink-path :demand t)
-#+end_src
-
-** S
-[[https://github.com/magnars/s.el][S]] is the long lost Emacs string manipulation library.
-
-** F
-[[https://github.com/rejeep/f.el][F]] is a modern API for working with files and directories in Emacs.
-
-** Annalist
-[[https://github.com/noctuid/annalist.el][annalist.el]] is a library that can be used to record information and later print that information using org-mode headings and tables. It allows defining different types of things that can be recorded (e.g. keybindings, settings, hooks, and advice) and supports custom filtering, sorting, and formatting. annalist is primarily intended for use in other packages like general and evil-collection, but it can also be used directly in a user’s configuration.
 * Kbd Configs
 ** Evil
+*** Evil mode
+The famous evil that make you look evil.
 #+begin_src elisp
-(use-package evil
-  :init
-    (setq evil-want-integration t) ;; t by default
-    (setq evil-want-keybinding nil)
-    (setq evil-vsplit-window-right t)
-    (setq evil-split-window-below t)
-  :config
-    (evil-mode 1)
-      ;; Use visual line motions even outside of visual-line-mode buffers
-    (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-    (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
-    (evil-set-initial-state 'messages-buffer-mode 'normal)
-    (evil-set-initial-state 'dashboard-mode 'normal)
-)
+  (use-package evil
+    :init
+      (setq evil-want-integration t) ;; t by default
+      (setq evil-want-keybinding nil)
+      (setq evil-vsplit-window-right t)
+      (setq evil-split-window-below t)
+      (setq evil-want-minibuffer t) ;; use evil in minibuffer!
+    :config
+      (evil-mode 1)
+        ;; Use visual line motions even outside of visual-line-mode buffers
+      (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+      (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+      (evil-set-initial-state 'messages-buffer-mode 'normal)
+      (evil-set-initial-state 'dashboard-mode 'normal)
+  )
 #+end_src
 
+*** Evil collection
 [[https://github.com/emacs-evil/evil-collection][evil-collection]] automatically configures various Emacs modes with Vi-like keybindings.
 
 #+begin_src elisp
@@ -594,39 +575,47 @@ This package implements hiding or abbreviation of the modeline displays (lighter
 
 *Note*: byte compile init.el will lead to function created by general-create-definer failed to work. See [[Header]].
 #+begin_src elisp
-;; Make ESC quit prompts
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+  ;; Make ESC quit prompts
+  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
-(use-package general
-:after evil
-:config
-  ;; (general-evil-setup)
-  ;; set up 'SPC' as the global leader key
-  (general-create-definer bind-leader-to
-    :states '(normal insert visual emacs)
-    :keymaps 'override
-    :prefix "SPC" ;; set leader
-    :global-prefix "M-SPC") ;; access leader in insert mode
-  (bind-leader-to
-      "b"  '(:ignore t                          :wk "Buffer")
-      "bb" '(switch-to-buffer                   :wk "Switch buffer")
-      "bd" '(kill-this-buffer                   :wk "Delete buffer")
-      "bn" '(next-buffer                        :wk "Next buffer")
-      "bp" '(previous-buffer                    :wk "Prev buffer")
-      "br" '(revert-buffer                      :wk "Reload buffer")
-      "]"  '(next-buffer                        :wk "Next buffer")
-      "["  '(previous-buffer                    :wk "Prev buffer")
+  (use-package general
+  :after evil
+  :config
+    ;; (general-evil-setup)
+    ;; set up 'SPC' as the global leader key
+    (general-create-definer bind-leader-to
+      :states '(normal insert visual emacs)
+      :keymaps 'override
+      :prefix "SPC" ;; set leader
+      :global-prefix "M-SPC") ;; access leader in insert mode
+    (bind-leader-to
+	"b"  '(:ignore t                          :wk "Buffer")
+	"bb" '(switch-to-buffer                   :wk "Switch buffer")
+	"bd" '(kill-this-buffer                   :wk "Delete buffer")
+	"bp" '(previous-buffer                    :wk "Prev Buffer ")
+	"bn" '(next-buffer                        :wk "Next Buffer ")
+	"br" '(revert-buffer                      :wk "Reload Buffer")
+	"["  '(previous-buffer                    :wk "Prev Buffer ")
+	"]"  '(next-buffer                        :wk "Next Buffer ")
 
-      "w"  '(:ignore t                          :wk "Window")
-      "wd" '(delete-window                      :wk "Delete window")
-      "wv" '(split-window-vertically            :wk "Vertical split")
-      "wh" '(split-window-horizontally          :wk "Horizontal split")
-      "wh" '(evil-window-left                   :wk "window <")
-      "wj" '(evil-window-down                   :wk "window v")
-      "wk" '(evil-window-up                     :wk "window ^")
-      "wl" '(evil-window-right                  :wk "window >")
+	"w"  '(:ignore t                          :wk "Window")
+	"wd" '(delete-window                      :wk "Delete window")
+	"wv" '(split-window-vertically            :wk "V Split 󰤼 ")
+	"wh" '(split-window-horizontally          :wk "H Split 󰤻 ")
+	"wh" '(evil-window-left                   :wk "window ")
+	"wj" '(evil-window-down                   :wk "window ")
+	"wk" '(evil-window-up                     :wk "window ")
+	"wl" '(evil-window-right                  :wk "window ")
+
+	"p"  '(:ignore t                          :wk "Package(Borg)")
+	"pa" '(borg-assimilate                    :wk "Assimilate")
+	"pc" '(borg-clone                         :wk "Clone")
+	"pr" '(borg-remove                        :wk "Remove")
+
+	"t"  '(:ignore t                          :wk "Toggle")
+
+    )
   )
-)
 #+end_src
 
 ** Which-key
@@ -634,8 +623,6 @@ This package implements hiding or abbreviation of the modeline displays (lighter
 #+begin_src elisp
 (use-package which-key
   :init
-  (which-key-mode 1)
-  :config
   (setq
     which-key-side-window-location 'bottom
     which-key-sort-order #'which-key-key-order-alpha
@@ -651,11 +638,63 @@ This package implements hiding or abbreviation of the modeline displays (lighter
     which-key-allow-imprecise-window-fit t
     which-key-separator " → "
   )
+  (which-key-mode 1)
 )
 #+end_src
 
-* Org mode
-** Evil
+* The Org of Emacs
+** Org UI
+*** Headings & Levels
+#+begin_src elisp
+  (use-package org
+    :config
+    (set-face-attribute 'org-level-1 nil :family "Cantarell" :height 1.5 :bold t)
+    (set-face-attribute 'org-level-2 nil :family "Cantarell" :height 1.25 :bold t)
+    (set-face-attribute 'org-level-3 nil :family "Cantarell" :height 1.1 :bold t)
+    (set-face-attribute 'org-level-4 nil :family "Cantarell" :height 1.05 :bold t)
+    (set-face-attribute 'org-level-5 nil :family "Cantarell" :height 1.05 :bold t)
+    (set-face-attribute 'org-level-6 nil :family "Cantarell" :height 1.05 :bold t)
+    (set-face-attribute 'org-document-title nil :family "Cantarell" :height 1.75 :bold t)
+    (setq org-adapt-indentation t)
+    (setq org-indent-indentation-per-level 1)
+  )
+#+end_src
+*** Superstar
+#+begin_src elisp
+  (use-package org-superstar
+  :hook (org-mode . org-superstar-mode)
+  :init
+    (setq
+      ;;org-superstar-headline-bullets-list '("✖" "✚" "◉" "○" "▶")
+      org-superstar-special-todo-items t
+      org-ellipsis "  "
+    )
+  )
+#+end_src
+*** Highlight TODO
+#+begin_src elisp
+  (use-package hl-todo
+    :init
+    (hl-todo-mode)
+  )
+#+end_src
+*** Fancy-priorities
+#+begin_src elisp
+  (use-package org-fancy-priorities)
+#+end_src
+*** Org-appear
+Automatically disaply emphasis markers and links when the cursor is on them.
+#+begin_src emacs-lisp
+(use-package org-appear
+  :hook (org-mode . org-appear-mode)
+  :init
+  (setq org-appear-autoemphasis  t)
+  ;(get it?) (setq org-appear-autolinks t)
+  (setq org-appear-autosubmarkers t)
+)
+#+end_src
+
+** Evil-org
 #+begin_src elisp
 (use-package evil-org)
 #+end_src
@@ -669,32 +708,336 @@ This package implements hiding or abbreviation of the modeline displays (lighter
 )
 #+end_src
 ** GTD
-** Org UI
-*** superstar
-#+begin_src elisp
-  (use-package org-superstar
-    :hook (org-mode . org-superstar-mode)
-    :init
-    ;; (setq org-superstar-headline-bullets-list '("✖" "✚" "◉" "○" "▶")
-	  ;; org-superstar-special-todo-items t
-	  ;; org-ellipsis " ↴ ")
-  )
-#+end_src
-*** fancy-priorities
-#+begin_src elisp
-(use-package org-fancy-priorities)
-#+end_src
-
 ** Pandoc
 #+begin_src elisp
 ;; (use-package org-pandoc)
 #+end_src
-* Utilities
+
+** Packages
+- [[evil-org]] if [[doom-module::editor evil]]
+- [[htmlize]]
+- [[jupyter]] if [[doom-module:+jupyter]]
+- [[ob-ammonite]] if [[doom-module::lang scala]]
+- [[ob-async]]
+- [[ob-crystal]] if [[doom-module::lang crystal]]
+- [[ob-go]] if [[doom-module::lang go]]
+- [[ob-ipython]] if [[doom-module:+ipython]]
+- [[ob-nim]] if [[doom-module::lang nim]]
+- [[ob-racket]] if [[doom-module::lang racket]]
+- [[ob-restclient]] if [[doom-module::lang rest]]
+- [[ob-rust]] if [[doom-module::lang rust]]
+- [[org-contacts]] if [[doom-module:+contacts]]
+- [[org-cliplink]]
+- [[org-download]] if [[doom-module:+dragndrop]]
+- [[orgit]]
+- [[org-noter]] if [[doom-module:+noter]]
+- [[org-pdftools]] if [[doom-module::tools pdf]]
+- [[org-plus-contrib]]
+- [[org-passwords]] if [[doom-module:+passwords]]
+- [[org-pomodoro]] if [[doom-module:+pomodoro]]
+- [[org-roam]] (v1) if [[doom-module:+roam]]
+- [[org-roam]] (v2) if [[doom-module:+roam2]]
+- [[org-yt]]
+- [[ox-clip]]
+- [[ox-hugo]] if [[doom-module:+hugo]]
+- [[ox-pandoc]] if [[doom-module:+pandoc]]
+- [[ox-rst]] if [[doom-module::lang rst]]
+- [[toc-org]]
+- if [[doom-module:+gnuplot]]
+  - [[doom-package:gnuplot]]
+  - [[doom-package:gnuplot-mode]]
+- if [[doom-module:+present]]
+  - [[doom-package:centered-window]]
+  - [[doom-package:org-tree-slide]]
+  - [[doom-package:org-re-reveal]]
+- if [[doom-module:+pretty]]
+  - [[doom-package:org-superstar]]
+  - [[doom-package:org-fancy-priorities]]
+    
+* LSP & Completion
+** Vertico
+[[https://github.com/minad/vertico#extensions][Vertico]] provides a performant and minimalistic vertical completion UI based on the default completion system. 
 #+begin_src elisp
-(use-package dirvish
-    :init (dirvish-override-dired-mode)
+(use-package vertico
+  :init
+  (vertico-mode)
+
+  ;; Different scroll margin
+  ;; (setq vertico-scroll-margin 0)
+
+  ;; Show more candidates
+  ;; (setq vertico-count 20)
+
+  ;; Grow and shrink the Vertico minibuffer
+  ;; (setq vertico-resize t)
+
+  ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
+  ;; (setq vertico-cycle t)
+  )
+
+;; Persist history over Emacs restarts. Vertico sorts by history position.
+(use-package savehist
+  :init
+  (savehist-mode))
+
+;; A few more useful configurations...
+(use-package emacs
+  :init
+  ;; Add prompt indicator to `completing-read-multiple'.
+  ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
+  (defun crm-indicator (args)
+    (cons (format "[CRM%s] %s"
+                  (replace-regexp-in-string
+                   "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+                   crm-separator)
+                  (car args))
+          (cdr args)))
+  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+
+  ;; Do not allow the cursor in the minibuffer prompt
+  (setq minibuffer-prompt-properties
+        '(read-only t cursor-intangible t face minibuffer-prompt))
+  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
+  ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
+  ;; Vertico commands are hidden in normal buffers.
+  ;; (setq read-extended-command-predicate
+  ;;       #'command-completion-default-include-p)
+
+  ;; Enable recursive minibuffers
+  (setq enable-recursive-minibuffers t))
+#+end_src
+** Consult
+[[https://github.com/minad/consult][Consult]] provides search and navigation commands based on the Emacs completion function completing-read.
+#+begin_src elisp
+(use-package consult
+  ;; Replace bindings. Lazily loaded due by `use-package'.
+  :bind (;; C-c bindings in `mode-specific-map'
+         ("C-c M-x" . consult-mode-command)
+         ("C-c h" . consult-history)
+         ("C-c k" . consult-kmacro)
+         ("C-c m" . consult-man)
+         ("C-c i" . consult-info)
+         ([remap Info-search] . consult-info)
+         ;; C-x bindings in `ctl-x-map'
+         ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+         ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
+         ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+         ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
+         ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
+         ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
+         ;; Custom M-# bindings for fast register access
+         ("M-#" . consult-register-load)
+         ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+         ("C-M-#" . consult-register)
+         ;; Other custom bindings
+         ("M-y" . consult-yank-pop)                ;; orig. yank-pop
+         ;; M-g bindings in `goto-map'
+         ("M-g e" . consult-compile-error)
+         ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+         ("M-g g" . consult-goto-line)             ;; orig. goto-line
+         ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
+         ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+         ("M-g m" . consult-mark)
+         ("M-g k" . consult-global-mark)
+         ("M-g i" . consult-imenu)
+         ("M-g I" . consult-imenu-multi)
+         ;; M-s bindings in `search-map'
+         ("M-s d" . consult-find)
+         ("M-s D" . consult-locate)
+         ("M-s g" . consult-grep)
+         ("M-s G" . consult-git-grep)
+         ("M-s r" . consult-ripgrep)
+         ("M-s l" . consult-line)
+         ("M-s L" . consult-line-multi)
+         ("M-s k" . consult-keep-lines)
+         ("M-s u" . consult-focus-lines)
+         ;; Isearch integration
+         ("M-s e" . consult-isearch-history)
+         :map isearch-mode-map
+         ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
+         ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
+         ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+         ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
+         ;; Minibuffer history
+         :map minibuffer-local-map
+         ("M-s" . consult-history)                 ;; orig. next-matching-history-element
+         ("M-r" . consult-history))                ;; orig. previous-matching-history-element
+
+  ;; Enable automatic preview at point in the *Completions* buffer. This is
+  ;; relevant when you use the default completion UI.
+  :hook (completion-list-mode . consult-preview-at-point-mode)
+
+  ;; The :init configuration is always executed (Not lazy)
+  :init
+
+  ;; Optionally configure the register formatting. This improves the register
+  ;; preview for `consult-register', `consult-register-load',
+  ;; `consult-register-store' and the Emacs built-ins.
+  (setq register-preview-delay 0.5
+        register-preview-function #'consult-register-format)
+
+  ;; Optionally tweak the register preview window.
+  ;; This adds thin lines, sorting and hides the mode line of the window.
+  (advice-add #'register-preview :override #'consult-register-window)
+
+  ;; Use Consult to select xref locations with preview
+  (setq xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref)
+
+  ;; Configure other variables and modes in the :config section,
+  ;; after lazily loading the package.
+  :config
+
+  ;; Optionally configure preview. The default value
+  ;; is 'any, such that any key triggers the preview.
+  ;; (setq consult-preview-key 'any)
+  ;; (setq consult-preview-key "M-.")
+  ;; (setq consult-preview-key '("S-<down>" "S-<up>"))
+  ;; For some commands and buffer sources it is useful to configure the
+  ;; :preview-key on a per-command basis using the `consult-customize' macro.
+  (consult-customize
+   consult-theme :preview-key '(:debounce 0.2 any)
+   consult-ripgrep consult-git-grep consult-grep
+   consult-bookmark consult-recent-file consult-xref
+   consult--source-bookmark consult--source-file-register
+   consult--source-recent-file consult--source-project-recent-file
+   ;; :preview-key "M-."
+   :preview-key '(:debounce 0.4 any))
+
+  ;; Optionally configure the narrowing key.
+  ;; Both < and C-+ work reasonably well.
+  (setq consult-narrow-key "<") ;; "C-+"
+
+  ;; Optionally make narrowing help available in the minibuffer.
+  ;; You may want to use `embark-prefix-help-command' or which-key instead.
+  ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
+
+  ;; By default `consult-project-function' uses `project-root' from project.el.
+  ;; Optionally configure a different project root function.
+  ;;;; 1. project.el (the default)
+  ;; (setq consult-project-function #'consult--default-project--function)
+  ;;;; 2. vc.el (vc-root-dir)
+  ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
+  ;;;; 3. locate-dominating-file
+  ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
+  ;;;; 4. projectile.el (projectile-project-root)
+  ;; (autoload 'projectile-project-root "projectile")
+  ;; (setq consult-project-function (lambda (_) (projectile-project-root)))
+  ;;;; 5. No project support
+  ;; (setq consult-project-function nil)
 )
 #+end_src
+** YASnippet
+[[https://github.com/joaotavora/yasnippet][YASnippet]] is a template system for Emacs. It allows you to type an abbreviation and automatically expand it into function templates.
+#+begin_src elisp
+(use-package yasnippet
+  :init
+  (yas-global-mode 1)
+)
+#+end_src
+** LSP-bridge
+[[https://github.com/manateelazycat/lsp-bridge][lsp-bridge]] builds a high-speed cache between Emacs and the LSP server.
+#+begin_src elisp
+(use-package lsp-bridge
+  :init
+  (global-lsp-bridge-mode)
+)
+#+end_src
+** UI
+*** Posframe
+*** Vertico-posframe
+[[https://github.com/tumashu/vertico-posframe][Vertico-posframe]] is an vertico extension, which lets vertico use posframe to show its candidate menu.
+** Copilot
+https://github.com/zerolfx/copilot.el
+* elisp
+- [[doom-package:buttercup]]
+- [[doom-package:elisp-def]]
+- [[doom-package:elisp-demos]]
+- [[doom-package:flycheck-cask]] if [[doom-module::checkers syntax]]
+- [[doom-package:flycheck-package]] if [[doom-module::checkers syntax]]
+- [[doom-package:highlight-quoted]]
+- [[doom-package:macrostep]]
+- [[doom-package:overseer]]
+* Utilities
+** Dirvish
+Dropin replacement for dired.
+#+begin_src elisp
+  (use-package dirvish
+    :init
+    (dirvish-override-dired-mode)
+    :custom
+    (dirvish-quick-access-entries ; It's a custom option, `setq' won't work
+     '(("h" "~/"                          "Home")
+       ("d" "~/Downloads/"                "Downloads")
+       ("m" "/mnt/"                       "Drives")
+       ("t" "~/.local/share/Trash/files/" "TrashCan")))
+    :config
+    ;; (dirvish-peek-mode) ; Preview files in minibuffer
+    ;; (dirvish-side-follow-mode) ; similar to `treemacs-follow-mode'
+    (setq dirvish-mode-line-format
+	  '(:left (sort symlink) :right (omit yank index)))
+    (setq dirvish-attributes
+	  '(all-the-icons file-time file-size collapse subtree-state vc-state git-msg))
+    (setq delete-by-moving-to-trash t)
+    (setq dired-listing-switches
+	  "-l --almost-all --human-readable --group-directories-first --no-group")
+    :bind ; Bind `dirvish|dirvish-side|dirvish-dwim' as you see fit
+    (("C-c f" . dirvish-fd)
+     :map dirvish-mode-map ; Dirvish inherits `dired-mode-map'
+     ("a"   . dirvish-quick-access)
+     ("f"   . dirvish-file-info-menu)
+     ("y"   . dirvish-yank-menu)
+     ("N"   . dirvish-narrow)
+     ("^"   . dirvish-history-last)
+     ("h"   . dirvish-history-jump) ; remapped `describe-mode'
+     ("s"   . dirvish-quicksort)    ; remapped `dired-sort-toggle-or-edit'
+     ("v"   . dirvish-vc-menu)      ; remapped `dired-view-file'
+     ("TAB" . dirvish-subtree-toggle)
+     ("M-f" . dirvish-history-go-forward)
+     ("M-b" . dirvish-history-go-backward)
+     ("M-l" . dirvish-ls-switches-menu)
+     ("M-m" . dirvish-mark-menu)
+     ("M-t" . dirvish-layout-toggle)
+     ("M-s" . dirvish-setup-menu)
+     ("M-e" . dirvish-emerge-menu)
+     ("M-j" . dirvish-fd-jump)))
+#+end_src
+** Helpful
+
+[[https://github.com/Wilfred/helpful][Helpful]] adds a lot of very helpful information to Emacs' =describe-= command buffers.
+For example, if you use =describe-function=, you will not only get the documentation about the function,
+you will also see the source code of the function and where it gets used in other places in the Emacs configuration.
+It is very useful for figuring out how things work in Emacs.
+
+#+begin_src elisp
+(use-package helpful
+  :commands (helpful-callable helpful-variable helpful-command helpful-key)
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+  :bind
+  ([remap describe-function] . counsel-describe-function)
+  ([remap describe-command] . helpful-command)
+  ([remap describe-variable] . counsel-describe-variable)
+  ([remap describe-key] . helpful-key))
+#+end_src
+
+* Libraries
+** S
+[[https://github.com/magnars/s.el][S]] is the long lost Emacs string manipulation library.
+
+** F
+[[https://github.com/rejeep/f.el][F]] is a modern API for working with files and directories in Emacs.
+
+** Annalist
+[[https://github.com/noctuid/annalist.el][annalist.el]] is a library that can be used to record information and later print that information using org-mode headings and tables. It allows defining different types of things that can be recorded (e.g. keybindings, settings, hooks, and advice) and supports custom filtering, sorting, and formatting. annalist is primarily intended for use in other packages like general and evil-collection, but it can also be used directly in a user’s configuration.
+** Shrink path
+[[https://github.com/zbelial/shrink-path.el][Shrink path]] is a small utility functions that allow for fish-style trunctated directories in eshell and for example modeline.
+#+begin_src elisp
+(use-package shrink-path :demand t)
+#+end_src
+
 * EAF
 [[https://github.com/emacs-eaf/emacs-application-framework][EAF]] is an extensible framework that revolutionizes the graphical capabilities of Emacs.
 #+begin_src elisp
@@ -717,6 +1060,8 @@ This package implements hiding or abbreviation of the modeline displays (lighter
 #+begin_src elisp
 ;; (use-package eaf-browser)       ;;M-x eaf-file-browser-qrcode
 (use-package eaf-git)       ;;M-x eaf-file-browser-qrcode
-;; (use-package eaf-file-manager)  ;;M-x eaf-open-in-file-manager
+(use-package eaf-file-manager)  ;;M-x eaf-open-in-file-manager
 (use-package eaf-pdf-viewer)
 #+end_src
+
+

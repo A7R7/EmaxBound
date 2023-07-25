@@ -1,8 +1,9 @@
+;;; early-init.el --- earliest birds  -*- lexical-binding: t; -*- no-byte-compile: t -*-
+
 (tool-bar-mode -1)
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
 
-;;; early-init.el --- earliest birds               -*- lexical-binding: t -*-
 (setq load-prefer-newer t)
 
 (let ((dir (file-name-directory (or load-file-name buffer-file-name))))

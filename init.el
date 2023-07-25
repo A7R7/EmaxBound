@@ -1,6 +1,5 @@
 ;;; init.el --- user-init-file
-;; -*-lexical-binding: t; -*-
-;; -*-no-byte-compile: t; -*-
+;;; -*- lexical-binding: t; no-byte-compile: t -*-
 
 ;;; Early birds
 (progn ;     startup
@@ -19,6 +18,8 @@
   (setq initial-buffer-choice t)
   (setq initial-scratch-message "")
 )
+
+(setq gc-cons-threshold (* 2 1000 1000))
 
 (eval-and-compile ; `borg'
   (add-to-list 'load-path (expand-file-name "lib/borg" user-emacs-directory))
@@ -197,30 +198,33 @@
 ;; End:
 ;;; init.el ends here
 
-  (set-face-attribute 'default nil
-    :font "JetBrainsMono Nerd Font"
-    :height 150
-    :weight 'medium)
-  (set-face-attribute 'variable-pitch nil
-    :font "Ubuntu Nerd Font"
-    :height 160
-    :weight 'medium)
-  (set-face-attribute 'fixed-pitch nil
-    :font "JetBrainsMono Nerd Font"
-    :height 150
-    :weight 'medium)
+(set-face-attribute 'default nil
+  :font "JetBrainsMono Nerd Font"
+  :height 150
+  :weight 'medium)
+(set-face-attribute 'variable-pitch nil
+  :font "Ubuntu Nerd Font"
+  :height 160
+  :weight 'medium)
+(set-face-attribute 'fixed-pitch nil
+  :font "JetBrainsMono Nerd Font"
+  :height 150
+  :weight 'medium)
 
-  (set-face-attribute 'font-lock-comment-face nil
-    :slant 'italic)
-  (set-face-attribute 'font-lock-keyword-face nil
-    :slant 'italic)
+(set-face-attribute 'font-lock-comment-face nil
+  :slant 'italic)
+(set-face-attribute 'font-lock-keyword-face nil
+  :slant 'italic)
 
 (setq-default line-spacing 0.12)
 
-(global-set-key (kbd "C-=") 'text-scale-increase)
-(global-set-key (kbd "C--") 'text-scale-decrease)
-(global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
-(global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
+(use-package emacs
+  :init 
+    (global-set-key (kbd "C-=")            'text-scale-increase)
+    (global-set-key (kbd "C--")            'text-scale-decrease)
+    (global-set-key (kbd "<C-wheel-up>")   'text-scale-increase)
+    (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
+)
 
 (use-package all-the-icons
   :ensure t
@@ -247,17 +251,6 @@
 (use-package doom-modeline
   :init (doom-modeline-mode 1)
   :custom ((doom-modeline-height 15)))
-
-(use-package helpful
-  :commands (helpful-callable helpful-variable helpful-command helpful-key)
-  :custom
-  (counsel-describe-function-function #'helpful-callable)
-  (counsel-describe-variable-function #'helpful-variable)
-  :bind
-  ([remap describe-function] . counsel-describe-function)
-  ([remap describe-command] . helpful-command)
-  ([remap describe-variable] . counsel-describe-variable)
-  ([remap describe-key] . helpful-key))
 
 (use-package dashboard
 :init
@@ -286,23 +279,21 @@
 
 (use-package diminish)
 
-  (use-package centaur-tabs
-    :hook
-      (emacs-startup . centaur-tabs-mode)
-    :init
-      (setq centaur-tabs-set-icons t
-	    centaur-tabs-set-modified-marker t
-	    centaur-tabs-modified-marker "M"
-	    centaur-tabs-cycle-scope 'tabs
-	    centaur-tabs-set-close-button nil
-	    centaur-tabs-enable-ido-completion nil)
-    :config
-      (centaur-tabs-mode t)
-      ;; (centaur-tabs-headline-match)
-      (centaur-tabs-group-by-projectile-project)
-  )
-
-(use-package shrink-path :demand t)
+(use-package centaur-tabs
+  :hook
+    (emacs-startup . centaur-tabs-mode)
+  :init
+    (setq centaur-tabs-set-icons t
+	  centaur-tabs-set-modified-marker t
+	  centaur-tabs-modified-marker "M"
+	  centaur-tabs-cycle-scope 'tabs
+	  centaur-tabs-set-close-button nil
+	  centaur-tabs-enable-ido-completion nil)
+  :config
+    (centaur-tabs-mode t)
+    ;; (centaur-tabs-headline-match)
+    (centaur-tabs-group-by-projectile-project)
+)
 
 (use-package evil
   :init
@@ -310,6 +301,7 @@
     (setq evil-want-keybinding nil)
     (setq evil-vsplit-window-right t)
     (setq evil-split-window-below t)
+    (setq evil-want-minibuffer t) ;; use evil in minibuffer!
   :config
     (evil-mode 1)
       ;; Use visual line motions even outside of visual-line-mode buffers
@@ -341,50 +333,96 @@
 :config
   ;; (general-evil-setup)
   ;; set up 'SPC' as the global leader key
-  (general-create-definer leader-bind
+  (general-create-definer bind-leader-to
     :states '(normal insert visual emacs)
     :keymaps 'override
     :prefix "SPC" ;; set leader
     :global-prefix "M-SPC") ;; access leader in insert mode
-  (leader-bind
+  (bind-leader-to
       "b"  '(:ignore t                          :wk "Buffer")
       "bb" '(switch-to-buffer                   :wk "Switch buffer")
       "bd" '(kill-this-buffer                   :wk "Delete buffer")
-      "bn" '(next-buffer                        :wk "Next buffer")
-      "bp" '(previous-buffer                    :wk "Prev buffer")
-      "br" '(revert-buffer                      :wk "Reload buffer")
-      "]"  '(next-buffer                        :wk "Next buffer")
-      "["  '(previous-buffer                    :wk "Prev buffer")
+      "bp" '(previous-buffer                    :wk "Prev Buffer ")
+      "bn" '(next-buffer                        :wk "Next Buffer ")
+      "br" '(revert-buffer                      :wk "Reload Buffer")
+      "["  '(previous-buffer                    :wk "Prev Buffer ")
+      "]"  '(next-buffer                        :wk "Next Buffer ")
 
       "w"  '(:ignore t                          :wk "Window")
       "wd" '(delete-window                      :wk "Delete window")
-      "wv" '(split-window-vertically            :wk "Vertical split")
-      "wh" '(split-window-horizontally          :wk "Horizontal split")
-      "wh" '(evil-window-left                   :wk "window <")
-      "wj" '(evil-window-down                   :wk "window v")
-      "wk" '(evil-window-up                     :wk "window ^")
-      "wl" '(evil-window-right                  :wk "window >")
+      "wv" '(split-window-vertically            :wk "V Split 󰤼 ")
+      "wh" '(split-window-horizontally          :wk "H Split 󰤻 ")
+      "wh" '(evil-window-left                   :wk "window ")
+      "wj" '(evil-window-down                   :wk "window ")
+      "wk" '(evil-window-up                     :wk "window ")
+      "wl" '(evil-window-right                  :wk "window ")
+
+      "p"  '(:ignore t                          :wk "Package(Borg)")
+      "pa" '(borg-assimilate                    :wk "Assimilate")
+      "pc" '(borg-clone                         :wk "Clone")
+      "pr" '(borg-remove                        :wk "Remove")
+
+      "t"  '(:ignore t                          :wk "Toggle")
+
   )
 )
 
 (use-package which-key
   :init
-  (which-key-mode 1)
-  :config
-  (setq which-key-side-window-location 'bottom
-        which-key-sort-order #'which-key-key-order-alpha
-        which-key-sort-uppercase-first nil
-        which-key-add-column-padding 1
-        which-key-max-display-columns nil
-        which-key-min-display-lines 6
-        which-key-side-window-slot -10
-        which-key-side-window-max-height 0.25
-        which-key-idle-delay 0.8
-        which-key-idle-secondary-delay 0.05
-        which-key-max-description-length 25
-        which-key-allow-imprecise-window-fit t
-        which-key-separator " → "
+  (setq
+    which-key-side-window-location 'bottom
+    which-key-sort-order #'which-key-key-order-alpha
+    which-key-sort-uppercase-first nil
+    which-key-add-column-padding 1
+    which-key-max-display-columns nil
+    which-key-min-display-lines 6
+    which-key-side-window-slot -10
+    which-key-side-window-max-height 0.25
+    which-key-idle-delay 0.8
+    which-key-idle-secondary-delay 0.03
+    which-key-max-description-length 25
+    which-key-allow-imprecise-window-fit t
+    which-key-separator " → "
   )
+  (which-key-mode 1)
+)
+
+(use-package org
+  :config
+  (set-face-attribute 'org-level-1 nil :family "Cantarell" :height 1.5 :bold t)
+  (set-face-attribute 'org-level-2 nil :family "Cantarell" :height 1.25 :bold t)
+  (set-face-attribute 'org-level-3 nil :family "Cantarell" :height 1.1 :bold t)
+  (set-face-attribute 'org-level-4 nil :family "Cantarell" :height 1.05 :bold t)
+  (set-face-attribute 'org-level-5 nil :family "Cantarell" :height 1.05 :bold t)
+  (set-face-attribute 'org-level-6 nil :family "Cantarell" :height 1.05 :bold t)
+  (set-face-attribute 'org-document-title nil :family "Cantarell" :height 1.75 :bold t)
+  (setq org-adapt-indentation t)
+  (setq org-indent-indentation-per-level 1)
+)
+
+(use-package org-superstar
+:hook (org-mode . org-superstar-mode)
+:init
+  (setq
+    ;;org-superstar-headline-bullets-list '("✖" "✚" "◉" "○" "▶")
+    org-superstar-special-todo-items t
+    org-ellipsis "  "
+  )
+)
+
+(use-package hl-todo
+  :init
+  (hl-todo-mode)
+)
+
+(use-package org-fancy-priorities)
+
+(use-package org-appear
+  :hook (org-mode . org-appear-mode)
+  :init
+  (setq org-appear-autoemphasis  t)
+  ;(get it?) (setq org-appear-autolinks t)
+  (setq org-appear-autosubmarkers t)
 )
 
 (use-package evil-org)
@@ -396,21 +434,237 @@
   (setq org-roam-v2-ack t)
 )
 
-  (use-package org-superstar
-    :hook (org-mode . org-superstar-mode)
-    :init
-    ;; (setq org-superstar-headline-bullets-list '("✖" "✚" "◉" "○" "▶")
-	  ;; org-superstar-special-todo-items t
-	  ;; org-ellipsis " ↴ ")
-  )
-
-(use-package org-fancy-priorities)
-
 ;; (use-package org-pandoc)
 
-(use-package dirvish
-    :init (dirvish-override-dired-mode)
+(use-package vertico
+  :init
+  (vertico-mode)
+
+  ;; Different scroll margin
+  ;; (setq vertico-scroll-margin 0)
+
+  ;; Show more candidates
+  ;; (setq vertico-count 20)
+
+  ;; Grow and shrink the Vertico minibuffer
+  ;; (setq vertico-resize t)
+
+  ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
+  ;; (setq vertico-cycle t)
+  )
+
+;; Persist history over Emacs restarts. Vertico sorts by history position.
+(use-package savehist
+  :init
+  (savehist-mode))
+
+;; A few more useful configurations...
+(use-package emacs
+  :init
+  ;; Add prompt indicator to `completing-read-multiple'.
+  ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
+  (defun crm-indicator (args)
+    (cons (format "[CRM%s] %s"
+                  (replace-regexp-in-string
+                   "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+                   crm-separator)
+                  (car args))
+          (cdr args)))
+  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+
+  ;; Do not allow the cursor in the minibuffer prompt
+  (setq minibuffer-prompt-properties
+        '(read-only t cursor-intangible t face minibuffer-prompt))
+  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
+  ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
+  ;; Vertico commands are hidden in normal buffers.
+  ;; (setq read-extended-command-predicate
+  ;;       #'command-completion-default-include-p)
+
+  ;; Enable recursive minibuffers
+  (setq enable-recursive-minibuffers t))
+
+(use-package consult
+  ;; Replace bindings. Lazily loaded due by `use-package'.
+  :bind (;; C-c bindings in `mode-specific-map'
+         ("C-c M-x" . consult-mode-command)
+         ("C-c h" . consult-history)
+         ("C-c k" . consult-kmacro)
+         ("C-c m" . consult-man)
+         ("C-c i" . consult-info)
+         ([remap Info-search] . consult-info)
+         ;; C-x bindings in `ctl-x-map'
+         ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+         ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
+         ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+         ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
+         ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
+         ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
+         ;; Custom M-# bindings for fast register access
+         ("M-#" . consult-register-load)
+         ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+         ("C-M-#" . consult-register)
+         ;; Other custom bindings
+         ("M-y" . consult-yank-pop)                ;; orig. yank-pop
+         ;; M-g bindings in `goto-map'
+         ("M-g e" . consult-compile-error)
+         ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+         ("M-g g" . consult-goto-line)             ;; orig. goto-line
+         ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
+         ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+         ("M-g m" . consult-mark)
+         ("M-g k" . consult-global-mark)
+         ("M-g i" . consult-imenu)
+         ("M-g I" . consult-imenu-multi)
+         ;; M-s bindings in `search-map'
+         ("M-s d" . consult-find)
+         ("M-s D" . consult-locate)
+         ("M-s g" . consult-grep)
+         ("M-s G" . consult-git-grep)
+         ("M-s r" . consult-ripgrep)
+         ("M-s l" . consult-line)
+         ("M-s L" . consult-line-multi)
+         ("M-s k" . consult-keep-lines)
+         ("M-s u" . consult-focus-lines)
+         ;; Isearch integration
+         ("M-s e" . consult-isearch-history)
+         :map isearch-mode-map
+         ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
+         ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
+         ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+         ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
+         ;; Minibuffer history
+         :map minibuffer-local-map
+         ("M-s" . consult-history)                 ;; orig. next-matching-history-element
+         ("M-r" . consult-history))                ;; orig. previous-matching-history-element
+
+  ;; Enable automatic preview at point in the *Completions* buffer. This is
+  ;; relevant when you use the default completion UI.
+  :hook (completion-list-mode . consult-preview-at-point-mode)
+
+  ;; The :init configuration is always executed (Not lazy)
+  :init
+
+  ;; Optionally configure the register formatting. This improves the register
+  ;; preview for `consult-register', `consult-register-load',
+  ;; `consult-register-store' and the Emacs built-ins.
+  (setq register-preview-delay 0.5
+        register-preview-function #'consult-register-format)
+
+  ;; Optionally tweak the register preview window.
+  ;; This adds thin lines, sorting and hides the mode line of the window.
+  (advice-add #'register-preview :override #'consult-register-window)
+
+  ;; Use Consult to select xref locations with preview
+  (setq xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref)
+
+  ;; Configure other variables and modes in the :config section,
+  ;; after lazily loading the package.
+  :config
+
+  ;; Optionally configure preview. The default value
+  ;; is 'any, such that any key triggers the preview.
+  ;; (setq consult-preview-key 'any)
+  ;; (setq consult-preview-key "M-.")
+  ;; (setq consult-preview-key '("S-<down>" "S-<up>"))
+  ;; For some commands and buffer sources it is useful to configure the
+  ;; :preview-key on a per-command basis using the `consult-customize' macro.
+  (consult-customize
+   consult-theme :preview-key '(:debounce 0.2 any)
+   consult-ripgrep consult-git-grep consult-grep
+   consult-bookmark consult-recent-file consult-xref
+   consult--source-bookmark consult--source-file-register
+   consult--source-recent-file consult--source-project-recent-file
+   ;; :preview-key "M-."
+   :preview-key '(:debounce 0.4 any))
+
+  ;; Optionally configure the narrowing key.
+  ;; Both < and C-+ work reasonably well.
+  (setq consult-narrow-key "<") ;; "C-+"
+
+  ;; Optionally make narrowing help available in the minibuffer.
+  ;; You may want to use `embark-prefix-help-command' or which-key instead.
+  ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
+
+  ;; By default `consult-project-function' uses `project-root' from project.el.
+  ;; Optionally configure a different project root function.
+  ;;;; 1. project.el (the default)
+  ;; (setq consult-project-function #'consult--default-project--function)
+  ;;;; 2. vc.el (vc-root-dir)
+  ;; (setq consult-project-function (lambda (_) (vc-root-dir)))
+  ;;;; 3. locate-dominating-file
+  ;; (setq consult-project-function (lambda (_) (locate-dominating-file "." ".git")))
+  ;;;; 4. projectile.el (projectile-project-root)
+  ;; (autoload 'projectile-project-root "projectile")
+  ;; (setq consult-project-function (lambda (_) (projectile-project-root)))
+  ;;;; 5. No project support
+  ;; (setq consult-project-function nil)
 )
+
+(use-package yasnippet
+  :init
+  (yas-global-mode 1)
+)
+
+(use-package lsp-bridge
+  :init
+  (global-lsp-bridge-mode)
+)
+
+(use-package dirvish
+  :init
+  (dirvish-override-dired-mode)
+  :custom
+  (dirvish-quick-access-entries ; It's a custom option, `setq' won't work
+   '(("h" "~/"                          "Home")
+     ("d" "~/Downloads/"                "Downloads")
+     ("m" "/mnt/"                       "Drives")
+     ("t" "~/.local/share/Trash/files/" "TrashCan")))
+  :config
+  ;; (dirvish-peek-mode) ; Preview files in minibuffer
+  ;; (dirvish-side-follow-mode) ; similar to `treemacs-follow-mode'
+  (setq dirvish-mode-line-format
+	'(:left (sort symlink) :right (omit yank index)))
+  (setq dirvish-attributes
+	'(all-the-icons file-time file-size collapse subtree-state vc-state git-msg))
+  (setq delete-by-moving-to-trash t)
+  (setq dired-listing-switches
+	"-l --almost-all --human-readable --group-directories-first --no-group")
+  :bind ; Bind `dirvish|dirvish-side|dirvish-dwim' as you see fit
+  (("C-c f" . dirvish-fd)
+   :map dirvish-mode-map ; Dirvish inherits `dired-mode-map'
+   ("a"   . dirvish-quick-access)
+   ("f"   . dirvish-file-info-menu)
+   ("y"   . dirvish-yank-menu)
+   ("N"   . dirvish-narrow)
+   ("^"   . dirvish-history-last)
+   ("h"   . dirvish-history-jump) ; remapped `describe-mode'
+   ("s"   . dirvish-quicksort)    ; remapped `dired-sort-toggle-or-edit'
+   ("v"   . dirvish-vc-menu)      ; remapped `dired-view-file'
+   ("TAB" . dirvish-subtree-toggle)
+   ("M-f" . dirvish-history-go-forward)
+   ("M-b" . dirvish-history-go-backward)
+   ("M-l" . dirvish-ls-switches-menu)
+   ("M-m" . dirvish-mark-menu)
+   ("M-t" . dirvish-layout-toggle)
+   ("M-s" . dirvish-setup-menu)
+   ("M-e" . dirvish-emerge-menu)
+   ("M-j" . dirvish-fd-jump)))
+
+(use-package helpful
+  :commands (helpful-callable helpful-variable helpful-command helpful-key)
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+  :bind
+  ([remap describe-function] . counsel-describe-function)
+  ([remap describe-command] . helpful-command)
+  ([remap describe-variable] . counsel-describe-variable)
+  ([remap describe-key] . helpful-key))
+
+(use-package shrink-path :demand t)
 
 (use-package eaf
 ;; :load-path "~/.emacs.d/site-lisp/emacs-application-framework"
@@ -427,9 +681,7 @@
   ;; (eaf-bind-key nil "M-q" eaf-browser-keybinding)
 ) ;; unbind, see more in the Wiki
 
-(use-package eaf-browser)       ;;M-x eaf-file-browser-qrcode
+;; (use-package eaf-browser)       ;;M-x eaf-file-browser-qrcode
 (use-package eaf-git)       ;;M-x eaf-file-browser-qrcode
 (use-package eaf-file-manager)  ;;M-x eaf-open-in-file-manager
 (use-package eaf-pdf-viewer)
-
-(setq gc-cons-threshold (* 2 1000 1000))

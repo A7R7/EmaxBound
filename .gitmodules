@@ -25,6 +25,9 @@
 [submodule "compat"]
 	path = lib/compat
 	url = https://github.com/emacs-compat/compat
+[submodule "consult"]
+	path = lib/consult
+	url = https://github.com/minad/consult
 [submodule "dash"]
 	path = lib/dash
 	url = https://github.com/magnars/dash.el
@@ -82,6 +85,9 @@
 [submodule "helpful"]
 	path = lib/helpful
 	url = https://github.com/Wilfred/helpful
+[submodule "hl-todo"]
+	path = lib/hl-todo
+	url = https://github.com/tarsius/hl-todo
 [submodule "llama"]
 	path = lib/llama
 	url = git@github.com:emacsmirror/llama.git
@@ -100,6 +106,9 @@
 [submodule "org-agenda-property"]
 	path = lib/org-agenda-property
 	url = https://github.com/Malabarba/org-agenda-property
+[submodule "org-appear"]
+	path = lib/org-appear
+	url = https://github.com/awth13/org-appear
 [submodule "org-edna"]
 	path = lib/org-edna
 	url = git@github.com:emacsmirror/org-edna.git
@@ -115,6 +124,9 @@
 [submodule "org-superstar"]
 	path = lib/org-superstar
 	url = https://github.com/integral-dw/org-superstar-mode
+[submodule "posframe"]
+	path = lib/posframe
+	url = https://github.com/tumashu/posframe
 [submodule "powerline"]
 	path = lib/powerline
 	url = https://github.com/milkypostman/powerline
@@ -133,15 +145,30 @@
 [submodule "transient"]
 	path = lib/transient
 	url = https://github.com/magit/transient
+[submodule "treemacs"]
+	path = lib/treemacs
+	url = https://github.com/Alexander-Miller/treemacs
 [submodule "treepy"]
 	path = lib/treepy
 	url = https://github.com/volrath/treepy.el
 [submodule "use-package"]
 	path = lib/use-package
 	url = git@github.com:jwiegley/use-package.git
+[submodule "vertico"]
+	path = lib/vertico
+	url = https://github.com/minad/vertico
+[submodule "vertico-posframe"]
+	path = lib/vertico-posframe
+	url = https://github.com/tumashu/vertico-posframe
 [submodule "which-key"]
 	path = lib/which-key
 	url = https://github.com/justbur/emacs-which-key
 [submodule "with-editor"]
 	path = lib/with-editor
 	url = https://github.com/magit/with-editor
+[submodule "yasnippet"]
+	path = lib/yasnippet
+	url = https://github.com/joaotavora/yasnippet
+[submodule "zoxide"]
+	path = lib/zoxide
+	url = https://gitlab.com/Vonfry/zoxide.el
