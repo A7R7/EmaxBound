@@ -378,26 +378,6 @@
   )
 )
 
-(use-package which-key
-  :init
-  (setq
-    which-key-side-window-location 'bottom
-    which-key-sort-order #'which-key-key-order-alpha
-    which-key-sort-uppercase-first nil
-    which-key-add-column-padding 1
-    which-key-max-display-columns nil
-    which-key-min-display-lines 6
-    which-key-side-window-slot -10
-    which-key-side-window-max-height 0.25
-    which-key-idle-delay 0.8
-    which-key-idle-secondary-delay 0.03
-    which-key-max-description-length 25
-    which-key-allow-imprecise-window-fit t
-    which-key-separator " → "
-  )
-  (which-key-mode 1)
-)
-
 (use-package org
   :config
   (set-face-attribute 'org-level-1 nil :family "Cantarell" :height 1.5 :bold t)
@@ -407,8 +387,7 @@
   (set-face-attribute 'org-level-5 nil :family "Cantarell" :height 1.05 :bold t)
   (set-face-attribute 'org-level-6 nil :family "Cantarell" :height 1.05 :bold t)
   (set-face-attribute 'org-document-title nil :family "Cantarell" :height 1.75 :bold t)
-  (setq org-adapt-indentation t)
-  (setq org-indent-indentation-per-level 1)
+  (org-indent-mode)
 )
 
 (use-package org-superstar
@@ -674,16 +653,44 @@
   (set-face-attribute 'diredfl-dir-name nil :bold t)
 )
 
+(use-package which-key
+  :init
+  (setq
+    which-key-side-window-location 'bottom
+    which-key-sort-order #'which-key-key-order-alpha
+    which-key-sort-uppercase-first nil
+    which-key-add-column-padding 1
+    which-key-max-display-columns nil
+    which-key-min-display-lines 6
+    which-key-side-window-slot -10
+    which-key-side-window-max-height 0.25
+    which-key-idle-delay 0.8
+    which-key-idle-secondary-delay 0.03
+    which-key-max-description-length 25
+    which-key-allow-imprecise-window-fit t
+    which-key-separator " → "
+  )
+  (which-key-mode 1)
+)
+
 (use-package helpful
-  :commands (helpful-callable helpful-variable helpful-command helpful-key)
+:bind
+   ([remap describe-key]      . helpful-key)
+   ([remap describe-command]  . helpful-command)
+   ([remap describe-variable] . helpful-variable)
+   ([remap describe-function] . helpful-callable)
+)
+
+(use-package marginalia
+  :general
+  (:keymaps 'minibuffer-local-map
+   "M-A" 'marginalia-cycle)
   :custom
-  (counsel-describe-function-function #'helpful-callable)
-  (counsel-describe-variable-function #'helpful-variable)
-  :bind
-  ([remap describe-function] . counsel-describe-function)
-  ([remap describe-command] . helpful-command)
-  ([remap describe-variable] . counsel-describe-variable)
-  ([remap describe-key] . helpful-key))
+  (marginalia-max-relative-age 0)
+  (marginalia-align 'right)
+  :init
+  (marginalia-mode)
+)
 
 (use-package shrink-path :demand t)
 

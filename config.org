@@ -10,10 +10,10 @@
 #+TITLE: EmaxBound Configuration
 #+AUTHOR: A7R7
 
+#+HTML: <img alt="EmaxBound" src="assets/EmacsBound.svg" width="100%">
 #+HTML: <a href="https://www.gnu.org/software/emacs/"><img alt="GNU Emacs" src="https://img.shields.io/badge/emacs-29.1-8A2BF2?logo=gnuemacs&logoColor=white"/></a>
 #+HTML: <a href="https://github.com/emacscollective/borg"><img alt="Package Manager" src="https://img.shields.io/badge/package_manager-borg-green"/></a>
 #+HTML: <a href="https://en.wikipedia.org/wiki/Linux"><img alt="Linux" src="https://img.shields.io/badge/linux-FCC624?logo=linux&logoColor=black"/></a>
-#+HTML: <img alt="EmaxBound" src="assets/EmacsBound.svg" width="100%">
 
 * Introduction
 ** How to deploy this config
@@ -260,6 +260,7 @@ Define a function to assimilate multiple packages at a time
   (add-hook 'lisp-interaction-mode-hook 'indent-spaces-mode))
 #+end_src
 
+Magit is a VERY powerful git client, especially for emacs.
 #+begin_src elisp
 (use-package magit
   :defer t
@@ -630,33 +631,9 @@ The famous evil that make you look evil.
   )
 #+end_src
 
-** Which-key
-[[https://github.com/justbur/emacs-which-key][Which-key]] is a minor mode for Emacs that displays the key bindings following your currently entered incomplete command (a prefix) in a popup.
-#+begin_src elisp
-(use-package which-key
-  :init
-  (setq
-    which-key-side-window-location 'bottom
-    which-key-sort-order #'which-key-key-order-alpha
-    which-key-sort-uppercase-first nil
-    which-key-add-column-padding 1
-    which-key-max-display-columns nil
-    which-key-min-display-lines 6
-    which-key-side-window-slot -10
-    which-key-side-window-max-height 0.25
-    which-key-idle-delay 0.8
-    which-key-idle-secondary-delay 0.03
-    which-key-max-description-length 25
-    which-key-allow-imprecise-window-fit t
-    which-key-separator " → "
-  )
-  (which-key-mode 1)
-)
-#+end_src
-
 * The Org of Emacs
-** Org UI
-*** Headings & Levels
+** User Interface
+*** Headings & Levels & arrangements
 #+begin_src elisp
   (use-package org
     :config
@@ -667,8 +644,6 @@ The famous evil that make you look evil.
     (set-face-attribute 'org-level-5 nil :family "Cantarell" :height 1.05 :bold t)
     (set-face-attribute 'org-level-6 nil :family "Cantarell" :height 1.05 :bold t)
     (set-face-attribute 'org-document-title nil :family "Cantarell" :height 1.75 :bold t)
-    (setq org-adapt-indentation t)
-    (setq org-indent-indentation-per-level 1)
   )
 #+end_src
 *** Superstar
@@ -706,18 +681,21 @@ Automatically disaply emphasis markers and links when the cursor is on them.
 )
 #+end_src
 
-** Evil-org
+*** Visual-fill-column
+https://codeberg.org/joostkremers/visual-fill-column
+** Kbd-configs
+*** Evil-org
 #+begin_src elisp
-(use-package evil-org)
+  (use-package evil-org)
 #+end_src
 ** Roam
 #+begin_src elisp
-(use-package org-roam
-:after org
-:init
-  (setq org-roam-directory (file-truename "~/roam"))
-  (setq org-roam-v2-ack t)
-)
+  (use-package org-roam
+  :after org
+  :init
+    (setq org-roam-directory (file-truename "~/roam"))
+    (setq org-roam-v2-ack t)
+  )
 #+end_src
 ** GTD
 ** Pandoc
@@ -747,8 +725,6 @@ Automatically disaply emphasis markers and links when the cursor is on them.
 - [[org-plus-contrib]]
 - [[org-passwords]] if [[doom-module:+passwords]]
 - [[org-pomodoro]] if [[doom-module:+pomodoro]]
-- [[org-roam]] (v1) if [[doom-module:+roam]]
-- [[org-roam]] (v2) if [[doom-module:+roam2]]
 - [[org-yt]]
 - [[ox-clip]]
 - [[ox-hugo]] if [[doom-module:+hugo]]
@@ -1026,6 +1002,30 @@ Dropin replacement for dired.
     (set-face-attribute 'diredfl-dir-name nil :bold t)
   )
 #+end_src
+** Which-key
+[[https://github.com/justbur/emacs-which-key][Which-key]] is a minor mode for Emacs that displays the key bindings following your currently entered incomplete command (a prefix) in a popup.
+#+begin_src elisp
+(use-package which-key
+  :init
+  (setq
+    which-key-side-window-location 'bottom
+    which-key-sort-order #'which-key-key-order-alpha
+    which-key-sort-uppercase-first nil
+    which-key-add-column-padding 1
+    which-key-max-display-columns nil
+    which-key-min-display-lines 6
+    which-key-side-window-slot -10
+    which-key-side-window-max-height 0.25
+    which-key-idle-delay 0.8
+    which-key-idle-secondary-delay 0.03
+    which-key-max-description-length 25
+    which-key-allow-imprecise-window-fit t
+    which-key-separator " → "
+  )
+  (which-key-mode 1)
+)
+#+end_src
+
 ** Helpful
 
 [[https://github.com/Wilfred/helpful][Helpful]] adds a lot of very helpful information to Emacs' =describe-= command buffers.
@@ -1034,18 +1034,28 @@ you will also see the source code of the function and where it gets used in othe
 It is very useful for figuring out how things work in Emacs.
 
 #+begin_src elisp
-(use-package helpful
-  :commands (helpful-callable helpful-variable helpful-command helpful-key)
-  :custom
-  (counsel-describe-function-function #'helpful-callable)
-  (counsel-describe-variable-function #'helpful-variable)
+  (use-package helpful
   :bind
-  ([remap describe-function] . counsel-describe-function)
-  ([remap describe-command] . helpful-command)
-  ([remap describe-variable] . counsel-describe-variable)
-  ([remap describe-key] . helpful-key))
+     ([remap describe-key]      . helpful-key)
+     ([remap describe-command]  . helpful-command)
+     ([remap describe-variable] . helpful-variable)
+     ([remap describe-function] . helpful-callable)
+  )
 #+end_src
 
+** Marginalia
+#+begin_src elisp
+  (use-package marginalia
+    :general
+    (:keymaps 'minibuffer-local-map
+     "M-A" 'marginalia-cycle)
+    :custom
+    (marginalia-max-relative-age 0)
+    (marginalia-align 'right)
+    :init
+    (marginalia-mode)
+  )
+#+end_src
 * Libraries
 ** S
 [[https://github.com/magnars/s.el][S]] is the long lost Emacs string manipulation library.

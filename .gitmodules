@@ -1,6 +1,9 @@
 [include]
 	path = .gitremotes
 	path = .borgconfig
+[submodule "2048-game"]
+	path = lib/2048-game
+	url = git@github.com:emacsmirror/2048-game.git
 [submodule "all-the-icons"]
 	path = lib/all-the-icons
 	url = https://github.com/domtronn/all-the-icons.el
@@ -19,6 +22,9 @@
 [submodule "centaur-tabs"]
 	path = lib/centaur-tabs
 	url = https://github.com/ema2159/centaur-tabs
+[submodule "centered-window"]
+	path = lib/centered-window
+	url = https://github.com/anler/centered-window-mode
 [submodule "closql"]
 	path = lib/closql
 	url = https://github.com/magit/closql
@@ -100,6 +106,9 @@
 [submodule "magit"]
 	path = lib/magit
 	url = https://github.com/magit/magit
+[submodule "marginalia"]
+	path = lib/marginalia
+	url = https://github.com/minad/marginalia
 [submodule "markdown-mode"]
 	path = lib/markdown-mode
 	url = https://github.com/jrblevin/markdown-mode
@@ -172,6 +181,9 @@
 [submodule "vertico-posframe"]
 	path = lib/vertico-posframe
 	url = https://github.com/tumashu/vertico-posframe
+[submodule "visual-fill-column"]
+	path = lib/visual-fill-column
+	url = git@github.com:emacsmirror/visual-fill-column.git
 [submodule "vscode-icon"]
 	path = lib/vscode-icon
 	url = https://github.com/jojojames/vscode-icon-emacs
