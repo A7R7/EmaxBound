@@ -25,14 +25,14 @@
   (add-to-list 'load-path (expand-file-name "lib/borg" user-emacs-directory))
   (require 'borg)
   (borg-initialize)
-  (defun borg-assimilate-loop ()
-    (interactive)
-    (catch 'loop-end
-      (while t ; Infinite loop until explicitly terminated
-        (condition-case nil
-          (borg-assimilate ()) ; Call your function here
-          (quit (throw 'loop-end nil)))))
-  ) ; Catch 'C-g' (quit) signal and end the loop
+;  (defun borg-assimilate-loop ()
+;    (interactive)
+;    (catch 'loop-end
+;      (while t ; Infinite loop until explicitly terminated
+;        (condition-case nil
+;          (borg-assimilate ()) ; Call your function here
+;          (quit (throw 'loop-end nil)))))
+;  ) ; Catch 'C-g' (quit) signal and end the loop
 )
 
 (eval-and-compile ; `use-package'
@@ -218,20 +218,20 @@
 
 (setq-default line-spacing 0.12)
 
- (use-package emacs
-   :init 
-     (global-set-key (kbd "C-=")            'text-scale-increase)
-     (global-set-key (kbd "C--")            'text-scale-decrease)
-     (global-set-key (kbd "<C-wheel-up>")   'text-scale-increase)
-     (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
- )
+(use-package emacs
+  :init 
+    (global-set-key (kbd "C-=")            'text-scale-increase)
+    (global-set-key (kbd "C--")            'text-scale-decrease)
+    (global-set-key (kbd "<C-wheel-up>")   'text-scale-increase)
+    (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
+)
 
 (use-package all-the-icons
   :ensure t
   :if (display-graphic-p))
 
-(use-package all-the-icons-dired
-  :hook (dired-mode . (lambda () (all-the-icons-dired-mode t))))
+;(use-package all-the-icons-dired
+;  :hook (dired-mode . (lambda () (all-the-icons-dired-mode t))))
 
 (use-package nerd-icons
   ;; :custom
@@ -261,7 +261,7 @@
   ;; show Dashboard in frames created with emacsclient -c
   (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
   ;;(setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
-  ;; (setq dashboard-startup-banner "~/.config/emacs/images/emacs-dash.png")  ;; use custom image as banner
+  (setq dashboard-startup-banner (concat user-emacs-directory "assets/EmacsBound.svg"))  ;; use custom image as banner
   (setq dashboard-center-content t) ;; set to 't' for centered content
 
   (setq dashboard-items '(
@@ -279,37 +279,37 @@
 
 (use-package diminish)
 
-  (use-package centaur-tabs
-    :hook
-      (emacs-startup . centaur-tabs-mode)
-    :init
-      (setq centaur-tabs-set-icons t
-	    centaur-tabs-set-modified-marker t
-	    centaur-tabs-modified-marker "M"
-	    centaur-tabs-cycle-scope 'tabs
-	    centaur-tabs-set-close-button nil
-	    centaur-tabs-enable-ido-completion nil)
-    :config
-      (centaur-tabs-mode t)
-      ;; (centaur-tabs-headline-match)
-      (centaur-tabs-group-by-projectile-project)
-  )
+(use-package centaur-tabs
+  :hook
+    (emacs-startup . centaur-tabs-mode)
+  :init
+    (setq centaur-tabs-set-icons t
+	  centaur-tabs-set-modified-marker t
+	  centaur-tabs-modified-marker "M"
+	  centaur-tabs-cycle-scope 'tabs
+	  centaur-tabs-set-close-button nil
+	  centaur-tabs-enable-ido-completion nil)
+  :config
+    (centaur-tabs-mode t)
+    ;; (centaur-tabs-headline-match)
+    (centaur-tabs-group-by-projectile-project)
+)
 
-  (use-package evil
-    :init
-      (setq evil-want-integration t) ;; t by default
-      (setq evil-want-keybinding nil)
-      (setq evil-vsplit-window-right t)
-      (setq evil-split-window-below t)
-      (setq evil-want-minibuffer t) ;; use evil in minibuffer!
-    :config
-      (evil-mode 1)
-        ;; Use visual line motions even outside of visual-line-mode buffers
-      (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-      (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
-      (evil-set-initial-state 'messages-buffer-mode 'normal)
-      (evil-set-initial-state 'dashboard-mode 'normal)
-  )
+(use-package evil
+  :init
+    (setq evil-want-integration t) ;; t by default
+    (setq evil-want-keybinding nil)
+    (setq evil-vsplit-window-right t)
+    (setq evil-split-window-below t)
+    (setq evil-want-minibuffer t) ;; use evil in minibuffer!
+  :config
+    (evil-mode 1)
+      ;; Use visual line motions even outside of visual-line-mode buffers
+    (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+    (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+    (evil-set-initial-state 'messages-buffer-mode 'normal)
+    (evil-set-initial-state 'dashboard-mode 'normal)
+)
 
 (use-package evil-collection
   ;; :demand t
@@ -325,47 +325,58 @@
   :config (setq ring-bell-function #'ignore)
 )
 
-  ;; Make ESC quit prompts
-  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+;; Make ESC quit prompts
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
-  (use-package general
-  :after evil
-  :config
-    ;; (general-evil-setup)
-    ;; set up 'SPC' as the global leader key
-    (general-create-definer bind-leader-to
-      :states '(normal insert visual emacs)
-      :keymaps 'override
-      :prefix "SPC" ;; set leader
-      :global-prefix "M-SPC") ;; access leader in insert mode
-    (bind-leader-to
-	"b"  '(:ignore t                          :wk "Buffer")
-	"bb" '(switch-to-buffer                   :wk "Switch buffer")
-	"bd" '(kill-this-buffer                   :wk "Delete buffer")
-	"bp" '(previous-buffer                    :wk "Prev Buffer ")
-	"bn" '(next-buffer                        :wk "Next Buffer ")
-	"br" '(revert-buffer                      :wk "Reload Buffer")
-	"["  '(previous-buffer                    :wk "Prev Buffer ")
-	"]"  '(next-buffer                        :wk "Next Buffer ")
+(use-package general
+:after evil
+:config
+  ;; (general-evil-setup)
+  ;; set up 'SPC' as the global leader key
+  (general-create-definer bind-leader-to
+    :states '(normal insert visual emacs)
+    :keymaps 'override
+    :prefix "SPC" ;; set leader
+    :global-prefix "M-SPC") ;; access leader in insert mode
+  (bind-leader-to
+      "b"  '(:ignore t                          :wk "Buffer ")
+      "bb" '(switch-to-buffer                   :wk "Switch ")
+      "bd" '(kill-this-buffer                   :wk "Delete ")
+      "bp" '(previous-buffer                    :wk "Prev ")
+      "bn" '(next-buffer                        :wk "Next ")
+      "["  '(previous-buffer                    :wk "Prev Buffer ")
+      "]"  '(next-buffer                        :wk "Next Buffer ")
+      "br" '(revert-buffer                      :wk "Reload 󰑓")
 
-	"w"  '(:ignore t                          :wk "Window")
-	"wd" '(delete-window                      :wk "Delete window")
-	"wv" '(split-window-vertically            :wk "V Split 󰤼 ")
-	"wh" '(split-window-horizontally          :wk "H Split 󰤻 ")
-	"wh" '(evil-window-left                   :wk "window ")
-	"wj" '(evil-window-down                   :wk "window ")
-	"wk" '(evil-window-up                     :wk "window ")
-	"wl" '(evil-window-right                  :wk "window ")
+      "TAB" '(:ignore t                         :wk "Tab 󰓩")
+      "TABp" '(tab-previous                      :wk "Prev ")
+      "TABn" '(tab-next                          :wk "Next ")
+      "{"  '(tab-previous                       :wk "Prev Tab ")
+      "}"  '(tab-next                           :wk "Next Tab ")
 
-	"p"  '(:ignore t                          :wk "Package(Borg)")
-	"pa" '(borg-assimilate                    :wk "Assimilate")
-	"pc" '(borg-clone                         :wk "Clone")
-	"pr" '(borg-remove                        :wk "Remove")
+      "w"  '(:ignore t                          :wk "Window ")
+      "wd" '(delete-window                      :wk "Delete ")
+      "wv" '(split-window-vertically            :wk "Split V 󰤼")
+      "wh" '(split-window-horizontally          :wk "Split H 󰤻")
+      "wh" '(evil-window-left                   :wk "Focus H ")
+      "wj" '(evil-window-down                   :wk "Focus J ")
+      "wk" '(evil-window-up                     :wk "Focus K ")
+      "wl" '(evil-window-right                  :wk "Focus L ")
 
-	"t"  '(:ignore t                          :wk "Toggle")
+      "B"  '(:ignore t                          :wk "Borg 󰏗")
+      "Ba" '(borg-assimilate                    :wk "Assimilate 󱧕")
+      "Bb" '(borg-build                         :wk "Build 󱇝")
+      "Bc" '(borg-clone                         :wk "Clone ")
+      "Br" '(borg-remove                        :wk "Remove 󱧖")
 
-    )
+      "t"  '(:ignore t                          :wk "Toggle 󰨚")
+      "e"  '(dirvish-side                       :wk "Dirvish 󰙅")
+
+      "q"  '(:ignore t                          :wk "Quit  ")
+      ;"qe" '(save-buffers-kill-emacs             :wk "Quit Emacs ")
+      "qq" '(save-buffers-kill-terminal         :wk "Quit Emacs ")
   )
+)
 
 (use-package which-key
   :init
@@ -387,35 +398,35 @@
   (which-key-mode 1)
 )
 
-  (use-package org
-    :config
-    (set-face-attribute 'org-level-1 nil :family "Cantarell" :height 1.5 :bold t)
-    (set-face-attribute 'org-level-2 nil :family "Cantarell" :height 1.25 :bold t)
-    (set-face-attribute 'org-level-3 nil :family "Cantarell" :height 1.1 :bold t)
-    (set-face-attribute 'org-level-4 nil :family "Cantarell" :height 1.05 :bold t)
-    (set-face-attribute 'org-level-5 nil :family "Cantarell" :height 1.05 :bold t)
-    (set-face-attribute 'org-level-6 nil :family "Cantarell" :height 1.05 :bold t)
-    (set-face-attribute 'org-document-title nil :family "Cantarell" :height 1.75 :bold t)
-    (setq org-adapt-indentation t)
-    (setq org-indent-indentation-per-level 1)
-  )
+(use-package org
+  :config
+  (set-face-attribute 'org-level-1 nil :family "Cantarell" :height 1.5 :bold t)
+  (set-face-attribute 'org-level-2 nil :family "Cantarell" :height 1.25 :bold t)
+  (set-face-attribute 'org-level-3 nil :family "Cantarell" :height 1.1 :bold t)
+  (set-face-attribute 'org-level-4 nil :family "Cantarell" :height 1.05 :bold t)
+  (set-face-attribute 'org-level-5 nil :family "Cantarell" :height 1.05 :bold t)
+  (set-face-attribute 'org-level-6 nil :family "Cantarell" :height 1.05 :bold t)
+  (set-face-attribute 'org-document-title nil :family "Cantarell" :height 1.75 :bold t)
+  (setq org-adapt-indentation t)
+  (setq org-indent-indentation-per-level 1)
+)
 
-  (use-package org-superstar
-  :hook (org-mode . org-superstar-mode)
+(use-package org-superstar
+:hook (org-mode . org-superstar-mode)
+:init
+  (setq
+    ;;org-superstar-headline-bullets-list '("✖" "✚" "◉" "○" "▶")
+    org-superstar-special-todo-items t
+    org-ellipsis "  "
+  )
+)
+
+(use-package hl-todo
   :init
-    (setq
-      ;;org-superstar-headline-bullets-list '("✖" "✚" "◉" "○" "▶")
-      org-superstar-special-todo-items t
-      org-ellipsis "  "
-    )
-  )
+  (hl-todo-mode)
+)
 
-  (use-package hl-todo
-    :init
-    (hl-todo-mode)
-  )
-
-  (use-package org-fancy-priorities)
+(use-package org-fancy-priorities)
 
 (use-package org-appear
   :hook (org-mode . org-appear-mode)
@@ -613,7 +624,7 @@
   (global-lsp-bridge-mode)
 )
 
-  (use-package dirvish
+(use-package dirvish
     :init
     (dirvish-override-dired-mode)
     :custom
@@ -651,7 +662,17 @@
      ("M-t" . dirvish-layout-toggle)
      ("M-s" . dirvish-setup-menu)
      ("M-e" . dirvish-emerge-menu)
-     ("M-j" . dirvish-fd-jump)))
+     ("M-j" . dirvish-fd-jump))
+)
+
+(use-package diredfl
+  :hook
+  ((dired-mode . diredfl-mode)
+   ;; highlight parent and directory preview as well
+   (dirvish-directory-view-mode . diredfl-mode))
+  :config
+  (set-face-attribute 'diredfl-dir-name nil :bold t)
+)
 
 (use-package helpful
   :commands (helpful-callable helpful-variable helpful-command helpful-key)
@@ -679,6 +700,7 @@
   ;; (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
   ;; (eaf-bind-key take_photo "p" eaf-camera-keybinding)
   ;; (eaf-bind-key nil "M-q" eaf-browser-keybinding)
+  (setq confirm-kill-processes nil)
 ) ;; unbind, see more in the Wiki
 
 ;; (use-package eaf-browser)       ;;M-x eaf-file-browser-qrcode

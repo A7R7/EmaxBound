@@ -4,12 +4,12 @@
 [submodule "all-the-icons"]
 	path = lib/all-the-icons
 	url = https://github.com/domtronn/all-the-icons.el
-[submodule "all-the-icons-dired"]
-	path = lib/all-the-icons-dired
-	url = https://github.com/wyuenho/all-the-icons-dired
 [submodule "annalist"]
 	path = lib/annalist
 	url = https://github.com/noctuid/annalist.el
+[submodule "async"]
+	path = lib/async
+	url = https://github.com/jwiegley/emacs-async
 [submodule "auto-compile"]
 	path = lib/auto-compile
 	url = https://github.com/emacscollective/auto-compile
@@ -40,6 +40,9 @@
 [submodule "diminish"]
 	path = lib/diminish
 	url = https://github.com/myrjola/diminish.el
+[submodule "diredfl"]
+	path = lib/diredfl
+	url = https://github.com/purcell/diredfl
 [submodule "dirvish"]
 	path = lib/dirvish
 	url = https://github.com/alexluigit/dirvish
@@ -103,12 +106,18 @@
 [submodule "nerd-icons"]
 	path = lib/nerd-icons
 	url = https://github.com/rainstormstudio/nerd-icons.el
+[submodule "orderless"]
+	path = lib/orderless
+	url = https://github.com/oantolin/orderless
 [submodule "org-agenda-property"]
 	path = lib/org-agenda-property
 	url = https://github.com/Malabarba/org-agenda-property
 [submodule "org-appear"]
 	path = lib/org-appear
 	url = https://github.com/awth13/org-appear
+[submodule "org-download"]
+	path = lib/org-download
+	url = https://github.com/abo-abo/org-download
 [submodule "org-edna"]
 	path = lib/org-edna
 	url = git@github.com:emacsmirror/org-edna.git
@@ -160,6 +169,9 @@
 [submodule "vertico-posframe"]
 	path = lib/vertico-posframe
 	url = https://github.com/tumashu/vertico-posframe
+[submodule "vscode-icon"]
+	path = lib/vscode-icon
+	url = https://github.com/jojojames/vscode-icon-emacs
 [submodule "which-key"]
 	path = lib/which-key
 	url = https://github.com/justbur/emacs-which-key

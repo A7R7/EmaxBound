@@ -7,3 +7,6 @@
 	no-byte-compile = lisp/magit-libgit.el
 [submodule "sqlite3"]
 	build-step = make
+[submodule "dirvish"]
+  load-path = .
+  load-path = extensions
