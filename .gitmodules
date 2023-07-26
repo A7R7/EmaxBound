@@ -127,6 +127,9 @@
 [submodule "org-gtd"]
 	path = lib/org-gtd
 	url = https://github.com/Trevoke/org-gtd.el
+[submodule "org-preview-html"]
+	path = lib/org-preview-html
+	url = https://github.com/jakebox/org-preview-html
 [submodule "org-roam"]
 	path = lib/org-roam
 	url = https://github.com/org-roam/org-roam

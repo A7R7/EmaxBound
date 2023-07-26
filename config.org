@@ -7,12 +7,12 @@
 #+OPTIONS: toc:2
 :END:
 
-[[file:assets/EmacsBound.svg][EmacsBound.svg]]
+[[file:assets/EmacsBound.svg][https://raw.githubusercontent.com/A7R7/EmaxBound/dd5c8aafa61f4b058135f8d337739ec8f10f1b9c/assets/EmacsBound.svg]]
 
 [[https://img.shields.io/github/repo-size/A7R7/EmaxBound][https://img.shields.io/github/repo-size/A7R7/EmaxBound.svg?style=svg]]
 [[https://github.com/emacscollective/borg][https://img.shields.io/badge/package--manager-borg-00BB00.svg?style=svg]]
 [[https://www.gnu.org/software/emacs/][https://img.shields.io/badge/emacs--29.1-8A2BE2.svg?style=svg]]
-[[https://img.shields.io/badge/-Linux-blue?logo=Linux&style=flat&logoColor=white][https://img.shields.io/badge/-Linux-blue?logo=Linux&style=flat&logoColor=white.svg?style=svg]]
+[[https://img.shields.io/badge/-Linux-blue?logo=Linux&style=flat&logoColor=white][https://img.shields.io/badge/-Linux-fcc624?logo=linux&style=flat&logoColor=black.svg?style=svg]]
 
 #+TITLE: The Emacs Configuration Org File
 #+AUTHOR: A7R7
