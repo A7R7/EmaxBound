@@ -10,11 +10,10 @@
 #+TITLE: EmaxBound Configuration
 #+AUTHOR: A7R7
 
-#+HTML: <img alt="EmaxBound" src="assets/EmacsBound.svg" align="center" width="80%">
-
-#+HTML: <img alt="Emacs" src="https://img.shields.io/badge/emacs-29.1-8A2BF2?logo=gnuemacs&logoColor=white">
-#+HTML: <img alt="Package Manager" src="https://img.shields.io/badge/package_manager-borg-green">
-#+HTML: <img alt="Linux" src="https://img.shields.io/badge/linux-FCC624?logo=linux&logoColor=black">
+#+HTML: <img alt="EmaxBound" src="assets/EmacsBound.svg" width="100%">
+#+HTML: <a href="https://www.gnu.org/software/emacs/"><img alt="GNU Emacs" src="https://img.shields.io/badge/emacs-29.1-8A2BF2?logo=gnuemacs&logoColor=white"/></a>
+#+HTML: <a href="https://github.com/emacscollective/borg"><img alt="Package Manager" src="https://img.shields.io/badge/package_manager-borg-green"/></a>
+#+HTML: <a href="https://en.wikipedia.org/wiki/Linux"><img alt="Linux" src="https://img.shields.io/badge/linux-FCC624?logo=linux&logoColor=black"/></a>
 
 * Introduction
 ** How to deploy this config
