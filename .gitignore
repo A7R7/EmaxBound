@@ -4,7 +4,8 @@
 !lib/**
 !etc
 !etc/**
-
+!assets
+!assets/**
 !.gitmodules
 !.gitremotes
 !.gitignore
