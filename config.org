@@ -10,15 +10,11 @@
 #+TITLE: EmaxBound Configuration
 #+AUTHOR: A7R7
 
-#+begin_export html
-<div style="display: flex; justify-content: center;">
-    <img alt="EmaxBound" src="assets/EmacsBound.svg">
-</div>
+#+HTML: <img alt="EmaxBound" src="assets/EmacsBound.svg" align="center" width="80%">
 
-<img alt="Package Manager" src="https://img.shields.io/badge/package_manager-borg-green">
-<img alt="Emacs" src="https://img.shields.io/badge/emacs-29.1-8A2BF2?logo=gnuemacs&logoColor=white">
-<img alt="Linux" src="https://img.shields.io/badge/linux-FCC624?logo=linux&logoColor=black">
-#+end_export
+#+HTML: <img alt="Emacs" src="https://img.shields.io/badge/emacs-29.1-8A2BF2?logo=gnuemacs&logoColor=white">
+#+HTML: <img alt="Package Manager" src="https://img.shields.io/badge/package_manager-borg-green">
+#+HTML: <img alt="Linux" src="https://img.shields.io/badge/linux-FCC624?logo=linux&logoColor=black">
 
 * Introduction
 ** How to deploy this config
