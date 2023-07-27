@@ -54,12 +54,9 @@ Check [[https://emacsmirror.net/manual/borg/Bootstrapping-using-a-seed.html][Boo
 - =min (last time the config get's updated, last time I refered to the config)=
   
 * TODO
-** lsp-bridge
 ** completion
-** org-mode indent
 ** Zoxide path
 ** vertico, frame, 
-** helpful error
 * Early Init
 *NOTE*: codes under this heading is tangled to early-init.el
 
@@ -372,8 +369,7 @@ Magit is a VERY powerful git client, especially for emacs.
 ;; End:
 ;;; init.el ends here
 #+end_src
-* UI Configs
-** Basics
+* UI
 ** Fonts
 
 Defining the various fonts that Emacs will use.
@@ -510,7 +506,6 @@ This package implements hiding or abbreviation of the modeline displays (lighter
 
 #+begin_src elisp
 (use-package diminish)
-
 #+end_src
 
 ** Tabs
@@ -520,18 +515,19 @@ This package implements hiding or abbreviation of the modeline displays (lighter
       (emacs-startup . centaur-tabs-mode)
     :init
       (setq centaur-tabs-set-icons t
-	    centaur-tabs-set-modified-marker t
-	    centaur-tabs-modified-marker "M"
-	    centaur-tabs-cycle-scope 'tabs
-	    centaur-tabs-set-close-button nil
-	    centaur-tabs-enable-ido-completion nil)
+            centaur-tabs-set-modified-marker t
+            centaur-tabs-modified-marker "M"
+            centaur-tabs-cycle-scope 'tabs
+            centaur-tabs-set-bar 'over
+            centaur-tabs-enable-ido-completion nil
+      )
     :config
       (centaur-tabs-mode t)
       ;; (centaur-tabs-headline-match)
-      (centaur-tabs-group-by-projectile-project)
+      ;; (centaur-tabs-group-by-projectile-project)
   )
 #+end_src
-* Kbd Configs
+* Kbd 
 ** Evil
 *** Evil mode
 The famous evil that make you look evil.
@@ -542,7 +538,7 @@ The famous evil that make you look evil.
       (setq evil-want-keybinding nil)
       (setq evil-vsplit-window-right t)
       (setq evil-split-window-below t)
-      (setq evil-want-minibuffer t) ;; use evil in minibuffer!
+      ;(setq evil-want-minibuffer t) ;; use evil in minibuffer
     :config
       (evil-mode 1)
         ;; Use visual line motions even outside of visual-line-mode buffers
@@ -550,6 +546,7 @@ The famous evil that make you look evil.
       (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
       (evil-set-initial-state 'messages-buffer-mode 'normal)
       (evil-set-initial-state 'dashboard-mode 'normal)
+      (evil-define-key 'normal 'foo-mode "e" 'baz)
   )
 #+end_src
 
@@ -557,19 +554,30 @@ The famous evil that make you look evil.
 [[https://github.com/emacs-evil/evil-collection][evil-collection]] automatically configures various Emacs modes with Vi-like keybindings.
 
 #+begin_src elisp
-(use-package evil-collection
-  ;; :demand t
-  :after evil
-  :config
-  ;(setq evil-collection-mode-list '(dashboard dired ibuffer))
-  (evil-collection-init))
+  (use-package evil-collection
+    ;; :demand t
+    :after evil
+    :custom (evil-collection-setup-minibuffer t)
+    :config
+    ;(setq evil-collection-mode-list '(dashboard dired ibuffer))
+    (evil-collection-init))
 
-(use-package evil-tutor
-  :demand t)
+  (use-package evil-tutor
+    :demand t)
 
-(use-package emacs
-  :config (setq ring-bell-function #'ignore)
-)
+  (use-package emacs
+    :config (setq ring-bell-function #'ignore)
+  )
+#+end_src
+*** Undo-tree
+#+begin_src elisp
+  (use-package undo-tree
+    :after evil
+    :diminish
+    :config
+    (evil-set-undo-system 'undo-tree)
+    (global-undo-tree-mode 1)
+  )
 #+end_src
 ** General
 [[https://github.com/noctuid/general.el][General]] provides a more convenient method for binding keys in emacs
@@ -585,68 +593,77 @@ The famous evil that make you look evil.
   :config
     ;; (general-evil-setup)
     ;; set up 'SPC' as the global leader key
-    (general-create-definer bind-leader-to
+    (general-create-definer config/bind-leader-to
       :states '(normal insert visual emacs)
       :keymaps 'override
       :prefix "SPC" ;; set leader
       :global-prefix "M-SPC") ;; access leader in insert mode
-    (bind-leader-to
-	"b"  '(:ignore t                          :wk "Buffer ")
-	"bb" '(switch-to-buffer                   :wk "Switch ")
-	"bd" '(kill-this-buffer                   :wk "Delete ")
-	"bp" '(previous-buffer                    :wk "Prev ")
-	"bn" '(next-buffer                        :wk "Next ")
-	"["  '(previous-buffer                    :wk "Prev Buffer ")
-	"]"  '(next-buffer                        :wk "Next Buffer ")
-	"br" '(revert-buffer                      :wk "Reload 󰑓")
+    (config/bind-leader-to
 
-        "TAB" '(:ignore t                         :wk "Tab 󰓩")
-        "TABp" '(tab-previous                      :wk "Prev ")
-        "TABn" '(tab-next                          :wk "Next ")
-	"{"  '(tab-previous                       :wk "Prev Tab ")
-	"}"  '(tab-next                           :wk "Next Tab ")
+	"b"       '(:ignore t                      :wk "Buffer ")
+	"bb"      '(switch-to-buffer               :wk "Switch ")
+	"bd"      '(kill-this-buffer               :wk "Delete ")
+	"bp"      '(previous-buffer                :wk "Prev ")
+	"bn"      '(next-buffer                    :wk "Next ")
+	"br"      '(revert-buffer                  :wk "Reload 󰑓")
+	"["       '(previous-buffer                :wk "Prev Buffer ")
+	"]"       '(next-buffer                    :wk "Next Buffer ")
 
-	"w"  '(:ignore t                          :wk "Window ")
-	"wd" '(delete-window                      :wk "Delete ")
-	"wv" '(split-window-vertically            :wk "Split V 󰤼")
-	"wh" '(split-window-horizontally          :wk "Split H 󰤻")
-	"wh" '(evil-window-left                   :wk "Focus H ")
-	"wj" '(evil-window-down                   :wk "Focus J ")
-	"wk" '(evil-window-up                     :wk "Focus K ")
-	"wl" '(evil-window-right                  :wk "Focus L ")
+	"TAB"     '(:ignore t                      :wk "Tab 󰓩")
+	"TAB TAB" '(tab-new                        :wk "Tab New 󰝜")
+	"TAB d"   '(tab-close                      :wk "Tab Del 󰭌")
+	"TAB p"   '(tab-previous                   :wk "Prev ")
+	"TAB n"   '(tab-next                       :wk "Next ")
+	"{"       '(tab-previous                   :wk "Prev Tab ")
+	"}"       '(tab-next                       :wk "Next Tab ")
 
-	"B"  '(:ignore t                          :wk "Borg 󰏗")
-	"Ba" '(borg-assimilate                    :wk "Assimilate 󱧕")
-	"Bb" '(borg-build                         :wk "Build 󱇝")
-	"Bc" '(borg-clone                         :wk "Clone ")
-	"Br" '(borg-remove                        :wk "Remove 󱧖")
-
-	"t"  '(:ignore t                          :wk "Toggle 󰨚")
-	"e"  '(dirvish-side                       :wk "Dirvish 󰙅")
-
-	"q"  '(:ignore t                          :wk "Quit  ")
-	;"qe" '(save-buffers-kill-emacs             :wk "Quit Emacs ")
-	"qq" '(save-buffers-kill-terminal         :wk "Quit Emacs ")
+	"w"       '(:ignore t                      :wk "Window ")
+	"wd"      '(delete-window                  :wk "Delete ")
+	"wv"      '(split-window-vertically        :wk "Split V 󰤼")
+	"wh"      '(split-window-horizontally      :wk "Split H 󰤻")
+	"wh"      '(evil-window-left               :wk "Focus H ")
+	"wj"      '(evil-window-down               :wk "Focus J ")
+	"wk"      '(evil-window-up                 :wk "Focus K ")
+	"wl"      '(evil-window-right              :wk "Focus L ")
+	          
+	"B"       '(:ignore t                      :wk "Borg 󰏗")
+	"Ba"      '(borg-assimilate                :wk "Assimilate 󱧕")
+	"Bb"      '(borg-build                     :wk "Build 󱇝")
+	"Bc"      '(borg-clone                     :wk "Clone ")
+	"Br"      '(borg-remove                    :wk "Remove 󱧖")
+	          
+	"t"       '(:ignore t                      :wk "Toggle 󰨚")
+	"e"       '(dirvish-side                   :wk "Dirvish 󰙅")
+	          
+	"q"       '(:ignore t                      :wk "Quit  ")
+	;"qe"      '(save-buffers-kill-emacs         :wk "Quit Emacs ")
+	"qq"      '(save-buffers-kill-terminal     :wk "Quit Emacs ")
     )
   )
 #+end_src
 
-* The Org of Emacs
+** Hydra
+* Org
 ** User Interface
-*** Headings & Levels & arrangements
+*** Headings & Levels
+**** Font size
+Change the font size of different org-levels.
 #+begin_src elisp
   (use-package org
     :config
+    (set-face-attribute 'org-document-title nil :family "Cantarell" :height 1.75 :bold t)
     (set-face-attribute 'org-level-1 nil :family "Cantarell" :height 1.5 :bold t)
     (set-face-attribute 'org-level-2 nil :family "Cantarell" :height 1.25 :bold t)
     (set-face-attribute 'org-level-3 nil :family "Cantarell" :height 1.1 :bold t)
     (set-face-attribute 'org-level-4 nil :family "Cantarell" :height 1.05 :bold t)
     (set-face-attribute 'org-level-5 nil :family "Cantarell" :height 1.05 :bold t)
     (set-face-attribute 'org-level-6 nil :family "Cantarell" :height 1.05 :bold t)
-    (set-face-attribute 'org-document-title nil :family "Cantarell" :height 1.75 :bold t)
   )
 #+end_src
-*** Superstar
+
+**** Nicer Heading Bullets
+
+[[https://github.com/integral-dw/org-superstar-mode][Org-superstar]] replaces the asterisk before every org-level with ascii symbols.
 #+begin_src elisp
   (use-package org-superstar
   :hook (org-mode . org-superstar-mode)
@@ -655,6 +672,22 @@ The famous evil that make you look evil.
       ;;org-superstar-headline-bullets-list '("✖" "✚" "◉" "○" "▶")
       org-superstar-special-todo-items t
       org-ellipsis "  "
+    )
+  )
+#+end_src
+*** Text arrangement
+Use [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]] to center =org-mode= buffers for a more pleasing writing experience as it centers the contents of the buffer horizontally to seem more like you are editing a document.
+Use visual-line-mode to wrap text.
+Use org-indent-mode to set different indenting for different levels.
+#+begin_src elisp
+  (add-hook 'org-mode-hook
+    (defun config/org-mode-text-arrangement ()
+      (setq visual-fill-column-width 100
+	    visual-fill-column-center-text t)
+      (visual-fill-column-mode 1)
+      (org-indent-mode)
+      (visual-line-mode 1)
+;      (variable-pitch-mode 1)
     )
   )
 #+end_src
@@ -681,8 +714,6 @@ Automatically disaply emphasis markers and links when the cursor is on them.
 )
 #+end_src
 
-*** Visual-fill-column
-https://codeberg.org/joostkremers/visual-fill-column
 ** Kbd-configs
 *** Evil-org
 #+begin_src elisp
@@ -938,7 +969,8 @@ https://codeberg.org/joostkremers/visual-fill-column
 [[https://github.com/tumashu/vertico-posframe][Vertico-posframe]] is an vertico extension, which lets vertico use posframe to show its candidate menu.
 ** Copilot
 https://github.com/zerolfx/copilot.el
-* elisp
+* Code
+** elisp
 - [[doom-package:buttercup]]
 - [[doom-package:elisp-def]]
 - [[doom-package:elisp-demos]]
@@ -1092,10 +1124,12 @@ It is very useful for figuring out how things work in Emacs.
 #+end_src
 
 #+begin_src elisp
-;; (use-package eaf-browser)       ;;M-x eaf-file-browser-qrcode
-(use-package eaf-git)       ;;M-x eaf-file-browser-qrcode
-(use-package eaf-file-manager)  ;;M-x eaf-open-in-file-manager
-(use-package eaf-pdf-viewer)
+  ;; (use-package eaf-browser)       ;;M-x eaf-file-browser-qrcode
+  (use-package eaf-git)       ;;M-x eaf-file-browser-qrcode
+  (use-package eaf-file-manager)  ;;M-x eaf-open-in-file-manager
+  (use-package eaf-pdf-viewer)
+  (use-package eaf-2048)
 #+end_src
+
 
 

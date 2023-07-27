@@ -16,6 +16,12 @@
 [submodule "auto-compile"]
 	path = lib/auto-compile
 	url = https://github.com/emacscollective/auto-compile
+[submodule "beacon"]
+	path = lib/beacon
+	url = https://github.com/Malabarba/beacon
+[submodule "blink-search"]
+	path = lib/blink-search
+	url = https://github.com/manateelazycat/blink-search.git
 [submodule "borg"]
 	path = lib/borg
 	url = https://github.com/emacscollective/borg
@@ -97,6 +103,9 @@
 [submodule "hl-todo"]
 	path = lib/hl-todo
 	url = https://github.com/tarsius/hl-todo
+[submodule "hydra"]
+	path = lib/hydra
+	url = https://github.com/abo-abo/hydra
 [submodule "llama"]
 	path = lib/llama
 	url = git@github.com:emacsmirror/llama.git
@@ -154,6 +163,9 @@
 [submodule "projectile"]
 	path = lib/projectile
 	url = https://github.com/bbatsov/projectile
+[submodule "queue"]
+	path = lib/queue
+	url = git@github.com:emacsmirror/queue.git
 [submodule "s"]
 	path = lib/s
 	url = https://github.com/magnars/s.el
@@ -172,6 +184,9 @@
 [submodule "treepy"]
 	path = lib/treepy
 	url = https://github.com/volrath/treepy.el
+[submodule "undo-tree"]
+	path = lib/undo-tree
+	url = https://gitlab.com/tsc25/undo-tree
 [submodule "use-package"]
 	path = lib/use-package
 	url = git@github.com:jwiegley/use-package.git
@@ -187,6 +202,9 @@
 [submodule "vscode-icon"]
 	path = lib/vscode-icon
 	url = https://github.com/jojojames/vscode-icon-emacs
+[submodule "vundo"]
+	path = lib/vundo
+	url = https://github.com/casouri/vundo
 [submodule "which-key"]
 	path = lib/which-key
 	url = https://github.com/justbur/emacs-which-key

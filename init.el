@@ -284,15 +284,16 @@
     (emacs-startup . centaur-tabs-mode)
   :init
     (setq centaur-tabs-set-icons t
-	  centaur-tabs-set-modified-marker t
-	  centaur-tabs-modified-marker "M"
-	  centaur-tabs-cycle-scope 'tabs
-	  centaur-tabs-set-close-button nil
-	  centaur-tabs-enable-ido-completion nil)
+          centaur-tabs-set-modified-marker t
+          centaur-tabs-modified-marker "M"
+          centaur-tabs-cycle-scope 'tabs
+          centaur-tabs-set-bar 'over
+          centaur-tabs-enable-ido-completion nil
+    )
   :config
     (centaur-tabs-mode t)
     ;; (centaur-tabs-headline-match)
-    (centaur-tabs-group-by-projectile-project)
+    ;; (centaur-tabs-group-by-projectile-project)
 )
 
 (use-package evil
@@ -301,7 +302,7 @@
     (setq evil-want-keybinding nil)
     (setq evil-vsplit-window-right t)
     (setq evil-split-window-below t)
-    (setq evil-want-minibuffer t) ;; use evil in minibuffer!
+    ;(setq evil-want-minibuffer t) ;; use evil in minibuffer
   :config
     (evil-mode 1)
       ;; Use visual line motions even outside of visual-line-mode buffers
@@ -309,11 +310,13 @@
     (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
     (evil-set-initial-state 'messages-buffer-mode 'normal)
     (evil-set-initial-state 'dashboard-mode 'normal)
+    (evil-define-key 'normal 'foo-mode "e" 'baz)
 )
 
 (use-package evil-collection
   ;; :demand t
   :after evil
+  :custom (evil-collection-setup-minibuffer t)
   :config
   ;(setq evil-collection-mode-list '(dashboard dired ibuffer))
   (evil-collection-init))
@@ -325,6 +328,14 @@
   :config (setq ring-bell-function #'ignore)
 )
 
+(use-package undo-tree
+  :after evil
+  :diminish
+  :config
+  (evil-set-undo-system 'undo-tree)
+  (global-undo-tree-mode 1)
+)
+
 ;; Make ESC quit prompts
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
@@ -333,61 +344,63 @@
 :config
   ;; (general-evil-setup)
   ;; set up 'SPC' as the global leader key
-  (general-create-definer bind-leader-to
+  (general-create-definer config/bind-leader-to
     :states '(normal insert visual emacs)
     :keymaps 'override
     :prefix "SPC" ;; set leader
     :global-prefix "M-SPC") ;; access leader in insert mode
-  (bind-leader-to
-      "b"  '(:ignore t                          :wk "Buffer ")
-      "bb" '(switch-to-buffer                   :wk "Switch ")
-      "bd" '(kill-this-buffer                   :wk "Delete ")
-      "bp" '(previous-buffer                    :wk "Prev ")
-      "bn" '(next-buffer                        :wk "Next ")
-      "["  '(previous-buffer                    :wk "Prev Buffer ")
-      "]"  '(next-buffer                        :wk "Next Buffer ")
-      "br" '(revert-buffer                      :wk "Reload 󰑓")
+  (config/bind-leader-to
 
-      "TAB" '(:ignore t                         :wk "Tab 󰓩")
-      "TABp" '(tab-previous                      :wk "Prev ")
-      "TABn" '(tab-next                          :wk "Next ")
-      "{"  '(tab-previous                       :wk "Prev Tab ")
-      "}"  '(tab-next                           :wk "Next Tab ")
+      "b"       '(:ignore t                      :wk "Buffer ")
+      "bb"      '(switch-to-buffer               :wk "Switch ")
+      "bd"      '(kill-this-buffer               :wk "Delete ")
+      "bp"      '(previous-buffer                :wk "Prev ")
+      "bn"      '(next-buffer                    :wk "Next ")
+      "br"      '(revert-buffer                  :wk "Reload 󰑓")
+      "["       '(previous-buffer                :wk "Prev Buffer ")
+      "]"       '(next-buffer                    :wk "Next Buffer ")
 
-      "w"  '(:ignore t                          :wk "Window ")
-      "wd" '(delete-window                      :wk "Delete ")
-      "wv" '(split-window-vertically            :wk "Split V 󰤼")
-      "wh" '(split-window-horizontally          :wk "Split H 󰤻")
-      "wh" '(evil-window-left                   :wk "Focus H ")
-      "wj" '(evil-window-down                   :wk "Focus J ")
-      "wk" '(evil-window-up                     :wk "Focus K ")
-      "wl" '(evil-window-right                  :wk "Focus L ")
+      "TAB"     '(:ignore t                      :wk "Tab 󰓩")
+      "TAB TAB" '(tab-new                        :wk "Tab New 󰝜")
+      "TAB d"   '(tab-close                      :wk "Tab Del 󰭌")
+      "TAB p"   '(tab-previous                   :wk "Prev ")
+      "TAB n"   '(tab-next                       :wk "Next ")
+      "{"       '(tab-previous                   :wk "Prev Tab ")
+      "}"       '(tab-next                       :wk "Next Tab ")
 
-      "B"  '(:ignore t                          :wk "Borg 󰏗")
-      "Ba" '(borg-assimilate                    :wk "Assimilate 󱧕")
-      "Bb" '(borg-build                         :wk "Build 󱇝")
-      "Bc" '(borg-clone                         :wk "Clone ")
-      "Br" '(borg-remove                        :wk "Remove 󱧖")
+      "w"       '(:ignore t                      :wk "Window ")
+      "wd"      '(delete-window                  :wk "Delete ")
+      "wv"      '(split-window-vertically        :wk "Split V 󰤼")
+      "wh"      '(split-window-horizontally      :wk "Split H 󰤻")
+      "wh"      '(evil-window-left               :wk "Focus H ")
+      "wj"      '(evil-window-down               :wk "Focus J ")
+      "wk"      '(evil-window-up                 :wk "Focus K ")
+      "wl"      '(evil-window-right              :wk "Focus L ")
 
-      "t"  '(:ignore t                          :wk "Toggle 󰨚")
-      "e"  '(dirvish-side                       :wk "Dirvish 󰙅")
+      "B"       '(:ignore t                      :wk "Borg 󰏗")
+      "Ba"      '(borg-assimilate                :wk "Assimilate 󱧕")
+      "Bb"      '(borg-build                     :wk "Build 󱇝")
+      "Bc"      '(borg-clone                     :wk "Clone ")
+      "Br"      '(borg-remove                    :wk "Remove 󱧖")
 
-      "q"  '(:ignore t                          :wk "Quit  ")
-      ;"qe" '(save-buffers-kill-emacs             :wk "Quit Emacs ")
-      "qq" '(save-buffers-kill-terminal         :wk "Quit Emacs ")
+      "t"       '(:ignore t                      :wk "Toggle 󰨚")
+      "e"       '(dirvish-side                   :wk "Dirvish 󰙅")
+
+      "q"       '(:ignore t                      :wk "Quit  ")
+      ;"qe"      '(save-buffers-kill-emacs         :wk "Quit Emacs ")
+      "qq"      '(save-buffers-kill-terminal     :wk "Quit Emacs ")
   )
 )
 
 (use-package org
   :config
+  (set-face-attribute 'org-document-title nil :family "Cantarell" :height 1.75 :bold t)
   (set-face-attribute 'org-level-1 nil :family "Cantarell" :height 1.5 :bold t)
   (set-face-attribute 'org-level-2 nil :family "Cantarell" :height 1.25 :bold t)
   (set-face-attribute 'org-level-3 nil :family "Cantarell" :height 1.1 :bold t)
   (set-face-attribute 'org-level-4 nil :family "Cantarell" :height 1.05 :bold t)
   (set-face-attribute 'org-level-5 nil :family "Cantarell" :height 1.05 :bold t)
   (set-face-attribute 'org-level-6 nil :family "Cantarell" :height 1.05 :bold t)
-  (set-face-attribute 'org-document-title nil :family "Cantarell" :height 1.75 :bold t)
-  (org-indent-mode)
 )
 
 (use-package org-superstar
@@ -399,6 +412,17 @@
     org-ellipsis "  "
   )
 )
+
+(add-hook 'org-mode-hook
+    (defun config/org-mode-text-arrangement ()
+      (setq visual-fill-column-width 100
+	    visual-fill-column-center-text t)
+      (visual-fill-column-mode 1)
+      (org-indent-mode)
+      (visual-line-mode 1)
+;      (variable-pitch-mode 1)
+    )
+  )
 
 (use-package hl-todo
   :init
@@ -714,3 +738,4 @@
 (use-package eaf-git)       ;;M-x eaf-file-browser-qrcode
 (use-package eaf-file-manager)  ;;M-x eaf-open-in-file-manager
 (use-package eaf-pdf-viewer)
+(use-package eaf-2048)
