@@ -28,9 +28,6 @@
 [submodule "centaur-tabs"]
 	path = lib/centaur-tabs
 	url = https://github.com/ema2159/centaur-tabs
-[submodule "centered-window"]
-	path = lib/centered-window
-	url = https://github.com/anler/centered-window-mode
 [submodule "closql"]
 	path = lib/closql
 	url = https://github.com/magit/closql

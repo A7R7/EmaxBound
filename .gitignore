@@ -6,6 +6,8 @@
 !etc/**
 !assets
 !assets/**
+!games
+!games/**
 !.gitmodules
 !.gitremotes
 !.gitignore

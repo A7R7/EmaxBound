@@ -46,14 +46,16 @@ Check [[https://emacsmirror.net/manual/borg/Bootstrapping-using-a-seed.html][Boo
   + Write config codes into this org file, then run [[elisp:org-babel-tangle][M-x org-babel-tangle]] so that emacs writes the codes into the corresponding file.
 
 ** References
+-  [[https://github.com/lccambiaghi/vanilla-emacs][Luca's vanilla-emacs]] (2023) very detailed org config file.
 -  [[https://gitlab.com/dwt1/configuring-emacs][DistroTube's Configuring Emacs]] (2023)
 -  [[https://github.com/seagle0128/.emacs.d][seagle0128's Centaur Emacs]] (2023)
 -  [[https://github.com/daviwil/emacs-from-scratch][Daviwell's Emacs from scratch]] (2021)
--  [[https://github.com/lccambiaghi/vanilla-emacs][Luca's vanilla-emacs]] (2023)
 *NOTE*: the year number after each line equals to
 - =min (last time the config get's updated, last time I refered to the config)=
   
-* TODO
+* TODOS
+** Syntax highlighting
+** Indenting
 ** completion
 ** Zoxide path
 ** vertico, frame, 
@@ -527,6 +529,20 @@ This package implements hiding or abbreviation of the modeline displays (lighter
       ;; (centaur-tabs-group-by-projectile-project)
   )
 #+end_src
+** Window center 
+[[https://github.com/joostkremers/visual-fill-column][visual-fill-column]] 
+#+begin_src elisp
+  (use-package visual-fill-column
+    :config
+    (defun config/window-center (width)
+      (interactive)
+      (setq visual-fill-column-width width
+            visual-fill-column-center-text t)
+      (visual-fill-column-mode 1)
+      (visual-line-mode 1)
+    )
+  )
+#+end_src
 * Kbd 
 ** Evil
 *** Evil mode
@@ -603,19 +619,19 @@ The famous evil that make you look evil.
 	"b"       '(:ignore t                      :wk "Buffer ")
 	"bb"      '(switch-to-buffer               :wk "Switch ")
 	"bd"      '(kill-this-buffer               :wk "Delete ")
+	"br"      '(revert-buffer                  :wk "Reload 󰑓")
 	"bp"      '(previous-buffer                :wk "Prev ")
 	"bn"      '(next-buffer                    :wk "Next ")
-	"br"      '(revert-buffer                  :wk "Reload 󰑓")
-	"["       '(previous-buffer                :wk "Prev Buffer ")
-	"]"       '(next-buffer                    :wk "Next Buffer ")
+	"["       '(centaur-tabs-backward          :wk "Prev Buffer ")
+	"]"       '(centaur-tabs-forward           :wk "Next Buffer ")
 
 	"TAB"     '(:ignore t                      :wk "Tab 󰓩")
 	"TAB TAB" '(tab-new                        :wk "Tab New 󰝜")
 	"TAB d"   '(tab-close                      :wk "Tab Del 󰭌")
-	"TAB p"   '(tab-previous                   :wk "Prev ")
-	"TAB n"   '(tab-next                       :wk "Next ")
-	"{"       '(tab-previous                   :wk "Prev Tab ")
-	"}"       '(tab-next                       :wk "Next Tab ")
+	"TAB p"   '(centaur-tabs-backward-tab      :wk "Prev ")
+	"TAB n"   '(centaur-tabs-forward-tab       :wk "Next ")
+	"{"       '(centaur-tabs-backward-tab      :wk "Prev Tab ")
+	"}"       '(centaur-tabs-forward-tab       :wk "Next Tab ")
 
 	"w"       '(:ignore t                      :wk "Window ")
 	"wd"      '(delete-window                  :wk "Delete ")
@@ -680,16 +696,13 @@ Use [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]] t
 Use visual-line-mode to wrap text.
 Use org-indent-mode to set different indenting for different levels.
 #+begin_src elisp
-  (add-hook 'org-mode-hook
-    (defun config/org-mode-text-arrangement ()
-      (setq visual-fill-column-width 100
-	    visual-fill-column-center-text t)
-      (visual-fill-column-mode 1)
-      (org-indent-mode)
-      (visual-line-mode 1)
-;      (variable-pitch-mode 1)
+    (add-hook 'org-mode-hook
+      (defun config/org-mode-text-arrangement ()
+        (config/window-center 100)
+        (org-indent-mode)
+  ;      (variable-pitch-mode 1)
+      )
     )
-  )
 #+end_src
 *** Highlight TODO
 #+begin_src elisp
@@ -1103,7 +1116,24 @@ It is very useful for figuring out how things work in Emacs.
 (use-package shrink-path :demand t)
 #+end_src
 
-* EAF
+* Games
+** Tetris
+#+begin_src elisp
+  (add-hook 'tetris-mode-hook
+    (defun config/tetris-center ()
+      (config/window-center 76)
+    )
+  )
+#+end_src
+** 2048
+#+begin_src elisp
+  (add-hook '2048-mode-hook
+    (defun config/2048-center ()
+      (config/window-center 35)
+    )
+  )
+#+end_src
+* Eaf
 [[https://github.com/emacs-eaf/emacs-application-framework][EAF]] is an extensible framework that revolutionizes the graphical capabilities of Emacs.
 #+begin_src elisp
 (use-package eaf

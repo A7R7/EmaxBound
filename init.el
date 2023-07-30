@@ -296,6 +296,17 @@
     ;; (centaur-tabs-group-by-projectile-project)
 )
 
+(use-package visual-fill-column
+  :config
+  (defun config/window-center (width)
+    (interactive)
+    (setq visual-fill-column-width width
+          visual-fill-column-center-text t)
+    (visual-fill-column-mode 1)
+    (visual-line-mode 1)
+  )
+)
+
 (use-package evil
   :init
     (setq evil-want-integration t) ;; t by default
@@ -354,19 +365,19 @@
       "b"       '(:ignore t                      :wk "Buffer ")
       "bb"      '(switch-to-buffer               :wk "Switch ")
       "bd"      '(kill-this-buffer               :wk "Delete ")
+      "br"      '(revert-buffer                  :wk "Reload 󰑓")
       "bp"      '(previous-buffer                :wk "Prev ")
       "bn"      '(next-buffer                    :wk "Next ")
-      "br"      '(revert-buffer                  :wk "Reload 󰑓")
-      "["       '(previous-buffer                :wk "Prev Buffer ")
-      "]"       '(next-buffer                    :wk "Next Buffer ")
+      "["       '(centaur-tabs-backward          :wk "Prev Buffer ")
+      "]"       '(centaur-tabs-forward           :wk "Next Buffer ")
 
       "TAB"     '(:ignore t                      :wk "Tab 󰓩")
       "TAB TAB" '(tab-new                        :wk "Tab New 󰝜")
       "TAB d"   '(tab-close                      :wk "Tab Del 󰭌")
-      "TAB p"   '(tab-previous                   :wk "Prev ")
-      "TAB n"   '(tab-next                       :wk "Next ")
-      "{"       '(tab-previous                   :wk "Prev Tab ")
-      "}"       '(tab-next                       :wk "Next Tab ")
+      "TAB p"   '(centaur-tabs-backward-tab      :wk "Prev ")
+      "TAB n"   '(centaur-tabs-forward-tab       :wk "Next ")
+      "{"       '(centaur-tabs-backward-tab      :wk "Prev Tab ")
+      "}"       '(centaur-tabs-forward-tab       :wk "Next Tab ")
 
       "w"       '(:ignore t                      :wk "Window ")
       "wd"      '(delete-window                  :wk "Delete ")
@@ -415,11 +426,8 @@
 
 (add-hook 'org-mode-hook
     (defun config/org-mode-text-arrangement ()
-      (setq visual-fill-column-width 100
-	    visual-fill-column-center-text t)
-      (visual-fill-column-mode 1)
+      (config/window-center 100)
       (org-indent-mode)
-      (visual-line-mode 1)
 ;      (variable-pitch-mode 1)
     )
   )
@@ -717,6 +725,18 @@
 )
 
 (use-package shrink-path :demand t)
+
+(add-hook 'tetris-mode-hook
+  (defun config/tetris-center ()
+    (config/window-center 76)
+  )
+)
+
+(add-hook '2048-mode-hook
+  (defun config/2048-center ()
+    (config/window-center 35)
+  )
+)
 
 (use-package eaf
 ;; :load-path "~/.emacs.d/site-lisp/emacs-application-framework"
