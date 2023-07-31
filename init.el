@@ -35,9 +35,10 @@
 ;  ) ; Catch 'C-g' (quit) signal and end the loop
 )
 
-(eval-and-compile ; `use-package'
-  (require  'use-package)
-  (setq use-package-verbose t))
+(setq use-package-verbose t)
+  ;(eval-and-compile ; `use-package'
+  ;  (require  'use-package)
+  ;  (setq use-package-verbose t))
 
 (use-package dash
   :config (global-dash-fontify-mode))
@@ -355,6 +356,8 @@
 :config
   ;; (general-evil-setup)
   ;; set up 'SPC' as the global leader key
+
+  (general-evil-setup t)
   (general-create-definer config/bind-leader-to
     :states '(normal insert visual emacs)
     :keymaps 'override
@@ -460,8 +463,11 @@
 
 (use-package vertico
   :init
-  (vertico-mode)
-
+  (vertico-mode 1)
+  (setq completion-styles '(orderless))
+  (setq orderless-component-separator #'orderless-escapable-split-on-space)
+  (setq orderless-matching-styles
+      '(orderless-initialism orderless-prefixes orderless-regexp))
   ;; Different scroll margin
   ;; (setq vertico-scroll-margin 0)
 
@@ -476,36 +482,36 @@
   )
 
 ;; Persist history over Emacs restarts. Vertico sorts by history position.
-(use-package savehist
-  :init
-  (savehist-mode))
+  (use-package savehist
+      :init
+      (savehist-mode))
 
 ;; A few more useful configurations...
-(use-package emacs
-  :init
-  ;; Add prompt indicator to `completing-read-multiple'.
-  ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
-  (defun crm-indicator (args)
-    (cons (format "[CRM%s] %s"
-                  (replace-regexp-in-string
-                   "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
-                   crm-separator)
-                  (car args))
-          (cdr args)))
-  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+  (use-package emacs
+      :init
+      ;; Add prompt indicator to `completing-read-multiple'.
+      ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
+      (defun crm-indicator (args)
+      (cons (format "[CRM%s] %s"
+                      (replace-regexp-in-string
+                      "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+                      crm-separator)
+                      (car args))
+              (cdr args)))
+      (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
 
-  ;; Do not allow the cursor in the minibuffer prompt
-  (setq minibuffer-prompt-properties
-        '(read-only t cursor-intangible t face minibuffer-prompt))
-  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+      ;; Do not allow the cursor in the minibuffer prompt
+      (setq minibuffer-prompt-properties
+          '(read-only t cursor-intangible t face minibuffer-prompt))
+      (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
 
-  ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
-  ;; Vertico commands are hidden in normal buffers.
-  ;; (setq read-extended-command-predicate
-  ;;       #'command-completion-default-include-p)
+      ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
+      ;; Vertico commands are hidden in normal buffers.
+      ;; (setq read-extended-command-predicate
+      ;;       #'command-completion-default-include-p)
 
-  ;; Enable recursive minibuffers
-  (setq enable-recursive-minibuffers t))
+      ;; Enable recursive minibuffers
+      (setq enable-recursive-minibuffers t))
 
 (use-package consult
   ;; Replace bindings. Lazily loaded due by `use-package'.
@@ -636,45 +642,67 @@
 )
 
 (use-package dirvish
-    :init
-    (dirvish-override-dired-mode)
-    :custom
-    (dirvish-quick-access-entries ; It's a custom option, `setq' won't work
-     '(("h" "~/"                          "Home")
-       ("d" "~/Downloads/"                "Downloads")
-       ("m" "/mnt/"                       "Drives")
-       ("t" "~/.local/share/Trash/files/" "TrashCan")))
-    :config
-    ;; (dirvish-peek-mode) ; Preview files in minibuffer
-    ;; (dirvish-side-follow-mode) ; similar to `treemacs-follow-mode'
-    (setq dirvish-mode-line-format
-	  '(:left (sort symlink) :right (omit yank index)))
-    (setq dirvish-attributes
-	  '(all-the-icons file-time file-size collapse subtree-state vc-state git-msg))
-    (setq delete-by-moving-to-trash t)
-    (setq dired-listing-switches
-	  "-l --almost-all --human-readable --group-directories-first --no-group")
-    :bind ; Bind `dirvish|dirvish-side|dirvish-dwim' as you see fit
-    (("C-c f" . dirvish-fd)
-     :map dirvish-mode-map ; Dirvish inherits `dired-mode-map'
-     ("a"   . dirvish-quick-access)
-     ("f"   . dirvish-file-info-menu)
-     ("y"   . dirvish-yank-menu)
-     ("N"   . dirvish-narrow)
-     ("^"   . dirvish-history-last)
-     ("h"   . dirvish-history-jump) ; remapped `describe-mode'
-     ("s"   . dirvish-quicksort)    ; remapped `dired-sort-toggle-or-edit'
-     ("v"   . dirvish-vc-menu)      ; remapped `dired-view-file'
-     ("TAB" . dirvish-subtree-toggle)
-     ("M-f" . dirvish-history-go-forward)
-     ("M-b" . dirvish-history-go-backward)
-     ("M-l" . dirvish-ls-switches-menu)
-     ("M-m" . dirvish-mark-menu)
-     ("M-t" . dirvish-layout-toggle)
-     ("M-s" . dirvish-setup-menu)
-     ("M-e" . dirvish-emerge-menu)
-     ("M-j" . dirvish-fd-jump))
+  :init
+  (dirvish-override-dired-mode)
+  :custom
+  (dirvish-quick-access-entries ; It's a custom option, `setq' won't work
+    '(("h" "~/"                          "Home")
+      ("d" "~/Downloads/"                "Downloads")
+      ("m" "/mnt/"                       "Drives")
+      ("t" "~/.local/share/Trash/files/" "TrashCan"))
+  )
+  :config
+  ;; (dirvish-peek-mode) ; Preview files in minibuffer
+  ;; (dirvish-side-follow-mode) ; similar to `treemacs-follow-mode'
+  (setq dirvish-mode-line-format
+          '(:left (sort symlink) :right (omit yank index)))
+  (setq dirvish-attributes
+          '(all-the-icons file-time file-size collapse subtree-state vc-state git-msg))
+  (setq delete-by-moving-to-trash t)
+  (setq dired-listing-switches
+          "-l --almost-all --human-readable --group-directories-first --no-group")
+  (nmap dirvish-mode-map
+      "TAB"    '(dirvish-subtree-toggle    :wk "Subtre-toggle")
+      "q"      '(dirvish-quit              :wk "Quit")
+      "h"      '(dired-up-directory        :wk "Up-dir")
+      "l"      '(dired-find-file           :wk "Open/Toggle")
+      "a"      '(dirvish-quick-access      :wk "Access")
+      "f"      '(dirvish-file-info-menu    :wk "File Info Menu")
+      "y"      '(dirvish-yank-menu         :wk "Yank Menu")
+      "N"      '(dirvish-narrow            :wk "Narrow")
+      "v"      '(dirvish-vc-menu           :wk "View-file") ; remapped `dired-view-file'
+      "s"      '(dirvish-quicksort         :wk "Quick-sort"); remapped `dired-sort-toggle-or-edit'
+
+      "M-f"    '(dirvish-history-go-forward  :wk "History-forward")
+      "M-b"    '(dirvish-history-go-backward :wk "History-back")
+      "M-l"    '(dirvish-ls-switches-menu    :wk "ls Switch Menu")
+      "M-m"    '(dirvish-mark-menu           :wk "Mark Menu")
+      "M-t"    '(dirvish-layout-toggle       :wk "Layout-toggle")
+      "M-s"    '(dirvish-setup-menu          :wk "Setup-Menu")
+      "M-e"    '(dirvish-emerge-menu         :wk "Emerge-Menu")
+      "M-j"    '(dirvish-fd-jump             :wk "fd-jump")
+  )
 )
+;      :bind ; Bind `dirvish|dirvish-side|dirvish-dwim' as you see fit
+;      (("C-c f" . dirvish-fd)
+;       :map dirvish-mode-map ; Dirvish inherits `dired-mode-map'
+;       ("a"   . dirvish-quick-access)
+;       ("f"   . dirvish-file-info-menu)
+;       ("y"   . dirvish-yank-menu)
+;       ("N"   . dirvish-narrow)
+;       ("^"   . dirvish-history-last)
+;       ("h"   . dirvish-history-jump) ; remapped `describe-mode'
+;       ("s"   . dirvish-quicksort)    ; remapped `dired-sort-toggle-or-edit'
+;       ("v"   . dirvish-vc-menu)      ; remapped `dired-view-file'
+;       ("TAB" . dirvish-subtree-toggle)
+;       ("M-f" . dirvish-history-go-forward)
+;       ("M-b" . dirvish-history-go-backward)
+;       ("M-l" . dirvish-ls-switches-menu)
+;       ("M-m" . dirvish-mark-menu)
+;       ("M-t" . dirvish-layout-toggle)
+;       ("M-s" . dirvish-setup-menu)
+;       ("M-e" . dirvish-emerge-menu)
+;       ("M-j" . dirvish-fd-jump))
 
 (use-package diredfl
   :hook
@@ -737,25 +765,3 @@
     (config/window-center 35)
   )
 )
-
-(use-package eaf
-;; :load-path "~/.emacs.d/site-lisp/emacs-application-framework"
-:custom
-  ; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
-  (eaf-browser-continue-where-left-off t)
-  (eaf-browser-enable-adblocker t)
-  (browse-url-browser-function 'eaf-open-browser)
-:config
-  (defalias 'browse-web #'eaf-open-browser)
-  ;; (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
-  ;; (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
-  ;; (eaf-bind-key take_photo "p" eaf-camera-keybinding)
-  ;; (eaf-bind-key nil "M-q" eaf-browser-keybinding)
-  (setq confirm-kill-processes nil)
-) ;; unbind, see more in the Wiki
-
-;; (use-package eaf-browser)       ;;M-x eaf-file-browser-qrcode
-(use-package eaf-git)       ;;M-x eaf-file-browser-qrcode
-(use-package eaf-file-manager)  ;;M-x eaf-open-in-file-manager
-(use-package eaf-pdf-viewer)
-(use-package eaf-2048)

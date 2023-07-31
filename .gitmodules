@@ -61,9 +61,6 @@
 [submodule "doom-themes"]
 	path = lib/doom-themes
 	url = https://github.com/doomemacs/themes
-[submodule "eaf"]
-	path = lib/eaf
-	url = https://github.com/emacs-eaf/emacs-application-framework
 [submodule "elisp-refs"]
 	path = lib/elisp-refs
 	url = https://github.com/Wilfred/elisp-refs
