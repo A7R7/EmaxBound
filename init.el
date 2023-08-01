@@ -199,115 +199,6 @@
 ;; End:
 ;;; init.el ends here
 
-(set-face-attribute 'default nil
-  :font "JetBrainsMono Nerd Font"
-  :height 150
-  :weight 'medium)
-(set-face-attribute 'variable-pitch nil
-  :font "Ubuntu Nerd Font"
-  :height 160
-  :weight 'medium)
-(set-face-attribute 'fixed-pitch nil
-  :font "JetBrainsMono Nerd Font"
-  :height 150
-  :weight 'medium)
-
-(set-face-attribute 'font-lock-comment-face nil
-  :slant 'italic)
-(set-face-attribute 'font-lock-keyword-face nil
-  :slant 'italic)
-
-(setq-default line-spacing 0.12)
-
-(use-package emacs
-  :init 
-    (global-set-key (kbd "C-=")            'text-scale-increase)
-    (global-set-key (kbd "C--")            'text-scale-decrease)
-    (global-set-key (kbd "<C-wheel-up>")   'text-scale-increase)
-    (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
-)
-
-(use-package all-the-icons
-  :ensure t
-  :if (display-graphic-p))
-
-;(use-package all-the-icons-dired
-;  :hook (dired-mode . (lambda () (all-the-icons-dired-mode t))))
-
-(use-package nerd-icons
-  ;; :custom
-  ;; The Nerd Font you want to use in GUI
-  ;; "Symbols Nerd Font Mono" is the default and is recommended
-  ;; but you can use any other Nerd Font if you want
-  ;; (nerd-icons-font-family "Symbols Nerd Font Mono")
-)
-
-(use-package doom-themes
-  :init
-  (load-theme 'doom-ayu-mirage t))
-
-(set-frame-parameter nil 'alpha-background 95)
-(add-to-list 'default-frame-alist '(alpha-background . 95))
-
-(use-package doom-modeline
-  :init (doom-modeline-mode 1)
-  :custom ((doom-modeline-height 15)))
-
-(use-package dashboard
-:init
-  (setq initial-buffer-choice 'dashboard-open)
-  (setq dashboard-set-heading-icons t)
-  (setq dashboard-set-file-icons t)
-  ;; (setq dashboard-banner-logo-title "Also try NeoVim!")
-  ;; show Dashboard in frames created with emacsclient -c
-  (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
-  ;;(setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
-  (setq dashboard-startup-banner (concat user-emacs-directory "assets/EmacsBound.svg"))  ;; use custom image as banner
-  (setq dashboard-center-content t) ;; set to 't' for centered content
-
-  (setq dashboard-items '(
-        (recents . 5)
-        (agenda . 5 )
-        (bookmarks . 3)
-        (projects . 3)
-        (registers . 3)
-  ))
-
-  ;; (dashboard-modify-heading-icons '((recents . "file-text") (bookmarks . "book")))
-:config
-  (dashboard-setup-startup-hook)
-)
-
-(use-package diminish)
-
-(use-package centaur-tabs
-  :hook
-    (emacs-startup . centaur-tabs-mode)
-  :init
-    (setq centaur-tabs-set-icons t
-          centaur-tabs-set-modified-marker t
-          centaur-tabs-modified-marker "M"
-          centaur-tabs-cycle-scope 'tabs
-          centaur-tabs-set-bar 'over
-          centaur-tabs-enable-ido-completion nil
-    )
-  :config
-    (centaur-tabs-mode t)
-    ;; (centaur-tabs-headline-match)
-    ;; (centaur-tabs-group-by-projectile-project)
-)
-
-(use-package visual-fill-column
-  :config
-  (defun config/window-center (width)
-    (interactive)
-    (setq visual-fill-column-width width
-          visual-fill-column-center-text t)
-    (visual-fill-column-mode 1)
-    (visual-line-mode 1)
-  )
-)
-
 (use-package evil
   :init
     (setq evil-want-integration t) ;; t by default
@@ -377,19 +268,21 @@
       "TAB"     '(:ignore t                      :wk "Tab 󰓩")
       "TAB TAB" '(tab-new                        :wk "Tab New 󰝜")
       "TAB d"   '(tab-close                      :wk "Tab Del 󰭌")
-      "TAB p"   '(centaur-tabs-backward-tab      :wk "Prev ")
-      "TAB n"   '(centaur-tabs-forward-tab       :wk "Next ")
-      "{"       '(centaur-tabs-backward-tab      :wk "Prev Tab ")
-      "}"       '(centaur-tabs-forward-tab       :wk "Next Tab ")
+      "TAB p"   '(tab-previous                   :wk "Prev ")
+      "TAB n"   '(tab-next                       :wk "Next ")
+      "{"       '(tab-previous                   :wk "Prev Tab ")
+      "}"       '(tab-next                       :wk "Next Tab ")
 
       "w"       '(:ignore t                      :wk "Window ")
       "wd"      '(delete-window                  :wk "Delete ")
-      "wv"      '(split-window-vertically        :wk "Split V 󰤼")
-      "wh"      '(split-window-horizontally      :wk "Split H 󰤻")
+      "wv"      '(split-window-vertically        :wk "Split 󰤻 ")
+      "ws"      '(split-window-horizontally      :wk "Split 󰤼 ")
       "wh"      '(evil-window-left               :wk "Focus H ")
       "wj"      '(evil-window-down               :wk "Focus J ")
       "wk"      '(evil-window-up                 :wk "Focus K ")
       "wl"      '(evil-window-right              :wk "Focus L ")
+      "\\"      '(split-window-vertically        :wk "Split 󰤻 ")
+      "|"       '(split-window-horizontally      :wk "Split 󰤼 ")
 
       "B"       '(:ignore t                      :wk "Borg 󰏗")
       "Ba"      '(borg-assimilate                :wk "Assimilate 󱧕")
@@ -397,6 +290,8 @@
       "Bc"      '(borg-clone                     :wk "Clone ")
       "Br"      '(borg-remove                    :wk "Remove 󱧖")
 
+      "g"       '(:ignore t                      :wk "Git")
+      "gg"      '(magit                          :wk "Magit")
       "t"       '(:ignore t                      :wk "Toggle 󰨚")
       "e"       '(dirvish-side                   :wk "Dirvish 󰙅")
 
@@ -406,25 +301,190 @@
   )
 )
 
+(use-package which-key
+:after general
+:init
+  (setq
+    which-key-sort-order #'which-key-key-order-alpha
+    which-key-sort-uppercase-first nil
+    which-key-add-column-padding 1
+    which-key-max-display-columns nil
+    which-key-min-display-lines 6
+    which-key-side-window-location 'bottom
+    which-key-side-window-slot -10
+    which-key-side-window-max-height 0.25
+    which-key-idle-delay 0.8
+    which-key-idle-secondary-delay 0.01
+    which-key-max-description-length 25
+    which-key-allow-imprecise-window-fit t
+    which-key-separator " → "
+    which-key-show-early-on-C-h t
+    which-key-show-prefix 'left
+  )
+  (which-key-mode 1)
+)
+
+(set-face-attribute 'default nil
+  :font "JetBrainsMono Nerd Font"
+  :height 150
+  :weight 'medium)
+(set-face-attribute 'variable-pitch nil
+  :font "Cantarell"
+  :height 160
+  :weight 'medium)
+(set-face-attribute 'fixed-pitch nil
+  :font "Cantarell"
+  :height 150
+  :weight 'medium)
+
+(set-face-attribute 'font-lock-comment-face nil
+  :slant 'italic)
+(set-face-attribute 'font-lock-keyword-face nil
+  :slant 'italic)
+
+;(setq-default line-spacing 0.12)
+
+(use-package emacs
+  :init 
+    (global-set-key (kbd "C-=")            'text-scale-increase)
+    (global-set-key (kbd "C--")            'text-scale-decrease)
+    (global-set-key (kbd "<C-wheel-up>")   'text-scale-increase)
+    (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
+)
+
+(use-package all-the-icons
+  :ensure t
+  :if (display-graphic-p))
+
+;(use-package all-the-icons-dired
+;  :hook (dired-mode . (lambda () (all-the-icons-dired-mode t))))
+
+(use-package nerd-icons
+  ;; :custom
+  ;; The Nerd Font you want to use in GUI
+  ;; "Symbols Nerd Font Mono" is the default and is recommended
+  ;; but you can use any other Nerd Font if you want
+  ;; (nerd-icons-font-family "Symbols Nerd Font Mono")
+)
+
+(use-package doom-themes
+  :after emacs
+  :init
+  (load-theme 'doom-ayu-mirage t))
+
+(set-frame-parameter nil 'alpha-background 95)
+(add-to-list 'default-frame-alist '(alpha-background . 95))
+
+(use-package doom-modeline
+  :init (doom-modeline-mode 1)
+  :custom ((doom-modeline-height 15)))
+
+(use-package dashboard
+:init
+  (setq initial-buffer-choice 'dashboard-open)
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
+  ;; (setq dashboard-banner-logo-title "Also try NeoVim!")
+  ;; show Dashboard in frames created with emacsclient -c
+  (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+  ;;(setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
+  (setq dashboard-startup-banner (concat user-emacs-directory "assets/EmacsBound.svg"))  ;; use custom image as banner
+  (setq dashboard-center-content t) ;; set to 't' for centered content
+
+  (setq dashboard-items '(
+        (recents . 5)
+        (agenda . 5 )
+        (bookmarks . 3)
+        (projects . 3)
+        (registers . 3)
+  ))
+
+  ;; (dashboard-modify-heading-icons '((recents . "file-text") (bookmarks . "book")))
+:config
+  (dashboard-setup-startup-hook)
+)
+
+(use-package diminish)
+
+(use-package centaur-tabs
+  :hook
+    (emacs-startup . centaur-tabs-mode)
+    (dired-mode . centaur-tabs-local-mode)
+    (dirvish-directory-view-mode . centaur-tabs-local-mode)
+  :init
+    (setq centaur-tabs-set-icons t
+          centaur-tabs-set-modified-marker t
+          centaur-tabs-modified-marker "M"
+          centaur-tabs-cycle-scope 'tabs
+          centaur-tabs-set-bar 'over
+          centaur-tabs-enable-ido-completion nil
+    )
+    (centaur-tabs-mode t)
+  :config
+    (centaur-tabs-change-fonts "Cantarell" 160)
+    ;; (centaur-tabs-headline-match)
+    ;; (centaur-tabs-group-by-projectile-project)
+
+)
+
+(use-package visual-fill-column
+  :config
+  (defun config/window-center (width)
+    (interactive)
+    (setq visual-fill-column-width width
+          visual-fill-column-center-text t)
+    (visual-fill-column-mode 1)
+    (visual-line-mode 1)
+  )
+)
+
+(add-hook 'minibuffer-setup-hook
+  (defun config/minibuffer-center ()
+    (config/window-center 140)
+  )
+)
+
+(add-hook 'magit-mode-hook
+  (defun config/magit-center ()
+    (config/window-center 80)
+  )
+)
+
 (use-package org
   :config
-  (set-face-attribute 'org-document-title nil :family "Cantarell" :height 1.75 :bold t)
-  (set-face-attribute 'org-level-1 nil :family "Cantarell" :height 1.5 :bold t)
-  (set-face-attribute 'org-level-2 nil :family "Cantarell" :height 1.25 :bold t)
-  (set-face-attribute 'org-level-3 nil :family "Cantarell" :height 1.1 :bold t)
-  (set-face-attribute 'org-level-4 nil :family "Cantarell" :height 1.05 :bold t)
-  (set-face-attribute 'org-level-5 nil :family "Cantarell" :height 1.05 :bold t)
-  (set-face-attribute 'org-level-6 nil :family "Cantarell" :height 1.05 :bold t)
+  (set-face-attribute 'org-document-title nil :family "Cantarell" :height 2.5 :bold t)
+  (set-face-attribute 'org-level-1 nil :family "Cantarell" :height 1.8 :bold t)
+  (set-face-attribute 'org-level-2 nil :family "Cantarell" :height 1.7 :bold t)
+  (set-face-attribute 'org-level-3 nil :family "Cantarell" :height 1.6 :bold t)
+  (set-face-attribute 'org-level-4 nil :family "Cantarell" :height 1.5 :bold t)
+  (set-face-attribute 'org-level-5 nil :family "Cantarell" :height 1.4 :bold t)
+  (set-face-attribute 'org-level-6 nil :family "Cantarell" :height 1.3 :bold t)
 )
 
 (use-package org-superstar
-:hook (org-mode . org-superstar-mode)
+:disabled
 :init
   (setq
     ;;org-superstar-headline-bullets-list '("✖" "✚" "◉" "○" "▶")
     org-superstar-special-todo-items t
-    org-ellipsis "  "
+    ;;org-ellipsis "  "
   )
+)
+
+(use-package org-bars
+:disabled
+:hook (org-mode . org-bars-mode)
+:config
+  (setq org-bars-color-options '(
+        :desaturate-level-faces 60
+        :darken-level-faces 15
+  ))
+  (setq org-bars-extra-pixels-height 12)
+  (setq org-bars-stars '(
+        :empty "▷"
+        :invisible "▶"
+        :visible "▼"
+  ))
 )
 
 (add-hook 'org-mode-hook
@@ -451,6 +511,16 @@
 )
 
 (use-package evil-org)
+
+(use-package org
+:config
+    (setq org-src-tab-acts-natively t)
+    (setq org-src-preserve-indentation nil)
+)
+
+(use-package valign
+:hook (org-mode . valign-mode)
+)
 
 (use-package org-roam
 :after org
@@ -642,18 +712,19 @@
 )
 
 (use-package dirvish
-  :init
+:init
   (dirvish-override-dired-mode)
-  :custom
+:custom
   (dirvish-quick-access-entries ; It's a custom option, `setq' won't work
     '(("h" "~/"                          "Home")
       ("d" "~/Downloads/"                "Downloads")
       ("m" "/mnt/"                       "Drives")
       ("t" "~/.local/share/Trash/files/" "TrashCan"))
   )
-  :config
+:config
   ;; (dirvish-peek-mode) ; Preview files in minibuffer
   ;; (dirvish-side-follow-mode) ; similar to `treemacs-follow-mode'
+  (setq dirvish-path-separators (list "  " "  " "  "))
   (setq dirvish-mode-line-format
           '(:left (sort symlink) :right (omit yank index)))
   (setq dirvish-attributes
@@ -711,26 +782,6 @@
    (dirvish-directory-view-mode . diredfl-mode))
   :config
   (set-face-attribute 'diredfl-dir-name nil :bold t)
-)
-
-(use-package which-key
-  :init
-  (setq
-    which-key-side-window-location 'bottom
-    which-key-sort-order #'which-key-key-order-alpha
-    which-key-sort-uppercase-first nil
-    which-key-add-column-padding 1
-    which-key-max-display-columns nil
-    which-key-min-display-lines 6
-    which-key-side-window-slot -10
-    which-key-side-window-max-height 0.25
-    which-key-idle-delay 0.8
-    which-key-idle-secondary-delay 0.03
-    which-key-max-description-length 25
-    which-key-allow-imprecise-window-fit t
-    which-key-separator " → "
-  )
-  (which-key-mode 1)
 )
 
 (use-package helpful

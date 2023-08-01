@@ -46,11 +46,12 @@ Check [[https://emacsmirror.net/manual/borg/Bootstrapping-using-a-seed.html][Boo
   + Write config codes into this org file, then run [[elisp:org-babel-tangle][M-x org-babel-tangle]] so that emacs writes the codes into the corresponding file.
 
 ** References
--  [[https://github.com/lccambiaghi/vanilla-emacs][Luca's vanilla-emacs]] (2023) very detailed org config file.
--  [[https://gitlab.com/dwt1/configuring-emacs][DistroTube's Configuring Emacs]] (2023)
--  [[https://github.com/seagle0128/.emacs.d][seagle0128's Centaur Emacs]] (2023)
--  [[https://github.com/daviwil/emacs-from-scratch][Daviwell's Emacs from scratch]] (2021)
-*NOTE*: the year number after each line equals to
+-  [[https://github.com/lccambiaghi/vanilla-emacs][Luca's vanilla-emacs]] (2023) detailed org config file.
+-  [[https://gitlab.com/dwt1/configuring-emacs][DistroTube's Configuring Emacs]] (2023) easy to follow.
+-  [[https://github.com/seagle0128/.emacs.d][seagle0128's Centaur Emacs]] (2023) be morden.
+-  [[https://github.com/daviwil/emacs-from-scratch][Daviwell's Emacs from scratch]] (2021) intuitive.
+-  [[https://github.com/lijigang/100-questions-about-orgmode][lijigang's 100-questions-about-orgmode]] (2023) for org mode of course.
+*NOTE*: the year number after link equals to
 - =min (last time the config get's updated, last time I refered to the config)=
   
 * TODOS
@@ -373,178 +374,6 @@ Magit is a VERY powerful git client, especially for emacs.
 ;; End:
 ;;; init.el ends here
 #+end_src
-* UI
-** Fonts
-
-Defining the various fonts that Emacs will use.
-#+begin_src elisp
-(set-face-attribute 'default nil
-  :font "JetBrainsMono Nerd Font"
-  :height 150
-  :weight 'medium)
-(set-face-attribute 'variable-pitch nil
-  :font "Ubuntu Nerd Font"
-  :height 160
-  :weight 'medium)
-(set-face-attribute 'fixed-pitch nil
-  :font "JetBrainsMono Nerd Font"
-  :height 150
-  :weight 'medium)
-
-
-
-#+end_src
-
-Makes commented text and keywords italics. Working in emacsclient but not emacs.
-#+begin_src elisp
-(set-face-attribute 'font-lock-comment-face nil
-  :slant 'italic)
-(set-face-attribute 'font-lock-keyword-face nil
-  :slant 'italic)
-#+end_src
-
-Uncomment the following line if line spacing needs adjusting.
-#+begin_src elisp
-(setq-default line-spacing 0.12)
-#+end_src
-
-*** Zooming In/Out
-You can use the bindings CTRL plus =/- for zooming in/out.  You can also use CTRL plus the mouse wheel for zooming in/out.
-
-#+begin_src elisp
- (use-package emacs
-   :init 
-     (global-set-key (kbd "C-=")            'text-scale-increase)
-     (global-set-key (kbd "C--")            'text-scale-decrease)
-     (global-set-key (kbd "<C-wheel-up>")   'text-scale-increase)
-     (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
- )
-#+end_src
-
-** Icons
-*** All-the-icons
-[[https://github.com/domtronn/all-the-icons.el][All-the-icons]] is an icon set that can be used with dashboard, dired, ibuffer and other Emacs programs.
-
-#+begin_src emacs-lisp
-(use-package all-the-icons
-  :ensure t
-  :if (display-graphic-p))
-
-;(use-package all-the-icons-dired
-;  :hook (dired-mode . (lambda () (all-the-icons-dired-mode t))))
-#+end_src
-
-*NOTE*: In order for the icons to work it is very important that you install the Resource Fonts included in this package. Run [[elisp:all-the-icons-install-fonts][M-x all-the-icons-install-fonts]] to install necessary icons.
-
-*** Nerd-icons
-[[https://github.com/rainstormstudio/nerd-icons.el][Nerd-icons]] is a library for easily using Nerd Font icons inside Emacs, an alternative to all-the-icons.
-Run [[elisp:nerd-icons-install-fonts][M-x nerd-icons-install-fonts]] to install =Symbols Nerd Fonts Mono= for you.
-#+begin_src elisp
-(use-package nerd-icons
-  ;; :custom
-  ;; The Nerd Font you want to use in GUI
-  ;; "Symbols Nerd Font Mono" is the default and is recommended
-  ;; but you can use any other Nerd Font if you want
-  ;; (nerd-icons-font-family "Symbols Nerd Font Mono")
-)
-#+end_src
-
-** Theme
-[[https://github.com/hlissner/emacs-doom-themes][Doom-themes]] is a great set of themes with a lot of variety and support for many different Emacs modes. Taking a look at the [[https://github.com/hlissner/emacs-doom-themes/tree/screenshots][screenshots]] might help you decide which one you like best.  You can also run =M-x counsel-load-theme= to choose between them easily.
-#+begin_src elisp
-(use-package doom-themes
-  :init
-  (load-theme 'doom-ayu-mirage t))
-#+end_src
-
-** Transparency
-Set background alpha to 5%
-#+begin_src elisp
-(set-frame-parameter nil 'alpha-background 95)
-(add-to-list 'default-frame-alist '(alpha-background . 95))
-#+end_src
-** Modeline
-[[https://github.com/seagle0128/doom-modeline][Doom-modeline]] is a very attractive and rich (yet still minimal) mode line configuration for Emacs.  The default configuration is quite good but you can check out the [[https://github.com/seagle0128/doom-modeline#customize][configuration options]] for more things you can enable or disable.
-
-#+begin_src elisp
-(use-package doom-modeline
-  :init (doom-modeline-mode 1)
-  :custom ((doom-modeline-height 15)))
-#+end_src
-
-*NOTE1*: [[Nerd-icons]] are necessary. Run [[elisp:nerd-icons-install-fonts][M-x nerd-icons-install-fonts]] to install the resource fonts.
-
-*NOTE2:* [[All-the-icons]] hasn't been supported since 4.0.0. If you prefer all-the-icons, please use release 3.4.0, then run [[elisp:all-the-icons-install-fonts][M-x all-the-icons-install-fonts]] to install necessary icons.
-
-** Dashboard
-Dashboard is an extensible startup screen showing you recent files, bookmarks, agenda items and an Emacs banner.
-#+begin_src elisp
-(use-package dashboard
-:init
-  (setq initial-buffer-choice 'dashboard-open)
-  (setq dashboard-set-heading-icons t)
-  (setq dashboard-set-file-icons t)
-  ;; (setq dashboard-banner-logo-title "Also try NeoVim!")
-  ;; show Dashboard in frames created with emacsclient -c
-  (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
-  ;;(setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
-  (setq dashboard-startup-banner (concat user-emacs-directory "assets/EmacsBound.svg"))  ;; use custom image as banner
-  (setq dashboard-center-content t) ;; set to 't' for centered content
-
-  (setq dashboard-items '(
-        (recents . 5)
-        (agenda . 5 )
-        (bookmarks . 3)
-        (projects . 3)
-        (registers . 3)
-  ))
-
-  ;; (dashboard-modify-heading-icons '((recents . "file-text") (bookmarks . "book")))
-:config
-  (dashboard-setup-startup-hook)
-)
-#+end_src
-
-** Diminish
-This package implements hiding or abbreviation of the modeline displays (lighters) of minor-modes.  With this package installed, you can add ':diminish' to any use-package block to hide that particular mode in the modeline.
-
-#+begin_src elisp
-(use-package diminish)
-#+end_src
-
-** Tabs
-#+begin_src elisp
-  (use-package centaur-tabs
-    :hook
-      (emacs-startup . centaur-tabs-mode)
-    :init
-      (setq centaur-tabs-set-icons t
-            centaur-tabs-set-modified-marker t
-            centaur-tabs-modified-marker "M"
-            centaur-tabs-cycle-scope 'tabs
-            centaur-tabs-set-bar 'over
-            centaur-tabs-enable-ido-completion nil
-      )
-    :config
-      (centaur-tabs-mode t)
-      ;; (centaur-tabs-headline-match)
-      ;; (centaur-tabs-group-by-projectile-project)
-  )
-#+end_src
-** Window center 
-[[https://github.com/joostkremers/visual-fill-column][visual-fill-column]] 
-#+begin_src elisp
-  (use-package visual-fill-column
-    :config
-    (defun config/window-center (width)
-      (interactive)
-      (setq visual-fill-column-width width
-            visual-fill-column-center-text t)
-      (visual-fill-column-mode 1)
-      (visual-line-mode 1)
-    )
-  )
-#+end_src
 * Kbd 
 ** Evil
 *** Evil mode
@@ -632,19 +461,21 @@ The famous evil that make you look evil.
         "TAB"     '(:ignore t                      :wk "Tab 󰓩")
         "TAB TAB" '(tab-new                        :wk "Tab New 󰝜")
         "TAB d"   '(tab-close                      :wk "Tab Del 󰭌")
-        "TAB p"   '(centaur-tabs-backward-tab      :wk "Prev ")
-        "TAB n"   '(centaur-tabs-forward-tab       :wk "Next ")
-        "{"       '(centaur-tabs-backward-tab      :wk "Prev Tab ")
-        "}"       '(centaur-tabs-forward-tab       :wk "Next Tab ")
-
+        "TAB p"   '(tab-previous                   :wk "Prev ")
+        "TAB n"   '(tab-next                       :wk "Next ")
+        "{"       '(tab-previous                   :wk "Prev Tab ")
+        "}"       '(tab-next                       :wk "Next Tab ")
+       
         "w"       '(:ignore t                      :wk "Window ")
         "wd"      '(delete-window                  :wk "Delete ")
-        "wv"      '(split-window-vertically        :wk "Split V 󰤼")
-        "wh"      '(split-window-horizontally      :wk "Split H 󰤻")
+        "wv"      '(split-window-vertically        :wk "Split 󰤻 ")
+        "ws"      '(split-window-horizontally      :wk "Split 󰤼 ")
         "wh"      '(evil-window-left               :wk "Focus H ")
         "wj"      '(evil-window-down               :wk "Focus J ")
         "wk"      '(evil-window-up                 :wk "Focus K ")
         "wl"      '(evil-window-right              :wk "Focus L ")
+        "\\"      '(split-window-vertically        :wk "Split 󰤻 ")
+        "|"       '(split-window-horizontally      :wk "Split 󰤼 ")
 
         "B"       '(:ignore t                      :wk "Borg 󰏗")
         "Ba"      '(borg-assimilate                :wk "Assimilate 󱧕")
@@ -652,6 +483,8 @@ The famous evil that make you look evil.
         "Bc"      '(borg-clone                     :wk "Clone ")
         "Br"      '(borg-remove                    :wk "Remove 󱧖")
 
+        "g"       '(:ignore t                      :wk "Git")
+        "gg"      '(magit                          :wk "Magit")
         "t"       '(:ignore t                      :wk "Toggle 󰨚")
         "e"       '(dirvish-side                   :wk "Dirvish 󰙅")
 
@@ -663,6 +496,231 @@ The famous evil that make you look evil.
 #+end_src
 
 ** Hydra
+** Which-key
+[[https://github.com/justbur/emacs-which-key][Which-key]] is a minor mode for Emacs that displays the key bindings following your currently entered incomplete command (a prefix) in a popup.
+#+begin_src elisp
+  (use-package which-key
+  :after general
+  :init
+    (setq
+      which-key-sort-order #'which-key-key-order-alpha
+      which-key-sort-uppercase-first nil
+      which-key-add-column-padding 1
+      which-key-max-display-columns nil
+      which-key-min-display-lines 6
+      which-key-side-window-location 'bottom
+      which-key-side-window-slot -10
+      which-key-side-window-max-height 0.25
+      which-key-idle-delay 0.8
+      which-key-idle-secondary-delay 0.01
+      which-key-max-description-length 25
+      which-key-allow-imprecise-window-fit t
+      which-key-separator " → "
+      which-key-show-early-on-C-h t
+      which-key-show-prefix 'left
+    )
+    (which-key-mode 1)
+  )
+#+end_src
+
+* UI
+** Fonts
+
+Defining the various fonts that Emacs will use.
+#+begin_src elisp
+(set-face-attribute 'default nil
+  :font "JetBrainsMono Nerd Font"
+  :height 150
+  :weight 'medium)
+(set-face-attribute 'variable-pitch nil
+  :font "Cantarell"
+  :height 160
+  :weight 'medium)
+(set-face-attribute 'fixed-pitch nil
+  :font "Cantarell"
+  :height 150
+  :weight 'medium)
+
+
+
+#+end_src
+
+Makes commented text and keywords italics. Working in emacsclient but not emacs.
+#+begin_src elisp
+(set-face-attribute 'font-lock-comment-face nil
+  :slant 'italic)
+(set-face-attribute 'font-lock-keyword-face nil
+  :slant 'italic)
+#+end_src
+
+Uncomment the following line if line spacing needs adjusting.
+#+begin_src elisp
+;(setq-default line-spacing 0.12)
+#+end_src
+
+*** Zooming In/Out
+You can use the bindings CTRL plus =/- for zooming in/out.  You can also use CTRL plus the mouse wheel for zooming in/out.
+
+#+begin_src elisp
+ (use-package emacs
+   :init 
+     (global-set-key (kbd "C-=")            'text-scale-increase)
+     (global-set-key (kbd "C--")            'text-scale-decrease)
+     (global-set-key (kbd "<C-wheel-up>")   'text-scale-increase)
+     (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
+ )
+#+end_src
+
+** Icons
+*** All-the-icons
+[[https://github.com/domtronn/all-the-icons.el][All-the-icons]] is an icon set that can be used with dashboard, dired, ibuffer and other Emacs programs.
+
+#+begin_src emacs-lisp
+(use-package all-the-icons
+  :ensure t
+  :if (display-graphic-p))
+
+;(use-package all-the-icons-dired
+;  :hook (dired-mode . (lambda () (all-the-icons-dired-mode t))))
+#+end_src
+
+*NOTE*: In order for the icons to work it is very important that you install the Resource Fonts included in this package. Run [[elisp:all-the-icons-install-fonts][M-x all-the-icons-install-fonts]] to install necessary icons.
+
+*** Nerd-icons
+[[https://github.com/rainstormstudio/nerd-icons.el][Nerd-icons]] is a library for easily using Nerd Font icons inside Emacs, an alternative to all-the-icons.
+Run [[elisp:nerd-icons-install-fonts][M-x nerd-icons-install-fonts]] to install =Symbols Nerd Fonts Mono= for you.
+#+begin_src elisp
+(use-package nerd-icons
+  ;; :custom
+  ;; The Nerd Font you want to use in GUI
+  ;; "Symbols Nerd Font Mono" is the default and is recommended
+  ;; but you can use any other Nerd Font if you want
+  ;; (nerd-icons-font-family "Symbols Nerd Font Mono")
+)
+#+end_src
+
+** Theme
+[[https://github.com/hlissner/emacs-doom-themes][Doom-themes]] is a great set of themes with a lot of variety and support for many different Emacs modes. Taking a look at the [[https://github.com/hlissner/emacs-doom-themes/tree/screenshots][screenshots]] might help you decide which one you like best.  You can also run =M-x counsel-load-theme= to choose between them easily.
+#+begin_src elisp
+  (use-package doom-themes
+    :after emacs
+    :init
+    (load-theme 'doom-ayu-mirage t))
+#+end_src
+
+** Transparency
+Set background alpha to 5%
+#+begin_src elisp
+(set-frame-parameter nil 'alpha-background 95)
+(add-to-list 'default-frame-alist '(alpha-background . 95))
+#+end_src
+** Modeline
+[[https://github.com/seagle0128/doom-modeline][Doom-modeline]] is a very attractive and rich (yet still minimal) mode line configuration for Emacs.  The default configuration is quite good but you can check out the [[https://github.com/seagle0128/doom-modeline#customize][configuration options]] for more things you can enable or disable.
+
+#+begin_src elisp
+(use-package doom-modeline
+  :init (doom-modeline-mode 1)
+  :custom ((doom-modeline-height 15)))
+#+end_src
+
+*NOTE1*: [[Nerd-icons]] are necessary. Run [[elisp:nerd-icons-install-fonts][M-x nerd-icons-install-fonts]] to install the resource fonts.
+
+*NOTE2:* [[All-the-icons]] hasn't been supported since 4.0.0. If you prefer all-the-icons, please use release 3.4.0, then run [[elisp:all-the-icons-install-fonts][M-x all-the-icons-install-fonts]] to install necessary icons.
+
+** Dashboard
+Dashboard is an extensible startup screen showing you recent files, bookmarks, agenda items and an Emacs banner.
+#+begin_src elisp
+(use-package dashboard
+:init
+  (setq initial-buffer-choice 'dashboard-open)
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
+  ;; (setq dashboard-banner-logo-title "Also try NeoVim!")
+  ;; show Dashboard in frames created with emacsclient -c
+  (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+  ;;(setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
+  (setq dashboard-startup-banner (concat user-emacs-directory "assets/EmacsBound.svg"))  ;; use custom image as banner
+  (setq dashboard-center-content t) ;; set to 't' for centered content
+
+  (setq dashboard-items '(
+        (recents . 5)
+        (agenda . 5 )
+        (bookmarks . 3)
+        (projects . 3)
+        (registers . 3)
+  ))
+
+  ;; (dashboard-modify-heading-icons '((recents . "file-text") (bookmarks . "book")))
+:config
+  (dashboard-setup-startup-hook)
+)
+#+end_src
+
+** Diminish
+This package implements hiding or abbreviation of the modeline displays (lighters) of minor-modes.  With this package installed, you can add ':diminish' to any use-package block to hide that particular mode in the modeline.
+
+#+begin_src elisp
+(use-package diminish)
+#+end_src
+
+** Tabs
+#+begin_src elisp
+  (use-package centaur-tabs
+    :hook
+      (emacs-startup . centaur-tabs-mode)
+      (dired-mode . centaur-tabs-local-mode)
+      (dirvish-directory-view-mode . centaur-tabs-local-mode)
+    :init
+      (setq centaur-tabs-set-icons t
+            centaur-tabs-set-modified-marker t
+            centaur-tabs-modified-marker "M"
+            centaur-tabs-cycle-scope 'tabs
+            centaur-tabs-set-bar 'over
+            centaur-tabs-enable-ido-completion nil
+      )
+      (centaur-tabs-mode t)
+    :config
+      (centaur-tabs-change-fonts "Cantarell" 160)
+      ;; (centaur-tabs-headline-match)
+      ;; (centaur-tabs-group-by-projectile-project)
+
+  )
+#+end_src
+** Window center 
+[[https://github.com/joostkremers/visual-fill-column][visual-fill-column]] is a small Emacs minor mode that mimics the effect of fill-column in visual-line-mode. Instead of wrapping lines at the window edge, which is the standard behaviour of visual-line-mode, it wraps lines at fill-column.
+Another use case for visual-fill-column is to =centre the text= in a window.
+#+begin_src elisp
+  (use-package visual-fill-column
+    :config
+    (defun config/window-center (width)
+      (interactive)
+      (setq visual-fill-column-width width
+            visual-fill-column-center-text t)
+      (visual-fill-column-mode 1)
+      (visual-line-mode 1)
+    )
+  )
+#+end_src
+
+Use visual-fill-column to center text in minibuffer.
+Have some bugs.
+#+begin_src elisp
+  (add-hook 'minibuffer-setup-hook
+    (defun config/minibuffer-center ()
+      (config/window-center 140)
+    )
+  )
+#+end_src
+
+Use visual-fill-column to center magit
+#+begin_src elisp
+  (add-hook 'magit-mode-hook
+    (defun config/magit-center ()
+      (config/window-center 80)
+    )
+  )
+#+end_src
+
 * Org
 ** User Interface
 *** Headings & Levels
@@ -671,30 +729,55 @@ Change the font size of different org-levels.
 #+begin_src elisp
   (use-package org
     :config
-    (set-face-attribute 'org-document-title nil :family "Cantarell" :height 1.75 :bold t)
-    (set-face-attribute 'org-level-1 nil :family "Cantarell" :height 1.5 :bold t)
-    (set-face-attribute 'org-level-2 nil :family "Cantarell" :height 1.25 :bold t)
-    (set-face-attribute 'org-level-3 nil :family "Cantarell" :height 1.1 :bold t)
-    (set-face-attribute 'org-level-4 nil :family "Cantarell" :height 1.05 :bold t)
-    (set-face-attribute 'org-level-5 nil :family "Cantarell" :height 1.05 :bold t)
-    (set-face-attribute 'org-level-6 nil :family "Cantarell" :height 1.05 :bold t)
+    (set-face-attribute 'org-document-title nil :family "Cantarell" :height 2.5 :bold t)
+    (set-face-attribute 'org-level-1 nil :family "Cantarell" :height 1.8 :bold t)
+    (set-face-attribute 'org-level-2 nil :family "Cantarell" :height 1.7 :bold t)
+    (set-face-attribute 'org-level-3 nil :family "Cantarell" :height 1.6 :bold t)
+    (set-face-attribute 'org-level-4 nil :family "Cantarell" :height 1.5 :bold t)
+    (set-face-attribute 'org-level-5 nil :family "Cantarell" :height 1.4 :bold t)
+    (set-face-attribute 'org-level-6 nil :family "Cantarell" :height 1.3 :bold t)
   )
 #+end_src
 
-**** Nicer Heading Bullets
-
+**** Heading Bullets & bars
 [[https://github.com/integral-dw/org-superstar-mode][Org-superstar]] replaces the asterisk before every org-level with ascii symbols.
+Disabled because org-morden is a drop-in replacement.
 #+begin_src elisp
   (use-package org-superstar
-  :hook (org-mode . org-superstar-mode)
+  :disabled
   :init
     (setq
       ;;org-superstar-headline-bullets-list '("✖" "✚" "◉" "○" "▶")
       org-superstar-special-todo-items t
-      org-ellipsis "  "
+      ;;org-ellipsis "  "
     )
   )
 #+end_src
+
+[[https://github.com/tonyaldon/org-bars][Org-bars-mode]] is a minor mode for org-mode. It adds bars to the virtual indentation provided by the built-in package org-indent.
+Temporarily disabled for performance.
+#+begin_src elisp
+  (use-package org-bars
+  :disabled
+  :hook (org-mode . org-bars-mode)
+  :config
+    (setq org-bars-color-options '(
+          :desaturate-level-faces 60
+          :darken-level-faces 15
+    ))
+    (setq org-bars-extra-pixels-height 12)
+    (setq org-bars-stars '(
+          :empty "▷"
+          :invisible "▶"
+          :visible "▼"
+    ))
+  )
+#+end_src
+
+**** Org-morden
+[[https://github.com/minad/org-modern][org-morden]] implements a modern style for Org buffers using font locking and text properties. The package styles =headlines=, =keywords=, =tables= and =source blocks=. 
+*This awesome package throws no warning during compilation.
+
 *** Text arrangement
 Use [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]] to center =org-mode= buffers for a more pleasing writing experience as it centers the contents of the buffer horizontally to seem more like you are editing a document.
 Use visual-line-mode to wrap text.
@@ -736,6 +819,24 @@ Automatically disaply emphasis markers and links when the cursor is on them.
 #+begin_src elisp
   (use-package evil-org)
 #+end_src
+** Code-block
+#+begin_src elisp
+  (use-package org
+  :config
+      (setq org-src-tab-acts-natively t)
+      (setq org-src-preserve-indentation nil)
+  )
+#+end_src
+
+** Table-block
+[[https://github.com/casouri/valign][Valign]] provides visual alignment for Org Mode, Markdown and table.el tables on GUI Emacs. It can properly align tables containing variable-pitch font, CJK characters and images. Meanwhile, the text-based alignment generated by Org mode (or Markdown mode) is left untouched.
+#+begin_src elisp
+  (use-package valign
+  :hook (org-mode . valign-mode)
+  )
+#+end_src
+[[https://github.com/tbanel/orgaggregate][Orgtbl-aggregate]] can creat a new table by computing sums, averages, and so on, out of material from the first table.
+
 ** Roam
 #+begin_src elisp
   (use-package org-roam
@@ -1004,18 +1105,19 @@ https://github.com/zerolfx/copilot.el
 Dropin replacement for dired.
 #+begin_src elisp
   (use-package dirvish
-    :init
+  :init
     (dirvish-override-dired-mode)
-    :custom
+  :custom
     (dirvish-quick-access-entries ; It's a custom option, `setq' won't work
       '(("h" "~/"                          "Home")
         ("d" "~/Downloads/"                "Downloads")
         ("m" "/mnt/"                       "Drives")
         ("t" "~/.local/share/Trash/files/" "TrashCan"))
     )
-    :config
+  :config
     ;; (dirvish-peek-mode) ; Preview files in minibuffer
     ;; (dirvish-side-follow-mode) ; similar to `treemacs-follow-mode'
+    (setq dirvish-path-separators (list "  " "  " "  "))
     (setq dirvish-mode-line-format
             '(:left (sort symlink) :right (omit yank index)))
     (setq dirvish-attributes
@@ -1076,32 +1178,7 @@ Dropin replacement for dired.
     (set-face-attribute 'diredfl-dir-name nil :bold t)
   )
 #+end_src
-** Which-key
-[[https://github.com/justbur/emacs-which-key][Which-key]] is a minor mode for Emacs that displays the key bindings following your currently entered incomplete command (a prefix) in a popup.
-#+begin_src elisp
-(use-package which-key
-  :init
-  (setq
-    which-key-side-window-location 'bottom
-    which-key-sort-order #'which-key-key-order-alpha
-    which-key-sort-uppercase-first nil
-    which-key-add-column-padding 1
-    which-key-max-display-columns nil
-    which-key-min-display-lines 6
-    which-key-side-window-slot -10
-    which-key-side-window-max-height 0.25
-    which-key-idle-delay 0.8
-    which-key-idle-secondary-delay 0.03
-    which-key-max-description-length 25
-    which-key-allow-imprecise-window-fit t
-    which-key-separator " → "
-  )
-  (which-key-mode 1)
-)
-#+end_src
-
 ** Helpful
-
 [[https://github.com/Wilfred/helpful][Helpful]] adds a lot of very helpful information to Emacs' =describe-= command buffers.
 For example, if you use =describe-function=, you will not only get the documentation about the function,
 you will also see the source code of the function and where it gets used in other places in the Emacs configuration.
@@ -1165,31 +1242,20 @@ It is very useful for figuring out how things work in Emacs.
 * Eaf
 [[https://github.com/emacs-eaf/emacs-application-framework][EAF]] is an extensible framework that revolutionizes the graphical capabilities of Emacs.
 #+begin_src elisp :tangle no
-(use-package eaf
-;; :load-path "~/.emacs.d/site-lisp/emacs-application-framework"
-:custom
-  ; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
-  (eaf-browser-continue-where-left-off t)
-  (eaf-browser-enable-adblocker t)
-  (browse-url-browser-function 'eaf-open-browser)
-:config
-  (defalias 'browse-web #'eaf-open-browser)
-  ;; (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
-  ;; (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
-  ;; (eaf-bind-key take_photo "p" eaf-camera-keybinding)
-  ;; (eaf-bind-key nil "M-q" eaf-browser-keybinding)
-  (setq confirm-kill-processes nil)
-) ;; unbind, see more in the Wiki
+  (use-package eaf
+  ;; :load-path "~/.emacs.d/site-lisp/emacs-application-framework"
+  :custom
+    ; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
+    (eaf-browser-continue-where-left-off t)
+    (eaf-browser-enable-adblocker t)
+    (browse-url-browser-function 'eaf-open-browser)
+  :config
+    (defalias 'browse-web #'eaf-open-browser)
+    ;; (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
+    ;; (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
+    ;; (eaf-bind-key take_photo "p" eaf-camera-keybinding)
+    ;; (eaf-bind-key nil "M-q" eaf-browser-keybinding)
+    (setq confirm-kill-processes nil)
+  ) ;; unbind, see more in the Wiki
 #+end_src
-
-#+begin_src elisp :tangle no
-  ;; (use-package eaf-browser)       ;;M-x eaf-file-browser-qrcode
-  (use-package eaf-git)       ;;M-x eaf-file-browser-qrcode
-  ;; uncompatible with dirvish
-  ;;(use-package eaf-file-manager)  ;;M-x eaf-open-in-file-manager
-  (use-package eaf-pdf-viewer)
-  (use-package eaf-2048)
-#+end_src
-
-
 
