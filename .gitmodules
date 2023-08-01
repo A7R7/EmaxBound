@@ -226,6 +226,9 @@
 [submodule "which-key"]
 	path = lib/which-key
 	url = https://github.com/justbur/emacs-which-key
+[submodule "which-key-posframe"]
+	path = lib/which-key-posframe
+	url = https://github.com/emacsorphanage/which-key-posframe
 [submodule "with-editor"]
 	path = lib/with-editor
 	url = https://github.com/magit/with-editor
