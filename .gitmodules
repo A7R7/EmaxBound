@@ -13,6 +13,9 @@
 [submodule "async"]
 	path = lib/async
 	url = https://github.com/jwiegley/emacs-async
+[submodule "auctex"]
+	path = lib/auctex
+	url = git@github.com:emacsmirror/auctex.git
 [submodule "auto-compile"]
 	path = lib/auto-compile
 	url = https://github.com/emacscollective/auto-compile
@@ -61,6 +64,9 @@
 [submodule "doom-themes"]
 	path = lib/doom-themes
 	url = https://github.com/doomemacs/themes
+[submodule "edit-indirect"]
+	path = lib/edit-indirect
+	url = https://github.com/Fanael/edit-indirect
 [submodule "elisp-refs"]
 	path = lib/elisp-refs
 	url = https://github.com/Wilfred/elisp-refs
@@ -127,6 +133,9 @@
 [submodule "org-appear"]
 	path = lib/org-appear
 	url = https://github.com/awth13/org-appear
+[submodule "org-bars"]
+	path = lib/org-bars
+	url = https://github.com/tonyaldon/org-bars.git
 [submodule "org-download"]
 	path = lib/org-download
 	url = https://github.com/abo-abo/org-download
@@ -139,6 +148,9 @@
 [submodule "org-gtd"]
 	path = lib/org-gtd
 	url = https://github.com/Trevoke/org-gtd.el
+[submodule "org-modern"]
+	path = lib/org-modern
+	url = https://github.com/minad/org-modern
 [submodule "org-preview-html"]
 	path = lib/org-preview-html
 	url = https://github.com/jakebox/org-preview-html
@@ -148,6 +160,12 @@
 [submodule "org-superstar"]
 	path = lib/org-superstar
 	url = https://github.com/integral-dw/org-superstar-mode
+[submodule "orgtbl-aggregate"]
+	path = lib/orgtbl-aggregate
+	url = https://github.com/tbanel/orgaggregate
+[submodule "pacmacs"]
+	path = lib/pacmacs
+	url = https://github.com/codingteam/pacmacs.el
 [submodule "posframe"]
 	path = lib/posframe
 	url = https://github.com/tumashu/posframe
@@ -163,6 +181,9 @@
 [submodule "s"]
 	path = lib/s
 	url = https://github.com/magnars/s.el
+[submodule "separedit"]
+	path = lib/separedit
+	url = https://github.com/twlz0ne/separedit.el
 [submodule "shrink-path"]
 	path = lib/shrink-path
 	url = https://gitlab.com/bennya/shrink-path.el
@@ -184,6 +205,9 @@
 [submodule "use-package"]
 	path = lib/use-package
 	url = git@github.com:jwiegley/use-package.git
+[submodule "valign"]
+	path = lib/valign
+	url = https://github.com/casouri/valign
 [submodule "vertico"]
 	path = lib/vertico
 	url = https://github.com/minad/vertico
