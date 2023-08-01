@@ -99,37 +99,35 @@ Borg seed generated configs.
 #+end_src
 
 * Init
-** Header
-Init.el file header, disable byte compile for init.el, according to the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html][emacs manual]].
+** File-local-variable
+Disable byte compile for init.el, according to the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html][emacs manual]].
 #+begin_src elisp
 ;;; init.el --- user-init-file
 ;;; -*- lexical-binding: t; no-byte-compile: t -*-
 #+end_src
-** Loading message
+** Basic setups
 #+begin_src elisp
-;;; Early birds
-(progn ;     startup
-  (defvar before-user-init-time (current-time)
-    "Value of `current-time' when Emacs begins loading `user-init-file'.")
-  (message "Loading Emacs...done (%.3fs)"
-           (float-time (time-subtract before-user-init-time
-                                      before-init-time)))
-  (setq user-init-file (or load-file-name buffer-file-name))
-  (setq user-emacs-directory (file-name-directory user-init-file))
-  (message "Loading %s..." user-init-file)
+  ;;; Early birds
+  (progn ;     startup
+    (defvar before-user-init-time (current-time)
+      "Value of `current-time' when Emacs begins loading `user-init-file'.")
+    (message "Loading Emacs...done (%.3fs)"
+             (float-time (time-subtract before-user-init-time
+                                        before-init-time)))
+    (setq user-init-file (or load-file-name buffer-file-name))
+    (setq user-emacs-directory (file-name-directory user-init-file))
+    (message "Loading %s..." user-init-file)
 
-  (setq inhibit-startup-buffer-menu t)
-  (setq inhibit-startup-screen t)
-  (setq inhibit-startup-echo-area-message "locutus")
-  (setq initial-buffer-choice t)
-  (setq initial-scratch-message "")
-)
-#+end_src
-
-** Performance
-Dial the GC threshold back down so that garbage collection happens more frequently but in less time.
-#+begin_src elisp
-(setq gc-cons-threshold (* 2 1000 1000))
+    (setq inhibit-startup-buffer-menu t)
+    (setq inhibit-startup-screen t)
+    (setq inhibit-startup-echo-area-message "locutus")
+    (setq initial-buffer-choice t)
+    (setq initial-scratch-message "")
+    ;; Defer garbage collection further back in the startup process
+    (setq gc-cons-threshold most-positive-fixnum)
+    ;; Prevent flashing of unstyled modeline at startup
+    (setq-default mode-line-format nil)
+  )
 #+end_src
 
 ** Borg
@@ -377,7 +375,7 @@ Magit is a VERY powerful git client, especially for emacs.
 * Kbd 
 ** Evil
 *** Evil mode
-The famous evil that make you look evil.
+Evil mode that turns you into an evil.
 #+begin_src elisp
   (use-package evil
     :init
@@ -449,48 +447,51 @@ The famous evil that make you look evil.
       :global-prefix "M-SPC") ;; access leader in insert mode
     (config/bind-leader-to
 
-        "b"       '(:ignore t                      :wk "Buffer ")
-        "bb"      '(switch-to-buffer               :wk "Switch ")
-        "bd"      '(kill-this-buffer               :wk "Delete ")
-        "br"      '(revert-buffer                  :wk "Reload 󰑓")
-        "bp"      '(previous-buffer                :wk "Prev ")
-        "bn"      '(next-buffer                    :wk "Next ")
-        "["       '(centaur-tabs-backward          :wk "Prev Buffer ")
-        "]"       '(centaur-tabs-forward           :wk "Next Buffer ")
+	"b"       '(:ignore t                      :wk "  Buffer ")
+	"bb"      '(switch-to-buffer               :wk " Switch ")
+	"bd"      '(kill-this-buffer               :wk "󰅖 Delete ")
+	"br"      '(revert-buffer                  :wk "󰑓 Reload ")
+	"bp"      '(previous-buffer                :wk " Prev ")
+	"bn"      '(next-buffer                    :wk " Next ")
+	"["       '(centaur-tabs-backward          :wk " Prev Buffer ")
+	"]"       '(centaur-tabs-forward           :wk " Next Buffer ")
 
-        "TAB"     '(:ignore t                      :wk "Tab 󰓩")
-        "TAB TAB" '(tab-new                        :wk "Tab New 󰝜")
-        "TAB d"   '(tab-close                      :wk "Tab Del 󰭌")
-        "TAB p"   '(tab-previous                   :wk "Prev ")
-        "TAB n"   '(tab-next                       :wk "Next ")
-        "{"       '(tab-previous                   :wk "Prev Tab ")
-        "}"       '(tab-next                       :wk "Next Tab ")
-       
-        "w"       '(:ignore t                      :wk "Window ")
-        "wd"      '(delete-window                  :wk "Delete ")
-        "wv"      '(split-window-vertically        :wk "Split 󰤻 ")
-        "ws"      '(split-window-horizontally      :wk "Split 󰤼 ")
-        "wh"      '(evil-window-left               :wk "Focus H ")
-        "wj"      '(evil-window-down               :wk "Focus J ")
-        "wk"      '(evil-window-up                 :wk "Focus K ")
-        "wl"      '(evil-window-right              :wk "Focus L ")
-        "\\"      '(split-window-vertically        :wk "Split 󰤻 ")
-        "|"       '(split-window-horizontally      :wk "Split 󰤼 ")
+	"TAB"     '(:ignore t                      :wk " 󰓩 Tab ")
+	"TAB TAB" '(tab-new                        :wk "󰝜 Tab New ")
+	"TAB d"   '(tab-close                      :wk "󰭌 Tab Del ")
+	"TAB p"   '(tab-previous                   :wk " Prev ")
+	"TAB n"   '(tab-next                       :wk " Next ")
+	"{"       '(tab-previous                   :wk " Prev Tab ")
+	"}"       '(tab-next                       :wk " Next Tab ")
 
-        "B"       '(:ignore t                      :wk "Borg 󰏗")
-        "Ba"      '(borg-assimilate                :wk "Assimilate 󱧕")
-        "Bb"      '(borg-build                     :wk "Build 󱇝")
-        "Bc"      '(borg-clone                     :wk "Clone ")
-        "Br"      '(borg-remove                    :wk "Remove 󱧖")
+	"w"       '(:ignore t                      :wk "  Window ")
+	"wd"      '(delete-window                  :wk "󰅖 Delete  ")
+	"wv"      '(split-window-vertically        :wk "󰤻 Split   ")
+	"ws"      '(split-window-horizontally      :wk "󰤼 Split   ")
+	"wh"      '(evil-window-left               :wk " Focus H ")
+	"wj"      '(evil-window-down               :wk " Focus J ")
+	"wk"      '(evil-window-up                 :wk " Focus K ")
+	"wl"      '(evil-window-right              :wk " Focus L ")
+	"\\"      '(split-window-vertically        :wk "󰤻 Split   ")
+	"|"       '(split-window-horizontally      :wk "󰤼 Split   ")
 
-        "g"       '(:ignore t                      :wk "Git")
-        "gg"      '(magit                          :wk "Magit")
-        "t"       '(:ignore t                      :wk "Toggle 󰨚")
-        "e"       '(dirvish-side                   :wk "Dirvish 󰙅")
+	"B"       '(:ignore t                      :wk " 󰏗 Borg      ")
+	"Ba"      '(borg-assimilate                :wk "󱧕 Assimilate ")
+	"Bb"      '(borg-build                     :wk "󱇝 Build      ")
+	"Bc"      '(borg-clone                     :wk " Clone      ")
+	"Br"      '(borg-remove                    :wk "󱧖 Remove     ")
 
-        "q"       '(:ignore t                      :wk "Quit  ")
-        ;"qe"      '(save-buffers-kill-emacs         :wk "Quit Emacs ")
-        "qq"      '(save-buffers-kill-terminal     :wk "Quit Emacs ")
+	"g"       '(:ignore t                      :wk " 󰊢 Git     ")
+	"gg"      '(magit                          :wk " Magit    ")
+
+	"t"       '(:ignore t                      :wk "  Toggle ")
+
+	"e"       '(dirvish-side                   :wk "󰙅 Dirvish-side ")
+	"E"       '(dirvish                        :wk " Dirvish      ")
+
+	"q"       '(:ignore t                      :wk " 󰗼 Quit     ")
+	"qq"      '(save-buffers-kill-terminal     :wk "󰗼 Quit Emacs")
+	;"qe"      '(save-buffers-kill-emacs         :wk "Quit Emacs ")
     )
   )
 #+end_src
@@ -515,14 +516,23 @@ The famous evil that make you look evil.
       which-key-idle-secondary-delay 0.01
       which-key-max-description-length 25
       which-key-allow-imprecise-window-fit t
-      which-key-separator " → "
-      which-key-show-early-on-C-h t
-      which-key-show-prefix 'left
-    )
+      ;which-key-separator " → "
+      which-key-separator " "
+      Which-key-show-early-on-C-h t
+      which-key-sort-order 'which-key-prefix-then-key-order)
     (which-key-mode 1)
   )
 #+end_src
-
+[[https://github.com/yanghaoxie/which-key-posframe][Which-key-posframe]] use posframe to show which-key popup. 
+options for =which-key-posframe-poshandler=:
+posframe-poshandler-[frame/window/point]-[top/bottom/]-[center/left-corner/right-corner]
+#+begin_src elisp
+  (use-package which-key-posframe
+  :config
+    (setq which-key-posframe-poshandler 'posframe-poshandler-frame-bottom-center)
+    (which-key-posframe-mode)
+  )
+#+end_src
 * UI
 ** Fonts
 
@@ -551,11 +561,6 @@ Makes commented text and keywords italics. Working in emacsclient but not emacs.
   :slant 'italic)
 (set-face-attribute 'font-lock-keyword-face nil
   :slant 'italic)
-#+end_src
-
-Uncomment the following line if line spacing needs adjusting.
-#+begin_src elisp
-;(setq-default line-spacing 0.12)
 #+end_src
 
 *** Zooming In/Out
@@ -618,9 +623,12 @@ Set background alpha to 5%
 [[https://github.com/seagle0128/doom-modeline][Doom-modeline]] is a very attractive and rich (yet still minimal) mode line configuration for Emacs.  The default configuration is quite good but you can check out the [[https://github.com/seagle0128/doom-modeline#customize][configuration options]] for more things you can enable or disable.
 
 #+begin_src elisp
-(use-package doom-modeline
-  :init (doom-modeline-mode 1)
-  :custom ((doom-modeline-height 15)))
+  (use-package doom-modeline
+  :init 
+    (setq doom-modeline-height 37)
+    (doom-modeline-mode 1)
+  :config
+  )
 #+end_src
 
 *NOTE1*: [[Nerd-icons]] are necessary. Run [[elisp:nerd-icons-install-fonts][M-x nerd-icons-install-fonts]] to install the resource fonts.
@@ -670,6 +678,7 @@ This package implements hiding or abbreviation of the modeline displays (lighter
       (emacs-startup . centaur-tabs-mode)
       (dired-mode . centaur-tabs-local-mode)
       (dirvish-directory-view-mode . centaur-tabs-local-mode)
+      (dashboard-mode . centaur-tabs-local-mode)
     :init
       (setq centaur-tabs-set-icons t
             centaur-tabs-set-modified-marker t
@@ -686,41 +695,47 @@ This package implements hiding or abbreviation of the modeline displays (lighter
 
   )
 #+end_src
-** Window center 
-[[https://github.com/joostkremers/visual-fill-column][visual-fill-column]] is a small Emacs minor mode that mimics the effect of fill-column in visual-line-mode. Instead of wrapping lines at the window edge, which is the standard behaviour of visual-line-mode, it wraps lines at fill-column.
-Another use case for visual-fill-column is to =centre the text= in a window.
+** Line Number
+#+begin_src elisp
+  (defun config/toggle-line-number-nil ()      
+    (interactive)
+    (setq display-line-numbers nil)
+  )
+  (defun config/toggle-line-number-absolute () 
+    (interactive)
+    (setq display-line-numbers t)
+  )
+  (defun config/toggle-line-number-relative () 
+    (interactive)
+    (setq display-line-numbers 'relative)
+  )
+  (defun config/toggle-line-number-visual ()   
+    (interactive)
+    (setq display-line-numbers 'visual)
+  )
+  (config/bind-leader-to
+     "tl"      '(:ignore t :wk " Line Number")
+     "tln"     '(config/toggle-line-number-nil :wk "Disable")
+     "tlt"     '(config/toggle-line-number-absolute :wk "Absolute")
+     "tlr"     '(config/toggle-line-number-relative :wk "Relative")
+     "tlv"     '(config/toggle-line-number-visual :wk "Visual")
+  )
+#+end_src
+** Window center
 #+begin_src elisp
   (use-package visual-fill-column
-    :config
-    (defun config/window-center (width)
-      (interactive)
-      (setq visual-fill-column-width width
-            visual-fill-column-center-text t)
-      (visual-fill-column-mode 1)
-      (visual-line-mode 1)
+  :init
+    (global-visual-line-mode t)
+  :config
+    (add-hook 'visual-line-mode-hook
+      (defun center-window ()
+	(setq visual-fill-column-center-text t)
+	(setq visual-fill-column-width 120)
+        (visual-fill-column-mode)
+      )
     )
   )
 #+end_src
-
-Use visual-fill-column to center text in minibuffer.
-Have some bugs.
-#+begin_src elisp
-  (add-hook 'minibuffer-setup-hook
-    (defun config/minibuffer-center ()
-      (config/window-center 140)
-    )
-  )
-#+end_src
-
-Use visual-fill-column to center magit
-#+begin_src elisp
-  (add-hook 'magit-mode-hook
-    (defun config/magit-center ()
-      (config/window-center 80)
-    )
-  )
-#+end_src
-
 * Org
 ** User Interface
 *** Headings & Levels
@@ -744,10 +759,14 @@ Change the font size of different org-levels.
 Disabled because org-morden is a drop-in replacement.
 #+begin_src elisp
   (use-package org-superstar
-  :disabled
+  :defer t
   :init
     (setq
       ;;org-superstar-headline-bullets-list '("✖" "✚" "◉" "○" "▶")
+      ;;org-superstar-headline-bullets-list '("󰇊" "󰇋" "󰇌" "󰇍" "󰇎" "󰇏")
+      ;;org-superstar-headline-bullets-list '("󱅊" "󱅋" "󱅌" "󱅍" "󱅎" "󱅏")
+      ;;org-superstar-headline-bullets-list '("᪥" "፠" "߷" "᪣" "𐩕") 
+      ;;org-superstar-headline-bullets-list '("𑗕") 
       org-superstar-special-todo-items t
       ;;org-ellipsis "  "
     )
@@ -758,31 +777,30 @@ Disabled because org-morden is a drop-in replacement.
 Temporarily disabled for performance.
 #+begin_src elisp
   (use-package org-bars
-  :disabled
-  :hook (org-mode . org-bars-mode)
+  :defer t
   :config
     (setq org-bars-color-options '(
           :desaturate-level-faces 60
           :darken-level-faces 15
     ))
     (setq org-bars-extra-pixels-height 12)
-    (setq org-bars-stars '(
-          :empty "▷"
-          :invisible "▶"
-          :visible "▼"
-    ))
+    ;(setq org-bars-stars '(:empty "▷" :invisible "▶" :visible "▼"))
+    (setq org-bars-stars '(:empty "" :invisible "" :visible ""))
   )
 #+end_src
 
-**** Org-morden
-[[https://github.com/minad/org-modern][org-morden]] implements a modern style for Org buffers using font locking and text properties. The package styles =headlines=, =keywords=, =tables= and =source blocks=. 
+**** Org-modern
+[[https://github.com/minad/org-modern][org-modern]] implements a modern style for Org buffers using font locking and text properties. The package styles =headlines=, =keywords=, =tables= and =source blocks=. 
 *This awesome package throws no warning during compilation.
+#+begin_src elisp
+  (use-package org-modern)
+#+end_src
 
 *** Text arrangement
 Use [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]] to center =org-mode= buffers for a more pleasing writing experience as it centers the contents of the buffer horizontally to seem more like you are editing a document.
 Use visual-line-mode to wrap text.
 Use org-indent-mode to set different indenting for different levels.
-#+begin_src elisp
+#+begin_src elisp :tangle no
     (add-hook 'org-mode-hook
       (defun config/org-mode-text-arrangement ()
         (config/window-center 100)
@@ -1258,4 +1276,3 @@ It is very useful for figuring out how things work in Emacs.
     (setq confirm-kill-processes nil)
   ) ;; unbind, see more in the Wiki
 #+end_src
-
