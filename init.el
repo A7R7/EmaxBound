@@ -17,9 +17,11 @@
   (setq inhibit-startup-echo-area-message "locutus")
   (setq initial-buffer-choice t)
   (setq initial-scratch-message "")
+  ;; Defer garbage collection further back in the startup process
+  (setq gc-cons-threshold most-positive-fixnum)
+  ;; Prevent flashing of unstyled modeline at startup
+  (setq-default mode-line-format nil)
 )
-
-(setq gc-cons-threshold (* 2 1000 1000))
 
 (eval-and-compile ; `borg'
   (add-to-list 'load-path (expand-file-name "lib/borg" user-emacs-directory))
@@ -76,12 +78,6 @@
 (progn ;     startup
   (message "Loading early birds...done (%.3fs)"
            (float-time (time-subtract (current-time) before-user-init-time))))
-
-(use-package diff-hl
-  :config
-  (setq diff-hl-draw-borders nil)
-  (global-diff-hl-mode)
-  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t))
 
 (use-package diff-mode
   :defer t
@@ -249,55 +245,89 @@
   ;; set up 'SPC' as the global leader key
 
   (general-evil-setup t)
-  (general-create-definer config/bind-leader-to
+  (general-create-definer config/leader
     :states '(normal insert visual emacs)
     :keymaps 'override
     :prefix "SPC" ;; set leader
     :global-prefix "M-SPC") ;; access leader in insert mode
-  (config/bind-leader-to
 
-      "b"       '(:ignore t                      :wk "Buffer ")
-      "bb"      '(switch-to-buffer               :wk "Switch ")
-      "bd"      '(kill-this-buffer               :wk "Delete ")
-      "br"      '(revert-buffer                  :wk "Reload 󰑓")
-      "bp"      '(previous-buffer                :wk "Prev ")
-      "bn"      '(next-buffer                    :wk "Next ")
-      "["       '(centaur-tabs-backward          :wk "Prev Buffer ")
-      "]"       '(centaur-tabs-forward           :wk "Next Buffer ")
+  (config/leader
+      "DEL"     '(which-key-undo                 :wk "󰕍 Undo key"))
 
-      "TAB"     '(:ignore t                      :wk "Tab 󰓩")
-      "TAB TAB" '(tab-new                        :wk "Tab New 󰝜")
-      "TAB d"   '(tab-close                      :wk "Tab Del 󰭌")
-      "TAB p"   '(tab-previous                   :wk "Prev ")
-      "TAB n"   '(tab-next                       :wk "Next ")
-      "{"       '(tab-previous                   :wk "Prev Tab ")
-      "}"       '(tab-next                       :wk "Next Tab ")
+  (config/leader :infix "b"
+      ""        '(nil                            :wk "  Buffer ")
+      "DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
+      "b"       '(switch-to-buffer               :wk " Switch ")
+      "d"       '(kill-this-buffer               :wk "󰅖 Delete ")
+      "r"       '(revert-buffer                  :wk "󰑓 Reload ")
+      "["       '(previous-buffer                :wk " Prev ")
+      "]"       '(next-buffer                    :wk " Next ")
+  )
+  (config/leader
+      "{"       '(centaur-tabs-backward-group    :wk " Prev Group")
+      "}"       '(centaur-tabs-forward-group     :wk " Next Group")
+      "["       '(centaur-tabs-backward          :wk " Prev Buffer ")
+      "]"       '(centaur-tabs-forward           :wk " Next Buffer ")
+  )
 
-      "w"       '(:ignore t                      :wk "Window ")
-      "wd"      '(delete-window                  :wk "Delete ")
-      "wv"      '(split-window-vertically        :wk "Split 󰤻 ")
-      "ws"      '(split-window-horizontally      :wk "Split 󰤼 ")
-      "wh"      '(evil-window-left               :wk "Focus H ")
-      "wj"      '(evil-window-down               :wk "Focus J ")
-      "wk"      '(evil-window-up                 :wk "Focus K ")
-      "wl"      '(evil-window-right              :wk "Focus L ")
-      "\\"      '(split-window-vertically        :wk "Split 󰤻 ")
-      "|"       '(split-window-horizontally      :wk "Split 󰤼 ")
+  (config/leader :infix "TAB"
+      ""        '(nil                            :wk " 󰓩 Tab ")
+      "DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
+      "TAB"     '(tab-new                        :wk "󰝜 Tab New ")
+      "d"       '(tab-close                      :wk "󰭌 Tab Del ")
+      "["       '(tab-previous                   :wk " Prev ")
+      "]"       '(tab-next                       :wk " Next ")
+  )
 
-      "B"       '(:ignore t                      :wk "Borg 󰏗")
-      "Ba"      '(borg-assimilate                :wk "Assimilate 󱧕")
-      "Bb"      '(borg-build                     :wk "Build 󱇝")
-      "Bc"      '(borg-clone                     :wk "Clone ")
-      "Br"      '(borg-remove                    :wk "Remove 󱧖")
+  (config/leader :infix "w"
+      ""        '(nil                            :wk " 󰓩 Tab ")
+      "DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
+      "d"       '(delete-window                  :wk "󰅖 Delete  ")
+      "v"       '(split-window-vertically        :wk "󰤻 Split   ")
+      "s"       '(split-window-horizontally      :wk "󰤼 Split   ")
+      "h"       '(evil-window-left               :wk " Focus H ")
+      "j"       '(evil-window-down               :wk " Focus J ")
+      "k"       '(evil-window-up                 :wk " Focus K ")
+      "l"       '(evil-window-right              :wk " Focus L ")
+      "\\"      '(split-window-vertically        :wk "󰤻 Split   ")
+      "|"       '(split-window-horizontally      :wk "󰤼 Split   ")
+  )
+  (config/leader :infix "w"
+      "\\"      '(split-window-vertically        :wk "󰤻 Split   ")
+      "|"       '(split-window-horizontally      :wk "󰤼 Split   ")
+  )
 
-      "g"       '(:ignore t                      :wk "Git")
-      "gg"      '(magit                          :wk "Magit")
-      "t"       '(:ignore t                      :wk "Toggle 󰨚")
-      "e"       '(dirvish-side                   :wk "Dirvish 󰙅")
+  (config/leader :infix "B"
+      ""        '(nil                            :wk " 󰏗 Borg      ")
+      "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
+      "a"       '(borg-assimilate                :wk "󱧕 Assimilate ")
+      "A"       '(borg-activate                  :wk " Activate   ")
+      "b"       '(borg-build                     :wk "󱇝 Build      ")
+      "c"       '(borg-clone                     :wk " Clone      ")
+      "r"       '(borg-remove                    :wk "󱧖 Remove     ")
+  )
 
-      "q"       '(:ignore t                      :wk "Quit  ")
+  (config/leader :infix "t"
+      ""        '(nil                            :wk "  Toggle    ")
+      "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
+  )
+
+  (config/leader :infix "q"
+      ""        '(nil                            :wk " 󰗼 Quit      ")
+      "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
+      "q"       '(save-buffers-kill-terminal     :wk "󰗼 Quit Emacs ")
+  )
+
+  (config/leader :infix "g"
+      ""        '(nil                            :wk " 󰊢 Git       ")
+      "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
+      "g"       '(magit                          :wk " Magit      ")
+  )
+
+  (config/leader 
+      "e"       '(dirvish-side                   :wk "󰙅 Dirvish-side ")
+      "E"       '(dirvish                        :wk " Dirvish      ")
       ;"qe"      '(save-buffers-kill-emacs         :wk "Quit Emacs ")
-      "qq"      '(save-buffers-kill-terminal     :wk "Quit Emacs ")
   )
 )
 
@@ -317,11 +347,22 @@
     which-key-idle-secondary-delay 0.01
     which-key-max-description-length 25
     which-key-allow-imprecise-window-fit t
-    which-key-separator " → "
-    which-key-show-early-on-C-h t
-    which-key-show-prefix 'left
+    ;which-key-separator " → "
+    which-key-separator " "
+    Which-key-show-early-on-C-h t
+    which-key-sort-order 'which-key-prefix-then-key-order
   )
+  ;(general-define-key
+  ;:keymaps 'which-key-mode-map
+  ;  "DEL" '(which-key-undo :wk "undo")
+  ;)
   (which-key-mode 1)
+)
+
+(use-package which-key-posframe
+:config
+  (setq which-key-posframe-poshandler 'posframe-poshandler-frame-bottom-center)
+  (which-key-posframe-mode)
 )
 
 (set-face-attribute 'default nil
@@ -341,8 +382,6 @@
   :slant 'italic)
 (set-face-attribute 'font-lock-keyword-face nil
   :slant 'italic)
-
-;(setq-default line-spacing 0.12)
 
 (use-package emacs
   :init 
@@ -367,17 +406,32 @@
   ;; (nerd-icons-font-family "Symbols Nerd Font Mono")
 )
 
-(use-package doom-themes
-  :after emacs
-  :init
-  (load-theme 'doom-ayu-mirage t))
+(use-package olivetti
+:hook (org-mode . olivetti-mode)
+)
+
+(use-package visual-fill-column
+:defer t
+:init
+  (global-visual-line-mode t)
+:config
+  (add-hook 'visual-fill-column-mode-hook
+     (defun center-window ()
+       (setq visual-fill-column-center-text t)
+       (setq visual-fill-column-width 120)
+     )
+  )
+)
 
 (set-frame-parameter nil 'alpha-background 95)
 (add-to-list 'default-frame-alist '(alpha-background . 95))
 
 (use-package doom-modeline
-  :init (doom-modeline-mode 1)
-  :custom ((doom-modeline-height 15)))
+:init 
+  (setq doom-modeline-height 37)
+  (doom-modeline-mode 1)
+:config
+)
 
 (use-package dashboard
 :init
@@ -411,6 +465,7 @@
     (emacs-startup . centaur-tabs-mode)
     (dired-mode . centaur-tabs-local-mode)
     (dirvish-directory-view-mode . centaur-tabs-local-mode)
+    (dashboard-mode . centaur-tabs-local-mode)
   :init
     (setq centaur-tabs-set-icons t
           centaur-tabs-set-modified-marker t
@@ -427,129 +482,54 @@
 
 )
 
-(use-package visual-fill-column
+(defun config/toggle-line-number-nil ()      
+  (interactive)
+  (setq display-line-numbers nil)
+)
+(defun config/toggle-line-number-absolute () 
+  (interactive)
+  (setq display-line-numbers t)
+)
+(defun config/toggle-line-number-relative () 
+  (interactive)
+  (setq display-line-numbers 'relative)
+)
+(defun config/toggle-line-number-visual ()   
+  (interactive)
+  (setq display-line-numbers 'visual)
+)
+(config/leader :infix "tl"
+   ""        '(nil                                :wk "  Line Number ")
+   "DEL"     '(which-key-undo                     :wk "󰕍 Undo key ")
+   "n"       '(config/toggle-line-number-nil      :wk "󰅖 Nil        ")
+   "a"       '(config/toggle-line-number-absolute :wk "󰯫 Absolute   ")
+   "r"       '(config/toggle-line-number-relative :wk " Relative   ")
+   "v"       '(config/toggle-line-number-visual   :wk " Visual     ")
+)
+
+(use-package diff-hl
   :config
-  (defun config/window-center (width)
-    (interactive)
-    (setq visual-fill-column-width width
-          visual-fill-column-center-text t)
-    (visual-fill-column-mode 1)
-    (visual-line-mode 1)
-  )
+  (setq diff-hl-draw-borders nil)
+  (global-diff-hl-mode)
+  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
 )
-
-(add-hook 'minibuffer-setup-hook
-  (defun config/minibuffer-center ()
-    (config/window-center 140)
-  )
-)
-
-(add-hook 'magit-mode-hook
-  (defun config/magit-center ()
-    (config/window-center 80)
-  )
-)
-
-(use-package org
-  :config
-  (set-face-attribute 'org-document-title nil :family "Cantarell" :height 2.5 :bold t)
-  (set-face-attribute 'org-level-1 nil :family "Cantarell" :height 1.8 :bold t)
-  (set-face-attribute 'org-level-2 nil :family "Cantarell" :height 1.7 :bold t)
-  (set-face-attribute 'org-level-3 nil :family "Cantarell" :height 1.6 :bold t)
-  (set-face-attribute 'org-level-4 nil :family "Cantarell" :height 1.5 :bold t)
-  (set-face-attribute 'org-level-5 nil :family "Cantarell" :height 1.4 :bold t)
-  (set-face-attribute 'org-level-6 nil :family "Cantarell" :height 1.3 :bold t)
-)
-
-(use-package org-superstar
-:disabled
-:init
-  (setq
-    ;;org-superstar-headline-bullets-list '("✖" "✚" "◉" "○" "▶")
-    org-superstar-special-todo-items t
-    ;;org-ellipsis "  "
-  )
-)
-
-(use-package org-bars
-:disabled
-:hook (org-mode . org-bars-mode)
-:config
-  (setq org-bars-color-options '(
-        :desaturate-level-faces 60
-        :darken-level-faces 15
-  ))
-  (setq org-bars-extra-pixels-height 12)
-  (setq org-bars-stars '(
-        :empty "▷"
-        :invisible "▶"
-        :visible "▼"
-  ))
-)
-
-(add-hook 'org-mode-hook
-    (defun config/org-mode-text-arrangement ()
-      (config/window-center 100)
-      (org-indent-mode)
-;      (variable-pitch-mode 1)
-    )
-  )
-
-(use-package hl-todo
-  :init
-  (hl-todo-mode)
-)
-
-(use-package org-fancy-priorities)
-
-(use-package org-appear
-  :hook (org-mode . org-appear-mode)
-  :init
-  (setq org-appear-autoemphasis  t)
-  ;(get it?) (setq org-appear-autolinks t)
-  (setq org-appear-autosubmarkers t)
-)
-
-(use-package evil-org)
-
-(use-package org
-:config
-    (setq org-src-tab-acts-natively t)
-    (setq org-src-preserve-indentation nil)
-)
-
-(use-package valign
-:hook (org-mode . valign-mode)
-)
-
-(use-package org-roam
-:after org
-:init
-  (setq org-roam-directory (file-truename "~/roam"))
-  (setq org-roam-v2-ack t)
-)
-
-;; (use-package org-pandoc)
 
 (use-package vertico
   :init
-  (vertico-mode 1)
   (setq completion-styles '(orderless))
   (setq orderless-component-separator #'orderless-escapable-split-on-space)
   (setq orderless-matching-styles
       '(orderless-initialism orderless-prefixes orderless-regexp))
   ;; Different scroll margin
-  ;; (setq vertico-scroll-margin 0)
-
+  (setq vertico-scroll-margin 1)
   ;; Show more candidates
-  ;; (setq vertico-count 20)
-
+  (setq vertico-count 20)
   ;; Grow and shrink the Vertico minibuffer
-  ;; (setq vertico-resize t)
-
+  (setq vertico-resize nil)
   ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
-  ;; (setq vertico-cycle t)
-  )
+  (setq vertico-cycle t)
+  (vertico-mode 1)
+)
 
 ;; Persist history over Emacs restarts. Vertico sorts by history position.
   (use-package savehist
@@ -579,9 +559,41 @@
       ;; Vertico commands are hidden in normal buffers.
       ;; (setq read-extended-command-predicate
       ;;       #'command-completion-default-include-p)
-
       ;; Enable recursive minibuffers
       (setq enable-recursive-minibuffers t))
+
+(use-package vertico-directory
+  :after vertico
+  ;; More convenient directory navigation commands
+  :bind (:map vertico-map
+              ("RET" . vertico-directory-enter)
+              ("DEL" . vertico-directory-delete-char)
+              ("M-DEL" . vertico-directory-delete-word))
+  ;; Tidy shadowed file names
+  :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
+
+(use-package vertico-multiform
+  :after vertico
+  :config (vertico-multiform-mode)
+)
+
+(use-package vertico-posframe
+:after vertico-multiform
+:init 
+  (setq vertico-multiform-commands
+       '((consult-line posframe
+            (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
+            (vertico-posframe-fallback-mode . vertico-buffer-mode)
+            (vertico-posframe-width . 50))
+         (execute-extended-command
+            (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
+            (vertico-posframe-fallback-mode . vertico-buffer-mode))
+         (t posframe)
+        )
+  )
+  (vertico-multiform-mode 1)
+  (vertico-posframe-mode 1)
+)
 
 (use-package consult
   ;; Replace bindings. Lazily loaded due by `use-package'.
@@ -711,6 +723,79 @@
   (global-lsp-bridge-mode)
 )
 
+(use-package org
+  :config
+  (set-face-attribute 'org-document-title nil :family "Cantarell" :height 2.5 :bold t)
+  (set-face-attribute 'org-level-1 nil :family "Cantarell" :height 1.8 :bold t)
+  (set-face-attribute 'org-level-2 nil :family "Cantarell" :height 1.7 :bold t)
+  (set-face-attribute 'org-level-3 nil :family "Cantarell" :height 1.6 :bold t)
+  (set-face-attribute 'org-level-4 nil :family "Cantarell" :height 1.5 :bold t)
+  (set-face-attribute 'org-level-5 nil :family "Cantarell" :height 1.4 :bold t)
+  (set-face-attribute 'org-level-6 nil :family "Cantarell" :height 1.3 :bold t)
+)
+
+(use-package org-superstar
+:defer t
+:init
+  (setq
+    ;;org-superstar-headline-bullets-list '("✖" "✚" "◉" "○" "▶")
+    ;;org-superstar-headline-bullets-list '("󰇊" "󰇋" "󰇌" "󰇍" "󰇎" "󰇏")
+    org-superstar-special-todo-items t
+    ;;org-ellipsis "  "
+  )
+)
+
+(use-package org-bars
+:commands 'org-bars-mode
+:hook (org-mode . org-bars-mode)
+:config
+  (setq org-bars-color-options '(
+	:desaturate-level-faces 100
+	:darken-level-faces 10
+  ))
+  (setq org-bars-extra-pixels-height 12)
+  ;(setq org-bars-stars '(:empty "▷" :invisible "▶" :visible "▼"))
+  (setq org-bars-stars '(:empty "" :invisible "" :visible ""))
+)
+
+(use-package org-modern)
+
+(use-package hl-todo
+  :init
+  (hl-todo-mode)
+)
+
+(use-package org-fancy-priorities)
+
+(use-package org-appear
+  :hook (org-mode . org-appear-mode)
+  :init
+  (setq org-appear-autoemphasis  t)
+  ;(get it?) (setq org-appear-autolinks t)
+  (setq org-appear-autosubmarkers t)
+)
+
+(use-package evil-org)
+
+(use-package org
+:config
+    (setq org-src-tab-acts-natively t)
+    (setq org-src-preserve-indentation nil)
+)
+
+(use-package valign
+:hook (org-mode . valign-mode)
+)
+
+(use-package org-roam
+:after org
+:init
+  (setq org-roam-directory (file-truename "~/roam"))
+  (setq org-roam-v2-ack t)
+)
+
+;; (use-package org-pandoc)
+
 (use-package dirvish
 :init
   (dirvish-override-dired-mode)
@@ -793,13 +878,13 @@
 )
 
 (use-package marginalia
-  :general
+:general
   (:keymaps 'minibuffer-local-map
    "M-A" 'marginalia-cycle)
-  :custom
+:custom
   (marginalia-max-relative-age 0)
   (marginalia-align 'right)
-  :init
+:init
   (marginalia-mode)
 )
 

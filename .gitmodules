@@ -19,6 +19,9 @@
 [submodule "auto-compile"]
 	path = lib/auto-compile
 	url = https://github.com/emacscollective/auto-compile
+[submodule "avy"]
+	path = lib/avy
+	url = https://github.com/abo-abo/avy
 [submodule "beacon"]
 	path = lib/beacon
 	url = https://github.com/Malabarba/beacon
@@ -67,12 +70,18 @@
 [submodule "edit-indirect"]
 	path = lib/edit-indirect
 	url = https://github.com/Fanael/edit-indirect
+[submodule "elisp-def"]
+	path = lib/elisp-def
+	url = https://github.com/Wilfred/elisp-def
 [submodule "elisp-refs"]
 	path = lib/elisp-refs
 	url = https://github.com/Wilfred/elisp-refs
 [submodule "emacsql"]
 	path = lib/emacsql
 	url = https://github.com/magit/emacsql
+[submodule "embark"]
+	path = lib/embark
+	url = https://github.com/oantolin/embark
 [submodule "epkg"]
 	path = lib/epkg
 	url = https://github.com/emacscollective/epkg
@@ -121,9 +130,15 @@
 [submodule "markdown-mode"]
 	path = lib/markdown-mode
 	url = https://github.com/jrblevin/markdown-mode
+[submodule "nano-theme"]
+	path = lib/nano-theme
+	url = https://github.com/rougier/nano-theme
 [submodule "nerd-icons"]
 	path = lib/nerd-icons
 	url = https://github.com/rainstormstudio/nerd-icons.el
+[submodule "olivetti"]
+	path = lib/olivetti
+	url = https://github.com/rnkn/olivetti
 [submodule "orderless"]
 	path = lib/orderless
 	url = https://github.com/oantolin/orderless
@@ -187,9 +202,15 @@
 [submodule "shrink-path"]
 	path = lib/shrink-path
 	url = https://gitlab.com/bennya/shrink-path.el
+[submodule "solaire-mode"]
+	path = lib/solaire-mode
+	url = https://github.com/hlissner/emacs-solaire-mode
 [submodule "sqlite3"]
 	path = lib/sqlite3
 	url = https://github.com/pekingduck/emacs-sqlite3-api
+[submodule "sublime-themes"]
+	path = lib/sublime-themes
+	url = https://github.com/owainlewis/emacs-color-themes
 [submodule "transient"]
 	path = lib/transient
 	url = https://github.com/magit/transient
@@ -232,6 +253,9 @@
 [submodule "with-editor"]
 	path = lib/with-editor
 	url = https://github.com/magit/with-editor
+[submodule "yascroll"]
+	path = lib/yascroll
+	url = https://github.com/emacsorphanage/yascroll
 [submodule "yasnippet"]
 	path = lib/yasnippet
 	url = https://github.com/joaotavora/yasnippet

@@ -8,5 +8,12 @@
 [submodule "sqlite3"]
 	build-step = make
 [submodule "dirvish"]
+	load-path = .
+	load-path = extensions
+[submodule "vertico"]
+	load-path = .
+	load-path = extensions
+[submodule "lsp-bridge"]
   load-path = .
-  load-path = extensions
+  load-path = acm
+  load-path = core

@@ -20,11 +20,13 @@
 This config file is still in its early stages of development, *Everything is unstable!*
 
 To play around with my config files, clone this repo anywhere you like on your system.
+
 #+begin_src bash
 git clone --depth=1 https://github.com/A7R7/EmaxBound.git
 #+end_src
 
 Then, simply execute these make rules inside the repo directory.
+
 #+begin_src bash
 make bootstrap-borg  # bootstrap borg itself
 make bootstrap       # bootstrap collective or new drones
@@ -40,11 +42,14 @@ Check [[https://emacsmirror.net/manual/borg/Bootstrapping-using-a-seed.html][Boo
 
 - Firstly, I generated the structure from the seed.
 - Then, I copied and pasted all the original code from init.el and early-init.el to this org file.
-- Last, any further config does not go beyond the following 2 steps:
+- Last, most further config does not go beyond the following 2 steps:
 
   + Run [[elisp: borg-assimilate][M-x borg-assimilate]] and input the name of the package to install this package.
   + Write config codes into this org file, then run [[elisp:org-babel-tangle][M-x org-babel-tangle]] so that emacs writes the codes into the corresponding file.
 
+ps: For some packages, you need to manually specify its load path or build method in ~.borgconfig~ for them to work.
+
+For example, some packages have an ~extensions~ dir in their repo. To load these extensions, you need to add ~load-path = .~ and ~load-path = extensions~ under the corresponding submodule inside ~.borgconfig~.
 ** References
 -  [[https://github.com/lccambiaghi/vanilla-emacs][Luca's vanilla-emacs]] (2023) detailed org config file.
 -  [[https://gitlab.com/dwt1/configuring-emacs][DistroTube's Configuring Emacs]] (2023) easy to follow.
@@ -56,7 +61,6 @@ Check [[https://emacsmirror.net/manual/borg/Bootstrapping-using-a-seed.html][Boo
   
 * TODOS
 ** Syntax highlighting
-** Indenting
 ** completion
 ** Zoxide path
 ** vertico, frame, 
@@ -105,6 +109,7 @@ Disable byte compile for init.el, according to the [[https://www.gnu.org/softwar
 ;;; init.el --- user-init-file
 ;;; -*- lexical-binding: t; no-byte-compile: t -*-
 #+end_src
+
 ** Basic setups
 #+begin_src elisp
   ;;; Early birds
@@ -157,15 +162,18 @@ Use-package is built-in since emacs-29
   ;  (require  'use-package)
   ;  (setq use-package-verbose t))
 #+end_src
+
 ** dash
 #+begin_src elisp
 (use-package dash
   :config (global-dash-fontify-mode))
 #+end_src
+
 ** eieio
 #+begin_src elisp
 (use-package eieio)
 #+end_src
+
 ** auto-compile
 #+begin_src elisp
 (use-package auto-compile
@@ -177,6 +185,7 @@ Use-package is built-in since emacs-29
   (setq auto-compile-update-autoloads             t)
 )
 #+end_src
+
 ** epkg
 #+begin_src elisp
 (use-package epkg
@@ -187,6 +196,7 @@ Use-package is built-in since emacs-29
   (setq epkg-database-connector
         (if (>= emacs-major-version 29) 'sqlite-builtin 'sqlite-module)))
 #+end_src
+
 ** custom
 #+begin_src elisp
 (use-package custom
@@ -196,27 +206,22 @@ Use-package is built-in since emacs-29
   (when (file-exists-p custom-file)
     (load custom-file)))
 #+end_src
+
 ** server
 #+begin_src elisp
 (use-package server
   :commands (server-running-p)
   :config (or (server-running-p) (server-mode)))
 #+end_src
+
 ** elisp
 #+begin_src elisp
 (progn ;     startup
   (message "Loading early birds...done (%.3fs)"
            (float-time (time-subtract (current-time) before-user-init-time))))
 #+end_src
-** long tail
-#+begin_src elisp
-(use-package diff-hl
-  :config
-  (setq diff-hl-draw-borders nil)
-  (global-diff-hl-mode)
-  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t))
-#+end_src
 
+** long tail
 #+begin_src elisp
 (use-package diff-mode
   :defer t
@@ -372,10 +377,12 @@ Magit is a VERY powerful git client, especially for emacs.
 ;; End:
 ;;; init.el ends here
 #+end_src
+
 * Kbd 
 ** Evil
 *** Evil mode
 Evil mode that turns you into an evil.
+
 #+begin_src elisp
   (use-package evil
     :init
@@ -414,6 +421,7 @@ Evil mode that turns you into an evil.
     :config (setq ring-bell-function #'ignore)
   )
 #+end_src
+
 *** Undo-tree
 #+begin_src elisp
   (use-package undo-tree
@@ -424,6 +432,7 @@ Evil mode that turns you into an evil.
     (global-undo-tree-mode 1)
   )
 #+end_src
+
 ** General
 [[https://github.com/noctuid/general.el][General]] provides a more convenient method for binding keys in emacs
 (for both evil and non-evil users).
@@ -440,58 +449,89 @@ Evil mode that turns you into an evil.
     ;; set up 'SPC' as the global leader key
 
     (general-evil-setup t)
-    (general-create-definer config/bind-leader-to
+    (general-create-definer config/leader
       :states '(normal insert visual emacs)
       :keymaps 'override
       :prefix "SPC" ;; set leader
       :global-prefix "M-SPC") ;; access leader in insert mode
-    (config/bind-leader-to
 
-	"b"       '(:ignore t                      :wk "  Buffer ")
-	"bb"      '(switch-to-buffer               :wk " Switch ")
-	"bd"      '(kill-this-buffer               :wk "󰅖 Delete ")
-	"br"      '(revert-buffer                  :wk "󰑓 Reload ")
-	"bp"      '(previous-buffer                :wk " Prev ")
-	"bn"      '(next-buffer                    :wk " Next ")
-	"["       '(centaur-tabs-backward          :wk " Prev Buffer ")
-	"]"       '(centaur-tabs-forward           :wk " Next Buffer ")
+    (config/leader
+        "DEL"     '(which-key-undo                 :wk "󰕍 Undo key"))
 
-	"TAB"     '(:ignore t                      :wk " 󰓩 Tab ")
-	"TAB TAB" '(tab-new                        :wk "󰝜 Tab New ")
-	"TAB d"   '(tab-close                      :wk "󰭌 Tab Del ")
-	"TAB p"   '(tab-previous                   :wk " Prev ")
-	"TAB n"   '(tab-next                       :wk " Next ")
-	"{"       '(tab-previous                   :wk " Prev Tab ")
-	"}"       '(tab-next                       :wk " Next Tab ")
+    (config/leader :infix "b"
+        ""        '(nil                            :wk "  Buffer ")
+        "DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
+        "b"       '(switch-to-buffer               :wk " Switch ")
+        "d"       '(kill-this-buffer               :wk "󰅖 Delete ")
+        "r"       '(revert-buffer                  :wk "󰑓 Reload ")
+        "["       '(previous-buffer                :wk " Prev ")
+        "]"       '(next-buffer                    :wk " Next ")
+    )
+    (config/leader
+        "{"       '(centaur-tabs-backward-group    :wk " Prev Group")
+        "}"       '(centaur-tabs-forward-group     :wk " Next Group")
+        "["       '(centaur-tabs-backward          :wk " Prev Buffer ")
+        "]"       '(centaur-tabs-forward           :wk " Next Buffer ")
+    )
 
-	"w"       '(:ignore t                      :wk "  Window ")
-	"wd"      '(delete-window                  :wk "󰅖 Delete  ")
-	"wv"      '(split-window-vertically        :wk "󰤻 Split   ")
-	"ws"      '(split-window-horizontally      :wk "󰤼 Split   ")
-	"wh"      '(evil-window-left               :wk " Focus H ")
-	"wj"      '(evil-window-down               :wk " Focus J ")
-	"wk"      '(evil-window-up                 :wk " Focus K ")
-	"wl"      '(evil-window-right              :wk " Focus L ")
-	"\\"      '(split-window-vertically        :wk "󰤻 Split   ")
-	"|"       '(split-window-horizontally      :wk "󰤼 Split   ")
+    (config/leader :infix "TAB"
+        ""        '(nil                            :wk " 󰓩 Tab ")
+        "DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
+        "TAB"     '(tab-new                        :wk "󰝜 Tab New ")
+        "d"       '(tab-close                      :wk "󰭌 Tab Del ")
+        "["       '(tab-previous                   :wk " Prev ")
+        "]"       '(tab-next                       :wk " Next ")
+    )
 
-	"B"       '(:ignore t                      :wk " 󰏗 Borg      ")
-	"Ba"      '(borg-assimilate                :wk "󱧕 Assimilate ")
-	"Bb"      '(borg-build                     :wk "󱇝 Build      ")
-	"Bc"      '(borg-clone                     :wk " Clone      ")
-	"Br"      '(borg-remove                    :wk "󱧖 Remove     ")
+    (config/leader :infix "w"
+        ""        '(nil                            :wk " 󰓩 Tab ")
+        "DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
+        "d"       '(delete-window                  :wk "󰅖 Delete  ")
+        "v"       '(split-window-vertically        :wk "󰤻 Split   ")
+        "s"       '(split-window-horizontally      :wk "󰤼 Split   ")
+        "h"       '(evil-window-left               :wk " Focus H ")
+        "j"       '(evil-window-down               :wk " Focus J ")
+        "k"       '(evil-window-up                 :wk " Focus K ")
+        "l"       '(evil-window-right              :wk " Focus L ")
+        "\\"      '(split-window-vertically        :wk "󰤻 Split   ")
+        "|"       '(split-window-horizontally      :wk "󰤼 Split   ")
+    )
+    (config/leader :infix "w"
+        "\\"      '(split-window-vertically        :wk "󰤻 Split   ")
+        "|"       '(split-window-horizontally      :wk "󰤼 Split   ")
+    )
 
-	"g"       '(:ignore t                      :wk " 󰊢 Git     ")
-	"gg"      '(magit                          :wk " Magit    ")
+    (config/leader :infix "B"
+        ""        '(nil                            :wk " 󰏗 Borg      ")
+        "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
+        "a"       '(borg-assimilate                :wk "󱧕 Assimilate ")
+        "A"       '(borg-activate                  :wk " Activate   ")
+        "b"       '(borg-build                     :wk "󱇝 Build      ")
+        "c"       '(borg-clone                     :wk " Clone      ")
+        "r"       '(borg-remove                    :wk "󱧖 Remove     ")
+    )
 
-	"t"       '(:ignore t                      :wk "  Toggle ")
+    (config/leader :infix "t"
+        ""        '(nil                            :wk "  Toggle    ")
+        "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
+    )
 
-	"e"       '(dirvish-side                   :wk "󰙅 Dirvish-side ")
-	"E"       '(dirvish                        :wk " Dirvish      ")
+    (config/leader :infix "q"
+        ""        '(nil                            :wk " 󰗼 Quit      ")
+        "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
+        "q"       '(save-buffers-kill-terminal     :wk "󰗼 Quit Emacs ")
+    )
 
-	"q"       '(:ignore t                      :wk " 󰗼 Quit     ")
-	"qq"      '(save-buffers-kill-terminal     :wk "󰗼 Quit Emacs")
-	;"qe"      '(save-buffers-kill-emacs         :wk "Quit Emacs ")
+    (config/leader :infix "g"
+        ""        '(nil                            :wk " 󰊢 Git       ")
+        "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
+        "g"       '(magit                          :wk " Magit      ")
+    )
+
+    (config/leader 
+        "e"       '(dirvish-side                   :wk "󰙅 Dirvish-side ")
+        "E"       '(dirvish                        :wk " Dirvish      ")
+        ;"qe"      '(save-buffers-kill-emacs         :wk "Quit Emacs ")
     )
   )
 #+end_src
@@ -519,7 +559,12 @@ Evil mode that turns you into an evil.
       ;which-key-separator " → "
       which-key-separator " "
       Which-key-show-early-on-C-h t
-      which-key-sort-order 'which-key-prefix-then-key-order)
+      which-key-sort-order 'which-key-prefix-then-key-order
+    )
+    ;(general-define-key
+    ;:keymaps 'which-key-mode-map
+    ;  "DEL" '(which-key-undo :wk "undo")
+    ;)
     (which-key-mode 1)
   )
 #+end_src
@@ -533,10 +578,12 @@ posframe-poshandler-[frame/window/point]-[top/bottom/]-[center/left-corner/right
     (which-key-posframe-mode)
   )
 #+end_src
+
 * UI
 ** Fonts
 
 Defining the various fonts that Emacs will use.
+
 #+begin_src elisp
 (set-face-attribute 'default nil
   :font "JetBrainsMono Nerd Font"
@@ -556,6 +603,7 @@ Defining the various fonts that Emacs will use.
 #+end_src
 
 Makes commented text and keywords italics. Working in emacsclient but not emacs.
+
 #+begin_src elisp
 (set-face-attribute 'font-lock-comment-face nil
   :slant 'italic)
@@ -606,19 +654,42 @@ Run [[elisp:nerd-icons-install-fonts][M-x nerd-icons-install-fonts]] to install 
 
 ** Theme
 [[https://github.com/hlissner/emacs-doom-themes][Doom-themes]] is a great set of themes with a lot of variety and support for many different Emacs modes. Taking a look at the [[https://github.com/hlissner/emacs-doom-themes/tree/screenshots][screenshots]] might help you decide which one you like best.  You can also run =M-x counsel-load-theme= to choose between them easily.
+
+** Window center
+*** Olivetti
+[[https://github.com/rnkn/olivetti][Olibetti]] is a simple Emacs minor mode for a nice writing environment.
+Set olivetti-style to both margins and fringes for a fancy "page" look.
+
 #+begin_src elisp
-  (use-package doom-themes
-    :after emacs
-    :init
-    (load-theme 'doom-ayu-mirage t))
+  (use-package olivetti
+  :hook (org-mode . olivetti-mode)
+  )
+#+end_src
+
+*** Visual-fill-column
+#+begin_src elisp
+  (use-package visual-fill-column
+  :defer t
+  :init
+    (global-visual-line-mode t)
+  :config
+    (add-hook 'visual-fill-column-mode-hook
+       (defun center-window ()
+         (setq visual-fill-column-center-text t)
+         (setq visual-fill-column-width 120)
+       )
+    )
+  )
 #+end_src
 
 ** Transparency
+
 Set background alpha to 5%
 #+begin_src elisp
 (set-frame-parameter nil 'alpha-background 95)
 (add-to-list 'default-frame-alist '(alpha-background . 95))
 #+end_src
+
 ** Modeline
 [[https://github.com/seagle0128/doom-modeline][Doom-modeline]] is a very attractive and rich (yet still minimal) mode line configuration for Emacs.  The default configuration is quite good but you can check out the [[https://github.com/seagle0128/doom-modeline#customize][configuration options]] for more things you can enable or disable.
 
@@ -695,6 +766,7 @@ This package implements hiding or abbreviation of the modeline displays (lighter
 
   )
 #+end_src
+
 ** Line Number
 #+begin_src elisp
   (defun config/toggle-line-number-nil ()      
@@ -713,231 +785,57 @@ This package implements hiding or abbreviation of the modeline displays (lighter
     (interactive)
     (setq display-line-numbers 'visual)
   )
-  (config/bind-leader-to
-     "tl"      '(:ignore t :wk " Line Number")
-     "tln"     '(config/toggle-line-number-nil :wk "Disable")
-     "tlt"     '(config/toggle-line-number-absolute :wk "Absolute")
-     "tlr"     '(config/toggle-line-number-relative :wk "Relative")
-     "tlv"     '(config/toggle-line-number-visual :wk "Visual")
+  (config/leader :infix "tl"
+     ""        '(nil                                :wk "  Line Number ")
+     "DEL"     '(which-key-undo                     :wk "󰕍 Undo key ")
+     "n"       '(config/toggle-line-number-nil      :wk "󰅖 Nil        ")
+     "a"       '(config/toggle-line-number-absolute :wk "󰯫 Absolute   ")
+     "r"       '(config/toggle-line-number-relative :wk " Relative   ")
+     "v"       '(config/toggle-line-number-visual   :wk " Visual     ")
   )
 #+end_src
-** Window center
+
+** Diff
 #+begin_src elisp
-  (use-package visual-fill-column
-  :init
-    (global-visual-line-mode t)
-  :config
-    (add-hook 'visual-line-mode-hook
-      (defun center-window ()
-	(setq visual-fill-column-center-text t)
-	(setq visual-fill-column-width 120)
-        (visual-fill-column-mode)
-      )
-    )
-  )
-#+end_src
-* Org
-** User Interface
-*** Headings & Levels
-**** Font size
-Change the font size of different org-levels.
-#+begin_src elisp
-  (use-package org
+  (use-package diff-hl
     :config
-    (set-face-attribute 'org-document-title nil :family "Cantarell" :height 2.5 :bold t)
-    (set-face-attribute 'org-level-1 nil :family "Cantarell" :height 1.8 :bold t)
-    (set-face-attribute 'org-level-2 nil :family "Cantarell" :height 1.7 :bold t)
-    (set-face-attribute 'org-level-3 nil :family "Cantarell" :height 1.6 :bold t)
-    (set-face-attribute 'org-level-4 nil :family "Cantarell" :height 1.5 :bold t)
-    (set-face-attribute 'org-level-5 nil :family "Cantarell" :height 1.4 :bold t)
-    (set-face-attribute 'org-level-6 nil :family "Cantarell" :height 1.3 :bold t)
+    (setq diff-hl-draw-borders nil)
+    (global-diff-hl-mode)
+    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
   )
 #+end_src
 
-**** Heading Bullets & bars
-[[https://github.com/integral-dw/org-superstar-mode][Org-superstar]] replaces the asterisk before every org-level with ascii symbols.
-Disabled because org-morden is a drop-in replacement.
-#+begin_src elisp
-  (use-package org-superstar
-  :defer t
-  :init
-    (setq
-      ;;org-superstar-headline-bullets-list '("✖" "✚" "◉" "○" "▶")
-      ;;org-superstar-headline-bullets-list '("󰇊" "󰇋" "󰇌" "󰇍" "󰇎" "󰇏")
-      ;;org-superstar-headline-bullets-list '("󱅊" "󱅋" "󱅌" "󱅍" "󱅎" "󱅏")
-      ;;org-superstar-headline-bullets-list '("᪥" "፠" "߷" "᪣" "𐩕") 
-      ;;org-superstar-headline-bullets-list '("𑗕") 
-      org-superstar-special-todo-items t
-      ;;org-ellipsis "  "
-    )
-  )
-#+end_src
-
-[[https://github.com/tonyaldon/org-bars][Org-bars-mode]] is a minor mode for org-mode. It adds bars to the virtual indentation provided by the built-in package org-indent.
-Temporarily disabled for performance.
-#+begin_src elisp
-  (use-package org-bars
-  :defer t
-  :config
-    (setq org-bars-color-options '(
-          :desaturate-level-faces 60
-          :darken-level-faces 15
-    ))
-    (setq org-bars-extra-pixels-height 12)
-    ;(setq org-bars-stars '(:empty "▷" :invisible "▶" :visible "▼"))
-    (setq org-bars-stars '(:empty "" :invisible "" :visible ""))
-  )
-#+end_src
-
-**** Org-modern
-[[https://github.com/minad/org-modern][org-modern]] implements a modern style for Org buffers using font locking and text properties. The package styles =headlines=, =keywords=, =tables= and =source blocks=. 
-*This awesome package throws no warning during compilation.
-#+begin_src elisp
-  (use-package org-modern)
-#+end_src
-
-*** Text arrangement
-Use [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]] to center =org-mode= buffers for a more pleasing writing experience as it centers the contents of the buffer horizontally to seem more like you are editing a document.
-Use visual-line-mode to wrap text.
-Use org-indent-mode to set different indenting for different levels.
-#+begin_src elisp :tangle no
-    (add-hook 'org-mode-hook
-      (defun config/org-mode-text-arrangement ()
-        (config/window-center 100)
-        (org-indent-mode)
-  ;      (variable-pitch-mode 1)
-      )
-    )
-#+end_src
-*** Highlight TODO
-#+begin_src elisp
-  (use-package hl-todo
-    :init
-    (hl-todo-mode)
-  )
-#+end_src
-*** Fancy-priorities
-#+begin_src elisp
-  (use-package org-fancy-priorities)
-#+end_src
-*** Org-appear
-Automatically disaply emphasis markers and links when the cursor is on them.
-#+begin_src emacs-lisp
-(use-package org-appear
-  :hook (org-mode . org-appear-mode)
-  :init
-  (setq org-appear-autoemphasis  t)
-  ;(get it?) (setq org-appear-autolinks t)
-  (setq org-appear-autosubmarkers t)
-)
-#+end_src
-
-** Kbd-configs
-*** Evil-org
-#+begin_src elisp
-  (use-package evil-org)
-#+end_src
-** Code-block
-#+begin_src elisp
-  (use-package org
-  :config
-      (setq org-src-tab-acts-natively t)
-      (setq org-src-preserve-indentation nil)
-  )
-#+end_src
-
-** Table-block
-[[https://github.com/casouri/valign][Valign]] provides visual alignment for Org Mode, Markdown and table.el tables on GUI Emacs. It can properly align tables containing variable-pitch font, CJK characters and images. Meanwhile, the text-based alignment generated by Org mode (or Markdown mode) is left untouched.
-#+begin_src elisp
-  (use-package valign
-  :hook (org-mode . valign-mode)
-  )
-#+end_src
-[[https://github.com/tbanel/orgaggregate][Orgtbl-aggregate]] can creat a new table by computing sums, averages, and so on, out of material from the first table.
-
-** Roam
-#+begin_src elisp
-  (use-package org-roam
-  :after org
-  :init
-    (setq org-roam-directory (file-truename "~/roam"))
-    (setq org-roam-v2-ack t)
-  )
-#+end_src
-** GTD
-** Pandoc
-#+begin_src elisp
-;; (use-package org-pandoc)
-#+end_src
-
-** Packages
-- [[evil-org]] if [[doom-module::editor evil]]
-- [[htmlize]]
-- [[jupyter]] if [[doom-module:+jupyter]]
-- [[ob-ammonite]] if [[doom-module::lang scala]]
-- [[ob-async]]
-- [[ob-crystal]] if [[doom-module::lang crystal]]
-- [[ob-go]] if [[doom-module::lang go]]
-- [[ob-ipython]] if [[doom-module:+ipython]]
-- [[ob-nim]] if [[doom-module::lang nim]]
-- [[ob-racket]] if [[doom-module::lang racket]]
-- [[ob-restclient]] if [[doom-module::lang rest]]
-- [[ob-rust]] if [[doom-module::lang rust]]
-- [[org-contacts]] if [[doom-module:+contacts]]
-- [[org-cliplink]]
-- [[org-download]] if [[doom-module:+dragndrop]]
-- [[orgit]]
-- [[org-noter]] if [[doom-module:+noter]]
-- [[org-pdftools]] if [[doom-module::tools pdf]]
-- [[org-plus-contrib]]
-- [[org-passwords]] if [[doom-module:+passwords]]
-- [[org-pomodoro]] if [[doom-module:+pomodoro]]
-- [[org-yt]]
-- [[ox-clip]]
-- [[ox-hugo]] if [[doom-module:+hugo]]
-- [[ox-pandoc]] if [[doom-module:+pandoc]]
-- [[ox-rst]] if [[doom-module::lang rst]]
-- [[toc-org]]
-- if [[doom-module:+gnuplot]]
-  - [[doom-package:gnuplot]]
-  - [[doom-package:gnuplot-mode]]
-- if [[doom-module:+present]]
-  - [[doom-package:centered-window]]
-  - [[doom-package:org-tree-slide]]
-  - [[doom-package:org-re-reveal]]
-- if [[doom-module:+pretty]]
-  - [[doom-package:org-superstar]]
-  - [[doom-package:org-fancy-priorities]]
-    
 * LSP & Completion
 ** Vertico
 [[https://github.com/minad/vertico#extensions][Vertico]] provides a performant and minimalistic vertical completion UI based on the default completion system. 
 #+begin_src elisp
   (use-package vertico
     :init
-    (vertico-mode 1)
     (setq completion-styles '(orderless))
     (setq orderless-component-separator #'orderless-escapable-split-on-space)
     (setq orderless-matching-styles
         '(orderless-initialism orderless-prefixes orderless-regexp))
     ;; Different scroll margin
-    ;; (setq vertico-scroll-margin 0)
-
+    (setq vertico-scroll-margin 1)
     ;; Show more candidates
-    ;; (setq vertico-count 20)
-
+    (setq vertico-count 20)
     ;; Grow and shrink the Vertico minibuffer
-    ;; (setq vertico-resize t)
-
+    (setq vertico-resize nil)
     ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
-    ;; (setq vertico-cycle t)
-    )
+    (setq vertico-cycle t)
+    (vertico-mode 1)
+  )
+#+end_src
 
+*** Savehist
+#+begin_src elisp
   ;; Persist history over Emacs restarts. Vertico sorts by history position.
     (use-package savehist
         :init
         (savehist-mode))
+#+end_src
 
+#+begin_src elisp
   ;; A few more useful configurations...
     (use-package emacs
         :init
@@ -961,10 +859,54 @@ Automatically disaply emphasis markers and links when the cursor is on them.
         ;; Vertico commands are hidden in normal buffers.
         ;; (setq read-extended-command-predicate
         ;;       #'command-completion-default-include-p)
-
         ;; Enable recursive minibuffers
         (setq enable-recursive-minibuffers t))
 #+end_src
+
+*** Vertico-directory
+#+begin_src elisp
+(use-package vertico-directory
+  :after vertico
+  ;; More convenient directory navigation commands
+  :bind (:map vertico-map
+              ("RET" . vertico-directory-enter)
+              ("DEL" . vertico-directory-delete-char)
+              ("M-DEL" . vertico-directory-delete-word))
+  ;; Tidy shadowed file names
+  :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
+#+end_src
+*** Vertico-multiform
+Vertico-multiform configures Vertico modes per command or completion category.
+
+#+begin_src elisp
+  (use-package vertico-multiform
+    :after vertico
+    :config (vertico-multiform-mode)
+  )
+#+end_src
+
+*** Vertico-posframe
+[[https://github.com/tumashu/vertico-posframe][Vertico-posframe]] is an vertico extension, which lets vertico use posframe to show its candidate menu.
+#+begin_src elisp
+  (use-package vertico-posframe
+  :after vertico-multiform
+  :init 
+    (setq vertico-multiform-commands
+         '((consult-line posframe
+              (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
+              (vertico-posframe-fallback-mode . vertico-buffer-mode)
+              (vertico-posframe-width . 50))
+           (execute-extended-command
+              (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
+              (vertico-posframe-fallback-mode . vertico-buffer-mode))
+           (t posframe)
+          )
+    )
+    (vertico-multiform-mode 1)
+    (vertico-posframe-mode 1)
+  )
+#+end_src
+
 ** Consult
 [[https://github.com/minad/consult][Consult]] provides search and navigation commands based on the Emacs completion function completing-read.
 #+begin_src elisp
@@ -1086,6 +1028,7 @@ Automatically disaply emphasis markers and links when the cursor is on them.
   ;; (setq consult-project-function nil)
 )
 #+end_src
+
 ** YASnippet
 [[https://github.com/joaotavora/yasnippet][YASnippet]] is a template system for Emacs. It allows you to type an abbreviation and automatically expand it into function templates.
 #+begin_src elisp
@@ -1094,6 +1037,7 @@ Automatically disaply emphasis markers and links when the cursor is on them.
   (yas-global-mode 1)
 )
 #+end_src
+
 ** LSP-bridge
 [[https://github.com/manateelazycat/lsp-bridge][lsp-bridge]] builds a high-speed cache between Emacs and the LSP server.
 #+begin_src elisp
@@ -1102,12 +1046,189 @@ Automatically disaply emphasis markers and links when the cursor is on them.
   (global-lsp-bridge-mode)
 )
 #+end_src
+
 ** UI
 *** Posframe
 *** Vertico-posframe
 [[https://github.com/tumashu/vertico-posframe][Vertico-posframe]] is an vertico extension, which lets vertico use posframe to show its candidate menu.
 ** Copilot
 https://github.com/zerolfx/copilot.el
+* Org
+** User Interface
+*** Headings & Levels
+**** Font size
+Change the font size of different org-levels.
+#+begin_src elisp
+  (use-package org
+    :config
+    (set-face-attribute 'org-document-title nil :family "Cantarell" :height 2.5 :bold t)
+    (set-face-attribute 'org-level-1 nil :family "Cantarell" :height 1.8 :bold t)
+    (set-face-attribute 'org-level-2 nil :family "Cantarell" :height 1.7 :bold t)
+    (set-face-attribute 'org-level-3 nil :family "Cantarell" :height 1.6 :bold t)
+    (set-face-attribute 'org-level-4 nil :family "Cantarell" :height 1.5 :bold t)
+    (set-face-attribute 'org-level-5 nil :family "Cantarell" :height 1.4 :bold t)
+    (set-face-attribute 'org-level-6 nil :family "Cantarell" :height 1.3 :bold t)
+  )
+#+end_src
+
+**** Heading Bullets & bars
+[[https://github.com/integral-dw/org-superstar-mode][Org-superstar]] replaces the asterisk before every org-level with ascii symbols.
+Disabled because org-morden is a drop-in replacement.
+#+begin_src elisp
+  (use-package org-superstar
+  :defer t
+  :init
+    (setq
+      ;;org-superstar-headline-bullets-list '("✖" "✚" "◉" "○" "▶")
+      ;;org-superstar-headline-bullets-list '("󰇊" "󰇋" "󰇌" "󰇍" "󰇎" "󰇏")
+      org-superstar-special-todo-items t
+      ;;org-ellipsis "  "
+    )
+  )
+#+end_src
+
+[[https://github.com/tonyaldon/org-bars][Org-bars-mode]] is a minor mode for org-mode. It adds bars to the virtual indentation provided by the built-in package org-indent.
+Temporarily disabled for performance.
+#+begin_src elisp
+  (use-package org-bars
+  :commands 'org-bars-mode
+  :hook (org-mode . org-bars-mode)
+  :config
+    (setq org-bars-color-options '(
+	  :desaturate-level-faces 100
+	  :darken-level-faces 10
+    ))
+    (setq org-bars-extra-pixels-height 12)
+    ;(setq org-bars-stars '(:empty "▷" :invisible "▶" :visible "▼"))
+    (setq org-bars-stars '(:empty "" :invisible "" :visible ""))
+  )
+#+end_src
+
+**** Org-modern
+[[https://github.com/minad/org-modern][org-modern]] implements a modern style for Org buffers using font locking and text properties. The package styles =headlines=, =keywords=, =tables= and =source blocks=. 
+*This awesome package throws no warning during compilation.
+#+begin_src elisp
+  (use-package org-modern)
+#+end_src
+
+*** Text arrangement
+Use [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]] to center =org-mode= buffers for a more pleasing writing experience as it centers the contents of the buffer horizontally to seem more like you are editing a document.
+Use visual-line-mode to wrap text.
+Use org-indent-mode to set different indenting for different levels.
+#+begin_src elisp :tangle no
+    (add-hook 'org-mode-hook
+      (defun config/org-mode-text-arrangement ()
+        (config/window-center 100)
+        (org-indent-mode)
+  ;      (variable-pitch-mode 1)
+      )
+    )
+#+end_src
+
+*** Highlight TODO
+#+begin_src elisp
+  (use-package hl-todo
+    :init
+    (hl-todo-mode)
+  )
+#+end_src
+
+*** Fancy-priorities
+#+begin_src elisp
+  (use-package org-fancy-priorities)
+#+end_src
+
+*** Org-appear
+Automatically disaply emphasis markers and links when the cursor is on them.
+#+begin_src emacs-lisp
+(use-package org-appear
+  :hook (org-mode . org-appear-mode)
+  :init
+  (setq org-appear-autoemphasis  t)
+  ;(get it?) (setq org-appear-autolinks t)
+  (setq org-appear-autosubmarkers t)
+)
+#+end_src
+
+** Kbd-configs
+*** Evil-org
+#+begin_src elisp
+  (use-package evil-org)
+#+end_src
+
+** Code-block
+#+begin_src elisp
+  (use-package org
+  :config
+      (setq org-src-tab-acts-natively t)
+      (setq org-src-preserve-indentation nil)
+  )
+#+end_src
+
+** Table-block
+[[https://github.com/casouri/valign][Valign]] provides visual alignment for Org Mode, Markdown and table.el tables on GUI Emacs. It can properly align tables containing variable-pitch font, CJK characters and images. Meanwhile, the text-based alignment generated by Org mode (or Markdown mode) is left untouched.
+#+begin_src elisp
+  (use-package valign
+  :hook (org-mode . valign-mode)
+  )
+#+end_src
+[[https://github.com/tbanel/orgaggregate][Orgtbl-aggregate]] can creat a new table by computing sums, averages, and so on, out of material from the first table.
+
+** Roam
+#+begin_src elisp
+  (use-package org-roam
+  :after org
+  :init
+    (setq org-roam-directory (file-truename "~/roam"))
+    (setq org-roam-v2-ack t)
+  )
+#+end_src
+
+** GTD
+** Pandoc
+#+begin_src elisp
+;; (use-package org-pandoc)
+#+end_src
+
+** Packages
+- [[evil-org]] if [[doom-module::editor evil]]
+- [[htmlize]]
+- [[jupyter]] if [[doom-module:+jupyter]]
+- [[ob-ammonite]] if [[doom-module::lang scala]]
+- [[ob-async]]
+- [[ob-crystal]] if [[doom-module::lang crystal]]
+- [[ob-go]] if [[doom-module::lang go]]
+- [[ob-ipython]] if [[doom-module:+ipython]]
+- [[ob-nim]] if [[doom-module::lang nim]]
+- [[ob-racket]] if [[doom-module::lang racket]]
+- [[ob-restclient]] if [[doom-module::lang rest]]
+- [[ob-rust]] if [[doom-module::lang rust]]
+- [[org-contacts]] if [[doom-module:+contacts]]
+- [[org-cliplink]]
+- [[org-download]] if [[doom-module:+dragndrop]]
+- [[orgit]]
+- [[org-noter]] if [[doom-module:+noter]]
+- [[org-pdftools]] if [[doom-module::tools pdf]]
+- [[org-plus-contrib]]
+- [[org-passwords]] if [[doom-module:+passwords]]
+- [[org-pomodoro]] if [[doom-module:+pomodoro]]
+- [[org-yt]]
+- [[ox-clip]]
+- [[ox-hugo]] if [[doom-module:+hugo]]
+- [[ox-pandoc]] if [[doom-module:+pandoc]]
+- [[ox-rst]] if [[doom-module::lang rst]]
+- [[toc-org]]
+- if [[doom-module:+gnuplot]]
+  - [[doom-package:gnuplot]]
+  - [[doom-package:gnuplot-mode]]
+- if [[doom-module:+present]]
+  - [[doom-package:centered-window]]
+  - [[doom-package:org-tree-slide]]
+  - [[doom-package:org-re-reveal]]
+- if [[doom-module:+pretty]]
+  - [[doom-package:org-superstar]]
+  - [[doom-package:org-fancy-priorities]]
+    
 * Code
 ** elisp
 - [[doom-package:buttercup]]
@@ -1215,16 +1336,17 @@ It is very useful for figuring out how things work in Emacs.
 ** Marginalia
 #+begin_src elisp
   (use-package marginalia
-    :general
+  :general
     (:keymaps 'minibuffer-local-map
      "M-A" 'marginalia-cycle)
-    :custom
+  :custom
     (marginalia-max-relative-age 0)
     (marginalia-align 'right)
-    :init
+  :init
     (marginalia-mode)
   )
 #+end_src
+
 * Libraries
 ** S
 [[https://github.com/magnars/s.el][S]] is the long lost Emacs string manipulation library.
@@ -1249,6 +1371,7 @@ It is very useful for figuring out how things work in Emacs.
     )
   )
 #+end_src
+
 ** 2048
 #+begin_src elisp
   (add-hook '2048-mode-hook
@@ -1257,6 +1380,7 @@ It is very useful for figuring out how things work in Emacs.
     )
   )
 #+end_src
+
 * Eaf
 [[https://github.com/emacs-eaf/emacs-application-framework][EAF]] is an extensible framework that revolutionizes the graphical capabilities of Emacs.
 #+begin_src elisp :tangle no
