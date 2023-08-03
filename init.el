@@ -201,7 +201,8 @@
     (setq evil-want-keybinding nil)
     (setq evil-vsplit-window-right t)
     (setq evil-split-window-below t)
-    ;(setq evil-want-minibuffer t) ;; use evil in minibuffer
+    (setq evil-want-C-u-scroll t)
+
   :config
     (evil-mode 1)
       ;; Use visual line motions even outside of visual-line-mode buffers
@@ -367,7 +368,8 @@
 
 (set-face-attribute 'default nil
   ;:font "JetBrainsMono Nerd Font"
-  :font "RobotoMono Nerd Font Propo"
+  :font "RobotoMono Nerd Font"
+  ;:font "Sarasa Term SC Nerd"
   :height 155
   ;:weight 'medium
 )
@@ -428,11 +430,29 @@
 )
 
 (set-frame-parameter nil 'alpha-background 96)
+(add-to-list 'default-frame-alist '(alpha-background . 96))
 
-(defun transparency (value)
+(defun config/transparency (value)
   "Sets the transparency of the frame window. 0=transparent/100=opaque"
   (interactive "nTransparency Value 0 - 100 opaque:")
   (set-frame-parameter nil 'alpha-background value))
+
+(pixel-scroll-precision-mode 1)
+(setq pixel-scroll-precision-interpolate-page t)
+(defun +pixel-scroll-interpolate-down (&optional lines)
+  (interactive)
+  (if lines
+      (pixel-scroll-precision-interpolate (* -1 lines (pixel-line-height)))
+    (pixel-scroll-interpolate-down)))
+
+(defun +pixel-scroll-interpolate-up (&optional lines)
+  (interactive)
+  (if lines
+      (pixel-scroll-precision-interpolate (* lines (pixel-line-height))))
+  (pixel-scroll-interpolate-up))
+
+(defalias 'scroll-up-command '+pixel-scroll-interpolate-down)
+(defalias 'scroll-down-command '+pixel-scroll-interpolate-up)
 
 (use-package doom-modeline
 :init 
@@ -745,7 +765,8 @@
 )
 
 (use-package org-superstar
-:hook (org-mode . org-superstar-mode)
+:defer t
+;:hook (org-mode . org-superstar-mode)
 :init
   (setq
     ;;org-superstar-headline-bullets-list '("󰇊" "󰇋" "󰇌" "󰇍" "󰇎" "󰇏")
@@ -755,6 +776,7 @@
 )
 
 (use-package org-bars
+:defer t
 :commands 'org-bars-mode
 ;:hook (org-mode . org-bars-mode)
 :config
@@ -770,7 +792,9 @@
 :hook (org-mode . org-visual-indent-mode)
 )
 
-(use-package org-modern)
+(use-package org-modern
+:hook (org-mode . org-modern-mode)
+)
 
 (use-package hl-todo
   :init
@@ -786,6 +810,7 @@
   ;(setq org-appear-autolinks t)
   (setq org-appear-autosubmarkers t)
   (setq org-appear-inside-latex t)
+  (setq org-hide-emphasis-markers t)
 )
 
 (use-package evil-org)

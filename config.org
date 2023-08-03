@@ -23,13 +23,10 @@
 
 This config file is still in its early stages of development, *Everything is unstable!*
 To play around with my config files, clone this repo anywhere you like on your system.
-
 #+begin_src bash
 git clone --depth=1 https://github.com/A7R7/EmaxBound.git
 #+end_src
-
 Then, simply execute these make rules inside the repo directory.
-
 #+begin_src bash
 make bootstrap-borg  # bootstrap borg itself
 make bootstrap       # bootstrap collective or new drones
@@ -70,13 +67,11 @@ For example, some packages have an ~extensions~ dir in their repo. To load these
 *NOTE*: codes under this heading is tangled to early-init.el
 
 File header, disable byte-compile
-
 #+begin_src elisp :tangle early-init.el
 ;;; early-init.el --- earliest birds  -*- lexical-binding: t; -*- no-byte-compile: t -*-
 #+end_src
 
 Disable tool-bar, menu-bar and scroll-bar before they're loaded.
-
 #+begin_src elisp :tangle early-init.el
 (tool-bar-mode -1)
 (menu-bar-mode -1)
@@ -84,7 +79,6 @@ Disable tool-bar, menu-bar and scroll-bar before they're loaded.
 #+end_src
 
 Borg seed generated configs.
-
 #+begin_src elisp :tangle early-init.el
 (setq load-prefer-newer t)
 
@@ -178,11 +172,15 @@ Use-package is built-in since emacs-29
 #+end_src
 
 ** eieio
+
 #+begin_src elisp
 (use-package eieio)
 #+end_src
 
 ** auto-compile
+
+ [[https://github.com/emacscollective/auto-compile][Auto-Compile]] automatically compile Emacs Lisp libraries
+
 #+begin_src elisp
 (use-package auto-compile
   :config
@@ -195,6 +193,9 @@ Use-package is built-in since emacs-29
 #+end_src
 
 ** epkg
+
+ [[https://github.com/emacscollective/epkg][Epkg]] allows you browse the Emacsmirror package database
+
 #+begin_src elisp
 (use-package epkg
   :defer t
@@ -206,6 +207,7 @@ Use-package is built-in since emacs-29
 #+end_src
 
 ** custom
+
 #+begin_src elisp
 (use-package custom
   :no-require t
@@ -273,7 +275,8 @@ Use-package is built-in since emacs-29
   (add-hook 'lisp-interaction-mode-hook 'indent-spaces-mode))
 #+end_src
 
-Magit is a VERY powerful git client, especially for emacs.
+[[https://github.com/magit/magit][Magit]] is a VERY powerful git client.
+
 #+begin_src elisp
 (use-package magit
   :defer t
@@ -399,7 +402,8 @@ Magit is a VERY powerful git client, especially for emacs.
       (setq evil-want-keybinding nil)
       (setq evil-vsplit-window-right t)
       (setq evil-split-window-below t)
-      ;(setq evil-want-minibuffer t) ;; use evil in minibuffer
+      (setq evil-want-C-u-scroll t)
+
     :config
       (evil-mode 1)
         ;; Use visual line motions even outside of visual-line-mode buffers
@@ -444,6 +448,7 @@ Magit is a VERY powerful git client, especially for emacs.
 #+end_src
 
 ** General
+
 [[https://github.com/noctuid/general.el][General]] provides a more convenient method for binding keys in emacs
 (for both evil and non-evil users).
 
@@ -547,6 +552,7 @@ Magit is a VERY powerful git client, especially for emacs.
 #+end_src
 
 ** Which-key
+
 [[https://github.com/justbur/emacs-which-key][Which-key]] is a minor mode for Emacs that displays the key bindings following your currently entered incomplete command (a prefix) in a popup.
 #+begin_src elisp
   (use-package which-key
@@ -577,9 +583,10 @@ Magit is a VERY powerful git client, especially for emacs.
     (which-key-mode 1)
   )
 #+end_src
+
 [[https://github.com/yanghaoxie/which-key-posframe][Which-key-posframe]] use posframe to show which-key popup. 
 options for =which-key-posframe-poshandler=:
-posframe-poshandler-[frame/window/point]-[top/bottom/]-[center/left-corner/right-corner]
+~posframe-poshandler-[frame/window/point]-[top/bottom/]-[center/left-corner/right-corner]~
 #+begin_src elisp
   (use-package which-key-posframe
   :config
@@ -589,15 +596,17 @@ posframe-poshandler-[frame/window/point]-[top/bottom/]-[center/left-corner/right
 #+end_src
 
 ** Hydra
+** Mouse
+
 * UI
 ** Fonts
 
 Defining the various fonts that Emacs will use.
-
 #+begin_src elisp
   (set-face-attribute 'default nil
     ;:font "JetBrainsMono Nerd Font"
-    :font "RobotoMono Nerd Font Propo"
+    :font "RobotoMono Nerd Font"
+    ;:font "Sarasa Term SC Nerd"
     :height 155
     ;:weight 'medium
   )
@@ -609,11 +618,9 @@ Defining the various fonts that Emacs will use.
     :font "Sarasa Gothic SC"
     :height 180
   )
-
 #+end_src
 
 Makes commented text and keywords italics. Working in emacsclient but not emacs.
-
 #+begin_src elisp
 (set-face-attribute 'font-lock-comment-face nil
   :slant 'italic)
@@ -637,6 +644,7 @@ You can use the bindings CTRL plus =/- for zooming in/out.  You can also use CTR
 
 ** Icons
 *** All-the-icons
+
 [[https://github.com/domtronn/all-the-icons.el][All-the-icons]] is an icon set that can be used with dashboard, dired, ibuffer and other Emacs programs.
 
 #+begin_src emacs-lisp
@@ -708,16 +716,37 @@ Note that for pages with variable-pitch fonts,
 ** Transparency
 
 Set background Transparency, according to [[https://www.emacswiki.org/emacs/TransparentEmacs][this page]].
-
 #+begin_src elisp
   (set-frame-parameter nil 'alpha-background 96)
+  (add-to-list 'default-frame-alist '(alpha-background . 96))
 
-  (defun transparency (value)
+  (defun config/transparency (value)
     "Sets the transparency of the frame window. 0=transparent/100=opaque"
     (interactive "nTransparency Value 0 - 100 opaque:")
     (set-frame-parameter nil 'alpha-background value))
 #+end_src
 
+** Scroll
+
+This piece of code is taken from https://emacs-china.org/t/topic/25114/5
+#+begin_src elisp
+(pixel-scroll-precision-mode 1)
+(setq pixel-scroll-precision-interpolate-page t)
+(defun +pixel-scroll-interpolate-down (&optional lines)
+  (interactive)
+  (if lines
+      (pixel-scroll-precision-interpolate (* -1 lines (pixel-line-height)))
+    (pixel-scroll-interpolate-down)))
+
+(defun +pixel-scroll-interpolate-up (&optional lines)
+  (interactive)
+  (if lines
+      (pixel-scroll-precision-interpolate (* lines (pixel-line-height))))
+  (pixel-scroll-interpolate-up))
+
+(defalias 'scroll-up-command '+pixel-scroll-interpolate-down)
+(defalias 'scroll-down-command '+pixel-scroll-interpolate-up)
+#+end_src
 ** Modeline
 [[https://github.com/seagle0128/doom-modeline][Doom-modeline]] is a very attractive and rich (yet still minimal) mode line configuration for Emacs.  The default configuration is quite good but you can check out the [[https://github.com/seagle0128/doom-modeline#customize][configuration options]] for more things you can enable or disable.
 
@@ -1119,11 +1148,12 @@ Change the font size of different org-levels.
 **** Level Bullets & lines
 
 [[https://github.com/integral-dw/org-superstar-mode][Org-superstar]] replaces the asterisk before every org-level with ascii symbols.
-+Disabled because org-morden is a drop-in replacement.+
+Disabled because org-morden is a drop-in replacement.
 
 #+begin_src elisp
   (use-package org-superstar
-  :hook (org-mode . org-superstar-mode)
+  :defer t
+  ;:hook (org-mode . org-superstar-mode)
   :init
     (setq
       ;;org-superstar-headline-bullets-list '("󰇊" "󰇋" "󰇌" "󰇍" "󰇎" "󰇏")
@@ -1139,6 +1169,7 @@ Have drawbacks when using mixed-pitch-mode.
 
 #+begin_src elisp
   (use-package org-bars
+  :defer t
   :commands 'org-bars-mode
   ;:hook (org-mode . org-bars-mode)
   :config
@@ -1152,7 +1183,7 @@ Have drawbacks when using mixed-pitch-mode.
 #+end_src
 
 [[https://github.com/legalnonsense/org-visual-outline][Org-visual-outline]] does the same as Org-bars-mode. It is split into two independent packages:
-- Org-dynamic-bullets :: handles the dynamic bullets. =May broke highlight=.
+- Org-dynamic-bullets :: handles the dynamic bullets. =Brokes highlight=.
 - Org-visual-indent  :: adds vertical lines to org-indent. =Does better than Org-bars-mode=
 
 #+begin_src elisp
@@ -1163,8 +1194,11 @@ Have drawbacks when using mixed-pitch-mode.
 
 [[https://github.com/minad/org-modern][Org-modern]] implements a modern style for Org buffers using font locking and text properties. The package styles =headlines=, =keywords=, =tables= and =source blocks=. 
 *This awesome package throws no warning during compilation.
+
 #+begin_src elisp
-  (use-package org-modern)
+  (use-package org-modern
+  :hook (org-mode . org-modern-mode)
+  )
 #+end_src
 
 *** Text arrangement
@@ -1206,6 +1240,7 @@ Use org-indent-mode to set different indenting for different levels.
     ;(setq org-appear-autolinks t)
     (setq org-appear-autosubmarkers t)
     (setq org-appear-inside-latex t)
+    (setq org-hide-emphasis-markers t)
   )
 #+end_src
 
@@ -1250,43 +1285,6 @@ Use org-indent-mode to set different indenting for different levels.
 #+end_src
 
 ** Packages
-- [[evil-org]] if [[doom-module::editor evil]]
-- [[htmlize]]
-- [[jupyter]] if [[doom-module:+jupyter]]
-- [[ob-ammonite]] if [[doom-module::lang scala]]
-- [[ob-async]]
-- [[ob-crystal]] if [[doom-module::lang crystal]]
-- [[ob-go]] if [[doom-module::lang go]]
-- [[ob-ipython]] if [[doom-module:+ipython]]
-- [[ob-nim]] if [[doom-module::lang nim]]
-- [[ob-racket]] if [[doom-module::lang racket]]
-- [[ob-restclient]] if [[doom-module::lang rest]]
-- [[ob-rust]] if [[doom-module::lang rust]]
-- [[org-contacts]] if [[doom-module:+contacts]]
-- [[org-cliplink]]
-- [[org-download]] if [[doom-module:+dragndrop]]
-- [[orgit]]
-- [[org-noter]] if [[doom-module:+noter]]
-- [[org-pdftools]] if [[doom-module::tools pdf]]
-- [[org-plus-contrib]]
-- [[org-passwords]] if [[doom-module:+passwords]]
-- [[org-pomodoro]] if [[doom-module:+pomodoro]]
-- [[org-yt]]
-- [[ox-clip]]
-- [[ox-hugo]] if [[doom-module:+hugo]]
-- [[ox-pandoc]] if [[doom-module:+pandoc]]
-- [[ox-rst]] if [[doom-module::lang rst]]
-- [[toc-org]]
-- if [[doom-module:+gnuplot]]
-  - [[doom-package:gnuplot]]
-  - [[doom-package:gnuplot-mode]]
-- if [[doom-module:+present]]
-  - [[doom-package:centered-window]]
-  - [[doom-package:org-tree-slide]]
-  - [[doom-package:org-re-reveal]]
-- if [[doom-module:+pretty]]
-  - [[doom-package:org-superstar]]
-  - [[doom-package:org-fancy-priorities]]
     
 * Code
 ** elisp
@@ -1457,3 +1455,10 @@ It is very useful for figuring out how things work in Emacs.
     (setq confirm-kill-processes nil)
   ) ;; unbind, see more in the Wiki
 #+end_src
+
+* TODOs
+** pixel-scroll-precision-mode for evil scroll
+** vertico-buffer & minibuffer
+** Org mode 
+*** Roam
+*** GTD

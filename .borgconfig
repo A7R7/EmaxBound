@@ -17,3 +17,7 @@
   load-path = .
   load-path = acm
   load-path = core
+[submodule "eaf"]
+  load-path = .
+  load-path = core
+  load-path = extension
