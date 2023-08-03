@@ -17,6 +17,7 @@
 
 * Introduction
 ** How to deploy this config
+
 This config file is still in its early stages of development, *Everything is unstable!*
 
 To play around with my config files, clone this repo anywhere you like on your system.
@@ -37,7 +38,9 @@ If you're using emacs29 or above, run ~emacs --init-directory=<path-of-the-repo>
 Else, you can have a look at [[https://github.com/plexus/chemacs2][chemacs2]], which makes it easy to run multiple Emacs configurations side by side.
 
 ** How I built this config
-The whole config structure is built upon [[https://github.com/emacscollective/emacs.g][emacscollective/emacs.g]]. It is a starter-kit using borg as the package manager, which utilizes git submodules to maintain all its packages.
+
+The whole config structure is built upon [[https://github.com/emacscollective/emacs.g][emacscollective/emacs.g]].
+It is a starter-kit using borg as the package manager, which utilizes git submodules to maintain all its packages.
 Check [[https://emacsmirror.net/manual/borg/Bootstrapping-using-a-seed.html][Bootstrapping-using-a-seed]] from its [[https://emacsmirror.net/manual/borg/][manual]] to see how to build the config structure.
 
 - Firstly, I generated the structure from the seed.
@@ -50,7 +53,9 @@ Check [[https://emacsmirror.net/manual/borg/Bootstrapping-using-a-seed.html][Boo
 ps: For some packages, you need to manually specify its load path or build method in ~.borgconfig~ for them to work.
 
 For example, some packages have an ~extensions~ dir in their repo. To load these extensions, you need to add ~load-path = .~ and ~load-path = extensions~ under the corresponding submodule inside ~.borgconfig~.
+
 ** References
+
 -  [[https://github.com/lccambiaghi/vanilla-emacs][Luca's vanilla-emacs]] (2023) detailed org config file.
 -  [[https://gitlab.com/dwt1/configuring-emacs][DistroTube's Configuring Emacs]] (2023) easy to follow.
 -  [[https://github.com/seagle0128/.emacs.d][seagle0128's Centaur Emacs]] (2023) be morden.
@@ -59,20 +64,18 @@ For example, some packages have an ~extensions~ dir in their repo. To load these
 *NOTE*: the year number after link equals to
 - =min (last time the config get's updated, last time I refered to the config)=
   
-* TODOS
-** Syntax highlighting
-** completion
-** Zoxide path
-** vertico, frame, 
 * Early Init
+
 *NOTE*: codes under this heading is tangled to early-init.el
 
 File header, disable byte-compile
+
 #+begin_src elisp :tangle early-init.el
 ;;; early-init.el --- earliest birds  -*- lexical-binding: t; -*- no-byte-compile: t -*-
 #+end_src
 
 Disable tool-bar, menu-bar and scroll-bar before they're loaded.
+
 #+begin_src elisp :tangle early-init.el
 (tool-bar-mode -1)
 (menu-bar-mode -1)
@@ -80,6 +83,7 @@ Disable tool-bar, menu-bar and scroll-bar before they're loaded.
 #+end_src
 
 Borg seed generated configs.
+
 #+begin_src elisp :tangle early-init.el
 (setq load-prefer-newer t)
 
@@ -104,13 +108,16 @@ Borg seed generated configs.
 
 * Init
 ** File-local-variable
+
 Disable byte compile for init.el, according to the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html][emacs manual]].
+
 #+begin_src elisp
 ;;; init.el --- user-init-file
 ;;; -*- lexical-binding: t; no-byte-compile: t -*-
 #+end_src
 
 ** Basic setups
+
 #+begin_src elisp
   ;;; Early birds
   (progn ;     startup
@@ -381,7 +388,8 @@ Magit is a VERY powerful git client, especially for emacs.
 * Kbd 
 ** Evil
 *** Evil mode
-Evil mode that turns you into an evil.
+
+[[https://github.com/emacs-evil/evil][Evil mode]] that turns you into an evil.
 
 #+begin_src elisp
   (use-package evil
@@ -403,7 +411,8 @@ Evil mode that turns you into an evil.
 #+end_src
 
 *** Evil collection
-[[https://github.com/emacs-evil/evil-collection][evil-collection]] automatically configures various Emacs modes with Vi-like keybindings.
+
+[[https://github.com/emacs-evil/evil-collection][Evil-collection]] automatically configures various Emacs modes with Vi-like keybindings.
 
 #+begin_src elisp
   (use-package evil-collection
@@ -536,7 +545,6 @@ Evil mode that turns you into an evil.
   )
 #+end_src
 
-** Hydra
 ** Which-key
 [[https://github.com/justbur/emacs-which-key][Which-key]] is a minor mode for Emacs that displays the key bindings following your currently entered incomplete command (a prefix) in a popup.
 #+begin_src elisp
@@ -579,26 +587,27 @@ posframe-poshandler-[frame/window/point]-[top/bottom/]-[center/left-corner/right
   )
 #+end_src
 
+** Hydra
 * UI
 ** Fonts
 
 Defining the various fonts that Emacs will use.
 
 #+begin_src elisp
-(set-face-attribute 'default nil
-  :font "JetBrainsMono Nerd Font"
-  :height 150
-  :weight 'medium)
-(set-face-attribute 'variable-pitch nil
-  :font "Cantarell"
-  :height 160
-  :weight 'medium)
-(set-face-attribute 'fixed-pitch nil
-  :font "Cantarell"
-  :height 150
-  :weight 'medium)
-
-
+  (set-face-attribute 'default nil
+    ;:font "JetBrainsMono Nerd Font"
+    :font "RobotoMono Nerd Font Propo"
+    :height 155
+    ;:weight 'medium
+  )
+  (set-face-attribute 'variable-pitch nil
+    :font "Sarasa Gothic SC"
+    :height 180
+  )
+  (set-face-attribute 'fixed-pitch nil
+    :font "Sarasa Gothic SC"
+    :height 180
+  )
 
 #+end_src
 
@@ -612,6 +621,7 @@ Makes commented text and keywords italics. Working in emacsclient but not emacs.
 #+end_src
 
 *** Zooming In/Out
+
 You can use the bindings CTRL plus =/- for zooming in/out.  You can also use CTRL plus the mouse wheel for zooming in/out.
 
 #+begin_src elisp
@@ -655,32 +665,40 @@ Run [[elisp:nerd-icons-install-fonts][M-x nerd-icons-install-fonts]] to install 
 ** Theme
 [[https://github.com/hlissner/emacs-doom-themes][Doom-themes]] is a great set of themes with a lot of variety and support for many different Emacs modes. Taking a look at the [[https://github.com/hlissner/emacs-doom-themes/tree/screenshots][screenshots]] might help you decide which one you like best.  You can also run =M-x counsel-load-theme= to choose between them easily.
 
-** Window center
+** Text center
+
+There're 3 modes that can center text in a window
+
 *** Olivetti
+
 [[https://github.com/rnkn/olivetti][Olibetti]] is a simple Emacs minor mode for a nice writing environment.
 Set olivetti-style to both margins and fringes for a fancy "page" look.
+
+Note that for pages with variable-pitch fonts, =olivetti-body-width= should be set smaller for it to look good.
 
 #+begin_src elisp
   (use-package olivetti
   :hook (org-mode . olivetti-mode)
+        (Custom-mode . olivetti-mode)
+        (olivetti-mode . visual-line-mode)
+  :config
+    (defun config/shrink-olivetti-body-width ()
+       (when mixed-pitch-mode
+         (setq olivetti-body-width 0.3)))
+
+    (add-hook 'olivetti-mode-hook 'config/shrink-olivetti-body-width)
+
+    (config/leader
+      "tc"  '(olivetti-mode     :wk "󰉠 Center")
+    )
   )
 #+end_src
 
 *** Visual-fill-column
-#+begin_src elisp
-  (use-package visual-fill-column
-  :defer t
-  :init
-    (global-visual-line-mode t)
-  :config
-    (add-hook 'visual-fill-column-mode-hook
-       (defun center-window ()
-         (setq visual-fill-column-center-text t)
-         (setq visual-fill-column-width 120)
-       )
-    )
-  )
-#+end_src
+
+ [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]]  asdf
+
+*** Writeroom-mode
 
 ** Transparency
 
@@ -706,40 +724,38 @@ Set background alpha to 5%
 
 *NOTE2:* [[All-the-icons]] hasn't been supported since 4.0.0. If you prefer all-the-icons, please use release 3.4.0, then run [[elisp:all-the-icons-install-fonts][M-x all-the-icons-install-fonts]] to install necessary icons.
 
-** Dashboard
-Dashboard is an extensible startup screen showing you recent files, bookmarks, agenda items and an Emacs banner.
-#+begin_src elisp
-(use-package dashboard
-:init
-  (setq initial-buffer-choice 'dashboard-open)
-  (setq dashboard-set-heading-icons t)
-  (setq dashboard-set-file-icons t)
-  ;; (setq dashboard-banner-logo-title "Also try NeoVim!")
-  ;; show Dashboard in frames created with emacsclient -c
-  (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
-  ;;(setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
-  (setq dashboard-startup-banner (concat user-emacs-directory "assets/EmacsBound.svg"))  ;; use custom image as banner
-  (setq dashboard-center-content t) ;; set to 't' for centered content
-
-  (setq dashboard-items '(
-        (recents . 5)
-        (agenda . 5 )
-        (bookmarks . 3)
-        (projects . 3)
-        (registers . 3)
-  ))
-
-  ;; (dashboard-modify-heading-icons '((recents . "file-text") (bookmarks . "book")))
-:config
-  (dashboard-setup-startup-hook)
-)
-#+end_src
-
-** Diminish
+*** Diminish
 This package implements hiding or abbreviation of the modeline displays (lighters) of minor-modes.  With this package installed, you can add ':diminish' to any use-package block to hide that particular mode in the modeline.
 
 #+begin_src elisp
 (use-package diminish)
+#+end_src
+** Dashboard
+Dashboard is an extensible startup screen showing you recent files, bookmarks, agenda items and an Emacs banner.
+#+begin_src elisp
+  (use-package dashboard
+  :init
+    (setq initial-buffer-choice 'dashboard-open)
+    (setq dashboard-set-heading-icons t)
+    (setq dashboard-set-file-icons t)
+    ;; show Dashboard in frames created with emacsclient -c
+    (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+    ;;(setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
+    (setq dashboard-startup-banner (concat user-emacs-directory "assets/EmacsBound.svg"))  ;; use custom image as banner
+    (setq dashboard-center-content t) ;; set to 't' for centered content
+
+    (setq dashboard-items '(
+          (recents . 5)
+          (agenda . 5 )
+          (bookmarks . 3)
+          (projects . 3)
+          (registers . 3)
+    ))
+
+    ;; (dashboard-modify-heading-icons '((recents . "file-text") (bookmarks . "book")))
+  :config
+    (dashboard-setup-startup-hook)
+  )
 #+end_src
 
 ** Tabs
@@ -795,6 +811,14 @@ This package implements hiding or abbreviation of the modeline displays (lighter
   )
 #+end_src
 
+** Mini-buffer
+
+Darken the background of minibuffer using solaire-mode.
+
+#+begin_src elisp
+ (add-hook 'minibuffer-mode-hook 'solaire-mode)
+#+end_src
+
 ** Diff
 #+begin_src elisp
   (use-package diff-hl
@@ -807,7 +831,9 @@ This package implements hiding or abbreviation of the modeline displays (lighter
 
 * LSP & Completion
 ** Vertico
+
 [[https://github.com/minad/vertico#extensions][Vertico]] provides a performant and minimalistic vertical completion UI based on the default completion system. 
+
 #+begin_src elisp
   (use-package vertico
     :init
@@ -816,11 +842,11 @@ This package implements hiding or abbreviation of the modeline displays (lighter
     (setq orderless-matching-styles
         '(orderless-initialism orderless-prefixes orderless-regexp))
     ;; Different scroll margin
-    (setq vertico-scroll-margin 1)
+    ;(setq vertico-scroll-margin 1)
     ;; Show more candidates
-    (setq vertico-count 20)
+    ;(setq vertico-count 20)
     ;; Grow and shrink the Vertico minibuffer
-    (setq vertico-resize nil)
+    ;(setq vertico-resize nil)
     ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
     (setq vertico-cycle t)
     (vertico-mode 1)
@@ -828,6 +854,7 @@ This package implements hiding or abbreviation of the modeline displays (lighter
 #+end_src
 
 *** Savehist
+
 #+begin_src elisp
   ;; Persist history over Emacs restarts. Vertico sorts by history position.
     (use-package savehist
@@ -864,6 +891,7 @@ This package implements hiding or abbreviation of the modeline displays (lighter
 #+end_src
 
 *** Vertico-directory
+
 #+begin_src elisp
 (use-package vertico-directory
   :after vertico
@@ -876,6 +904,7 @@ This package implements hiding or abbreviation of the modeline displays (lighter
   :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
 #+end_src
 *** Vertico-multiform
+
 Vertico-multiform configures Vertico modes per command or completion category.
 
 #+begin_src elisp
@@ -886,7 +915,9 @@ Vertico-multiform configures Vertico modes per command or completion category.
 #+end_src
 
 *** Vertico-posframe
+
 [[https://github.com/tumashu/vertico-posframe][Vertico-posframe]] is an vertico extension, which lets vertico use posframe to show its candidate menu.
+
 #+begin_src elisp
   (use-package vertico-posframe
   :after vertico-multiform
@@ -908,7 +939,9 @@ Vertico-multiform configures Vertico modes per command or completion category.
 #+end_src
 
 ** Consult
+
 [[https://github.com/minad/consult][Consult]] provides search and navigation commands based on the Emacs completion function completing-read.
+
 #+begin_src elisp
 (use-package consult
   ;; Replace bindings. Lazily loaded due by `use-package'.
@@ -1055,31 +1088,34 @@ Vertico-multiform configures Vertico modes per command or completion category.
 https://github.com/zerolfx/copilot.el
 * Org
 ** User Interface
-*** Headings & Levels
-**** Font size
+*** Fonts
 Change the font size of different org-levels.
+
 #+begin_src elisp
   (use-package org
+    :hook (org-mode . mixed-pitch-mode)
     :config
     (set-face-attribute 'org-document-title nil :family "Cantarell" :height 2.5 :bold t)
     (set-face-attribute 'org-level-1 nil :family "Cantarell" :height 1.8 :bold t)
-    (set-face-attribute 'org-level-2 nil :family "Cantarell" :height 1.7 :bold t)
-    (set-face-attribute 'org-level-3 nil :family "Cantarell" :height 1.6 :bold t)
-    (set-face-attribute 'org-level-4 nil :family "Cantarell" :height 1.5 :bold t)
-    (set-face-attribute 'org-level-5 nil :family "Cantarell" :height 1.4 :bold t)
-    (set-face-attribute 'org-level-6 nil :family "Cantarell" :height 1.3 :bold t)
+    (set-face-attribute 'org-level-2 nil :family "Cantarell" :height 1.6 :bold t)
+    (set-face-attribute 'org-level-3 nil :family "Cantarell" :height 1.4 :bold t)
+    (set-face-attribute 'org-level-4 nil :family "Cantarell" :height 1.3 )
+    (set-face-attribute 'org-level-5 nil :family "Cantarell" :height 1.2 )
+    (set-face-attribute 'org-level-6 nil :family "Cantarell" :height 1.1 )
   )
 #+end_src
 
-**** Heading Bullets & bars
+*** Headings & Levels
+**** Level Bullets & lines
+
 [[https://github.com/integral-dw/org-superstar-mode][Org-superstar]] replaces the asterisk before every org-level with ascii symbols.
 Disabled because org-morden is a drop-in replacement.
+
 #+begin_src elisp
   (use-package org-superstar
   :defer t
   :init
     (setq
-      ;;org-superstar-headline-bullets-list '("✖" "✚" "◉" "○" "▶")
       ;;org-superstar-headline-bullets-list '("󰇊" "󰇋" "󰇌" "󰇍" "󰇎" "󰇏")
       org-superstar-special-todo-items t
       ;;org-ellipsis "  "
@@ -1087,34 +1123,46 @@ Disabled because org-morden is a drop-in replacement.
   )
 #+end_src
 
-[[https://github.com/tonyaldon/org-bars][Org-bars-mode]] is a minor mode for org-mode. It adds bars to the virtual indentation provided by the built-in package org-indent.
-Temporarily disabled for performance.
+[[https://github.com/tonyaldon/org-bars][Org-bars-mode]] is a minor mode for org-mode.
+It adds bars to the virtual indentation provided by the built-in package org-indent.
+Have drawbacks when using mixed-pitch-mode.
+
 #+begin_src elisp
   (use-package org-bars
   :commands 'org-bars-mode
-  :hook (org-mode . org-bars-mode)
+  ;:hook (org-mode . org-bars-mode)
   :config
     (setq org-bars-color-options '(
-	  :desaturate-level-faces 100
-	  :darken-level-faces 10
+          :desaturate-level-faces 100
+          :darken-level-faces 10
     ))
-    (setq org-bars-extra-pixels-height 12)
-    ;(setq org-bars-stars '(:empty "▷" :invisible "▶" :visible "▼"))
+    (setq org-bars-extra-pixels-height 25)
     (setq org-bars-stars '(:empty "" :invisible "" :visible ""))
   )
 #+end_src
 
-**** Org-modern
-[[https://github.com/minad/org-modern][org-modern]] implements a modern style for Org buffers using font locking and text properties. The package styles =headlines=, =keywords=, =tables= and =source blocks=. 
+[[https://github.com/legalnonsense/org-visual-outline][Org-visual-outline]] does the same as Org-bars-mode. It is split into two independent packages:
+- Org-dynamic-bullets :: handles the dynamic bullets. =May broke highlight=.
+- Org-visual-indent  :: adds vertical lines to org-indent. =Does better than Org-bars-mode=
+
+#+begin_src elisp
+  (use-package org-visual-outline
+  :hook (org-mode . org-visual-indent-mode)
+  )
+#+end_src
+
+[[https://github.com/minad/org-modern][Org-modern]] implements a modern style for Org buffers using font locking and text properties. The package styles =headlines=, =keywords=, =tables= and =source blocks=. 
 *This awesome package throws no warning during compilation.
 #+begin_src elisp
   (use-package org-modern)
 #+end_src
 
 *** Text arrangement
+
 Use [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]] to center =org-mode= buffers for a more pleasing writing experience as it centers the contents of the buffer horizontally to seem more like you are editing a document.
 Use visual-line-mode to wrap text.
 Use org-indent-mode to set different indenting for different levels.
+
 #+begin_src elisp :tangle no
     (add-hook 'org-mode-hook
       (defun config/org-mode-text-arrangement ()
@@ -1139,15 +1187,16 @@ Use org-indent-mode to set different indenting for different levels.
 #+end_src
 
 *** Org-appear
-Automatically disaply emphasis markers and links when the cursor is on them.
+[[https://github.com/awth13/org-appearAutomatically][Org-appear]] disaply emphasis markers and links when the cursor is on them.
 #+begin_src emacs-lisp
-(use-package org-appear
-  :hook (org-mode . org-appear-mode)
-  :init
-  (setq org-appear-autoemphasis  t)
-  ;(get it?) (setq org-appear-autolinks t)
-  (setq org-appear-autosubmarkers t)
-)
+  (use-package org-appear
+    :hook (org-mode . org-appear-mode)
+    :init
+    (setq org-appear-autoemphasis  t)
+    (setq org-appear-autolinks t)
+    (setq org-appear-autosubmarkers t)
+    (setq org-appear-inside-latex t)
+  )
 #+end_src
 
 ** Kbd-configs
@@ -1231,14 +1280,12 @@ Automatically disaply emphasis markers and links when the cursor is on them.
     
 * Code
 ** elisp
-- [[doom-package:buttercup]]
-- [[doom-package:elisp-def]]
-- [[doom-package:elisp-demos]]
-- [[doom-package:flycheck-cask]] if [[doom-module::checkers syntax]]
-- [[doom-package:flycheck-package]] if [[doom-module::checkers syntax]]
-- [[doom-package:highlight-quoted]]
-- [[doom-package:macrostep]]
-- [[doom-package:overseer]]
+- buttercup
+- elisp-def
+- elisp-demos
+- [[highlight-quoted]]
+- macrostep
+- overseer
 * Utilities
 ** Dirvish
 Dropin replacement for dired.

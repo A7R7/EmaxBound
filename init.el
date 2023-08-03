@@ -366,17 +366,19 @@
 )
 
 (set-face-attribute 'default nil
-  :font "JetBrainsMono Nerd Font"
-  :height 150
-  :weight 'medium)
+  ;:font "JetBrainsMono Nerd Font"
+  :font "RobotoMono Nerd Font Propo"
+  :height 155
+  ;:weight 'medium
+)
 (set-face-attribute 'variable-pitch nil
-  :font "Cantarell"
-  :height 160
-  :weight 'medium)
+  :font "Sarasa Gothic SC"
+  :height 180
+)
 (set-face-attribute 'fixed-pitch nil
-  :font "Cantarell"
-  :height 150
-  :weight 'medium)
+  :font "Sarasa Gothic SC"
+  :height 180
+)
 
 (set-face-attribute 'font-lock-comment-face nil
   :slant 'italic)
@@ -408,18 +410,17 @@
 
 (use-package olivetti
 :hook (org-mode . olivetti-mode)
-)
-
-(use-package visual-fill-column
-:defer t
-:init
-  (global-visual-line-mode t)
+      (Custom-mode . olivetti-mode)
+      (olivetti-mode . visual-line-mode)
 :config
-  (add-hook 'visual-fill-column-mode-hook
-     (defun center-window ()
-       (setq visual-fill-column-center-text t)
-       (setq visual-fill-column-width 120)
-     )
+  (defun config/shrink-olivetti-body-width ()
+     (when mixed-pitch-mode
+       (setq olivetti-body-width 0.3)))
+
+  (add-hook 'olivetti-mode-hook 'config/shrink-olivetti-body-width)
+
+  (config/leader
+    "tc"  '(olivetti-mode     :wk "󰉠 Center")
   )
 )
 
@@ -433,12 +434,13 @@
 :config
 )
 
+(use-package diminish)
+
 (use-package dashboard
 :init
   (setq initial-buffer-choice 'dashboard-open)
   (setq dashboard-set-heading-icons t)
   (setq dashboard-set-file-icons t)
-  ;; (setq dashboard-banner-logo-title "Also try NeoVim!")
   ;; show Dashboard in frames created with emacsclient -c
   (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
   ;;(setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
@@ -457,8 +459,6 @@
 :config
   (dashboard-setup-startup-hook)
 )
-
-(use-package diminish)
 
 (use-package centaur-tabs
   :hook
@@ -507,6 +507,8 @@
    "v"       '(config/toggle-line-number-visual   :wk " Visual     ")
 )
 
+(add-hook 'minibuffer-mode-hook 'solaire-mode)
+
 (use-package diff-hl
   :config
   (setq diff-hl-draw-borders nil)
@@ -521,11 +523,11 @@
   (setq orderless-matching-styles
       '(orderless-initialism orderless-prefixes orderless-regexp))
   ;; Different scroll margin
-  (setq vertico-scroll-margin 1)
+  ;(setq vertico-scroll-margin 1)
   ;; Show more candidates
-  (setq vertico-count 20)
+  ;(setq vertico-count 20)
   ;; Grow and shrink the Vertico minibuffer
-  (setq vertico-resize nil)
+  ;(setq vertico-resize nil)
   ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
   (setq vertico-cycle t)
   (vertico-mode 1)
@@ -724,21 +726,21 @@
 )
 
 (use-package org
+  :hook (org-mode . mixed-pitch-mode)
   :config
   (set-face-attribute 'org-document-title nil :family "Cantarell" :height 2.5 :bold t)
   (set-face-attribute 'org-level-1 nil :family "Cantarell" :height 1.8 :bold t)
-  (set-face-attribute 'org-level-2 nil :family "Cantarell" :height 1.7 :bold t)
-  (set-face-attribute 'org-level-3 nil :family "Cantarell" :height 1.6 :bold t)
-  (set-face-attribute 'org-level-4 nil :family "Cantarell" :height 1.5 :bold t)
-  (set-face-attribute 'org-level-5 nil :family "Cantarell" :height 1.4 :bold t)
-  (set-face-attribute 'org-level-6 nil :family "Cantarell" :height 1.3 :bold t)
+  (set-face-attribute 'org-level-2 nil :family "Cantarell" :height 1.6 :bold t)
+  (set-face-attribute 'org-level-3 nil :family "Cantarell" :height 1.4 :bold t)
+  (set-face-attribute 'org-level-4 nil :family "Cantarell" :height 1.3 )
+  (set-face-attribute 'org-level-5 nil :family "Cantarell" :height 1.2 )
+  (set-face-attribute 'org-level-6 nil :family "Cantarell" :height 1.1 )
 )
 
 (use-package org-superstar
 :defer t
 :init
   (setq
-    ;;org-superstar-headline-bullets-list '("✖" "✚" "◉" "○" "▶")
     ;;org-superstar-headline-bullets-list '("󰇊" "󰇋" "󰇌" "󰇍" "󰇎" "󰇏")
     org-superstar-special-todo-items t
     ;;org-ellipsis "  "
@@ -747,15 +749,18 @@
 
 (use-package org-bars
 :commands 'org-bars-mode
-:hook (org-mode . org-bars-mode)
+;:hook (org-mode . org-bars-mode)
 :config
   (setq org-bars-color-options '(
-	:desaturate-level-faces 100
-	:darken-level-faces 10
+        :desaturate-level-faces 100
+        :darken-level-faces 10
   ))
-  (setq org-bars-extra-pixels-height 12)
-  ;(setq org-bars-stars '(:empty "▷" :invisible "▶" :visible "▼"))
+  (setq org-bars-extra-pixels-height 25)
   (setq org-bars-stars '(:empty "" :invisible "" :visible ""))
+)
+
+(use-package org-visual-outline
+:hook (org-mode . org-visual-indent-mode)
 )
 
 (use-package org-modern)
@@ -771,8 +776,9 @@
   :hook (org-mode . org-appear-mode)
   :init
   (setq org-appear-autoemphasis  t)
-  ;(get it?) (setq org-appear-autolinks t)
+  (setq org-appear-autolinks t)
   (setq org-appear-autosubmarkers t)
+  (setq org-appear-inside-latex t)
 )
 
 (use-package evil-org)

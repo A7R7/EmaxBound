@@ -130,6 +130,9 @@
 [submodule "markdown-mode"]
 	path = lib/markdown-mode
 	url = https://github.com/jrblevin/markdown-mode
+[submodule "mixed-pitch"]
+	path = lib/mixed-pitch
+	url = https://gitlab.com/jabranham/mixed-pitch
 [submodule "nano-theme"]
 	path = lib/nano-theme
 	url = https://github.com/rougier/nano-theme
@@ -175,6 +178,12 @@
 [submodule "org-superstar"]
 	path = lib/org-superstar
 	url = https://github.com/integral-dw/org-superstar-mode
+[submodule "org-visibility"]
+	path = lib/org-visibility
+	url = https://github.com/nullman/emacs-org-visibility
+[submodule "org-visual-outline"]
+	path = lib/org-visual-outline
+	url = https://github.com/legalnonsense/org-visual-outline
 [submodule "orgtbl-aggregate"]
 	path = lib/orgtbl-aggregate
 	url = https://github.com/tbanel/orgaggregate
@@ -253,6 +262,9 @@
 [submodule "with-editor"]
 	path = lib/with-editor
 	url = https://github.com/magit/with-editor
+[submodule "writeroom-mode"]
+	path = lib/writeroom-mode
+	url = https://github.com/joostkremers/writeroom-mode
 [submodule "yascroll"]
 	path = lib/yascroll
 	url = https://github.com/emacsorphanage/yascroll
