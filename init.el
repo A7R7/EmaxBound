@@ -411,11 +411,14 @@
 (use-package olivetti
 :hook (org-mode . olivetti-mode)
       (Custom-mode . olivetti-mode)
+      (help-mode . olivetti-mode)
+      (dashboard-mode . olivetti-mode)
+      (dashboard-mode . variable-pitch-mode)
       (olivetti-mode . visual-line-mode)
 :config
   (defun config/shrink-olivetti-body-width ()
      (when mixed-pitch-mode
-       (setq olivetti-body-width 0.3)))
+       (setq olivetti-body-width 54)))
 
   (add-hook 'olivetti-mode-hook 'config/shrink-olivetti-body-width)
 
@@ -424,8 +427,12 @@
   )
 )
 
-(set-frame-parameter nil 'alpha-background 95)
-(add-to-list 'default-frame-alist '(alpha-background . 95))
+(set-frame-parameter nil 'alpha-background 96)
+
+(defun transparency (value)
+  "Sets the transparency of the frame window. 0=transparent/100=opaque"
+  (interactive "nTransparency Value 0 - 100 opaque:")
+  (set-frame-parameter nil 'alpha-background value))
 
 (use-package doom-modeline
 :init 
@@ -738,7 +745,7 @@
 )
 
 (use-package org-superstar
-:defer t
+:hook (org-mode . org-superstar-mode)
 :init
   (setq
     ;;org-superstar-headline-bullets-list '("󰇊" "󰇋" "󰇌" "󰇍" "󰇎" "󰇏")
@@ -776,7 +783,7 @@
   :hook (org-mode . org-appear-mode)
   :init
   (setq org-appear-autoemphasis  t)
-  (setq org-appear-autolinks t)
+  ;(setq org-appear-autolinks t)
   (setq org-appear-autosubmarkers t)
   (setq org-appear-inside-latex t)
 )

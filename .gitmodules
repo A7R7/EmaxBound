@@ -202,6 +202,12 @@
 [submodule "queue"]
 	path = lib/queue
 	url = git@github.com:emacsmirror/queue.git
+[submodule "rainbow-mode"]
+	path = lib/rainbow-mode
+	url = git@github.com:emacsmirror/rainbow-mode.git
+[submodule "ripgrep"]
+	path = lib/ripgrep
+	url = https://github.com/nlamirault/ripgrep.el
 [submodule "s"]
 	path = lib/s
 	url = https://github.com/magnars/s.el
@@ -223,6 +229,9 @@
 [submodule "transient"]
 	path = lib/transient
 	url = https://github.com/magit/transient
+[submodule "transient-posframe"]
+	path = lib/transient-posframe
+	url = https://github.com/yanghaoxie/transient-posframe
 [submodule "treemacs"]
 	path = lib/treemacs
 	url = https://github.com/Alexander-Miller/treemacs

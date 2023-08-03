@@ -15,11 +15,13 @@
 #+HTML: <a href="https://github.com/emacscollective/borg"><img alt="Package Manager" src="https://img.shields.io/badge/package_manager-borg-green"/></a>
 #+HTML: <a href="https://en.wikipedia.org/wiki/Linux"><img alt="Linux" src="https://img.shields.io/badge/linux-FCC624?logo=linux&logoColor=black"/></a>
 
+* Screenshots
+#+HTML: <img alt="Dashboard" src="assets/dashboard.png" width="100%">
+#+HTML: <img alt="Org Mode" src="assets/org_mode.png" width="100%">
 * Introduction
 ** How to deploy this config
 
 This config file is still in its early stages of development, *Everything is unstable!*
-
 To play around with my config files, clone this repo anywhere you like on your system.
 
 #+begin_src bash
@@ -34,7 +36,6 @@ make bootstrap       # bootstrap collective or new drones
 #+end_src
 
 If you're using emacs29 or above, run ~emacs --init-directory=<path-of-the-repo>~ (replace the path).
-
 Else, you can have a look at [[https://github.com/plexus/chemacs2][chemacs2]], which makes it easy to run multiple Emacs configurations side by side.
 
 ** How I built this config
@@ -674,17 +675,21 @@ There're 3 modes that can center text in a window
 [[https://github.com/rnkn/olivetti][Olibetti]] is a simple Emacs minor mode for a nice writing environment.
 Set olivetti-style to both margins and fringes for a fancy "page" look.
 
-Note that for pages with variable-pitch fonts, =olivetti-body-width= should be set smaller for it to look good.
+Note that for pages with variable-pitch fonts,
+=olivetti-body-width= should be set smaller for it to look good.
 
 #+begin_src elisp
   (use-package olivetti
   :hook (org-mode . olivetti-mode)
         (Custom-mode . olivetti-mode)
+        (help-mode . olivetti-mode)
+        (dashboard-mode . olivetti-mode)
+        (dashboard-mode . variable-pitch-mode)
         (olivetti-mode . visual-line-mode)
   :config
     (defun config/shrink-olivetti-body-width ()
        (when mixed-pitch-mode
-         (setq olivetti-body-width 0.3)))
+         (setq olivetti-body-width 54)))
 
     (add-hook 'olivetti-mode-hook 'config/shrink-olivetti-body-width)
 
@@ -696,16 +701,21 @@ Note that for pages with variable-pitch fonts, =olivetti-body-width= should be s
 
 *** Visual-fill-column
 
- [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]]  asdf
+ [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]]  
 
 *** Writeroom-mode
 
 ** Transparency
 
-Set background alpha to 5%
+Set background Transparency, according to [[https://www.emacswiki.org/emacs/TransparentEmacs][this page]].
+
 #+begin_src elisp
-(set-frame-parameter nil 'alpha-background 95)
-(add-to-list 'default-frame-alist '(alpha-background . 95))
+  (set-frame-parameter nil 'alpha-background 96)
+
+  (defun transparency (value)
+    "Sets the transparency of the frame window. 0=transparent/100=opaque"
+    (interactive "nTransparency Value 0 - 100 opaque:")
+    (set-frame-parameter nil 'alpha-background value))
 #+end_src
 
 ** Modeline
@@ -1109,11 +1119,11 @@ Change the font size of different org-levels.
 **** Level Bullets & lines
 
 [[https://github.com/integral-dw/org-superstar-mode][Org-superstar]] replaces the asterisk before every org-level with ascii symbols.
-Disabled because org-morden is a drop-in replacement.
++Disabled because org-morden is a drop-in replacement.+
 
 #+begin_src elisp
   (use-package org-superstar
-  :defer t
+  :hook (org-mode . org-superstar-mode)
   :init
     (setq
       ;;org-superstar-headline-bullets-list '("󰇊" "󰇋" "󰇌" "󰇍" "󰇎" "󰇏")
@@ -1193,7 +1203,7 @@ Use org-indent-mode to set different indenting for different levels.
     :hook (org-mode . org-appear-mode)
     :init
     (setq org-appear-autoemphasis  t)
-    (setq org-appear-autolinks t)
+    ;(setq org-appear-autolinks t)
     (setq org-appear-autosubmarkers t)
     (setq org-appear-inside-latex t)
   )
