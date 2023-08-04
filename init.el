@@ -779,7 +779,7 @@
 (use-package org
   :hook (org-mode . mixed-pitch-mode)
   :config
-  (set-face-attribute 'org-document-title nil :family "Cantarell" :height 2.5 :bold t)
+  ;(set-face-attribute 'org-document-title nil :family "Cantarell" :height 2.5 :bold t)
   (set-face-attribute 'org-level-1 nil :family "Cantarell" :height 1.8 :bold t)
   (set-face-attribute 'org-level-2 nil :family "Cantarell" :height 1.6 :bold t)
   (set-face-attribute 'org-level-3 nil :family "Cantarell" :height 1.4 :bold t)

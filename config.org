@@ -137,27 +137,18 @@ Disable byte compile for init.el, according to the [[https://www.gnu.org/softwar
   )
 #+end_src
 
-** Borg
-Define a function to assimilate multiple packages at a time
+** Core units
+
+ * [[https://github.com/emacscollective/borg][Borg]] assimilate Emacs packages as Git submodules. Core of the core units.
 #+begin_src elisp
 (eval-and-compile ; `borg'
   (add-to-list 'load-path (expand-file-name "lib/borg" user-emacs-directory))
   (require 'borg)
   (borg-initialize)
-;  (defun borg-assimilate-loop ()
-;    (interactive)
-;    (catch 'loop-end
-;      (while t ; Infinite loop until explicitly terminated
-;        (condition-case nil
-;          (borg-assimilate ()) ; Call your function here
-;          (quit (throw 'loop-end nil)))))
-;  ) ; Catch 'C-g' (quit) signal and end the loop
 )
-
 #+end_src
 
-** Use-package
-Use-package is built-in since emacs-29
+ * Use-package is built-in since emacs-29! Uncomment the comment if running below29.
 #+begin_src elisp
 (setq use-package-verbose t)
   ;(eval-and-compile ; `use-package'
@@ -165,22 +156,18 @@ Use-package is built-in since emacs-29
   ;  (setq use-package-verbose t))
 #+end_src
 
-** dash
+ * [[https://github.com/magnars/dash.el][Dash]] is a modern list library for Emacs See its overview at [[https://github.com/magnars/dash.el#functions][dash.el - functions]].
 #+begin_src elisp
 (use-package dash
   :config (global-dash-fontify-mode))
 #+end_src
 
-** eieio
-
+ * [[https://www.gnu.org/software/emacs][EIEIO]] is a series of Lisp routines which implements a subset of CLOS, the Common Lisp Object System. In addition, EIEIO also adds a few new features which help it integrate more strongly with the Emacs running environment.
 #+begin_src elisp
 (use-package eieio)
 #+end_src
 
-** auto-compile
-
- [[https://github.com/emacscollective/auto-compile][Auto-Compile]] automatically compile Emacs Lisp libraries
-
+ * [[https://github.com/emacscollective/auto-compile][Auto-Compile]] automatically compile Emacs Lisp libraries
 #+begin_src elisp
 (use-package auto-compile
   :config
@@ -192,10 +179,7 @@ Use-package is built-in since emacs-29
 )
 #+end_src
 
-** epkg
-
- [[https://github.com/emacscollective/epkg][Epkg]] allows you browse the Emacsmirror package database
-
+ * [[https://github.com/emacscollective/epkg][Epkg]] allows you browse the Emacsmirror package database
 #+begin_src elisp
 (use-package epkg
   :defer t
@@ -206,8 +190,7 @@ Use-package is built-in since emacs-29
         (if (>= emacs-major-version 29) 'sqlite-builtin 'sqlite-module)))
 #+end_src
 
-** custom
-
+ * custom
 #+begin_src elisp
 (use-package custom
   :no-require t
@@ -217,14 +200,13 @@ Use-package is built-in since emacs-29
     (load custom-file)))
 #+end_src
 
-** server
+ * Server 
 #+begin_src elisp
 (use-package server
   :commands (server-running-p)
   :config (or (server-running-p) (server-mode)))
 #+end_src
 
-** elisp
 #+begin_src elisp
 (progn ;     startup
   (message "Loading early birds...done (%.3fs)"
@@ -1165,13 +1147,14 @@ https://github.com/zerolfx/copilot.el
 * Org
 ** User Interface
 *** Fonts
+
 Change the font size of different org-levels.
 
 #+begin_src elisp
   (use-package org
     :hook (org-mode . mixed-pitch-mode)
     :config
-    (set-face-attribute 'org-document-title nil :family "Cantarell" :height 2.5 :bold t)
+    ;(set-face-attribute 'org-document-title nil :family "Cantarell" :height 2.5 :bold t)
     (set-face-attribute 'org-level-1 nil :family "Cantarell" :height 1.8 :bold t)
     (set-face-attribute 'org-level-2 nil :family "Cantarell" :height 1.6 :bold t)
     (set-face-attribute 'org-level-3 nil :family "Cantarell" :height 1.4 :bold t)
@@ -1513,4 +1496,6 @@ It is very useful for figuring out how things work in Emacs.
 - Org mode 
     + Roam
     + GTD
+    * asdf 
+    
 - Posframe for magit and others
