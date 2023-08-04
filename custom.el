@@ -10,6 +10,8 @@
  '(doom-ayu-mirage-brighter-modeline t)
  '(doom-modeline-enable-word-count t)
  '(fill-column 90)
+ '(mini-frame-internal-border-color "white")
+ '(mini-frame-show-parameters '((left . 0.5) (top . 0.0) (width . 0.8) (height . 1)))
  '(mixed-pitch-fixed-pitch-faces
    '(diff-added diff-context diff-file-header diff-function diff-header diff-hunk-header diff-removed font-latex-math-face font-latex-sedate-face font-latex-warning-face font-latex-sectioning-5-face font-lock-builtin-face font-lock-comment-delimiter-face font-lock-constant-face font-lock-doc-face font-lock-function-name-face font-lock-keyword-face font-lock-negation-char-face font-lock-preprocessor-face font-lock-regexp-grouping-backslash font-lock-regexp-grouping-construct font-lock-string-face font-lock-type-face font-lock-variable-name-face line-number line-number-current-line line-number-major-tick line-number-minor-tick markdown-code-face markdown-gfm-checkbox-face markdown-inline-code-face markdown-language-info-face markdown-language-keyword-face markdown-math-face message-header-name message-header-to message-header-cc message-header-newsgroups message-header-xheader message-header-subject message-header-other mu4e-header-key-face mu4e-header-value-face mu4e-link-face mu4e-contact-face mu4e-compose-separator-face mu4e-compose-header-face org-block org-document-info-keyword org-code org-indent org-latex-and-related org-checkbox org-formula org-meta-line org-table org-verbatim))
  '(mixed-pitch-set-height t)
@@ -50,6 +52,7 @@
  '(org-block-begin-line ((t (:height 0.8 :weight light :foreground "#3f4460" :extend t :inherit variable-pitch))))
  '(org-meta-line ((t (:foreground "LightSteelBlue4"))))
  '(org-modern-block-name ((t (:inherit variable-pitch))))
+ '(org-special-keyword ((t (:foreground "light steel blue"))))
  '(org-tag ((t (:foreground "LightSteelBlue4" :weight normal))))
  '(org-visual-indent-blank-pipe-face ((t (:background "#1f2430" :foreground "#1f2430" :height 0.1 :width extra-expanded))))
  '(org-visual-indent-pipe-face ((t (:background "slate gray" :foreground "slate gray" :height 0.1))))

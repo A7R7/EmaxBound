@@ -390,6 +390,9 @@ Use-package is built-in since emacs-29
 #+end_src
 
 * Kbd 
+
+We setup keybinding framworks and basic keybindings at this place. Note that not all keybindings are set here. Some package specific keybinding configs are set under where the package is configed
+
 ** Evil
 *** Evil mode
 
@@ -599,6 +602,10 @@ options for =which-key-posframe-poshandler=:
 ** Mouse
 
 * UI
+
+We setup UI for basic emacs widgets at this place. Again, Note that not all UI's are set here. 
+Some package specific UI configs are set under where the package is configed.
+
 ** Fonts
 
 Defining the various fonts that Emacs will use.
@@ -674,45 +681,51 @@ Run [[elisp:nerd-icons-install-fonts][M-x nerd-icons-install-fonts]] to install 
 ** Theme
 [[https://github.com/hlissner/emacs-doom-themes][Doom-themes]] is a great set of themes with a lot of variety and support for many different Emacs modes. Taking a look at the [[https://github.com/hlissner/emacs-doom-themes/tree/screenshots][screenshots]] might help you decide which one you like best.  You can also run =M-x counsel-load-theme= to choose between them easily.
 
-** Text center
+** Text Arrangement
+*** Centering
 
-There're 3 modes that can center text in a window
+We have 3 modes that can help centering text in a window. But currently we only use olivetti mode.
 
-*** Olivetti
+**** Olivetti
 
-[[https://github.com/rnkn/olivetti][Olibetti]] is a simple Emacs minor mode for a nice writing environment.
-Set olivetti-style to both margins and fringes for a fancy "page" look.
+    [[https://github.com/rnkn/olivetti][Olibetti]] is a simple Emacs minor mode for a nice writing environment.
+    Set olivetti-style to both margins and fringes for a fancy "page" look.
 
-Note that for pages with variable-pitch fonts,
-=olivetti-body-width= should be set smaller for it to look good.
+    Note that for pages with variable-pitch fonts,
+    =olivetti-body-width= should be set smaller for it to look good.
+                                                                                                                                                                                                                                #+begin_src elisp
+    (use-package olivetti
+    :hook (org-mode . olivetti-mode)
+            (Custom-mode . olivetti-mode)
+            (help-mode . olivetti-mode)
+            (dashboard-mode . olivetti-mode)
+            (dashboard-mode . variable-pitch-mode)
+            (olivetti-mode . visual-line-mode)
+    :config
+        (defun config/adjust-olivetti-body-width ()
+        (when (and (boundp 'mixed-pitch-mode) mixed-pitch-mode)
+            (setq olivetti-body-width 54)))
 
-#+begin_src elisp
-  (use-package olivetti
-  :hook (org-mode . olivetti-mode)
-        (Custom-mode . olivetti-mode)
-        (help-mode . olivetti-mode)
-        (dashboard-mode . olivetti-mode)
-        (dashboard-mode . variable-pitch-mode)
-        (olivetti-mode . visual-line-mode)
-  :config
-    (defun config/shrink-olivetti-body-width ()
-       (when mixed-pitch-mode
-         (setq olivetti-body-width 54)))
+        (add-hook 'olivetti-mode-hook 'config/adjust-olivetti-body-width)
 
-    (add-hook 'olivetti-mode-hook 'config/shrink-olivetti-body-width)
-
-    (config/leader
-      "tc"  '(olivetti-mode     :wk "󰉠 Center")
+        (config/leader
+        "tc"  '(olivetti-mode     :wk "󰉠 Center")
+        )
     )
+                                                                                                                                                                                                                                        #+end_src
+**** Visual-fill-column
+
+    [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]]  
+    
+**** Writeroom-mode
+
+*** Spacing 
+[[https://github.com/trevorpogue/topspace][Topspace]] recenter line 1 with scrollable upper margin/padding
+#+begin_src elisp
+  (use-package topspace
+  :hook (dashboard-mode . topspace-mode)
   )
 #+end_src
-
-*** Visual-fill-column
-
- [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]]  
-
-*** Writeroom-mode
-
 ** Transparency
 
 Set background Transparency, according to [[https://www.emacswiki.org/emacs/TransparentEmacs][this page]].
@@ -850,26 +863,8 @@ Dashboard is an extensible startup screen showing you recent files, bookmarks, a
   )
 #+end_src
 
-** Mini-buffer
-
-Darken the background of minibuffer using solaire-mode.
-
-#+begin_src elisp
- (add-hook 'minibuffer-mode-hook 'solaire-mode)
-#+end_src
-
-** Diff
-#+begin_src elisp
-  (use-package diff-hl
-    :config
-    (setq diff-hl-draw-borders nil)
-    (global-diff-hl-mode)
-    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
-  )
-#+end_src
-
-* LSP & Completion
-** Vertico
+** Minibuffer
+*** Vertico
 
 [[https://github.com/minad/vertico#extensions][Vertico]] provides a performant and minimalistic vertical completion UI based on the default completion system. 
 
@@ -888,11 +883,13 @@ Darken the background of minibuffer using solaire-mode.
     ;(setq vertico-resize nil)
     ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
     (setq vertico-cycle t)
+    ;; use Vertico as an in-buffer completion UI
+    (setq completion-in-region-function 'consult-completion-in-region)
     (vertico-mode 1)
   )
 #+end_src
 
-*** Savehist
+**** Savehist
 
 #+begin_src elisp
   ;; Persist history over Emacs restarts. Vertico sorts by history position.
@@ -929,7 +926,7 @@ Darken the background of minibuffer using solaire-mode.
         (setq enable-recursive-minibuffers t))
 #+end_src
 
-*** Vertico-directory
+**** Vertico-directory
 
 #+begin_src elisp
 (use-package vertico-directory
@@ -942,7 +939,7 @@ Darken the background of minibuffer using solaire-mode.
   ;; Tidy shadowed file names
   :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
 #+end_src
-*** Vertico-multiform
+**** Vertico-multiform
 
 Vertico-multiform configures Vertico modes per command or completion category.
 
@@ -959,12 +956,13 @@ Vertico-multiform configures Vertico modes per command or completion category.
 
 #+begin_src elisp
   (use-package vertico-posframe
+  :disabled
   :after vertico-multiform
   :init 
     (setq vertico-multiform-commands
          '((consult-line posframe
               (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
-              (vertico-posframe-fallback-mode . vertico-buffer-mode)
+              ;(vertico-posframe-fallback-mode . vertico-buffer-mode)
               (vertico-posframe-width . 50))
            (execute-extended-command
               (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
@@ -972,11 +970,54 @@ Vertico-multiform configures Vertico modes per command or completion category.
            (t posframe)
           )
     )
-    (vertico-multiform-mode 1)
-    (vertico-posframe-mode 1)
+    ;(vertico-multiform-mode 1)
+    ;(vertico-posframe-mode 1)
   )
 #+end_src
 
+*** Mini-frame
+
+[[https://github.com/muffinmad/emacs-mini-frame][Mini-Frame]], similar to posframe, shows minibuffer in child frame on read-from-minibuffer.
+#+begin_src elisp
+  (use-package mini-frame
+  :config
+    (setq mini-frame-detach-on-hide nil)
+    ;(setq mini-frame-standalone 't)
+    ;(setq mini-frame-resize-min-height 10)
+    (setq mini-frame-ignore-commands 
+      (append mini-frame-ignore-commands
+       '(evil-window-split evil-window-vsplit evil-ex)))
+  )
+#+end_src
+*** Solaire mode
+
+Darken the background of minibuffer using solaire-mode.
+#+begin_src elisp
+  ;(add-hook 'minibuffer-setup-hook 'solaire-mode)
+#+end_src
+*** Center text
+
+Use olivetti to center text in minibuffer!
+#+begin_src elisp
+  (add-hook 'minibuffer-setup-hook
+    (defun config/set-minibuffer-margin ()
+      (setq olivetti-body-width 140)
+      (olivetti-mode)
+    )
+  )
+#+end_src
+
+** Diff
+#+begin_src elisp
+  (use-package diff-hl
+    :config
+    (setq diff-hl-draw-borders nil)
+    (global-diff-hl-mode)
+    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
+  )
+#+end_src
+
+* LSP & Completion
 ** Consult
 
 [[https://github.com/minad/consult][Consult]] provides search and navigation commands based on the Emacs completion function completing-read.
@@ -1119,10 +1160,6 @@ Vertico-multiform configures Vertico modes per command or completion category.
 )
 #+end_src
 
-** UI
-*** Posframe
-*** Vertico-posframe
-[[https://github.com/tumashu/vertico-posframe][Vertico-posframe]] is an vertico extension, which lets vertico use posframe to show its candidate menu.
 ** Copilot
 https://github.com/zerolfx/copilot.el
 * Org
@@ -1146,6 +1183,26 @@ Change the font size of different org-levels.
 
 *** Headings & Levels
 **** Level Bullets & lines
+
+[[https://github.com/minad/org-modern][Org-modern]] implements a modern style for Org buffers using font locking and text properties. The package styles =headlines=, =keywords=, =tables= and =source blocks=. 
+*This awesome package throws no warning during compilation. 
+
+#+begin_src elisp
+  (use-package org-modern
+  :hook (org-mode . org-modern-mode)
+  :config
+     (setq org-modern-keyword
+       (quote (("author" . "⛾")
+               ("title" . "❖")
+               ("subtitle" . "§")
+               (t . t))))
+     (setq org-modern-star
+          ;'("◉" "○" "◈" "◇" "✳")
+          '("⚀" "⚁" "⚂" "⚃" "⚄" "⚅")
+          ;'("☰" "☱" "☲" "☳" "☴" "☵" "☶" "☷")
+     )
+  )
+#+end_src
 
 [[https://github.com/integral-dw/org-superstar-mode][Org-superstar]] replaces the asterisk before every org-level with ascii symbols.
 Disabled because org-morden is a drop-in replacement.
@@ -1189,15 +1246,6 @@ Have drawbacks when using mixed-pitch-mode.
 #+begin_src elisp
   (use-package org-visual-outline
   :hook (org-mode . org-visual-indent-mode)
-  )
-#+end_src
-
-[[https://github.com/minad/org-modern][Org-modern]] implements a modern style for Org buffers using font locking and text properties. The package styles =headlines=, =keywords=, =tables= and =source blocks=. 
-*This awesome package throws no warning during compilation.
-
-#+begin_src elisp
-  (use-package org-modern
-  :hook (org-mode . org-modern-mode)
   )
 #+end_src
 
@@ -1437,10 +1485,10 @@ It is very useful for figuring out how things work in Emacs.
 #+end_src
 
 * Eaf
+
 [[https://github.com/emacs-eaf/emacs-application-framework][EAF]] is an extensible framework that revolutionizes the graphical capabilities of Emacs.
-#+begin_src elisp :tangle no
+#+begin_src elisp 
   (use-package eaf
-  ;; :load-path "~/.emacs.d/site-lisp/emacs-application-framework"
   :custom
     ; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
     (eaf-browser-continue-where-left-off t)
@@ -1454,11 +1502,15 @@ It is very useful for figuring out how things work in Emacs.
     ;; (eaf-bind-key nil "M-q" eaf-browser-keybinding)
     (setq confirm-kill-processes nil)
   ) ;; unbind, see more in the Wiki
+
+  (use-package eaf-browser)
+  (use-package eaf-pdf-viewer)
 #+end_src
 
 * TODOs
-** pixel-scroll-precision-mode for evil scroll
-** vertico-buffer & minibuffer
-** Org mode 
-*** Roam
-*** GTD
+- pixel-scroll-precision-mode for evil scroll
+- vertico-buffer & minibuffer
+- Org mode 
+    + Roam
+    + GTD
+- Posframe for magit and others

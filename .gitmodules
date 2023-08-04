@@ -133,6 +133,9 @@
 [submodule "markdown-mode"]
 	path = lib/markdown-mode
 	url = https://github.com/jrblevin/markdown-mode
+[submodule "mini-frame"]
+	path = lib/mini-frame
+	url = https://github.com/muffinmad/emacs-mini-frame
 [submodule "minimap"]
 	path = lib/minimap
 	url = git@github.com:emacsmirror/minimap.git
@@ -196,6 +199,9 @@
 [submodule "pacmacs"]
 	path = lib/pacmacs
 	url = https://github.com/codingteam/pacmacs.el
+[submodule "pdf-tools"]
+	path = lib/pdf-tools
+	url = https://github.com/vedang/pdf-tools
 [submodule "posframe"]
 	path = lib/posframe
 	url = https://github.com/tumashu/posframe
@@ -226,12 +232,21 @@
 [submodule "solaire-mode"]
 	path = lib/solaire-mode
 	url = https://github.com/hlissner/emacs-solaire-mode
+[submodule "spacious-padding"]
+	path = lib/spacious-padding
+	url = https://github.com/emacsmirror/spacious-padding
 [submodule "sqlite3"]
 	path = lib/sqlite3
 	url = https://github.com/pekingduck/emacs-sqlite3-api
 [submodule "sublime-themes"]
 	path = lib/sublime-themes
 	url = https://github.com/owainlewis/emacs-color-themes
+[submodule "tablist"]
+	path = lib/tablist
+	url = https://github.com/emacsorphanage/tablist
+[submodule "topspace"]
+	path = lib/topspace
+	url = https://github.com/trevorpogue/topspace
 [submodule "transient"]
 	path = lib/transient
 	url = https://github.com/magit/transient

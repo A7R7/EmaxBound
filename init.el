@@ -412,21 +412,25 @@
 
 (use-package olivetti
 :hook (org-mode . olivetti-mode)
-      (Custom-mode . olivetti-mode)
-      (help-mode . olivetti-mode)
-      (dashboard-mode . olivetti-mode)
-      (dashboard-mode . variable-pitch-mode)
-      (olivetti-mode . visual-line-mode)
+        (Custom-mode . olivetti-mode)
+        (help-mode . olivetti-mode)
+        (dashboard-mode . olivetti-mode)
+        (dashboard-mode . variable-pitch-mode)
+        (olivetti-mode . visual-line-mode)
 :config
-  (defun config/shrink-olivetti-body-width ()
-     (when mixed-pitch-mode
-       (setq olivetti-body-width 54)))
+    (defun config/adjust-olivetti-body-width ()
+    (when (and (boundp 'mixed-pitch-mode) mixed-pitch-mode)
+        (setq olivetti-body-width 54)))
 
-  (add-hook 'olivetti-mode-hook 'config/shrink-olivetti-body-width)
+    (add-hook 'olivetti-mode-hook 'config/adjust-olivetti-body-width)
 
-  (config/leader
+    (config/leader
     "tc"  '(olivetti-mode     :wk "󰉠 Center")
-  )
+    )
+)
+
+(use-package topspace
+:hook (dashboard-mode . topspace-mode)
 )
 
 (set-frame-parameter nil 'alpha-background 96)
@@ -534,15 +538,6 @@
    "v"       '(config/toggle-line-number-visual   :wk " Visual     ")
 )
 
-(add-hook 'minibuffer-mode-hook 'solaire-mode)
-
-(use-package diff-hl
-  :config
-  (setq diff-hl-draw-borders nil)
-  (global-diff-hl-mode)
-  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
-)
-
 (use-package vertico
   :init
   (setq completion-styles '(orderless))
@@ -557,6 +552,8 @@
   ;(setq vertico-resize nil)
   ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
   (setq vertico-cycle t)
+  ;; use Vertico as an in-buffer completion UI
+  (setq completion-in-region-function 'consult-completion-in-region)
   (vertico-mode 1)
 )
 
@@ -607,12 +604,13 @@
 )
 
 (use-package vertico-posframe
+:disabled
 :after vertico-multiform
 :init 
   (setq vertico-multiform-commands
        '((consult-line posframe
             (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
-            (vertico-posframe-fallback-mode . vertico-buffer-mode)
+            ;(vertico-posframe-fallback-mode . vertico-buffer-mode)
             (vertico-posframe-width . 50))
          (execute-extended-command
             (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
@@ -620,8 +618,34 @@
          (t posframe)
         )
   )
-  (vertico-multiform-mode 1)
-  (vertico-posframe-mode 1)
+  ;(vertico-multiform-mode 1)
+  ;(vertico-posframe-mode 1)
+)
+
+(use-package mini-frame
+:config
+  (setq mini-frame-detach-on-hide nil)
+  ;(setq mini-frame-standalone 't)
+  ;(setq mini-frame-resize-min-height 10)
+  (setq mini-frame-ignore-commands 
+    (append mini-frame-ignore-commands
+     '(evil-window-split evil-window-vsplit evil-ex)))
+)
+
+;(add-hook 'minibuffer-setup-hook 'solaire-mode)
+
+(add-hook 'minibuffer-setup-hook
+  (defun config/set-minibuffer-margin ()
+    (setq olivetti-body-width 140)
+    (olivetti-mode)
+  )
+)
+
+(use-package diff-hl
+  :config
+  (setq diff-hl-draw-borders nil)
+  (global-diff-hl-mode)
+  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
 )
 
 (use-package consult
@@ -764,6 +788,21 @@
   (set-face-attribute 'org-level-6 nil :family "Cantarell" :height 1.1 )
 )
 
+(use-package org-modern
+:hook (org-mode . org-modern-mode)
+:config
+   (setq org-modern-keyword
+     (quote (("author" . "⛾")
+             ("title" . "❖")
+             ("subtitle" . "§")
+             (t . t))))
+   (setq org-modern-star
+        ;'("◉" "○" "◈" "◇" "✳")
+        '("⚀" "⚁" "⚂" "⚃" "⚄" "⚅")
+        ;'("☰" "☱" "☲" "☳" "☴" "☵" "☶" "☷")
+   )
+)
+
 (use-package org-superstar
 :defer t
 ;:hook (org-mode . org-superstar-mode)
@@ -790,10 +829,6 @@
 
 (use-package org-visual-outline
 :hook (org-mode . org-visual-indent-mode)
-)
-
-(use-package org-modern
-:hook (org-mode . org-modern-mode)
 )
 
 (use-package hl-todo
@@ -939,3 +974,21 @@
     (config/window-center 35)
   )
 )
+
+(use-package eaf
+:custom
+  ; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
+  (eaf-browser-continue-where-left-off t)
+  (eaf-browser-enable-adblocker t)
+  (browse-url-browser-function 'eaf-open-browser)
+:config
+  (defalias 'browse-web #'eaf-open-browser)
+  ;; (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
+  ;; (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
+  ;; (eaf-bind-key take_photo "p" eaf-camera-keybinding)
+  ;; (eaf-bind-key nil "M-q" eaf-browser-keybinding)
+  (setq confirm-kill-processes nil)
+) ;; unbind, see more in the Wiki
+
+(use-package eaf-browser)
+(use-package eaf-pdf-viewer)
