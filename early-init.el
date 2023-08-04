@@ -1,4 +1,4 @@
-;;; early-init.el --- earliest birds  -*- lexical-binding: t; -*- no-byte-compile: t -*-
+;;; early-init.el --- earliest birds  -*- lexical-binding: t; no-byte-compile: t -*-
 
 (tool-bar-mode -1)
 (menu-bar-mode -1)

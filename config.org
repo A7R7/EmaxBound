@@ -10,14 +10,14 @@
 #+TITLE: EmaxBound Configuration
 #+AUTHOR: A7R7
 
-#+HTML: <img alt="EmaxBound" src="assets/EmacsBound.svg" width="100%">
-#+HTML: <a href="https://www.gnu.org/software/emacs/"><img alt="GNU Emacs" src="https://img.shields.io/badge/emacs-29.1-8A2BF2?logo=gnuemacs&logoColor=white"/></a>
-#+HTML: <a href="https://github.com/emacscollective/borg"><img alt="Package Manager" src="https://img.shields.io/badge/package_manager-borg-green"/></a>
-#+HTML: <a href="https://en.wikipedia.org/wiki/Linux"><img alt="Linux" src="https://img.shields.io/badge/linux-FCC624?logo=linux&logoColor=black"/></a>
+#+HTML:<img alt="EmaxBound" src="assets/EmacsBound.svg" width="100%"> 
+#+HTML:<a href="https://www.gnu.org/software/emacs/"><img alt="GNU Emacs" src="https://img.shields.io/badge/emacs-29.1-8A2BF2?logo=gnuemacs&logoColor=white"/></a>
+#+HTML:<a href="https://github.com/emacscollective/borg"><img alt="Package Manager" src="https://img.shields.io/badge/package_manager-borg-green"/></a>
+#+HTML:<a href="https://en.wikipedia.org/wiki/Linux"><img alt="Linux" src="https://img.shields.io/badge/linux-FCC624?logo=linux&logoColor=black"/></a>
 
 * Screenshots
-#+HTML: <img alt="Dashboard" src="assets/dashboard.png" width="100%">
-#+HTML: <img alt="Org Mode" src="assets/org_mode.png" width="100%">
+#+HTML:<img alt="Dashboard" src="assets/dashboard.png" width="100%">
+#+HTML:<img alt="Org Mode" src="assets/org_mode.png" width="100%">
 * Introduction
 ** How to deploy this config
 
@@ -44,7 +44,6 @@ Check [[https://emacsmirror.net/manual/borg/Bootstrapping-using-a-seed.html][Boo
 - Firstly, I generated the structure from the seed.
 - Then, I copied and pasted all the original code from init.el and early-init.el to this org file.
 - Last, most further config does not go beyond the following 2 steps:
-
   + Run [[elisp: borg-assimilate][M-x borg-assimilate]] and input the name of the package to install this package.
   + Write config codes into this org file, then run [[elisp:org-babel-tangle][M-x org-babel-tangle]] so that emacs writes the codes into the corresponding file.
 
@@ -61,14 +60,13 @@ For example, some packages have an ~extensions~ dir in their repo. To load these
 -  [[https://github.com/lijigang/100-questions-about-orgmode][lijigang's 100-questions-about-orgmode]] (2023) for org mode of course.
 *NOTE*: the year number after link equals to
 - =min (last time the config get's updated, last time I refered to the config)=
-  
-* Early Init
+* Earliest birds
 
-*NOTE*: codes under this heading is tangled to early-init.el
+*NOTE*: codes under this heading are tangled to early-init.el
 
-File header, disable byte-compile
+Disable byte-compile for early-init.el, according to the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html][emacs manual]].
 #+begin_src elisp :tangle early-init.el
-;;; early-init.el --- earliest birds  -*- lexical-binding: t; -*- no-byte-compile: t -*-
+;;; early-init.el --- earliest birds  -*- lexical-binding: t; no-byte-compile: t -*-
 #+end_src
 
 Disable tool-bar, menu-bar and scroll-bar before they're loaded.
@@ -101,24 +99,22 @@ Borg seed generated configs.
 ;;; early-init.el ends here
 #+end_src
 
-* Init
-** File-local-variable
+* Early birds
+
+*NOTE*: Starting from here, codes are tangled to init.el !
 
 Disable byte compile for init.el, according to the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html][emacs manual]].
-
 #+begin_src elisp
 ;;; init.el --- user-init-file
-;;; -*- lexical-binding: t; no-byte-compile: t -*-
 #+end_src
 
-** Basic setups
-
+Calculating time used loading emacs excutable, as well as setting some variables.
 #+begin_src elisp
-  ;;; Early birds
+;;; -*- lexical-binding: t; no-byte-compile: t -*-
   (progn ;     startup
     (defvar before-user-init-time (current-time)
       "Value of `current-time' when Emacs begins loading `user-init-file'.")
-    (message "Loading Emacs...done (%.3fs)"
+    (message "Loading Emacs...done (%fs)"
              (float-time (time-subtract before-user-init-time
                                         before-init-time)))
     (setq user-init-file (or load-file-name buffer-file-name))
@@ -137,7 +133,7 @@ Disable byte compile for init.el, according to the [[https://www.gnu.org/softwar
   )
 #+end_src
 
-** Core units
+* Core units
 
  * [[https://github.com/emacscollective/borg][Borg]] assimilate Emacs packages as Git submodules. Core of the core units.
 #+begin_src elisp
@@ -157,6 +153,8 @@ Disable byte compile for init.el, according to the [[https://www.gnu.org/softwar
 #+end_src
 
  * [[https://github.com/magnars/dash.el][Dash]] is a modern list library for Emacs See its overview at [[https://github.com/magnars/dash.el#functions][dash.el - functions]].
+
+=Dash-Fontify mode= is a buffer-local minor mode intended for Emacs Lisp buffers.  Enabling it causes the special variables bound in anaphoric Dash macros to be fontified.  These anaphoras include ‘it’, ‘it-index’, ‘acc’, and ‘other’.  In older Emacs versions which do not dynamically detect macros, Dash-Fontify mode additionally fontifies Dash macro calls.
 #+begin_src elisp
 (use-package dash
   :config (global-dash-fontify-mode))
@@ -190,7 +188,7 @@ Disable byte compile for init.el, according to the [[https://www.gnu.org/softwar
         (if (>= emacs-major-version 29) 'sqlite-builtin 'sqlite-module)))
 #+end_src
 
- * custom
+ * [[https://www.emacswiki.org/emacs/CustomizingAndSaving#Customize][Customize system]] of emacs. Set the file path used for storing customization information.
 #+begin_src elisp
 (use-package custom
   :no-require t
@@ -200,20 +198,21 @@ Disable byte compile for init.el, according to the [[https://www.gnu.org/softwar
     (load custom-file)))
 #+end_src
 
- * Server 
+ * Server allows Emacs to operate as a server for other processes. Built in.
 #+begin_src elisp
 (use-package server
   :commands (server-running-p)
   :config (or (server-running-p) (server-mode)))
 #+end_src
 
+ * 
 #+begin_src elisp
 (progn ;     startup
-  (message "Loading early birds...done (%.3fs)"
+  (message "Loading early birds...done (%fs)"
            (float-time (time-subtract (current-time) before-user-init-time))))
 #+end_src
 
-** long tail
+* long tail
 #+begin_src elisp
 (use-package diff-mode
   :defer t
@@ -257,8 +256,7 @@ Disable byte compile for init.el, according to the [[https://www.gnu.org/softwar
   (add-hook 'lisp-interaction-mode-hook 'indent-spaces-mode))
 #+end_src
 
-[[https://github.com/magit/magit][Magit]] is a VERY powerful git client.
-
+ * [[https://github.com/magit/magit][Magit]] is a VERY powerful git client.
 #+begin_src elisp
 (use-package magit
   :defer t
@@ -343,32 +341,6 @@ Disable byte compile for init.el, according to the [[https://www.gnu.org/softwar
 (use-package tramp-sh
   :defer t
   :config (cl-pushnew 'tramp-own-remote-path tramp-remote-path))
-#+end_src
-
-** Tequila worms
-#+begin_src elisp
-(progn ;     startup
-  (message "Loading %s...done (%.3fs)" user-init-file
-           (float-time (time-subtract (current-time)
-                                      before-user-init-time)))
-  (add-hook 'after-init-hook
-            (lambda ()
-              (message
-               "Loading %s...done (%.3fs) [after-init]" user-init-file
-               (float-time (time-subtract (current-time)
-                                          before-user-init-time))))
-            t))
-
-(progn ;     personalize
-  (let ((file (expand-file-name (concat (user-real-login-name) ".el")
-                                user-emacs-directory)))
-    (when (file-exists-p file)
-      (load file))))
-
-;; Local Variables:
-;; indent-tabs-mode: nil
-;; End:
-;;; init.el ends here
 #+end_src
 
 * Kbd 
@@ -512,7 +484,7 @@ We setup keybinding framworks and basic keybindings at this place. Note that not
     )
 
     (config/leader :infix "t"
-        ""        '(nil                            :wk "  Toggle    ")
+        ""        '(nil                            :wk " 󰭩 Toggle    ")
         "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
     )
 
@@ -1154,7 +1126,7 @@ Change the font size of different org-levels.
   (use-package org
     :hook (org-mode . mixed-pitch-mode)
     :config
-    ;(set-face-attribute 'org-document-title nil :family "Cantarell" :height 2.5 :bold t)
+    (set-face-attribute 'org-document-title nil :family "Cantarell" :height 2.5 :bold t)
     (set-face-attribute 'org-level-1 nil :family "Cantarell" :height 1.8 :bold t)
     (set-face-attribute 'org-level-2 nil :family "Cantarell" :height 1.6 :bold t)
     (set-face-attribute 'org-level-3 nil :family "Cantarell" :height 1.4 :bold t)
@@ -1178,7 +1150,8 @@ Change the font size of different org-levels.
        (quote (("author" . "⛾")
                ("title" . "❖")
                ("subtitle" . "§")
-               (t . t))))
+               ("html" . "󰲋 ")
+               (t . t)))) 
      (setq org-modern-star
           ;'("◉" "○" "◈" "◇" "✳")
           '("⚀" "⚁" "⚂" "⚃" "⚄" "⚅")
@@ -1488,6 +1461,31 @@ It is very useful for figuring out how things work in Emacs.
 
   (use-package eaf-browser)
   (use-package eaf-pdf-viewer)
+#+end_src
+* Tequila worms
+#+begin_src elisp
+(progn ;     startup
+  (message "Loading %s...done (%fs)" user-init-file
+           (float-time (time-subtract (current-time)
+                                      before-user-init-time)))
+  (add-hook 'after-init-hook
+            (lambda ()
+              (message
+               "Loading %s...done (%fs) [after-init]" user-init-file
+               (float-time (time-subtract (current-time)
+                                          before-user-init-time))))
+            t))
+
+(progn ;     personalize
+  (let ((file (expand-file-name (concat (user-real-login-name) ".el")
+                                user-emacs-directory)))
+    (when (file-exists-p file)
+      (load file))))
+
+;; Local Variables:
+;; indent-tabs-mode: nil
+;; End:
+;;; init.el ends here
 #+end_src
 
 * TODOs
