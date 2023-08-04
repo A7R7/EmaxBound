@@ -133,6 +133,9 @@
 [submodule "markdown-mode"]
 	path = lib/markdown-mode
 	url = https://github.com/jrblevin/markdown-mode
+[submodule "meow"]
+	path = lib/meow
+	url = https://github.com/meow-edit/meow
 [submodule "mini-frame"]
 	path = lib/mini-frame
 	url = https://github.com/muffinmad/emacs-mini-frame
