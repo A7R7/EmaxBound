@@ -103,6 +103,9 @@
 [submodule "f"]
 	path = lib/f
 	url = https://github.com/rejeep/f.el
+[submodule "gcmh"]
+	path = lib/gcmh
+	url = https://gitlab.com/koral/gcmh
 [submodule "general"]
 	path = lib/general
 	url = https://github.com/noctuid/general.el
@@ -163,6 +166,9 @@
 [submodule "org-appear"]
 	path = lib/org-appear
 	url = https://github.com/awth13/org-appear
+[submodule "org-auto-tangle"]
+	path = lib/org-auto-tangle
+	url = https://github.com/yilkalargaw/org-auto-tangle
 [submodule "org-bars"]
 	path = lib/org-bars
 	url = https://github.com/tonyaldon/org-bars.git
