@@ -818,6 +818,9 @@ Use olivetti to center text in minibuffer!
   )
 #+end_src
 
+** Posframe
+[[https://github.com/tumashu/posframe][Posframe]] can pop up a frame at point, this *posframe* is a child-frame connected to its root window's buffer. 
+
 * Facilities
 ** Long tail
 #+begin_src elisp
@@ -1631,7 +1634,7 @@ https://github.com/zerolfx/copilot.el
 - macrostep
 - oversee
 ** LaTeX
-*** AUCTex
+*** AUCTeX
 #+begin_src elisp
   (use-package lsp-bridge
   :config
@@ -1653,6 +1656,8 @@ AucTex needs some tweaks to be built.
 	build-step = borg-makeinfo
 	build-step = borg-update-autoloads
 #+end_src
+*** CDTeX
+*** 
 * Emacs OS
 ** Elfeed
 #+begin_src elisp
@@ -1754,3 +1759,5 @@ tweaks to build eaf
   #+begin_src elisp
     
   #+end_src
+
+  

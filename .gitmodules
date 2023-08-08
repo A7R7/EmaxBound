@@ -7,6 +7,12 @@
 [submodule "aas"]
 	path = lib/aas
 	url = https://github.com/ymarco/auto-activating-snippets
+[submodule "aio"]
+	path = lib/aio
+	url = https://github.com/skeeto/emacs-aio
+[submodule "alert"]
+	path = lib/alert
+	url = https://github.com/jwiegley/alert
 [submodule "all-the-icons"]
 	path = lib/all-the-icons
 	url = https://github.com/domtronn/all-the-icons.el
@@ -151,6 +157,9 @@
 [submodule "hydra"]
 	path = lib/hydra
 	url = https://github.com/abo-abo/hydra
+[submodule "js2-mode"]
+	path = lib/js2-mode
+	url = https://github.com/mooz/js2-mode
 [submodule "laas"]
 	path = lib/laas
 	url = https://github.com/tecosaur/LaTeX-auto-activating-snippets
@@ -193,6 +202,9 @@
 [submodule "nerd-icons"]
 	path = lib/nerd-icons
 	url = https://github.com/rainstormstudio/nerd-icons.el
+[submodule "notibox"]
+	path = lib/notibox
+	url = https://github.com/MitchMarq42/notibox.el.git
 [submodule "olivetti"]
 	path = lib/olivetti
 	url = https://github.com/rnkn/olivetti
@@ -220,6 +232,9 @@
 [submodule "org-fancy-priorities"]
 	path = lib/org-fancy-priorities
 	url = https://github.com/harrybournis/org-fancy-priorities
+[submodule "org-fragtog"]
+	path = lib/org-fragtog
+	url = https://github.com/io12/org-fragtog
 [submodule "org-gtd"]
 	path = lib/org-gtd
 	url = https://github.com/Trevoke/org-gtd.el
@@ -265,6 +280,9 @@
 [submodule "peg"]
 	path = lib/peg
 	url = git@github.com:emacsmirror/peg.git
+[submodule "popper"]
+	path = lib/popper
+	url = https://github.com/karthink/popper
 [submodule "posframe"]
 	path = lib/posframe
 	url = https://github.com/tumashu/posframe
@@ -292,6 +310,12 @@
 [submodule "shrink-path"]
 	path = lib/shrink-path
 	url = https://gitlab.com/bennya/shrink-path.el
+[submodule "simple-httpd"]
+	path = lib/simple-httpd
+	url = https://github.com/skeeto/emacs-web-server
+[submodule "skewer-mode"]
+	path = lib/skewer-mode
+	url = https://github.com/skeeto/skewer-mode
 [submodule "solaire-mode"]
 	path = lib/solaire-mode
 	url = https://github.com/hlissner/emacs-solaire-mode
@@ -361,6 +385,9 @@
 [submodule "writeroom-mode"]
 	path = lib/writeroom-mode
 	url = https://github.com/joostkremers/writeroom-mode
+[submodule "xenops"]
+	path = lib/xenops
+	url = https://github.com/dandavison/xenops
 [submodule "yascroll"]
 	path = lib/yascroll
 	url = https://github.com/emacsorphanage/yascroll
