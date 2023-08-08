@@ -70,6 +70,11 @@
   (message "Loading early birds...done (%fs)"
            (float-time (time-subtract (current-time) before-user-init-time))))
 
+(use-package org
+:config
+  (setq org-return-follows-link t)
+)
+
 (use-package shrink-path :demand t)
 
 (use-package evil

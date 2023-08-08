@@ -397,3 +397,6 @@
 [submodule "zoxide"]
 	path = lib/zoxide
 	url = https://gitlab.com/Vonfry/zoxide.el
+[submodule "org"]
+	path = lib/org
+	url = https://git.tecosaur.net/tec/org-mode.git

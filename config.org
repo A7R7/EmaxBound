@@ -59,6 +59,7 @@ For example, some packages have an ~extensions~ dir in their repo. To load these
 -  [[https://github.com/seagle0128/.emacs.d][seagle0128's Centaur Emacs]] (2023) be morden.
 -  [[https://github.com/daviwil/emacs-from-scratch][Daviwell's Emacs from scratch]] (2021) intuitive.
 -  [[https://github.com/lijigang/100-questions-about-orgmode][lijigang's 100-questions-about-orgmode]] (2023) for org mode of course.
+-  [[https://github.com/doomemacs/doomemacs][Doom Emacs]] (2023) Some best practices.
 *NOTE*: the year number after link equals to
 - =min (last time the config get's updated, last time I refered to the config)=
 * Earliest birds
@@ -137,6 +138,8 @@ Calculating time used loading emacs excutable, as well as setting some variables
 * Core units
 
  * [[https://github.com/emacscollective/borg][Borg]] assimilate Emacs packages as Git submodules. Core of the core units.
+   =borg-initialize= should be called in init.el for borg to initialize assimilated drones using =borg-activate=.
+    To skip the activation of the drone named DRONE, temporarily disable it by setting the value of the Git variable submodule.DRONE.disabled to true in ~/.config/emacs/.gitmodules.
 #+begin_src elisp
 (eval-and-compile ; `borg'
   (add-to-list 'load-path (expand-file-name "lib/borg" user-emacs-directory))
@@ -220,6 +223,26 @@ Dash needs some tweaks to be built
            (float-time (time-subtract (current-time) before-user-init-time))))
 #+end_src
 
+* Org-dev
+
+[[https://git.tecosaur.net/tec/org-mode][Org-dev]]  did some overhaul to org-latex-preview in org mode.
+Load this package before emacs load built-in Org.
+#+begin_src elisp
+  (use-package org
+  :config
+    (setq org-return-follows-link t)
+  )
+#+end_src
+
+#+begin_src toml 
+[submodule "org"]
+	load-path = lisp
+	build-step = make
+	build-step = borg-update-autoloads
+	build-step = borg-compile
+	build-step = borg-maketexi
+	build-step = borg-makeinfo
+#+end_src
 * Libraries
 ** S
 [[https://github.com/magnars/s.el][S]] is the long lost Emacs string manipulation library.
@@ -1657,7 +1680,6 @@ AucTex needs some tweaks to be built.
 	build-step = borg-update-autoloads
 #+end_src
 *** CDTeX
-*** 
 * Emacs OS
 ** Elfeed
 #+begin_src elisp
