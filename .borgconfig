@@ -1,22 +1,39 @@
 [submodule "dash"]
 	no-byte-compile = dash-functional.el
 	no-makeinfo = dash-template.texi
+
 [submodule "emacsql"]
-	no-byte-compile = emacsql-pg.el
-[submodule "magit"]
-	no-byte-compile = lisp/magit-libgit.el
+      no-byte-compile = emacsql-pg.el
+
 [submodule "sqlite3"]
 	build-step = make
+
+[submodule "magit"]
+	no-byte-compile = lisp/magit-libgit.el
+
 [submodule "dirvish"]
 	load-path = .
 	load-path = extensions
+
 [submodule "vertico"]
 	load-path = .
 	load-path = extensions
+
 [submodule "lsp-bridge"]
   load-path = .
   load-path = acm
   load-path = core
+
+[submodule "auctex"]
+	load-path = .
+	build-step = ./autogen.sh
+	build-step = ./configure
+	build-step = make
+	build-step = make doc
+	build-step = borg-maketexi
+	build-step = borg-makeinfo
+	build-step = borg-update-autoloads
+
 [submodule "eaf"]
   load-path = .
   load-path = core

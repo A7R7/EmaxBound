@@ -2,9 +2,11 @@
 # Tangle by default to init.el, which is the most common case
 #+PROPERTY: header-args:elisp :tangle init.el :language elisp
 #+PROPERTY: header-args:emacs-lisp :tangle init.el :language elisp
+#+PROPERTY: header-args:toml :tangle .borgconfig :language toml
 #+PROPERTY: header-args:mkdirp yes :comments no
 #+STARTUP: fold
 #+OPTIONS: toc:2
+#+auto_tangle: t
 :END:
 
 #+TITLE: EmaxBound Configuration
@@ -52,7 +54,6 @@ ps: For some packages, you need to manually specify its load path or build metho
 For example, some packages have an ~extensions~ dir in their repo. To load these extensions, you need to add ~load-path = .~ and ~load-path = extensions~ under the corresponding submodule inside ~.borgconfig~.
 
 ** References
-
 -  [[https://github.com/lccambiaghi/vanilla-emacs][Luca's vanilla-emacs]] (2023) detailed org config file.
 -  [[https://gitlab.com/dwt1/configuring-emacs][DistroTube's Configuring Emacs]] (2023) easy to follow.
 -  [[https://github.com/seagle0128/.emacs.d][seagle0128's Centaur Emacs]] (2023) be morden.
@@ -160,6 +161,13 @@ Calculating time used loading emacs excutable, as well as setting some variables
   :config (global-dash-fontify-mode))
 #+end_src
 
+Dash needs some tweaks to be built
+#+begin_src toml
+[submodule "dash"]
+	no-byte-compile = dash-functional.el
+	no-makeinfo = dash-template.texi
+#+end_src
+
  * [[https://www.gnu.org/software/emacs][EIEIO]] is a series of Lisp routines which implements a subset of CLOS, the Common Lisp Object System. In addition, EIEIO also adds a few new features which help it integrate more strongly with the Emacs running environment.
 #+begin_src elisp
 (use-package eieio)
@@ -212,141 +220,35 @@ Calculating time used loading emacs excutable, as well as setting some variables
            (float-time (time-subtract (current-time) before-user-init-time))))
 #+end_src
 
-* long tail
+* Libraries
+** S
+[[https://github.com/magnars/s.el][S]] is the long lost Emacs string manipulation library.
+
+** F
+[[https://github.com/rejeep/f.el][F]] is a modern API for working with files and directories in Emacs.
+
+** Annalist
+[[https://github.com/noctuid/annalist.el][annalist.el]] is a library that can be used to record information and later print that information using org-mode headings and tables. It allows defining different types of things that can be recorded (e.g. keybindings, settings, hooks, and advice) and supports custom filtering, sorting, and formatting. annalist is primarily intended for use in other packages like general and evil-collection, but it can also be used directly in a user’s configuration.
+** Shrink path
+[[https://github.com/zbelial/shrink-path.el][Shrink path]] is a small utility functions that allow for fish-style trunctated directories in eshell and for example modeline.
 #+begin_src elisp
-(use-package diff-mode
-  :defer t
-  :config
-  (when (>= emacs-major-version 27)
-    (set-face-attribute 'diff-refine-changed nil :extend t)
-    (set-face-attribute 'diff-refine-removed nil :extend t)
-    (set-face-attribute 'diff-refine-added   nil :extend t)))
+(use-package shrink-path :demand t)
 #+end_src
 
-#+begin_src elisp
-(use-package dired
-  :defer t
-  :config (setq dired-listing-switches "-alh"))
+** Emacsql
+tweaks to buiild emacsql
+#+begin_src toml
+  [submodule "emacsql"]
+	no-byte-compile = emacsql-pg.el
 #+end_src
-
-#+begin_src elisp
-(use-package eldoc
-  :when (version< "25" emacs-version)
-  :config (global-eldoc-mode))
+** Sqlite3
+#+begin_src toml
+[submodule "sqlite3"]
+	build-step = make
 #+end_src
-
-#+begin_src elisp
-(use-package help
-  :defer t
-  :config (temp-buffer-resize-mode))
-#+end_src
-
-#+begin_src elisp
-(progn ;    `isearch'
-  (setq isearch-allow-scroll t))
-#+end_src
-
-#+begin_src elisp
-(use-package lisp-mode
-  :config
-  (add-hook 'emacs-lisp-mode-hook 'outline-minor-mode)
-  (add-hook 'emacs-lisp-mode-hook 'reveal-mode)
-  (defun indent-spaces-mode ()
-    (setq indent-tabs-mode nil))
-  (add-hook 'lisp-interaction-mode-hook 'indent-spaces-mode))
-#+end_src
-
- * [[https://github.com/magit/magit][Magit]] is a VERY powerful git client.
-#+begin_src elisp
-(use-package magit
-  :defer t
-  :commands (magit-add-section-hook)
-  :config
-  (magit-add-section-hook 'magit-status-sections-hook
-                          'magit-insert-modules
-                          'magit-insert-stashes
-                          'append))
-#+end_src
-
-#+begin_src elisp
-(use-package man
-  :defer t
-  :config (setq Man-width 80))
-#+end_src
-
-#+begin_src elisp
-(use-package paren
-  :config (show-paren-mode))
-#+end_src
-
-#+begin_src elisp
-(use-package prog-mode
-  :config (global-prettify-symbols-mode)
-  (defun indicate-buffer-boundaries-left ()
-    (setq indicate-buffer-boundaries 'left))
-  (add-hook 'prog-mode-hook 'indicate-buffer-boundaries-left))
-#+end_src
-
-#+begin_src elisp
-(use-package recentf
-  :demand t
-  :config (add-to-list 'recentf-exclude "^/\\(?:ssh\\|su\\|sudo\\)?x?:"))
-#+end_src
-
-#+begin_src elisp
-(use-package savehist
-  :config (savehist-mode))
-#+end_src
-
-#+begin_src elisp
-(use-package saveplace
-  :when (version< "25" emacs-version)
-  :config (save-place-mode))
-#+end_src
-
-#+begin_src elisp
-(use-package simple
-  :config (column-number-mode))
-#+end_src
-
-#+begin_src elisp
-(use-package smerge-mode
-  :defer t
-  :config
-  (when (>= emacs-major-version 27)
-    (set-face-attribute 'smerge-refined-removed nil :extend t)
-    (set-face-attribute 'smerge-refined-added   nil :extend t)))
-#+end_src
-
-#+begin_src elisp
-(progn ;    `text-mode'
-  (add-hook 'text-mode-hook 'indicate-buffer-boundaries-left))
-#+end_src
-
-#+begin_src elisp
-(use-package tramp
-  :defer t
-  :config
-  (add-to-list 'tramp-default-proxies-alist '(nil "\\`root\\'" "/ssh:%h:"))
-  (add-to-list 'tramp-default-proxies-alist '("localhost" nil nil))
-  (add-to-list 'tramp-default-proxies-alist
-               (list (regexp-quote (system-name)) nil nil))
-  (setq vc-ignore-dir-regexp
-        (format "\\(%s\\)\\|\\(%s\\)"
-                vc-ignore-dir-regexp
-                tramp-file-name-regexp)))
-#+end_src
-
-#+begin_src elisp
-(use-package tramp-sh
-  :defer t
-  :config (cl-pushnew 'tramp-own-remote-path tramp-remote-path))
-#+end_src
-
-* Kbd 
+* Basic Kbd 
 
 We setup keybinding framworks and basic keybindings at this place. Note that not all keybindings are set here. Some package specific keybinding configs are set under where the package is configed
-
 ** Evil
 *** Evil mode
 
@@ -611,9 +513,9 @@ options for =which-key-posframe-poshandler=:
 ** Hydra
 ** Mouse
 
-* UI
+* Basic UI
 
-We setup UI for basic emacs widgets at this place. Again, Note that not all UI's are set here. 
+We setup UI for basic emacs widgets at this place. Again, not all UI's are set here. 
 Some package specific UI configs are set under where the package is configed.
 
 ** Fonts
@@ -803,7 +705,7 @@ Dashboard is an extensible startup screen showing you recent files, bookmarks, a
     ;; show Dashboard in frames created with emacsclient -c
     (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
     ;;(setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
-    (setq dashboard-startup-banner (concat user-emacs-directory "assets/EmacsBound.svg"))  ;; use custom image as banner
+    (setq dashboard-startup-banner (concat user-emacs-directory "assets/EmacsBound.xpm"))  ;; use custom image as banner
     (setq dashboard-center-content t) ;; set to 't' for centered content
 
     (setq dashboard-items '(
@@ -874,117 +776,6 @@ Dashboard is an extensible startup screen showing you recent files, bookmarks, a
 #+end_src
 
 ** Minibuffer
-*** Vertico
-
-[[https://github.com/minad/vertico#extensions][Vertico]] provides a performant and minimalistic vertical completion UI based on the default completion system. 
-
-#+begin_src elisp
-  (use-package vertico
-    :init
-    (setq completion-styles '(orderless))
-    (setq orderless-component-separator #'orderless-escapable-split-on-space)
-    (setq orderless-matching-styles
-        '(orderless-initialism orderless-prefixes orderless-regexp))
-    ;; Different scroll margin
-    ;(setq vertico-scroll-margin 1)
-    ;; Show more candidates
-    ;(setq vertico-count 20)
-    ;; Grow and shrink the Vertico minibuffer
-    ;(setq vertico-resize nil)
-    ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
-    (setq vertico-cycle t)
-    ;; use Vertico as an in-buffer completion UI
-    (setq completion-in-region-function 'consult-completion-in-region)
-    (vertico-mode 1)
-  )
-#+end_src
-
-**** Savehist
-
-#+begin_src elisp
-  ;; Persist history over Emacs restarts. Vertico sorts by history position.
-    (use-package savehist
-        :init
-        (savehist-mode))
-#+end_src
-
-#+begin_src elisp
-  ;; A few more useful configurations...
-    (use-package emacs
-        :init
-        ;; Add prompt indicator to `completing-read-multiple'.
-        ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
-        (defun crm-indicator (args)
-        (cons (format "[CRM%s] %s"
-                        (replace-regexp-in-string
-                        "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
-                        crm-separator)
-                        (car args))
-                (cdr args)))
-        (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
-
-        ;; Do not allow the cursor in the minibuffer prompt
-        (setq minibuffer-prompt-properties
-            '(read-only t cursor-intangible t face minibuffer-prompt))
-        (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
-
-        ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
-        ;; Vertico commands are hidden in normal buffers.
-        ;; (setq read-extended-command-predicate
-        ;;       #'command-completion-default-include-p)
-        ;; Enable recursive minibuffers
-        (setq enable-recursive-minibuffers t))
-#+end_src
-
-**** Vertico-directory
-
-#+begin_src elisp
-(use-package vertico-directory
-  :after vertico
-  ;; More convenient directory navigation commands
-  :bind (:map vertico-map
-              ("RET" . vertico-directory-enter)
-              ("DEL" . vertico-directory-delete-char)
-              ("M-DEL" . vertico-directory-delete-word))
-  ;; Tidy shadowed file names
-  :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
-#+end_src
-**** Vertico-multiform
-
-Vertico-multiform configures Vertico modes per command or completion category.
-
-#+begin_src elisp
-  (use-package vertico-multiform
-    :after vertico
-    :config (vertico-multiform-mode)
-  )
-#+end_src
-
-*** Vertico-posframe
-
-[[https://github.com/tumashu/vertico-posframe][Vertico-posframe]] is an vertico extension, which lets vertico use posframe to show its candidate menu.
-
-#+begin_src elisp
-  (use-package vertico-posframe
-  :disabled
-  :after vertico-multiform
-  :init 
-    (setq vertico-multiform-commands
-         '((consult-line posframe
-              (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
-              ;(vertico-posframe-fallback-mode . vertico-buffer-mode)
-              (vertico-posframe-width . 50))
-           (execute-extended-command
-              (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
-              (vertico-posframe-fallback-mode . vertico-buffer-mode))
-           (t posframe)
-          )
-    )
-    ;(vertico-multiform-mode 1)
-    ;(vertico-posframe-mode 1)
-  )
-#+end_src
-
 *** Mini-frame
 
 [[https://github.com/muffinmad/emacs-mini-frame][Mini-Frame]], similar to posframe, shows minibuffer in child frame on read-from-minibuffer.
@@ -1027,7 +818,371 @@ Use olivetti to center text in minibuffer!
   )
 #+end_src
 
-* LSP & Completion
+* Facilities
+** Long tail
+#+begin_src elisp
+(use-package diff-mode
+  :defer t
+  :config
+  (when (>= emacs-major-version 27)
+    (set-face-attribute 'diff-refine-changed nil :extend t)
+    (set-face-attribute 'diff-refine-removed nil :extend t)
+    (set-face-attribute 'diff-refine-added   nil :extend t)))
+#+end_src
+
+#+begin_src elisp
+(use-package dired
+  :defer t
+  :config (setq dired-listing-switches "-alh"))
+#+end_src
+
+#+begin_src elisp
+(use-package eldoc
+  :when (version< "25" emacs-version)
+  :config (global-eldoc-mode))
+#+end_src
+
+#+begin_src elisp
+(use-package help
+  :defer t
+  :config (temp-buffer-resize-mode))
+#+end_src
+
+#+begin_src elisp
+(progn ;    `isearch'
+  (setq isearch-allow-scroll t))
+#+end_src
+
+#+begin_src elisp
+(use-package lisp-mode
+  :config
+  (add-hook 'emacs-lisp-mode-hook 'outline-minor-mode)
+  (add-hook 'emacs-lisp-mode-hook 'reveal-mode)
+  (defun indent-spaces-mode ()
+    (setq indent-tabs-mode nil))
+  (add-hook 'lisp-interaction-mode-hook 'indent-spaces-mode))
+#+end_src
+
+ * [[https://github.com/magit/magit][Magit]] is a VERY powerful git client.
+#+begin_src elisp
+(use-package magit
+  :defer t
+  :commands (magit-add-section-hook)
+  :config
+  (magit-add-section-hook 'magit-status-sections-hook
+                          'magit-insert-modules
+                          'magit-insert-stashes
+                          'append))
+#+end_src
+    - tweaks to build magit
+#+begin_src toml
+[submodule "magit"]
+	no-byte-compile = lisp/magit-libgit.el
+#+end_src
+#+begin_src elisp
+(use-package man
+  :defer t
+  :config (setq Man-width 80))
+#+end_src
+
+#+begin_src elisp
+(use-package paren
+  :config (show-paren-mode))
+#+end_src
+
+#+begin_src elisp
+(use-package prog-mode
+  :config (global-prettify-symbols-mode)
+  (defun indicate-buffer-boundaries-left ()
+    (setq indicate-buffer-boundaries 'left))
+  (add-hook 'prog-mode-hook 'indicate-buffer-boundaries-left))
+#+end_src
+
+#+begin_src elisp
+(use-package recentf
+  :demand t
+  :config (add-to-list 'recentf-exclude "^/\\(?:ssh\\|su\\|sudo\\)?x?:"))
+#+end_src
+
+#+begin_src elisp
+(use-package savehist
+  :config (savehist-mode))
+#+end_src
+
+#+begin_src elisp
+(use-package saveplace
+  :when (version< "25" emacs-version)
+  :config (save-place-mode))
+#+end_src
+
+#+begin_src elisp
+(use-package simple
+  :config (column-number-mode))
+#+end_src
+
+#+begin_src elisp
+(use-package smerge-mode
+  :defer t
+  :config
+  (when (>= emacs-major-version 27)
+    (set-face-attribute 'smerge-refined-removed nil :extend t)
+    (set-face-attribute 'smerge-refined-added   nil :extend t)))
+#+end_src
+
+#+begin_src elisp
+(progn ;    `text-mode'
+  (add-hook 'text-mode-hook 'indicate-buffer-boundaries-left))
+#+end_src
+
+#+begin_src elisp
+(use-package tramp
+  :defer t
+  :config
+  (add-to-list 'tramp-default-proxies-alist '(nil "\\`root\\'" "/ssh:%h:"))
+  (add-to-list 'tramp-default-proxies-alist '("localhost" nil nil))
+  (add-to-list 'tramp-default-proxies-alist
+               (list (regexp-quote (system-name)) nil nil))
+  (setq vc-ignore-dir-regexp
+        (format "\\(%s\\)\\|\\(%s\\)"
+                vc-ignore-dir-regexp
+                tramp-file-name-regexp)))
+#+end_src
+
+#+begin_src elisp
+(use-package tramp-sh
+  :defer t
+  :config (cl-pushnew 'tramp-own-remote-path tramp-remote-path))
+#+end_src
+
+** Dirvish
+Dropin replacement for dired.
+#+begin_src elisp
+  (use-package dirvish
+  :init
+    (dirvish-override-dired-mode)
+  :custom
+    (dirvish-quick-access-entries ; It's a custom option, `setq' won't work
+      '(("h" "~/"                          "Home")
+        ("d" "~/Downloads/"                "Downloads")
+        ("m" "/mnt/"                       "Drives")
+        ("t" "~/.local/share/Trash/files/" "TrashCan"))
+    )
+  :config
+    ;; (dirvish-peek-mode) ; Preview files in minibuffer
+    ;; (dirvish-side-follow-mode) ; similar to `treemacs-follow-mode'
+    (setq dirvish-path-separators (list "  " "  " "  "))
+    (setq dirvish-mode-line-format
+            '(:left (sort symlink) :right (omit yank index)))
+    (setq dirvish-attributes
+            '(all-the-icons file-time file-size collapse subtree-state vc-state git-msg))
+    (setq delete-by-moving-to-trash t)
+    (setq dired-listing-switches
+            "-l --almost-all --human-readable --group-directories-first --no-group")
+    (nmap dirvish-mode-map
+        "TAB"    '(dirvish-subtree-toggle    :wk "Subtre-toggle")
+        "q"      '(dirvish-quit              :wk "Quit")
+        "h"      '(dired-up-directory        :wk "Up-dir")
+        "l"      '(dired-find-file           :wk "Open/Toggle")
+        "a"      '(dirvish-quick-access      :wk "Access")
+        "f"      '(dirvish-file-info-menu    :wk "File Info Menu")
+        "y"      '(dirvish-yank-menu         :wk "Yank Menu")
+        "N"      '(dirvish-narrow            :wk "Narrow")
+        "v"      '(dirvish-vc-menu           :wk "View-file") ; remapped `dired-view-file'
+        "s"      '(dirvish-quicksort         :wk "Quick-sort"); remapped `dired-sort-toggle-or-edit'
+
+        "M-f"    '(dirvish-history-go-forward  :wk "History-forward")
+        "M-b"    '(dirvish-history-go-backward :wk "History-back")
+        "M-l"    '(dirvish-ls-switches-menu    :wk "ls Switch Menu")
+        "M-m"    '(dirvish-mark-menu           :wk "Mark Menu")
+        "M-t"    '(dirvish-layout-toggle       :wk "Layout-toggle")
+        "M-s"    '(dirvish-setup-menu          :wk "Setup-Menu")
+        "M-e"    '(dirvish-emerge-menu         :wk "Emerge-Menu")
+        "M-j"    '(dirvish-fd-jump             :wk "fd-jump")
+    )
+  )
+  ;      :bind ; Bind `dirvish|dirvish-side|dirvish-dwim' as you see fit
+  ;      (("C-c f" . dirvish-fd)
+  ;       :map dirvish-mode-map ; Dirvish inherits `dired-mode-map'
+  ;       ("a"   . dirvish-quick-access)
+  ;       ("f"   . dirvish-file-info-menu)
+  ;       ("y"   . dirvish-yank-menu)
+  ;       ("N"   . dirvish-narrow)
+  ;       ("^"   . dirvish-history-last)
+  ;       ("h"   . dirvish-history-jump) ; remapped `describe-mode'
+  ;       ("s"   . dirvish-quicksort)    ; remapped `dired-sort-toggle-or-edit'
+  ;       ("v"   . dirvish-vc-menu)      ; remapped `dired-view-file'
+  ;       ("TAB" . dirvish-subtree-toggle)
+  ;       ("M-f" . dirvish-history-go-forward)
+  ;       ("M-b" . dirvish-history-go-backward)
+  ;       ("M-l" . dirvish-ls-switches-menu)
+  ;       ("M-m" . dirvish-mark-menu)
+  ;       ("M-t" . dirvish-layout-toggle)
+  ;       ("M-s" . dirvish-setup-menu)
+  ;       ("M-e" . dirvish-emerge-menu)
+  ;       ("M-j" . dirvish-fd-jump))
+#+end_src
+#+begin_src elisp
+  (use-package diredfl
+    :hook
+    ((dired-mode . diredfl-mode)
+     ;; highlight parent and directory preview as well
+     (dirvish-directory-view-mode . diredfl-mode))
+    :config
+    (set-face-attribute 'diredfl-dir-name nil :bold t)
+  )
+#+end_src
+tweaks to build dirvish
+#+begin_src toml
+[submodule "dirvish"]
+	load-path = .
+	load-path = extensions
+#+end_src
+** Helpful
+[[https://github.com/Wilfred/helpful][Helpful]] adds a lot of very helpful information to Emacs' =describe-= command buffers.
+For example, if you use =describe-function=, you will not only get the documentation about the function,
+you will also see the source code of the function and where it gets used in other places in the Emacs configuration.
+It is very useful for figuring out how things work in Emacs.
+
+#+begin_src elisp
+  (use-package helpful
+  :bind
+     ([remap describe-key]      . helpful-key)
+     ([remap describe-command]  . helpful-command)
+     ([remap describe-variable] . helpful-variable)
+     ([remap describe-function] . helpful-callable)
+  )
+#+end_src
+
+** Marginalia
+#+begin_src elisp
+  (use-package marginalia
+  :general
+    (:keymaps 'minibuffer-local-map
+     "M-A" 'marginalia-cycle)
+  :custom
+    (marginalia-max-relative-age 0)
+    (marginalia-align 'right)
+  :init
+    (marginalia-mode)
+  )
+#+end_src
+
+** Vertico
+
+[[https://github.com/minad/vertico#extensions][Vertico]] provides a performant and minimalistic vertical completion UI based on the default completion system. 
+
+#+begin_src elisp
+  (use-package vertico
+    :init
+    (setq completion-styles '(orderless))
+    (setq orderless-component-separator #'orderless-escapable-split-on-space)
+    (setq orderless-matching-styles
+        '(orderless-initialism orderless-prefixes orderless-regexp))
+    ;; Different scroll margin
+    ;(setq vertico-scroll-margin 1)
+    ;; Show more candidates
+    ;(setq vertico-count 20)
+    ;; Grow and shrink the Vertico minibuffer
+    ;(setq vertico-resize nil)
+    ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
+    (setq vertico-cycle t)
+    ;; use Vertico as an in-buffer completion UI
+    (setq completion-in-region-function 'consult-completion-in-region)
+    (vertico-mode 1)
+  )
+#+end_src
+tweaks to build vertico
+#+begin_src toml
+[submodule "vertico"]
+	load-path = .
+	load-path = extensions
+#+end_src
+**** Vertico-directory
+
+#+begin_src elisp
+(use-package vertico-directory
+  :after vertico
+  ;; More convenient directory navigation commands
+  :bind (:map vertico-map
+              ("RET" . vertico-directory-enter)
+              ("DEL" . vertico-directory-delete-char)
+              ("M-DEL" . vertico-directory-delete-word))
+  ;; Tidy shadowed file names
+  :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
+#+end_src
+**** Vertico-multiform
+
+Vertico-multiform configures Vertico modes per command or completion category.
+
+#+begin_src elisp
+  (use-package vertico-multiform
+    :after vertico
+    :config (vertico-multiform-mode)
+  )
+#+end_src
+
+**** Vertico-posframe
+
+[[https://github.com/tumashu/vertico-posframe][Vertico-posframe]] is an vertico extension, which lets vertico use posframe to show its candidate menu.
+
+#+begin_src elisp
+  (use-package vertico-posframe
+  :disabled
+  :after vertico-multiform
+  :init 
+    (setq vertico-multiform-commands
+         '((consult-line posframe
+              (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
+              ;(vertico-posframe-fallback-mode . vertico-buffer-mode)
+              (vertico-posframe-width . 50))
+           (execute-extended-command
+              (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
+              (vertico-posframe-fallback-mode . vertico-buffer-mode))
+           (t posframe)
+          )
+    )
+    ;(vertico-multiform-mode 1)
+    ;(vertico-posframe-mode 1)
+  )
+#+end_src
+
+**** Savehist
+
+#+begin_src elisp
+  ;; Persist history over Emacs restarts. Vertico sorts by history position.
+    (use-package savehist
+        :init
+        (savehist-mode))
+#+end_src
+
+#+begin_src elisp
+  ;; A few more useful configurations...
+    (use-package emacs
+        :init
+        ;; Add prompt indicator to `completing-read-multiple'.
+        ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
+        (defun crm-indicator (args)
+        (cons (format "[CRM%s] %s"
+                        (replace-regexp-in-string
+                        "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+                        crm-separator)
+                        (car args))
+                (cdr args)))
+        (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+
+        ;; Do not allow the cursor in the minibuffer prompt
+        (setq minibuffer-prompt-properties
+            '(read-only t cursor-intangible t face minibuffer-prompt))
+        (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
+        ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
+        ;; Vertico commands are hidden in normal buffers.
+        ;; (setq read-extended-command-predicate
+        ;;       #'command-completion-default-include-p)
+        ;; Enable recursive minibuffers
+        (setq enable-recursive-minibuffers t))
+#+end_src
+
 ** Consult
 
 [[https://github.com/minad/consult][Consult]] provides search and navigation commands based on the Emacs completion function completing-read.
@@ -1152,28 +1307,31 @@ Use olivetti to center text in minibuffer!
 )
 #+end_src
 
-** YASnippet
-[[https://github.com/joaotavora/yasnippet][YASnippet]] is a template system for Emacs. It allows you to type an abbreviation and automatically expand it into function templates.
+** Blink search 
+
+[[https://github.com/manateelazycat/blink-search][Blink-search]] is the fastest multi-source search framework for Emacs.
+
 #+begin_src elisp
-(use-package yasnippet
-  :init
-  (yas-global-mode 1)
-)
+  (use-package blink-search
+  :config
+    (setq blink-search-enable-posframe t)
+  )
 #+end_src
 
-** LSP-bridge
-[[https://github.com/manateelazycat/lsp-bridge][lsp-bridge]] builds a high-speed cache between Emacs and the LSP server.
+** Color-rg
+[[https://github.com/manateelazycat/color-rg][Color-rg]] is a search and refactoring tool based on ripgrep.
 #+begin_src elisp
-(use-package lsp-bridge
-  :init
-  (global-lsp-bridge-mode)
-)
+  (use-package color-rg
+  :config
+    (general-def isearch-mode-map
+      "M-s M-s" 'isearch-toggle-color-rg
+    )
+  )
 #+end_src
+** Popweb 
 
-** Copilot
-https://github.com/zerolfx/copilot.el
 * Org
-** User Interface
+** UI
 *** Fonts
 
 Change the font size of different org-levels.
@@ -1304,7 +1462,7 @@ Use org-indent-mode to set different indenting for different levels.
   )
 #+end_src
 
-** Kbd-configs
+** Kbd
 *** Evil-org
 #+begin_src elisp
   (use-package evil-org)
@@ -1314,8 +1472,17 @@ Use org-indent-mode to set different indenting for different levels.
 #+begin_src elisp
   (use-package org
   :config
-      (setq org-src-tab-acts-natively t)
-      (setq org-src-preserve-indentation nil)
+    (setq org-src-tab-acts-natively t)
+    (setq org-src-preserve-indentation nil)
+  )
+#+end_src
+
+[[https://github.com/yilkalargaw/org-auto-tangle][Org-auto-tangle]] Automatically and Asynchronously tangles org files on save.
+Adding the option =#+auto_tangle: t= in an org file to auto-tangle.
+Or setting the =org-auto-tangle-default= variable to t to configure auto-tangle as the default behavior for all org buffers. In this case, it can be disabled for some buffers by adding =#+auto_tangle:nil=.
+#+begin_src elisp
+  (use-package org-auto-tangle
+  :hook (org-mode . org-auto-tangle-mode)
   )
 #+end_src
 
@@ -1329,6 +1496,7 @@ Use org-indent-mode to set different indenting for different levels.
 [[https://github.com/tbanel/orgaggregate][Orgtbl-aggregate]] can creat a new table by computing sums, averages, and so on, out of material from the first table.
 
 ** Roam
+
 #+begin_src elisp
   (use-package org-roam
   :after org
@@ -1339,145 +1507,196 @@ Use org-indent-mode to set different indenting for different levels.
 #+end_src
 
 ** GTD
+#+begin_src elisp
+  (use-package org-gtd
+  :init
+    (setq org-gtd-update-ack "3.0.0")
+  )
+#+end_src
 ** Pandoc
 #+begin_src elisp
 ;; (use-package org-pandoc)
 #+end_src
 
-** Packages
-    
-* Code
+* Coding
+** YASnippet
+[[https://github.com/joaotavora/yasnippet][YASnippet]] is a template system for Emacs. It allows you to type an abbreviation and automatically expand it into function templates.
+#+begin_src elisp
+(use-package yasnippet
+  :init
+  (yas-global-mode 1)
+)
+#+end_src
+
+** LSP-bridge
+[[https://github.com/manateelazycat/lsp-bridge][lsp-bridge]] builds a high-speed cache between Emacs and the LSP server.
+#+begin_src elisp
+(use-package lsp-bridge
+  :init
+  (global-lsp-bridge-mode)
+)
+#+end_src
+tweaks to build lsp-bridge
+#+begin_src toml
+[submodule "lsp-bridge"]
+  load-path = .
+  load-path = acm
+  load-path = core
+
+#+end_src
+** Fingertip
+fingertip.el is a plugin that provides grammatical edit base on treesit
+#+begin_src elisp
+  (use-package fingertip
+  :config
+    (dolist (hook (list
+                'c-mode-common-hook 'c-mode-hook 'c++-mode-hook
+                'c-ts-mode-hook 'c++-ts-mode-hook
+                'cmake-ts-mode-hook
+                'java-mode-hook
+                'haskell-mode-hook
+                'emacs-lisp-mode-hook 'lisp-interaction-mode-hook 'lisp-mode-hook
+                'maxima-mode-hook
+                'ielm-mode-hook
+                'bash-ts-mode-hook 'sh-mode-hook
+                'makefile-gmake-mode-hook
+                'php-mode-hook
+                'python-mode-hook 'python-ts-mode-hook
+                'js-mode-hook
+                'go-mode-hook
+                'qml-mode-hook
+                'jade-mode-hook
+                'css-mode-hook 'css-ts-mode-hook
+                'ruby-mode-hook
+                'coffee-mode-hook
+                'rust-mode-hook 'rust-ts-mode-hook
+                'qmake-mode-hook
+                'lua-mode-hook
+                'swift-mode-hook
+                'web-mode-hook
+                'markdown-mode-hook
+                'llvm-mode-hook
+                'conf-toml-mode-hook 'toml-ts-mode-hook
+                'nim-mode-hook
+                'typescript-mode-hook 'typescript-ts-mode-hook
+                'js-ts-mode-hook 'json-ts-mode-hook
+                ))
+    (add-hook hook #'(lambda () (fingertip-mode 1))))
+    (general-def 
+      :keymaps 'fingertip-mode-map
+        "(" 'fingertip-open-round
+        "[" 'fingertip-open-bracket
+        "{" 'fingertip-open-curly
+        ")" 'fingertip-close-round
+        "]" 'fingertip-close-bracket
+        "}" 'fingertip-close-curly
+        "=" 'fingertip-equal
+
+        "%" 'fingertip-match-paren
+        "\"" 'fingertip-double-quote
+        "'" 'fingertip-single-quote
+
+        "SPC" 'fingertip-space
+        "RET" 'fingertip-newline
+
+        "M-o" 'fingertip-backward-delete
+        "C-d" 'fingertip-forward-delete
+        "C-k" 'fingertip-kill
+
+        "M-\"" 'fingertip-wrap-double-quote
+        "M-'" 'fingertip-wrap-single-quote
+        "M-[" 'fingertip-wrap-bracket
+        "M-{" 'fingertip-wrap-curly
+        "M-(" 'fingertip-wrap-round
+        "M-)" 'fingertip-unwrap
+
+        "M-p" 'fingertip-jump-right
+        "M-n" 'fingertip-jump-left
+        "M-:" 'fingertip-jump-out-pair-and-newline
+
+        "C-j" 'fingertip-jump-up
+    )
+  )
+
+#+end_src
+** Copilot
+https://github.com/zerolfx/copilot.el
+
+* Languages
 ** elisp
 - buttercup
 - elisp-def
 - elisp-demos
 - [[highlight-quoted]]
 - macrostep
-- overseer
-* Utilities
-** Dirvish
-Dropin replacement for dired.
+- oversee
+** LaTeX
+*** AUCTex
 #+begin_src elisp
-  (use-package dirvish
-  :init
-    (dirvish-override-dired-mode)
-  :custom
-    (dirvish-quick-access-entries ; It's a custom option, `setq' won't work
-      '(("h" "~/"                          "Home")
-        ("d" "~/Downloads/"                "Downloads")
-        ("m" "/mnt/"                       "Drives")
-        ("t" "~/.local/share/Trash/files/" "TrashCan"))
-    )
+  (use-package lsp-bridge
   :config
-    ;; (dirvish-peek-mode) ; Preview files in minibuffer
-    ;; (dirvish-side-follow-mode) ; similar to `treemacs-follow-mode'
-    (setq dirvish-path-separators (list "  " "  " "  "))
-    (setq dirvish-mode-line-format
-            '(:left (sort symlink) :right (omit yank index)))
-    (setq dirvish-attributes
-            '(all-the-icons file-time file-size collapse subtree-state vc-state git-msg))
-    (setq delete-by-moving-to-trash t)
-    (setq dired-listing-switches
-            "-l --almost-all --human-readable --group-directories-first --no-group")
-    (nmap dirvish-mode-map
-        "TAB"    '(dirvish-subtree-toggle    :wk "Subtre-toggle")
-        "q"      '(dirvish-quit              :wk "Quit")
-        "h"      '(dired-up-directory        :wk "Up-dir")
-        "l"      '(dired-find-file           :wk "Open/Toggle")
-        "a"      '(dirvish-quick-access      :wk "Access")
-        "f"      '(dirvish-file-info-menu    :wk "File Info Menu")
-        "y"      '(dirvish-yank-menu         :wk "Yank Menu")
-        "N"      '(dirvish-narrow            :wk "Narrow")
-        "v"      '(dirvish-vc-menu           :wk "View-file") ; remapped `dired-view-file'
-        "s"      '(dirvish-quicksort         :wk "Quick-sort"); remapped `dired-sort-toggle-or-edit'
-
-        "M-f"    '(dirvish-history-go-forward  :wk "History-forward")
-        "M-b"    '(dirvish-history-go-backward :wk "History-back")
-        "M-l"    '(dirvish-ls-switches-menu    :wk "ls Switch Menu")
-        "M-m"    '(dirvish-mark-menu           :wk "Mark Menu")
-        "M-t"    '(dirvish-layout-toggle       :wk "Layout-toggle")
-        "M-s"    '(dirvish-setup-menu          :wk "Setup-Menu")
-        "M-e"    '(dirvish-emerge-menu         :wk "Emerge-Menu")
-        "M-j"    '(dirvish-fd-jump             :wk "fd-jump")
+    (setq lsp-bridge-tex-lsp-server "digestif")
+  )
+#+end_src
+#+begin_src elisp
+(use-package auctex)
+#+end_src
+AucTex needs some tweaks to be built.
+#+begin_src toml :tangle .borgconfig
+[submodule "auctex"]
+	load-path = .
+	build-step = ./autogen.sh
+	build-step = ./configure
+	build-step = make
+	build-step = make doc
+	build-step = borg-maketexi
+	build-step = borg-makeinfo
+	build-step = borg-update-autoloads
+#+end_src
+* Emacs OS
+** Elfeed
+#+begin_src elisp
+  (use-package elfeed
+  :config
+    (setq elfeed-feeds '(
+        ("http://nullprogram.com/feed/" blog emacs)
+        "http://www.50ply.com/atom.xml"  ; no autotagging
+        ("http://nedroid.com/feed/" webcomic)
+      )
     )
   )
-  ;      :bind ; Bind `dirvish|dirvish-side|dirvish-dwim' as you see fit
-  ;      (("C-c f" . dirvish-fd)
-  ;       :map dirvish-mode-map ; Dirvish inherits `dired-mode-map'
-  ;       ("a"   . dirvish-quick-access)
-  ;       ("f"   . dirvish-file-info-menu)
-  ;       ("y"   . dirvish-yank-menu)
-  ;       ("N"   . dirvish-narrow)
-  ;       ("^"   . dirvish-history-last)
-  ;       ("h"   . dirvish-history-jump) ; remapped `describe-mode'
-  ;       ("s"   . dirvish-quicksort)    ; remapped `dired-sort-toggle-or-edit'
-  ;       ("v"   . dirvish-vc-menu)      ; remapped `dired-view-file'
-  ;       ("TAB" . dirvish-subtree-toggle)
-  ;       ("M-f" . dirvish-history-go-forward)
-  ;       ("M-b" . dirvish-history-go-backward)
-  ;       ("M-l" . dirvish-ls-switches-menu)
-  ;       ("M-m" . dirvish-mark-menu)
-  ;       ("M-t" . dirvish-layout-toggle)
-  ;       ("M-s" . dirvish-setup-menu)
-  ;       ("M-e" . dirvish-emerge-menu)
-  ;       ("M-j" . dirvish-fd-jump))
 #+end_src
-#+begin_src elisp
-  (use-package diredfl
-    :hook
-    ((dired-mode . diredfl-mode)
-     ;; highlight parent and directory preview as well
-     (dirvish-directory-view-mode . diredfl-mode))
-    :config
-    (set-face-attribute 'diredfl-dir-name nil :bold t)
-  )
-#+end_src
-** Helpful
-[[https://github.com/Wilfred/helpful][Helpful]] adds a lot of very helpful information to Emacs' =describe-= command buffers.
-For example, if you use =describe-function=, you will not only get the documentation about the function,
-you will also see the source code of the function and where it gets used in other places in the Emacs configuration.
-It is very useful for figuring out how things work in Emacs.
+** Eaf
 
-#+begin_src elisp
-  (use-package helpful
-  :bind
-     ([remap describe-key]      . helpful-key)
-     ([remap describe-command]  . helpful-command)
-     ([remap describe-variable] . helpful-variable)
-     ([remap describe-function] . helpful-callable)
-  )
-#+end_src
-
-** Marginalia
-#+begin_src elisp
-  (use-package marginalia
-  :general
-    (:keymaps 'minibuffer-local-map
-     "M-A" 'marginalia-cycle)
+[[https://github.com/emacs-eaf/emacs-application-framework][EAF]] is an extensible framework that revolutionizes the graphical capabilities of Emacs.
+#+begin_src elisp 
+  (use-package eaf
+  :disabled
   :custom
-    (marginalia-max-relative-age 0)
-    (marginalia-align 'right)
-  :init
-    (marginalia-mode)
-  )
+    ; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
+    (eaf-browser-continue-where-left-off t)
+    (eaf-browser-enable-adblocker t)
+    (browse-url-browser-function 'eaf-open-browser)
+  :config
+    (defalias 'browse-web #'eaf-open-browser)
+    ;; (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
+    ;; (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
+    ;; (eaf-bind-key take_photo "p" eaf-camera-keybinding)
+    ;; (eaf-bind-key nil "M-q" eaf-browser-keybinding)
+    (setq confirm-kill-processes nil)
+  ) ;; unbind, see more in the Wiki
+
+  ;(use-package eaf-browser)
+  ;(use-package eaf-pdf-viewer)
 #+end_src
-
-* Libraries
-** S
-[[https://github.com/magnars/s.el][S]] is the long lost Emacs string manipulation library.
-
-** F
-[[https://github.com/rejeep/f.el][F]] is a modern API for working with files and directories in Emacs.
-
-** Annalist
-[[https://github.com/noctuid/annalist.el][annalist.el]] is a library that can be used to record information and later print that information using org-mode headings and tables. It allows defining different types of things that can be recorded (e.g. keybindings, settings, hooks, and advice) and supports custom filtering, sorting, and formatting. annalist is primarily intended for use in other packages like general and evil-collection, but it can also be used directly in a user’s configuration.
-** Shrink path
-[[https://github.com/zbelial/shrink-path.el][Shrink path]] is a small utility functions that allow for fish-style trunctated directories in eshell and for example modeline.
-#+begin_src elisp
-(use-package shrink-path :demand t)
+tweaks to build eaf
+#+begin_src toml
+[submodule "eaf"]
+  load-path = .
+  load-path = core
+  load-path = extension
 #+end_src
-
-* Games
+** Games
 ** Tetris
 #+begin_src elisp
   (add-hook 'tetris-mode-hook
@@ -1496,28 +1715,6 @@ It is very useful for figuring out how things work in Emacs.
   )
 #+end_src
 
-* Eaf
-
-[[https://github.com/emacs-eaf/emacs-application-framework][EAF]] is an extensible framework that revolutionizes the graphical capabilities of Emacs.
-#+begin_src elisp 
-  (use-package eaf
-  :custom
-    ; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
-    (eaf-browser-continue-where-left-off t)
-    (eaf-browser-enable-adblocker t)
-    (browse-url-browser-function 'eaf-open-browser)
-  :config
-    (defalias 'browse-web #'eaf-open-browser)
-    ;; (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
-    ;; (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
-    ;; (eaf-bind-key take_photo "p" eaf-camera-keybinding)
-    ;; (eaf-bind-key nil "M-q" eaf-browser-keybinding)
-    (setq confirm-kill-processes nil)
-  ) ;; unbind, see more in the Wiki
-
-  (use-package eaf-browser)
-  (use-package eaf-pdf-viewer)
-#+end_src
 * Tequila worms
 #+begin_src elisp
 (progn ;     startup
@@ -1553,3 +1750,7 @@ It is very useful for figuring out how things work in Emacs.
     * asdf 
     
 - Posframe for magit and others
+
+  #+begin_src elisp
+    
+  #+end_src

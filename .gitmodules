@@ -4,6 +4,9 @@
 [submodule "2048-game"]
 	path = lib/2048-game
 	url = git@github.com:emacsmirror/2048-game.git
+[submodule "aas"]
+	path = lib/aas
+	url = https://github.com/ymarco/auto-activating-snippets
 [submodule "all-the-icons"]
 	path = lib/all-the-icons
 	url = https://github.com/domtronn/all-the-icons.el
@@ -31,12 +34,18 @@
 [submodule "borg"]
 	path = lib/borg
 	url = https://github.com/emacscollective/borg
+[submodule "cdlatex"]
+	path = lib/cdlatex
+	url = https://github.com/cdominik/cdlatex
 [submodule "centaur-tabs"]
 	path = lib/centaur-tabs
 	url = https://github.com/ema2159/centaur-tabs
 [submodule "closql"]
 	path = lib/closql
 	url = https://github.com/magit/closql
+[submodule "color-rg"]
+	path = lib/color-rg
+	url = https://github.com/manateelazycat/color-rg
 [submodule "compat"]
 	path = lib/compat
 	url = https://github.com/emacs-compat/compat
@@ -73,6 +82,9 @@
 [submodule "edit-indirect"]
 	path = lib/edit-indirect
 	url = https://github.com/Fanael/edit-indirect
+[submodule "elfeed"]
+	path = lib/elfeed
+	url = https://github.com/skeeto/elfeed
 [submodule "elisp-def"]
 	path = lib/elisp-def
 	url = https://github.com/Wilfred/elisp-def
@@ -88,6 +100,9 @@
 [submodule "epkg"]
 	path = lib/epkg
 	url = https://github.com/emacscollective/epkg
+[submodule "etexshow"]
+	path = lib/etexshow
+	url = https://github.com/pgundlach/etexshow
 [submodule "evil"]
 	path = lib/evil
 	url = https://github.com/emacs-evil/evil
@@ -97,12 +112,18 @@
 [submodule "evil-org"]
 	path = lib/evil-org
 	url = https://github.com/Somelauw/evil-org-mode
+[submodule "evil-surround"]
+	path = lib/evil-surround
+	url = https://github.com/emacs-evil/evil-surround
 [submodule "evil-tutor"]
 	path = lib/evil-tutor
 	url = https://github.com/syl20bnr/evil-tutor
 [submodule "f"]
 	path = lib/f
 	url = https://github.com/rejeep/f.el
+[submodule "fingertip"]
+	path = lib/fingertip
+	url = https://github.com/manateelazycat/fingertip.git
 [submodule "gcmh"]
 	path = lib/gcmh
 	url = https://gitlab.com/koral/gcmh
@@ -112,15 +133,30 @@
 [submodule "git-modes"]
 	path = lib/git-modes
 	url = https://github.com/magit/git-modes
+[submodule "helm"]
+	path = lib/helm
+	url = https://github.com/emacs-helm/helm
+[submodule "helm-org"]
+	path = lib/helm-org
+	url = https://github.com/emacs-helm/helm-org
 [submodule "helpful"]
 	path = lib/helpful
 	url = https://github.com/Wilfred/helpful
 [submodule "hl-todo"]
 	path = lib/hl-todo
 	url = https://github.com/tarsius/hl-todo
+[submodule "ht"]
+	path = lib/ht
+	url = https://github.com/Wilfred/ht.el
 [submodule "hydra"]
 	path = lib/hydra
 	url = https://github.com/abo-abo/hydra
+[submodule "laas"]
+	path = lib/laas
+	url = https://github.com/tecosaur/LaTeX-auto-activating-snippets
+[submodule "leaf"]
+	path = lib/leaf
+	url = https://github.com/conao3/leaf.el
 [submodule "llama"]
 	path = lib/llama
 	url = git@github.com:emacsmirror/llama.git
@@ -136,6 +172,9 @@
 [submodule "markdown-mode"]
 	path = lib/markdown-mode
 	url = https://github.com/jrblevin/markdown-mode
+[submodule "math-symbol-lists"]
+	path = lib/math-symbol-lists
+	url = https://github.com/vspinu/math-symbol-lists
 [submodule "meow"]
 	path = lib/meow
 	url = https://github.com/meow-edit/meow
@@ -184,15 +223,24 @@
 [submodule "org-gtd"]
 	path = lib/org-gtd
 	url = https://github.com/Trevoke/org-gtd.el
+[submodule "org-ml"]
+	path = lib/org-ml
+	url = https://github.com/ndwarshuis/org-ml
 [submodule "org-modern"]
 	path = lib/org-modern
 	url = https://github.com/minad/org-modern
 [submodule "org-preview-html"]
 	path = lib/org-preview-html
 	url = https://github.com/jakebox/org-preview-html
+[submodule "org-ql"]
+	path = lib/org-ql
+	url = https://github.com/alphapapa/org-ql
 [submodule "org-roam"]
 	path = lib/org-roam
 	url = https://github.com/org-roam/org-roam
+[submodule "org-super-agenda"]
+	path = lib/org-super-agenda
+	url = https://github.com/alphapapa/org-super-agenda
 [submodule "org-superstar"]
 	path = lib/org-superstar
 	url = https://github.com/integral-dw/org-superstar-mode
@@ -205,12 +253,18 @@
 [submodule "orgtbl-aggregate"]
 	path = lib/orgtbl-aggregate
 	url = https://github.com/tbanel/orgaggregate
+[submodule "ov"]
+	path = lib/ov
+	url = https://github.com/emacsorphanage/ov
 [submodule "pacmacs"]
 	path = lib/pacmacs
 	url = https://github.com/codingteam/pacmacs.el
 [submodule "pdf-tools"]
 	path = lib/pdf-tools
 	url = https://github.com/vedang/pdf-tools
+[submodule "peg"]
+	path = lib/peg
+	url = git@github.com:emacsmirror/peg.git
 [submodule "posframe"]
 	path = lib/posframe
 	url = https://github.com/tumashu/posframe
@@ -268,6 +322,9 @@
 [submodule "treepy"]
 	path = lib/treepy
 	url = https://github.com/volrath/treepy.el
+[submodule "ts"]
+	path = lib/ts
+	url = https://github.com/alphapapa/ts.el
 [submodule "undo-tree"]
 	path = lib/undo-tree
 	url = https://gitlab.com/tsc25/undo-tree

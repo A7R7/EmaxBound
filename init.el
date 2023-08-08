@@ -70,98 +70,7 @@
   (message "Loading early birds...done (%fs)"
            (float-time (time-subtract (current-time) before-user-init-time))))
 
-(use-package diff-mode
-  :defer t
-  :config
-  (when (>= emacs-major-version 27)
-    (set-face-attribute 'diff-refine-changed nil :extend t)
-    (set-face-attribute 'diff-refine-removed nil :extend t)
-    (set-face-attribute 'diff-refine-added   nil :extend t)))
-
-(use-package dired
-  :defer t
-  :config (setq dired-listing-switches "-alh"))
-
-(use-package eldoc
-  :when (version< "25" emacs-version)
-  :config (global-eldoc-mode))
-
-(use-package help
-  :defer t
-  :config (temp-buffer-resize-mode))
-
-(progn ;    `isearch'
-  (setq isearch-allow-scroll t))
-
-(use-package lisp-mode
-  :config
-  (add-hook 'emacs-lisp-mode-hook 'outline-minor-mode)
-  (add-hook 'emacs-lisp-mode-hook 'reveal-mode)
-  (defun indent-spaces-mode ()
-    (setq indent-tabs-mode nil))
-  (add-hook 'lisp-interaction-mode-hook 'indent-spaces-mode))
-
-(use-package magit
-  :defer t
-  :commands (magit-add-section-hook)
-  :config
-  (magit-add-section-hook 'magit-status-sections-hook
-                          'magit-insert-modules
-                          'magit-insert-stashes
-                          'append))
-
-(use-package man
-  :defer t
-  :config (setq Man-width 80))
-
-(use-package paren
-  :config (show-paren-mode))
-
-(use-package prog-mode
-  :config (global-prettify-symbols-mode)
-  (defun indicate-buffer-boundaries-left ()
-    (setq indicate-buffer-boundaries 'left))
-  (add-hook 'prog-mode-hook 'indicate-buffer-boundaries-left))
-
-(use-package recentf
-  :demand t
-  :config (add-to-list 'recentf-exclude "^/\\(?:ssh\\|su\\|sudo\\)?x?:"))
-
-(use-package savehist
-  :config (savehist-mode))
-
-(use-package saveplace
-  :when (version< "25" emacs-version)
-  :config (save-place-mode))
-
-(use-package simple
-  :config (column-number-mode))
-
-(use-package smerge-mode
-  :defer t
-  :config
-  (when (>= emacs-major-version 27)
-    (set-face-attribute 'smerge-refined-removed nil :extend t)
-    (set-face-attribute 'smerge-refined-added   nil :extend t)))
-
-(progn ;    `text-mode'
-  (add-hook 'text-mode-hook 'indicate-buffer-boundaries-left))
-
-(use-package tramp
-  :defer t
-  :config
-  (add-to-list 'tramp-default-proxies-alist '(nil "\\`root\\'" "/ssh:%h:"))
-  (add-to-list 'tramp-default-proxies-alist '("localhost" nil nil))
-  (add-to-list 'tramp-default-proxies-alist
-               (list (regexp-quote (system-name)) nil nil))
-  (setq vc-ignore-dir-regexp
-        (format "\\(%s\\)\\|\\(%s\\)"
-                vc-ignore-dir-regexp
-                tramp-file-name-regexp)))
-
-(use-package tramp-sh
-  :defer t
-  :config (cl-pushnew 'tramp-own-remote-path tramp-remote-path))
+(use-package shrink-path :demand t)
 
 (use-package evil
   :init
@@ -497,7 +406,7 @@
   ;; show Dashboard in frames created with emacsclient -c
   (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
   ;;(setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
-  (setq dashboard-startup-banner (concat user-emacs-directory "assets/EmacsBound.svg"))  ;; use custom image as banner
+  (setq dashboard-startup-banner (concat user-emacs-directory "assets/EmacsBound.xpm"))  ;; use custom image as banner
   (setq dashboard-center-content t) ;; set to 't' for centered content
 
   (setq dashboard-items '(
@@ -560,6 +469,217 @@
    "v"       '(config/toggle-line-number-visual   :wk " Visual     ")
 )
 
+(use-package mini-frame
+:config
+  (setq mini-frame-detach-on-hide nil)
+  ;(setq mini-frame-standalone 't)
+  ;(setq mini-frame-resize-min-height 10)
+  (setq mini-frame-ignore-commands 
+    (append mini-frame-ignore-commands
+     '(evil-window-split evil-window-vsplit evil-ex)))
+)
+
+;(add-hook 'minibuffer-setup-hook 'solaire-mode)
+
+(add-hook 'minibuffer-setup-hook
+  (defun config/set-minibuffer-margin ()
+    (setq olivetti-body-width 140)
+    (olivetti-mode)
+  )
+)
+
+(use-package diff-hl
+  :config
+  (setq diff-hl-draw-borders nil)
+  (global-diff-hl-mode)
+  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
+)
+
+(use-package diff-mode
+  :defer t
+  :config
+  (when (>= emacs-major-version 27)
+    (set-face-attribute 'diff-refine-changed nil :extend t)
+    (set-face-attribute 'diff-refine-removed nil :extend t)
+    (set-face-attribute 'diff-refine-added   nil :extend t)))
+
+(use-package dired
+  :defer t
+  :config (setq dired-listing-switches "-alh"))
+
+(use-package eldoc
+  :when (version< "25" emacs-version)
+  :config (global-eldoc-mode))
+
+(use-package help
+  :defer t
+  :config (temp-buffer-resize-mode))
+
+(progn ;    `isearch'
+  (setq isearch-allow-scroll t))
+
+(use-package lisp-mode
+  :config
+  (add-hook 'emacs-lisp-mode-hook 'outline-minor-mode)
+  (add-hook 'emacs-lisp-mode-hook 'reveal-mode)
+  (defun indent-spaces-mode ()
+    (setq indent-tabs-mode nil))
+  (add-hook 'lisp-interaction-mode-hook 'indent-spaces-mode))
+
+(use-package magit
+  :defer t
+  :commands (magit-add-section-hook)
+  :config
+  (magit-add-section-hook 'magit-status-sections-hook
+                          'magit-insert-modules
+                          'magit-insert-stashes
+                          'append))
+
+(use-package man
+  :defer t
+  :config (setq Man-width 80))
+
+(use-package paren
+  :config (show-paren-mode))
+
+(use-package prog-mode
+  :config (global-prettify-symbols-mode)
+  (defun indicate-buffer-boundaries-left ()
+    (setq indicate-buffer-boundaries 'left))
+  (add-hook 'prog-mode-hook 'indicate-buffer-boundaries-left))
+
+(use-package recentf
+  :demand t
+  :config (add-to-list 'recentf-exclude "^/\\(?:ssh\\|su\\|sudo\\)?x?:"))
+
+(use-package savehist
+  :config (savehist-mode))
+
+(use-package saveplace
+  :when (version< "25" emacs-version)
+  :config (save-place-mode))
+
+(use-package simple
+  :config (column-number-mode))
+
+(use-package smerge-mode
+  :defer t
+  :config
+  (when (>= emacs-major-version 27)
+    (set-face-attribute 'smerge-refined-removed nil :extend t)
+    (set-face-attribute 'smerge-refined-added   nil :extend t)))
+
+(progn ;    `text-mode'
+  (add-hook 'text-mode-hook 'indicate-buffer-boundaries-left))
+
+(use-package tramp
+  :defer t
+  :config
+  (add-to-list 'tramp-default-proxies-alist '(nil "\\`root\\'" "/ssh:%h:"))
+  (add-to-list 'tramp-default-proxies-alist '("localhost" nil nil))
+  (add-to-list 'tramp-default-proxies-alist
+               (list (regexp-quote (system-name)) nil nil))
+  (setq vc-ignore-dir-regexp
+        (format "\\(%s\\)\\|\\(%s\\)"
+                vc-ignore-dir-regexp
+                tramp-file-name-regexp)))
+
+(use-package tramp-sh
+  :defer t
+  :config (cl-pushnew 'tramp-own-remote-path tramp-remote-path))
+
+(use-package dirvish
+:init
+  (dirvish-override-dired-mode)
+:custom
+  (dirvish-quick-access-entries ; It's a custom option, `setq' won't work
+    '(("h" "~/"                          "Home")
+      ("d" "~/Downloads/"                "Downloads")
+      ("m" "/mnt/"                       "Drives")
+      ("t" "~/.local/share/Trash/files/" "TrashCan"))
+  )
+:config
+  ;; (dirvish-peek-mode) ; Preview files in minibuffer
+  ;; (dirvish-side-follow-mode) ; similar to `treemacs-follow-mode'
+  (setq dirvish-path-separators (list "  " "  " "  "))
+  (setq dirvish-mode-line-format
+          '(:left (sort symlink) :right (omit yank index)))
+  (setq dirvish-attributes
+          '(all-the-icons file-time file-size collapse subtree-state vc-state git-msg))
+  (setq delete-by-moving-to-trash t)
+  (setq dired-listing-switches
+          "-l --almost-all --human-readable --group-directories-first --no-group")
+  (nmap dirvish-mode-map
+      "TAB"    '(dirvish-subtree-toggle    :wk "Subtre-toggle")
+      "q"      '(dirvish-quit              :wk "Quit")
+      "h"      '(dired-up-directory        :wk "Up-dir")
+      "l"      '(dired-find-file           :wk "Open/Toggle")
+      "a"      '(dirvish-quick-access      :wk "Access")
+      "f"      '(dirvish-file-info-menu    :wk "File Info Menu")
+      "y"      '(dirvish-yank-menu         :wk "Yank Menu")
+      "N"      '(dirvish-narrow            :wk "Narrow")
+      "v"      '(dirvish-vc-menu           :wk "View-file") ; remapped `dired-view-file'
+      "s"      '(dirvish-quicksort         :wk "Quick-sort"); remapped `dired-sort-toggle-or-edit'
+
+      "M-f"    '(dirvish-history-go-forward  :wk "History-forward")
+      "M-b"    '(dirvish-history-go-backward :wk "History-back")
+      "M-l"    '(dirvish-ls-switches-menu    :wk "ls Switch Menu")
+      "M-m"    '(dirvish-mark-menu           :wk "Mark Menu")
+      "M-t"    '(dirvish-layout-toggle       :wk "Layout-toggle")
+      "M-s"    '(dirvish-setup-menu          :wk "Setup-Menu")
+      "M-e"    '(dirvish-emerge-menu         :wk "Emerge-Menu")
+      "M-j"    '(dirvish-fd-jump             :wk "fd-jump")
+  )
+)
+;      :bind ; Bind `dirvish|dirvish-side|dirvish-dwim' as you see fit
+;      (("C-c f" . dirvish-fd)
+;       :map dirvish-mode-map ; Dirvish inherits `dired-mode-map'
+;       ("a"   . dirvish-quick-access)
+;       ("f"   . dirvish-file-info-menu)
+;       ("y"   . dirvish-yank-menu)
+;       ("N"   . dirvish-narrow)
+;       ("^"   . dirvish-history-last)
+;       ("h"   . dirvish-history-jump) ; remapped `describe-mode'
+;       ("s"   . dirvish-quicksort)    ; remapped `dired-sort-toggle-or-edit'
+;       ("v"   . dirvish-vc-menu)      ; remapped `dired-view-file'
+;       ("TAB" . dirvish-subtree-toggle)
+;       ("M-f" . dirvish-history-go-forward)
+;       ("M-b" . dirvish-history-go-backward)
+;       ("M-l" . dirvish-ls-switches-menu)
+;       ("M-m" . dirvish-mark-menu)
+;       ("M-t" . dirvish-layout-toggle)
+;       ("M-s" . dirvish-setup-menu)
+;       ("M-e" . dirvish-emerge-menu)
+;       ("M-j" . dirvish-fd-jump))
+
+(use-package diredfl
+  :hook
+  ((dired-mode . diredfl-mode)
+   ;; highlight parent and directory preview as well
+   (dirvish-directory-view-mode . diredfl-mode))
+  :config
+  (set-face-attribute 'diredfl-dir-name nil :bold t)
+)
+
+(use-package helpful
+:bind
+   ([remap describe-key]      . helpful-key)
+   ([remap describe-command]  . helpful-command)
+   ([remap describe-variable] . helpful-variable)
+   ([remap describe-function] . helpful-callable)
+)
+
+(use-package marginalia
+:general
+  (:keymaps 'minibuffer-local-map
+   "M-A" 'marginalia-cycle)
+:custom
+  (marginalia-max-relative-age 0)
+  (marginalia-align 'right)
+:init
+  (marginalia-mode)
+)
+
 (use-package vertico
   :init
   (setq completion-styles '(orderless))
@@ -578,37 +698,6 @@
   (setq completion-in-region-function 'consult-completion-in-region)
   (vertico-mode 1)
 )
-
-;; Persist history over Emacs restarts. Vertico sorts by history position.
-  (use-package savehist
-      :init
-      (savehist-mode))
-
-;; A few more useful configurations...
-  (use-package emacs
-      :init
-      ;; Add prompt indicator to `completing-read-multiple'.
-      ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
-      (defun crm-indicator (args)
-      (cons (format "[CRM%s] %s"
-                      (replace-regexp-in-string
-                      "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
-                      crm-separator)
-                      (car args))
-              (cdr args)))
-      (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
-
-      ;; Do not allow the cursor in the minibuffer prompt
-      (setq minibuffer-prompt-properties
-          '(read-only t cursor-intangible t face minibuffer-prompt))
-      (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
-
-      ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
-      ;; Vertico commands are hidden in normal buffers.
-      ;; (setq read-extended-command-predicate
-      ;;       #'command-completion-default-include-p)
-      ;; Enable recursive minibuffers
-      (setq enable-recursive-minibuffers t))
 
 (use-package vertico-directory
   :after vertico
@@ -644,31 +733,36 @@
   ;(vertico-posframe-mode 1)
 )
 
-(use-package mini-frame
-:config
-  (setq mini-frame-detach-on-hide nil)
-  ;(setq mini-frame-standalone 't)
-  ;(setq mini-frame-resize-min-height 10)
-  (setq mini-frame-ignore-commands 
-    (append mini-frame-ignore-commands
-     '(evil-window-split evil-window-vsplit evil-ex)))
-)
+;; Persist history over Emacs restarts. Vertico sorts by history position.
+  (use-package savehist
+      :init
+      (savehist-mode))
 
-;(add-hook 'minibuffer-setup-hook 'solaire-mode)
+;; A few more useful configurations...
+  (use-package emacs
+      :init
+      ;; Add prompt indicator to `completing-read-multiple'.
+      ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
+      (defun crm-indicator (args)
+      (cons (format "[CRM%s] %s"
+                      (replace-regexp-in-string
+                      "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+                      crm-separator)
+                      (car args))
+              (cdr args)))
+      (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
 
-(add-hook 'minibuffer-setup-hook
-  (defun config/set-minibuffer-margin ()
-    (setq olivetti-body-width 140)
-    (olivetti-mode)
-  )
-)
+      ;; Do not allow the cursor in the minibuffer prompt
+      (setq minibuffer-prompt-properties
+          '(read-only t cursor-intangible t face minibuffer-prompt))
+      (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
 
-(use-package diff-hl
-  :config
-  (setq diff-hl-draw-borders nil)
-  (global-diff-hl-mode)
-  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
-)
+      ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
+      ;; Vertico commands are hidden in normal buffers.
+      ;; (setq read-extended-command-predicate
+      ;;       #'command-completion-default-include-p)
+      ;; Enable recursive minibuffers
+      (setq enable-recursive-minibuffers t))
 
 (use-package consult
   ;; Replace bindings. Lazily loaded due by `use-package'.
@@ -788,14 +882,16 @@
   ;; (setq consult-project-function nil)
 )
 
-(use-package yasnippet
-  :init
-  (yas-global-mode 1)
+(use-package blink-search
+:config
+  (setq blink-search-enable-posframe t)
 )
 
-(use-package lsp-bridge
-  :init
-  (global-lsp-bridge-mode)
+(use-package color-rg
+:config
+  (general-def isearch-mode-map
+    "M-s M-s" 'isearch-toggle-color-rg
+  )
 )
 
 (use-package org
@@ -875,8 +971,12 @@
 
 (use-package org
 :config
-    (setq org-src-tab-acts-natively t)
-    (setq org-src-preserve-indentation nil)
+  (setq org-src-tab-acts-natively t)
+  (setq org-src-preserve-indentation nil)
+)
+
+(use-package org-auto-tangle
+:hook (org-mode . org-auto-tangle-mode)
 )
 
 (use-package valign
@@ -890,115 +990,113 @@
   (setq org-roam-v2-ack t)
 )
 
+(use-package org-gtd
+:init
+  (setq org-gtd-update-ack "3.0.0")
+)
+
 ;; (use-package org-pandoc)
 
-(use-package dirvish
-:init
-  (dirvish-override-dired-mode)
-:custom
-  (dirvish-quick-access-entries ; It's a custom option, `setq' won't work
-    '(("h" "~/"                          "Home")
-      ("d" "~/Downloads/"                "Downloads")
-      ("m" "/mnt/"                       "Drives")
-      ("t" "~/.local/share/Trash/files/" "TrashCan"))
-  )
+(use-package yasnippet
+  :init
+  (yas-global-mode 1)
+)
+
+(use-package lsp-bridge
+  :init
+  (global-lsp-bridge-mode)
+)
+
+(use-package fingertip
 :config
-  ;; (dirvish-peek-mode) ; Preview files in minibuffer
-  ;; (dirvish-side-follow-mode) ; similar to `treemacs-follow-mode'
-  (setq dirvish-path-separators (list "  " "  " "  "))
-  (setq dirvish-mode-line-format
-          '(:left (sort symlink) :right (omit yank index)))
-  (setq dirvish-attributes
-          '(all-the-icons file-time file-size collapse subtree-state vc-state git-msg))
-  (setq delete-by-moving-to-trash t)
-  (setq dired-listing-switches
-          "-l --almost-all --human-readable --group-directories-first --no-group")
-  (nmap dirvish-mode-map
-      "TAB"    '(dirvish-subtree-toggle    :wk "Subtre-toggle")
-      "q"      '(dirvish-quit              :wk "Quit")
-      "h"      '(dired-up-directory        :wk "Up-dir")
-      "l"      '(dired-find-file           :wk "Open/Toggle")
-      "a"      '(dirvish-quick-access      :wk "Access")
-      "f"      '(dirvish-file-info-menu    :wk "File Info Menu")
-      "y"      '(dirvish-yank-menu         :wk "Yank Menu")
-      "N"      '(dirvish-narrow            :wk "Narrow")
-      "v"      '(dirvish-vc-menu           :wk "View-file") ; remapped `dired-view-file'
-      "s"      '(dirvish-quicksort         :wk "Quick-sort"); remapped `dired-sort-toggle-or-edit'
+  (dolist (hook (list
+              'c-mode-common-hook 'c-mode-hook 'c++-mode-hook
+              'c-ts-mode-hook 'c++-ts-mode-hook
+              'cmake-ts-mode-hook
+              'java-mode-hook
+              'haskell-mode-hook
+              'emacs-lisp-mode-hook 'lisp-interaction-mode-hook 'lisp-mode-hook
+              'maxima-mode-hook
+              'ielm-mode-hook
+              'bash-ts-mode-hook 'sh-mode-hook
+              'makefile-gmake-mode-hook
+              'php-mode-hook
+              'python-mode-hook 'python-ts-mode-hook
+              'js-mode-hook
+              'go-mode-hook
+              'qml-mode-hook
+              'jade-mode-hook
+              'css-mode-hook 'css-ts-mode-hook
+              'ruby-mode-hook
+              'coffee-mode-hook
+              'rust-mode-hook 'rust-ts-mode-hook
+              'qmake-mode-hook
+              'lua-mode-hook
+              'swift-mode-hook
+              'web-mode-hook
+              'markdown-mode-hook
+              'llvm-mode-hook
+              'conf-toml-mode-hook 'toml-ts-mode-hook
+              'nim-mode-hook
+              'typescript-mode-hook 'typescript-ts-mode-hook
+              'js-ts-mode-hook 'json-ts-mode-hook
+              ))
+  (add-hook hook #'(lambda () (fingertip-mode 1))))
+  (general-def 
+    :keymaps 'fingertip-mode-map
+      "(" 'fingertip-open-round
+      "[" 'fingertip-open-bracket
+      "{" 'fingertip-open-curly
+      ")" 'fingertip-close-round
+      "]" 'fingertip-close-bracket
+      "}" 'fingertip-close-curly
+      "=" 'fingertip-equal
 
-      "M-f"    '(dirvish-history-go-forward  :wk "History-forward")
-      "M-b"    '(dirvish-history-go-backward :wk "History-back")
-      "M-l"    '(dirvish-ls-switches-menu    :wk "ls Switch Menu")
-      "M-m"    '(dirvish-mark-menu           :wk "Mark Menu")
-      "M-t"    '(dirvish-layout-toggle       :wk "Layout-toggle")
-      "M-s"    '(dirvish-setup-menu          :wk "Setup-Menu")
-      "M-e"    '(dirvish-emerge-menu         :wk "Emerge-Menu")
-      "M-j"    '(dirvish-fd-jump             :wk "fd-jump")
-  )
-)
-;      :bind ; Bind `dirvish|dirvish-side|dirvish-dwim' as you see fit
-;      (("C-c f" . dirvish-fd)
-;       :map dirvish-mode-map ; Dirvish inherits `dired-mode-map'
-;       ("a"   . dirvish-quick-access)
-;       ("f"   . dirvish-file-info-menu)
-;       ("y"   . dirvish-yank-menu)
-;       ("N"   . dirvish-narrow)
-;       ("^"   . dirvish-history-last)
-;       ("h"   . dirvish-history-jump) ; remapped `describe-mode'
-;       ("s"   . dirvish-quicksort)    ; remapped `dired-sort-toggle-or-edit'
-;       ("v"   . dirvish-vc-menu)      ; remapped `dired-view-file'
-;       ("TAB" . dirvish-subtree-toggle)
-;       ("M-f" . dirvish-history-go-forward)
-;       ("M-b" . dirvish-history-go-backward)
-;       ("M-l" . dirvish-ls-switches-menu)
-;       ("M-m" . dirvish-mark-menu)
-;       ("M-t" . dirvish-layout-toggle)
-;       ("M-s" . dirvish-setup-menu)
-;       ("M-e" . dirvish-emerge-menu)
-;       ("M-j" . dirvish-fd-jump))
+      "%" 'fingertip-match-paren
+      "\"" 'fingertip-double-quote
+      "'" 'fingertip-single-quote
 
-(use-package diredfl
-  :hook
-  ((dired-mode . diredfl-mode)
-   ;; highlight parent and directory preview as well
-   (dirvish-directory-view-mode . diredfl-mode))
-  :config
-  (set-face-attribute 'diredfl-dir-name nil :bold t)
-)
+      "SPC" 'fingertip-space
+      "RET" 'fingertip-newline
 
-(use-package helpful
-:bind
-   ([remap describe-key]      . helpful-key)
-   ([remap describe-command]  . helpful-command)
-   ([remap describe-variable] . helpful-variable)
-   ([remap describe-function] . helpful-callable)
-)
+      "M-o" 'fingertip-backward-delete
+      "C-d" 'fingertip-forward-delete
+      "C-k" 'fingertip-kill
 
-(use-package marginalia
-:general
-  (:keymaps 'minibuffer-local-map
-   "M-A" 'marginalia-cycle)
-:custom
-  (marginalia-max-relative-age 0)
-  (marginalia-align 'right)
-:init
-  (marginalia-mode)
-)
+      "M-\"" 'fingertip-wrap-double-quote
+      "M-'" 'fingertip-wrap-single-quote
+      "M-[" 'fingertip-wrap-bracket
+      "M-{" 'fingertip-wrap-curly
+      "M-(" 'fingertip-wrap-round
+      "M-)" 'fingertip-unwrap
 
-(use-package shrink-path :demand t)
+      "M-p" 'fingertip-jump-right
+      "M-n" 'fingertip-jump-left
+      "M-:" 'fingertip-jump-out-pair-and-newline
 
-(add-hook 'tetris-mode-hook
-  (defun config/tetris-center ()
-    (config/window-center 76)
+      "C-j" 'fingertip-jump-up
   )
 )
 
-(add-hook '2048-mode-hook
-  (defun config/2048-center ()
-    (config/window-center 35)
+(use-package lsp-bridge
+:config
+  (setq lsp-bridge-tex-lsp-server "digestif")
+)
+
+(use-package auctex)
+
+(use-package elfeed
+:config
+  (setq elfeed-feeds '(
+      ("http://nullprogram.com/feed/" blog emacs)
+      "http://www.50ply.com/atom.xml"  ; no autotagging
+      ("http://nedroid.com/feed/" webcomic)
+    )
   )
 )
 
 (use-package eaf
+:disabled
 :custom
   ; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
   (eaf-browser-continue-where-left-off t)
@@ -1013,8 +1111,20 @@
   (setq confirm-kill-processes nil)
 ) ;; unbind, see more in the Wiki
 
-(use-package eaf-browser)
-(use-package eaf-pdf-viewer)
+;(use-package eaf-browser)
+;(use-package eaf-pdf-viewer)
+
+(add-hook 'tetris-mode-hook
+  (defun config/tetris-center ()
+    (config/window-center 76)
+  )
+)
+
+(add-hook '2048-mode-hook
+  (defun config/2048-center ()
+    (config/window-center 35)
+  )
+)
 
 (progn ;     startup
   (message "Loading %s...done (%fs)" user-init-file
@@ -1038,3 +1148,5 @@
 ;; indent-tabs-mode: nil
 ;; End:
 ;;; init.el ends here
+
+
