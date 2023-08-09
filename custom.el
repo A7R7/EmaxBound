@@ -25,6 +25,37 @@
  '(olivetti-body-width nil)
  '(olivetti-style 'fancy)
  '(org-indent-indentation-per-level 3)
+ '(org-latex-preview-options
+   '(:foreground auto :background "Transparent" :scale 1.0 :matchers
+		 ("begin" "$1" "$" "$$" "\\(" "\\[")
+		 :zoom 1.25 :justify right))
+ '(org-latex-preview-process-alist
+   '((dvipng :programs
+	     ("latex" "dvipng")
+	     :description "dvi > png" :message "you need to install the programs: latex and dvipng." :image-input-type "dvi" :image-output-type "png" :latex-compiler
+	     ("%l -interaction nonstopmode -output-directory %o %f")
+	     :latex-precompiler
+	     ("%l -output-directory %o -ini -jobname=%b \"&%L\" mylatexformat.ltx %f")
+	     :image-converter
+	     ("dvipng --follow -D %D -T tight --depth --height -o %B-%%09d.png %f")
+	     :transparent-image-converter
+	     ("dvipng --follow -D %D -T tight -bg Transparent --depth --height -o %B-%%09d.png %f"))
+     (dvisvgm :programs
+	      ("latex" "dvisvgm")
+	      :description "dvi > svg" :message "you need to install the programs: latex and dvisvgm." :image-input-type "dvi" :image-output-type "svg" :latex-compiler
+	      ("%l -interaction nonstopmode -output-directory %o %f")
+	      :latex-precompiler
+	      ("%l -output-directory %o -ini -jobname=%b \"&%L\" mylatexformat.ltx %f")
+	      :image-converter
+	      ("dvisvgm --page=1- --optimize --clipjoin --relative --no-fonts --bbox=preview -o %B-%%9p.svg %f"))
+     (imagemagick :programs
+		  ("pdflatex" "convert")
+		  :description "pdf > png" :message "you need to install the programs: latex and imagemagick." :image-input-type "pdf" :image-output-type "png" :latex-compiler
+		  ("pdflatex -interaction nonstopmode -output-directory %o %f")
+		  :latex-precompiler
+		  ("pdftex -output-directory %o -ini -jobname=%b \"&pdflatex\" mylatexformat.ltx %f")
+		  :image-converter
+		  ("convert -density %D -trim -antialias %f -quality 100 %B-%%09d.png"))))
  '(org-modern-block-fringe nil)
  '(org-modern-block-name '("⇲ " . "⇱ "))
  '(org-modern-keyword nil)
@@ -36,7 +67,8 @@
  '(vertico-count 20)
  '(vertico-posframe-border-width 3)
  '(vertico-posframe-width 140)
- '(vertico-resize nil))
+ '(vertico-resize nil)
+ '(warning-suppress-log-types '((comp))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -60,14 +92,18 @@
  '(meow-cheatsheet-command ((t (:height 180 :inherit fixed-pitch))))
  '(olivetti-fringe ((t (:background "#171B24"))))
  '(org-block-begin-line ((t (:height 0.8 :weight light :foreground "#3f4460" :extend t :inherit variable-pitch))))
+ '(org-default ((t (:inherit variable-pitch))))
  '(org-document-info ((t (:weight bold :height 1.8 :family "Cantarell"))))
  '(org-document-info-keyword ((t (:foreground "LightSteelBlue4" :inherit org-document-info))))
+ '(org-latex-and-related ((t (:foreground "LightSteelBlue4" :weight bold))))
+ '(org-level-1 ((t (:family "Cantarell" :height 1.8 :extend nil :inherit outline-1))))
  '(org-meta-line ((t (:foreground "LightSteelBlue4"))))
  '(org-modern-block-name ((t (:inherit variable-pitch))))
  '(org-special-keyword ((t (:foreground "LightSteelBlue4"))))
  '(org-tag ((t (:foreground "LightSteelBlue4" :weight normal))))
  '(org-visual-indent-blank-pipe-face ((t (:background "#1f2430" :foreground "#1f2430" :height 0.1 :width extra-expanded))))
  '(org-visual-indent-pipe-face ((t (:background "slate gray" :foreground "slate gray" :height 0.1))))
+ '(outline-1 ((t (:extend t :foreground "#73d0ff"))))
  '(scroll-bar ((t (:background "gray13" :distant-foreground "black" :foreground "dim gray" :box nil :width condensed))))
  '(tooltip ((t (:height 1.5 :foreground "#cbccc6" :background "#171b24" :inherit variable-pitch))))
  '(variable-pitch ((t (:slant normal :weight regular :height 180 :width normal :foundry "TMC " :family "Arimo Nerd Font Propo"))))

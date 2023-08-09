@@ -130,6 +130,9 @@
 [submodule "fingertip"]
 	path = lib/fingertip
 	url = https://github.com/manateelazycat/fingertip.git
+[submodule "fixed-pitch-mode"]
+	path = lib/fixed-pitch-mode
+	url = https://github.com/cstby/fixed-pitch-mode.git
 [submodule "gcmh"]
 	path = lib/gcmh
 	url = https://gitlab.com/koral/gcmh
@@ -211,6 +214,9 @@
 [submodule "orderless"]
 	path = lib/orderless
 	url = https://github.com/oantolin/orderless
+[submodule "org"]
+	path = lib/org
+	url = https://git.tecosaur.net/tec/org-mode.git
 [submodule "org-agenda-property"]
 	path = lib/org-agenda-property
 	url = https://github.com/Malabarba/org-agenda-property
@@ -397,6 +403,3 @@
 [submodule "zoxide"]
 	path = lib/zoxide
 	url = https://gitlab.com/Vonfry/zoxide.el
-[submodule "org"]
-	path = lib/org
-	url = https://git.tecosaur.net/tec/org-mode.git

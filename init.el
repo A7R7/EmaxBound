@@ -70,11 +70,6 @@
   (message "Loading early birds...done (%fs)"
            (float-time (time-subtract (current-time) before-user-init-time))))
 
-(use-package org
-:config
-  (setq org-return-follows-link t)
-)
-
 (use-package shrink-path :demand t)
 
 (use-package evil
@@ -119,6 +114,7 @@
 )
 
 (use-package meow
+:defer t
 :config
   (defun meow-setup ()
     (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
@@ -900,16 +896,22 @@
 )
 
 (use-package org
-  :hook (org-mode . mixed-pitch-mode)
-  :config
-  (set-face-attribute 'org-document-title nil :family "Cantarell" :height 2.5 :bold t)
-  (set-face-attribute 'org-level-1 nil :family "Cantarell" :height 1.8 :bold t)
-  (set-face-attribute 'org-level-2 nil :family "Cantarell" :height 1.6 :bold t)
-  (set-face-attribute 'org-level-3 nil :family "Cantarell" :height 1.4 :bold t)
-  (set-face-attribute 'org-level-4 nil :family "Cantarell" :height 1.3 )
-  (set-face-attribute 'org-level-5 nil :family "Cantarell" :height 1.2 )
-  (set-face-attribute 'org-level-6 nil :family "Cantarell" :height 1.1 )
+:config
+  (setq org-latex-preview-numbered t)
+  (add-hook 'org-mode-hook #'turn-on-org-cdlatex)
 )
+
+(use-package org
+;    :hook (org-mode . mixed-pitch-mode)
+    :config
+    (set-face-attribute 'org-document-title nil :family "Cantarell" :height 2.5 :bold t)
+    (set-face-attribute 'org-level-1 nil :family "Cantarell" :height 1.8 )
+    (set-face-attribute 'org-level-2 nil :family "Cantarell" :height 1.6 )
+    (set-face-attribute 'org-level-3 nil :family "Cantarell" :height 1.4 )
+    (set-face-attribute 'org-level-4 nil :family "Cantarell" :height 1.3 )
+    (set-face-attribute 'org-level-5 nil :family "Cantarell" :height 1.2 )
+    (set-face-attribute 'org-level-6 nil :family "Cantarell" :height 1.1 )
+  )
 
 (use-package org-modern
 :hook (org-mode . org-modern-mode)
@@ -968,7 +970,7 @@
   (setq org-appear-autoemphasis  t)
   ;(setq org-appear-autolinks t)
   (setq org-appear-autosubmarkers t)
-  (setq org-appear-inside-latex t)
+  ;(setq org-appear-inside-latex t)
   (setq org-hide-emphasis-markers t)
 )
 
@@ -996,16 +998,137 @@
 )
 
 (use-package org-gtd
+:after org
 :init
   (setq org-gtd-update-ack "3.0.0")
 )
 
 ;; (use-package org-pandoc)
 
+(use-package org-fragtog
+:config
+    ;; Vertically align LaTeX preview in org mode
+    (defun my-org-latex-preview-advice (beg end &rest _args)
+    (let* ((ov (car (overlays-at (/ (+ beg end) 2) t)))
+            (img (cdr (overlay-get ov 'display)))
+            (new-img (plist-put img :ascent 95)))
+        (overlay-put ov 'display (cons 'image new-img))))
+    (advice-add 'org--make-preview-overlay
+                :after #'my-org-latex-preview-advice)
+
+    ;; from: https://kitchingroup.cheme.cmu.edu/blog/2016/11/06/
+    ;; Justifying-LaTeX-preview-fragments-in-org-mode/
+    ;; specify the justification you want
+    (plist-put org-format-latex-options :justify 'right)
+
+    (defun eli/org-justify-fragment-overlay (beg end image imagetype)
+    (let* ((position (plist-get org-format-latex-options :justify))
+            (img (create-image image 'svg t))
+            (ov (car (overlays-at (/ (+ beg end) 2) t)))
+            (width (car (image-display-size (overlay-get ov 'display))))
+            offset)
+        (cond
+        ((and (eq 'center position) 
+            (= beg (line-beginning-position)))
+        (setq offset (floor (- (/ fill-column 2)
+                                (/ width 2))))
+        (if (< offset 0)
+            (setq offset 0))
+        (overlay-put ov 'before-string (make-string offset ? )))
+        ((and (eq 'right position) 
+            (= beg (line-beginning-position)))
+        (setq offset (floor (- fill-column
+                                width)))
+        (if (< offset 0)
+            (setq offset 0))
+        (overlay-put ov 'before-string (make-string offset ? ))))))
+    (advice-add 'org--make-preview-overlay
+                :after 'eli/org-justify-fragment-overlay)
+
+    ;; from: https://kitchingroup.cheme.cmu.edu/blog/2016/11/07/
+    ;; Better-equation-numbering-in-LaTeX-fragments-in-org-mode/
+    (defun org-renumber-environment (orig-func &rest args)
+    (let ((results '()) 
+            (counter -1)
+            (numberp))
+        (setq results (cl-loop for (begin .  env) in 
+            (org-element-map (org-element-parse-buffer)
+                'latex-environment
+                (lambda (env)
+                (cons
+                    (org-element-property :begin env)
+                    (org-element-property :value env))))
+            collect
+            (cond
+                ((and (string-match "\\\\begin{equation}" env)
+                    (not (string-match "\\\\tag{" env)))
+                (cl-incf counter)
+                (cons begin counter))
+                ((and (string-match "\\\\begin{align}" env)
+                    (string-match "\\\\notag" env))
+                (cl-incf counter)
+                (cons begin counter))
+                ((string-match "\\\\begin{align}" env)
+                (prog2
+                    (cl-incf counter)
+                    (cons begin counter)                          
+                (with-temp-buffer
+                    (insert env)
+                    (goto-char (point-min))
+                    ;; \\ is used for a new line. Each one leads
+                    ;; to a number
+                    (cl-incf counter (count-matches "\\\\$"))
+                    ;; unless there are nonumbers.
+                    (goto-char (point-min))
+                    (cl-decf counter
+                            (count-matches "\\nonumber")))))
+                (t
+                (cons begin nil)))))
+        (when (setq numberp (cdr (assoc (point) results)))
+        (setf (car args)
+                (concat
+                (format "\\setcounter{equation}{%s}\n" numberp)
+                (car args)))))
+    (apply orig-func args))
+    (advice-add 'org-create-formula-image :around #'org-renumber-environment)
+)
+
 (use-package yasnippet
   :init
   (yas-global-mode 1)
 )
+
+(use-package aas
+  :hook (LaTeX-mode . aas-activate-for-major-mode)
+  :hook (org-mode . aas-activate-for-major-mode)
+  :config
+  (aas-set-snippets 'text-mode
+    ;; expand unconditionally
+    ";o-" "ō"
+    ";i-" "ī"
+    ";a-" "ā"
+    ";u-" "ū"
+    ";e-" "ē")
+  (aas-set-snippets 'latex-mode
+    ;; set condition!
+    :cond #'texmathp ; expand only while in math
+    "supp" "\\supp"
+    "On" "O(n)"
+    "O1" "O(1)"
+    "Olog" "O(\\log n)"
+    "Olon" "O(n \\log n)"
+    ;; Use YAS/Tempel snippets with ease!
+    "amin" '(yas "\\argmin_{$1}") ; YASnippet snippet shorthand form
+    "amax" '(tempel "\\argmax_{" p "}") ; Tempel snippet shorthand form
+    ;; bind to functions!
+    ";ig" #'insert-register
+    ";call-sin"
+    (lambda (angle) ; Get as fancy as you like
+      (interactive "sAngle: ")
+      (insert (format "%s" (sin (string-to-number angle))))))
+  ;; disable snippets by redefining them with a nil expansion
+  (aas-set-snippets 'latex-mode
+    "supp" nil))
 
 (use-package lsp-bridge
   :init
