@@ -19,16 +19,19 @@
 
 * Screenshots
 #+HTML:<img alt="Dashboard" src="assets/dashboard.png" width="100%">
-#+HTML:<img alt="Org Mode" src="assets/org_mode.png" width="100%">
+#+HTML:<img alt="Org Mode" src="assets/org_mode.png" width="80%" style="box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">
 * Introduction
 ** How to deploy this config
 
 This config file is still in its early stages of development, *Everything is unstable!*
 To play around with my config files, clone this repo anywhere you like on your system.
+
 #+begin_src bash
 git clone --depth=1 https://github.com/A7R7/EmaxBound.git
 #+end_src
+
 Then, simply execute these make rules inside the repo directory.
+
 #+begin_src bash
 make bootstrap-borg  # bootstrap borg itself
 make bootstrap       # bootstrap collective or new drones
@@ -37,7 +40,7 @@ make bootstrap       # bootstrap collective or new drones
 If you're using emacs29 or above, run ~emacs --init-directory=<path-of-the-repo>~ (replace the path).
 Else, you can have a look at [[https://github.com/plexus/chemacs2][chemacs2]], which makes it easy to run multiple Emacs configurations side by side.
 
-** How I built this config
+** How I built this config from seed
 
 The whole config structure is built upon [[https://github.com/emacscollective/emacs.g][emacscollective/emacs.g]].
 It is a starter-kit using borg as the package manager, which utilizes git submodules to maintain all its packages.
@@ -48,10 +51,7 @@ Check [[https://emacsmirror.net/manual/borg/Bootstrapping-using-a-seed.html][Boo
 - Last, most further config does not go beyond the following 2 steps:
   + Run [[elisp: borg-assimilate][M-x borg-assimilate]] and input the name of the package to install this package.
   + Write config codes into this org file, then run [[elisp:org-babel-tangle][M-x org-babel-tangle]] so that emacs writes the codes into the corresponding file.
-
-ps: For some packages, you need to manually specify its load path or build method in ~.borgconfig~ for them to work.
-
-For example, some packages have an ~extensions~ dir in their repo. To load these extensions, you need to add ~load-path = .~ and ~load-path = extensions~ under the corresponding submodule inside ~.borgconfig~.
+  + For some packages, specify its load path or build method in ~.borgconfig~ for them to be load or built as expected.
 
 ** References
 -  [[https://github.com/lccambiaghi/vanilla-emacs][Luca's vanilla-emacs]] (2023) detailed org config file.
@@ -140,6 +140,7 @@ Calculating time used loading emacs excutable, as well as setting some variables
  * [[https://github.com/emacscollective/borg][Borg]] assimilate Emacs packages as Git submodules. Core of the core units.
    =borg-initialize= should be called in init.el for borg to initialize assimilated drones using =borg-activate=.
     To skip the activation of the drone named DRONE, temporarily disable it by setting the value of the Git variable submodule.DRONE.disabled to true in ~/.config/emacs/.gitmodules.
+
 #+begin_src elisp
 (eval-and-compile ; `borg'
   (add-to-list 'load-path (expand-file-name "lib/borg" user-emacs-directory))
@@ -157,8 +158,8 @@ Calculating time used loading emacs excutable, as well as setting some variables
 #+end_src
 
  * [[https://github.com/magnars/dash.el][Dash]] is a modern list library for Emacs See its overview at [[https://github.com/magnars/dash.el#functions][dash.el - functions]].
+    =Dash-Fontify mode= is a buffer-local minor mode intended for Emacs Lisp buffers.  Enabling it causes the special variables bound in anaphoric Dash macros to be fontified.  These anaphoras include ‘it’, ‘it-index’, ‘acc’, and ‘other’.  In older Emacs versions which do not dynamically detect macros, Dash-Fontify mode additionally fontifies Dash macro calls.
 
-=Dash-Fontify mode= is a buffer-local minor mode intended for Emacs Lisp buffers.  Enabling it causes the special variables bound in anaphoric Dash macros to be fontified.  These anaphoras include ‘it’, ‘it-index’, ‘acc’, and ‘other’.  In older Emacs versions which do not dynamically detect macros, Dash-Fontify mode additionally fontifies Dash macro calls.
 #+begin_src elisp
 (use-package dash
   :config (global-dash-fontify-mode))
@@ -216,6 +217,23 @@ Dash needs some tweaks to be built
 (use-package server
   :commands (server-running-p)
   :config (or (server-running-p) (server-mode)))
+#+end_src
+
+ * [[https://git.tecosaur.net/tec/org-mode][Org-9.7]] (preview) did some overhaul to org-latex-preview in org mode. Load External org before the built in org is loaded.
+#+begin_src elisp
+  (use-package org)
+#+end_src
+
+All the .el files are placed in the ./lisp/ folder.
+According to the installation manual of org, we need to make autoloads before compile.
+#+begin_src toml 
+  [submodule "org"]
+          load-path = lisp
+          build-step = make autoloads
+          build-step = borg-update-autoloads
+          build-step = borg-compile
+          build-step = borg-maketexi
+          build-step = borg-makeinfo
 #+end_src
 
  * End of early birds, calculate load time.
@@ -317,6 +335,8 @@ We setup keybinding framworks and basic keybindings at this place. Note that not
 #+begin_src elisp
   (use-package meow
   :defer t
+  :custom-face
+    (meow-cheatsheet-command ((t (:height 180 :inherit fixed-pitch))))
   :config
     (defun meow-setup ()
       (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
@@ -370,6 +390,7 @@ We setup keybinding framworks and basic keybindings at this place. Note that not
         (meow-setup)
   )
 #+end_src
+
 ** General
 
 [[https://github.com/noctuid/general.el][General]] provides a more convenient method for binding keys in emacs
@@ -554,8 +575,15 @@ Defining the various fonts that Emacs will use.
 
 Makes commented text and keywords italics. Working in emacsclient but not emacs.
 #+begin_src elisp
-(set-face-attribute 'font-lock-comment-face nil :slant 'italic)
+(set-face-attribute 'font-lock-comment-face nil 
+  :foreground "LightSteelBlue4" :slant 'italic)
 (set-face-attribute 'font-lock-keyword-face nil :slant 'italic)
+#+end_src
+
+links
+
+#+begin_src elisp
+(set-face-attribute 'link nil :foreground "#ffcc66" :underline t :bold nil)
 #+end_src
 
 *** Zooming In/Out
@@ -586,6 +614,7 @@ Personally I prefer fixed-pitch-mode.
     (setq  mixed-pitch-set-height t)
   )
 #+end_src
+
 ** Icons
 *** All-the-icons
 
@@ -638,6 +667,8 @@ We have 3 modes that can help centering text in a window. But currently we only 
     (dashboard-mode . olivetti-mode)
     (dashboard-mode . variable-pitch-mode)
     (olivetti-mode . visual-line-mode)
+  :custom-face
+    (olivetti-fringe ((t (:background "#171B24"))))
   :init 
     (setq-default fill-column 90)
   :config
@@ -645,12 +676,13 @@ We have 3 modes that can help centering text in a window. But currently we only 
     (setq olivetti-body-width nil
           olivetti-style 'fancy)
     (set-face-attribute 'olivetti-fringe nil :background "#171B24")
+
     (defun config/adjust-olivetti-body-width ()
       (when (and (boundp 'mixed-pitch-mode) mixed-pitch-mode)
         (setq olivetti-body-width 54)))
-    (add-hook 'olivetti-mode-hook 'config/adjust-olivetti-body-width)
+    ;(add-hook 'olivetti-mode-hook 'config/adjust-olivetti-body-width)
     (config/leader
-    "tc"  '(olivetti-mode     :wk "󰉠 Center")
+      "tc"  '(olivetti-mode     :wk "󰉠 Center")
     )
   )
 #+end_src
@@ -662,12 +694,14 @@ We have 3 modes that can help centering text in a window. But currently we only 
 **** Writeroom-mode
 
 *** Spacing 
+
 [[https://github.com/trevorpogue/topspace][Topspace]] recenter line 1 with scrollable upper margin/padding
 #+begin_src elisp
   (use-package topspace
   :hook (dashboard-mode . topspace-mode)
   )
 #+end_src
+
 ** Transparency
 
 Set background Transparency, according to [[https://www.emacswiki.org/emacs/TransparentEmacs][this page]].
@@ -785,29 +819,45 @@ Dashboard is an extensible startup screen showing you recent files, bookmarks, a
 
 ** Line Number
 #+begin_src elisp
-  (defun config/toggle-line-number-nil ()      
-    (interactive)
-    (setq display-line-numbers nil)
+  (use-package emacs
+  :custom-face
+    (line-number ((t (:weight normal :slant normal :foreground "LightSteelBlue4" :inherit default))))
+    (line-number-current-line ((t (:inherit (hl-line default) :foreground "#ffcc66" :slant italic :weight normal))))
+  :config
+    (defun config/toggle-line-number-nil ()      
+        (interactive)
+        (setq display-line-numbers nil)
+    )
+    (defun config/toggle-line-number-absolute () 
+        (interactive)
+        (setq display-line-numbers t)
+    )
+    (defun config/toggle-line-number-relative () 
+        (interactive)
+        (setq display-line-numbers 'relative)
+    )
+    (defun config/toggle-line-number-visual ()   
+        (interactive)
+        (setq display-line-numbers 'visual)
+    )
+    (config/leader :infix "tl"
+        ""        '(nil                                :wk "  Line Number ")
+        "DEL"     '(which-key-undo                     :wk "󰕍 Undo key ")
+        "n"       '(config/toggle-line-number-nil      :wk "󰅖 Nil        ")
+        "a"       '(config/toggle-line-number-absolute :wk "󰯫 Absolute   ")
+        "r"       '(config/toggle-line-number-relative :wk " Relative   ")
+        "v"       '(config/toggle-line-number-visual   :wk " Visual     ")
+    )
   )
-  (defun config/toggle-line-number-absolute () 
-    (interactive)
-    (setq display-line-numbers t)
-  )
-  (defun config/toggle-line-number-relative () 
-    (interactive)
-    (setq display-line-numbers 'relative)
-  )
-  (defun config/toggle-line-number-visual ()   
-    (interactive)
-    (setq display-line-numbers 'visual)
-  )
-  (config/leader :infix "tl"
-     ""        '(nil                                :wk "  Line Number ")
-     "DEL"     '(which-key-undo                     :wk "󰕍 Undo key ")
-     "n"       '(config/toggle-line-number-nil      :wk "󰅖 Nil        ")
-     "a"       '(config/toggle-line-number-absolute :wk "󰯫 Absolute   ")
-     "r"       '(config/toggle-line-number-relative :wk " Relative   ")
-     "v"       '(config/toggle-line-number-visual   :wk " Visual     ")
+#+end_src
+
+** Scrolling
+#+begin_src elisp
+  (use-package emacs
+  :config
+    (setq scroll-conservatively 97)
+    (setq scroll-preserve-screen-position 1)
+    (setq mouse-wheel-progressive-speed nil)
   )
 #+end_src
 
@@ -847,7 +897,11 @@ Use olivetti to center text in minibuffer!
 ** Diff
 #+begin_src elisp
   (use-package diff-hl
-    :config
+  :custom-face
+    (diff-hl-change ((t (:background "#2c5f72" :foreground "#77a8d9"))))
+    (diff-hl-delete ((t (:background "#844953" :foreground "#f27983"))))
+    (diff-hl-insert ((t (:background "#5E734A" :foreground "#a6cc70"))))
+  :config
     (setq diff-hl-draw-borders nil)
     (global-diff-hl-mode)
     (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
@@ -1375,41 +1429,19 @@ Vertico-multiform configures Vertico modes per command or completion category.
 ** Popweb 
 
 * Org
-** Org-9.7
-
-[[https://git.tecosaur.net/tec/org-mode][Org-9.7]] (preview) did some overhaul to org-latex-preview in org mode.
-#+begin_src elisp
-  (use-package org
-  :init
-    (setq org-latex-preview-numbered t)
-    (plist-put org-latex-preview-options :zoom 1.25)
-    (let ((pos (assoc 'dvisvgm org-latex-preview-process-alist)))
-      (plist-put (cdr pos) :image-converter '("dvisvgm --page=1- --optimize --clipjoin --relative --no-fonts --bbox=preview -o %B-%%9p.svg %f")))
-  :config
-    (add-hook 'org-mode-hook #'turn-on-org-cdlatex)
-  )
-#+end_src
-
-All the .el files are placed in the ./lisp/ folder.
-According to the installation manual of org, we need to make autoloads before compile.
-#+begin_src toml 
-  [submodule "org"]
-          load-path = lisp
-          build-step = make autoloads
-          build-step = borg-update-autoloads
-          build-step = borg-compile
-          build-step = borg-maketexi
-          build-step = borg-makeinfo
-#+end_src
-
 ** UI
 *** Fonts
 
 Change the font size of different org-levels.
 #+begin_src elisp
   (use-package org
-    ;    :hook (org-mode . mixed-pitch-mode)
-    :config
+  :custom-face
+    (org-latex-and-related ((t (:foreground "LightSteelBlue4" :weight bold))))
+    (org-meta-line ((t (:foreground "LightSteelBlue4"))))
+    (org-special-keyword ((t (:foreground "LightSteelBlue4"))))
+    (org-tag ((t (:foreground "LightSteelBlue4" :weight normal))))
+        :hook (org-mode . mixed-pitch-mode)
+  :config
     (set-face-attribute 'org-level-1 nil :family "Cantarell" :height 1.8 )
     (set-face-attribute 'org-level-2 nil :family "Cantarell" :height 1.6 )
     (set-face-attribute 'org-level-3 nil :family "Cantarell" :height 1.4 )
@@ -1423,8 +1455,7 @@ Change the font size of different org-levels.
   )
 #+end_src
 
-*** Headings & Levels
-**** Level Bullets & lines
+*** Bullets
 
 [[https://github.com/minad/org-modern][Org-modern]] implements a modern style for Org buffers using font locking and text properties. The package styles =headlines=, =keywords=, =tables= and =source blocks=. 
 
@@ -1447,11 +1478,8 @@ Change the font size of different org-levels.
          '((43 . "⯌") (45 . "⮚") (42 . "⊛"))
      )
      (setq org-modern-block-name '("⇲ " . "⇱ "))
-     (setq
-       org-modern-block-fringe nil
-       org-modern-keyword nil
-       org-modern-todo nil
-     )
+     (setq org-modern-block-fringe nil)
+     (setq org-modern-todo nil)
      (set-face-attribute 'org-modern-block-name nil
         :inherit 'variable-pitch)
   )
@@ -1473,6 +1501,7 @@ Disabled because org-morden is a drop-in replacement.
   )
 #+end_src
 
+*** Indent lines
 [[https://github.com/tonyaldon/org-bars][Org-bars-mode]] is a minor mode for org-mode.
 It adds bars to the virtual indentation provided by the built-in package org-indent.
 Have drawbacks when using mixed-pitch-mode.
@@ -1482,6 +1511,9 @@ Have drawbacks when using mixed-pitch-mode.
   :defer t
   :commands 'org-bars-mode
   ;:hook (org-mode . org-bars-mode)
+  :custom-face
+    (org-visual-indent-blank-pipe-face ((t (:background "#1f2430" :foreground "#1f2430" :height 0.1 :width extra-expanded))))
+    (org-visual-indent-pipe-face ((t (:background "slate gray" :foreground "slate gray" :height 0.1))))
   :config
     (setq org-bars-color-options '(
           :desaturate-level-faces 100
@@ -1564,6 +1596,7 @@ Use org-indent-mode to set different indenting for different levels.
 #+end_src
 
 *** Code block
+
 [[https://github.com/yilkalargaw/org-auto-tangle][Org-auto-tangle]] Automatically and Asynchronously tangles org files on save.
 Adding the option =#+auto_tangle: t= in an org file to auto-tangle.
 Or setting the =org-auto-tangle-default= variable to t to configure auto-tangle as the default behavior for all org buffers. In this case, it can be disabled for some buffers by adding =#+auto_tangle:nil=.
@@ -1593,21 +1626,20 @@ Or setting the =org-auto-tangle-default= variable to t to configure auto-tangle 
   )
 #+end_src
 
-** GTD
+** LaTeX
+*** Org 9.7
 #+begin_src elisp
-  (use-package org-gtd
-  :after org
+  (use-package org
   :init
-    (setq org-gtd-update-ack "3.0.0")
+    (setq org-latex-preview-numbered t)
+    (plist-put org-latex-preview-options :zoom 1.25)
+    (let ((pos (assoc 'dvisvgm org-latex-preview-process-alist)))
+      (plist-put (cdr pos) :image-converter '("dvisvgm --page=1- --optimize --clipjoin --relative --no-fonts --bbox=preview -o %B-%%9p.svg %f")))
+  :config
+    (add-hook 'org-mode-hook #'turn-on-org-cdlatex)
   )
 #+end_src
 
-** Pandoc
-#+begin_src elisp
-;; (use-package org-pandoc)
-#+end_src
-
-** LaTeX
 *** Org-fragtog
 [[https://github.com/io12/org-fragtog][Org-fragtog]] automatically toggle Org mode LaTeX fragment previews as the cursor enters and exits them
 
@@ -1700,6 +1732,20 @@ Code under :config is taken from https://emacs-china.org/t/org-mode-latex-mode/2
       (apply orig-func args))
       (advice-add 'org-create-formula-image :around #'org-renumber-environment)
   )
+#+end_src
+
+** GTD
+#+begin_src elisp
+  (use-package org-gtd
+  :after org
+  :init
+    (setq org-gtd-update-ack "3.0.0")
+  )
+#+end_src
+
+** Pandoc
+#+begin_src elisp
+;; (use-package org-pandoc)
 #+end_src
 
 * Coding

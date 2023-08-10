@@ -67,6 +67,8 @@
   :commands (server-running-p)
   :config (or (server-running-p) (server-mode)))
 
+(use-package org)
+
 (progn ;     startup
   (message "Loading early birds...done (%fs)"
            (float-time (time-subtract (current-time) before-user-init-time))))
@@ -116,6 +118,8 @@
 
 (use-package meow
 :defer t
+:custom-face
+  (meow-cheatsheet-command ((t (:height 180 :inherit fixed-pitch))))
 :config
   (defun meow-setup ()
     (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
@@ -320,8 +324,11 @@
   :height 180 
 )
 
-(set-face-attribute 'font-lock-comment-face nil :slant 'italic)
+(set-face-attribute 'font-lock-comment-face nil 
+  :foreground "LightSteelBlue4" :slant 'italic)
 (set-face-attribute 'font-lock-keyword-face nil :slant 'italic)
+
+(set-face-attribute 'link nil :foreground "#ffcc66" :underline t :bold nil)
 
 (use-package emacs
   :init 
@@ -361,6 +368,8 @@
   (dashboard-mode . olivetti-mode)
   (dashboard-mode . variable-pitch-mode)
   (olivetti-mode . visual-line-mode)
+:custom-face
+  (olivetti-fringe ((t (:background "#171B24"))))
 :init 
   (setq-default fill-column 90)
 :config
@@ -368,12 +377,13 @@
   (setq olivetti-body-width nil
         olivetti-style 'fancy)
   (set-face-attribute 'olivetti-fringe nil :background "#171B24")
+
   (defun config/adjust-olivetti-body-width ()
     (when (and (boundp 'mixed-pitch-mode) mixed-pitch-mode)
       (setq olivetti-body-width 54)))
-  (add-hook 'olivetti-mode-hook 'config/adjust-olivetti-body-width)
+  ;(add-hook 'olivetti-mode-hook 'config/adjust-olivetti-body-width)
   (config/leader
-  "tc"  '(olivetti-mode     :wk "󰉠 Center")
+    "tc"  '(olivetti-mode     :wk "󰉠 Center")
   )
 )
 
@@ -465,29 +475,42 @@
 
 )
 
-(defun config/toggle-line-number-nil ()      
-  (interactive)
-  (setq display-line-numbers nil)
+(use-package emacs
+:custom-face
+  (line-number ((t (:weight normal :slant normal :foreground "LightSteelBlue4" :inherit default))))
+  (line-number-current-line ((t (:inherit (hl-line default) :foreground "#ffcc66" :slant italic :weight normal))))
+:config
+  (defun config/toggle-line-number-nil ()      
+      (interactive)
+      (setq display-line-numbers nil)
+  )
+  (defun config/toggle-line-number-absolute () 
+      (interactive)
+      (setq display-line-numbers t)
+  )
+  (defun config/toggle-line-number-relative () 
+      (interactive)
+      (setq display-line-numbers 'relative)
+  )
+  (defun config/toggle-line-number-visual ()   
+      (interactive)
+      (setq display-line-numbers 'visual)
+  )
+  (config/leader :infix "tl"
+      ""        '(nil                                :wk "  Line Number ")
+      "DEL"     '(which-key-undo                     :wk "󰕍 Undo key ")
+      "n"       '(config/toggle-line-number-nil      :wk "󰅖 Nil        ")
+      "a"       '(config/toggle-line-number-absolute :wk "󰯫 Absolute   ")
+      "r"       '(config/toggle-line-number-relative :wk " Relative   ")
+      "v"       '(config/toggle-line-number-visual   :wk " Visual     ")
+  )
 )
-(defun config/toggle-line-number-absolute () 
-  (interactive)
-  (setq display-line-numbers t)
-)
-(defun config/toggle-line-number-relative () 
-  (interactive)
-  (setq display-line-numbers 'relative)
-)
-(defun config/toggle-line-number-visual ()   
-  (interactive)
-  (setq display-line-numbers 'visual)
-)
-(config/leader :infix "tl"
-   ""        '(nil                                :wk "  Line Number ")
-   "DEL"     '(which-key-undo                     :wk "󰕍 Undo key ")
-   "n"       '(config/toggle-line-number-nil      :wk "󰅖 Nil        ")
-   "a"       '(config/toggle-line-number-absolute :wk "󰯫 Absolute   ")
-   "r"       '(config/toggle-line-number-relative :wk " Relative   ")
-   "v"       '(config/toggle-line-number-visual   :wk " Visual     ")
+
+(use-package emacs
+:config
+  (setq scroll-conservatively 97)
+  (setq scroll-preserve-screen-position 1)
+  (setq mouse-wheel-progressive-speed nil)
 )
 
 (use-package mini-frame
@@ -510,7 +533,11 @@
 )
 
 (use-package diff-hl
-  :config
+:custom-face
+  (diff-hl-change ((t (:background "#2c5f72" :foreground "#77a8d9"))))
+  (diff-hl-delete ((t (:background "#844953" :foreground "#f27983"))))
+  (diff-hl-insert ((t (:background "#5E734A" :foreground "#a6cc70"))))
+:config
   (setq diff-hl-draw-borders nil)
   (global-diff-hl-mode)
   (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
@@ -921,18 +948,13 @@
 )
 
 (use-package org
-:init
-  (setq org-latex-preview-numbered t)
-  (plist-put org-latex-preview-options :zoom 1.25)
-  (let ((pos (assoc 'dvisvgm org-latex-preview-process-alist)))
-    (plist-put (cdr pos) :image-converter '("dvisvgm --page=1- --optimize --clipjoin --relative --no-fonts --bbox=preview -o %B-%%9p.svg %f")))
+:custom-face
+  (org-latex-and-related ((t (:foreground "LightSteelBlue4" :weight bold))))
+  (org-meta-line ((t (:foreground "LightSteelBlue4"))))
+  (org-special-keyword ((t (:foreground "LightSteelBlue4"))))
+  (org-tag ((t (:foreground "LightSteelBlue4" :weight normal))))
+      :hook (org-mode . mixed-pitch-mode)
 :config
-  (add-hook 'org-mode-hook #'turn-on-org-cdlatex)
-)
-
-(use-package org
-  ;    :hook (org-mode . mixed-pitch-mode)
-  :config
   (set-face-attribute 'org-level-1 nil :family "Cantarell" :height 1.8 )
   (set-face-attribute 'org-level-2 nil :family "Cantarell" :height 1.6 )
   (set-face-attribute 'org-level-3 nil :family "Cantarell" :height 1.4 )
@@ -963,11 +985,8 @@
        '((43 . "⯌") (45 . "⮚") (42 . "⊛"))
    )
    (setq org-modern-block-name '("⇲ " . "⇱ "))
-   (setq
-     org-modern-block-fringe nil
-     org-modern-keyword nil
-     org-modern-todo nil
-   )
+   (setq org-modern-block-fringe nil)
+   (setq org-modern-todo nil)
    (set-face-attribute 'org-modern-block-name nil
       :inherit 'variable-pitch)
 )
@@ -987,6 +1006,9 @@
 :defer t
 :commands 'org-bars-mode
 ;:hook (org-mode . org-bars-mode)
+:custom-face
+  (org-visual-indent-blank-pipe-face ((t (:background "#1f2430" :foreground "#1f2430" :height 0.1 :width extra-expanded))))
+  (org-visual-indent-pipe-face ((t (:background "slate gray" :foreground "slate gray" :height 0.1))))
 :config
   (setq org-bars-color-options '(
         :desaturate-level-faces 100
@@ -1043,13 +1065,15 @@
   (setq org-roam-v2-ack t)
 )
 
-(use-package org-gtd
-:after org
+(use-package org
 :init
-  (setq org-gtd-update-ack "3.0.0")
+  (setq org-latex-preview-numbered t)
+  (plist-put org-latex-preview-options :zoom 1.25)
+  (let ((pos (assoc 'dvisvgm org-latex-preview-process-alist)))
+    (plist-put (cdr pos) :image-converter '("dvisvgm --page=1- --optimize --clipjoin --relative --no-fonts --bbox=preview -o %B-%%9p.svg %f")))
+:config
+  (add-hook 'org-mode-hook #'turn-on-org-cdlatex)
 )
-
-;; (use-package org-pandoc)
 
 (use-package org-fragtog
 :config
@@ -1138,6 +1162,14 @@
     (apply orig-func args))
     (advice-add 'org-create-formula-image :around #'org-renumber-environment)
 )
+
+(use-package org-gtd
+:after org
+:init
+  (setq org-gtd-update-ack "3.0.0")
+)
+
+;; (use-package org-pandoc)
 
 (use-package yasnippet
   :init

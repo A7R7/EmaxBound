@@ -2,6 +2,14 @@
 	no-byte-compile = dash-functional.el
 	no-makeinfo = dash-template.texi
 
+[submodule "org"]
+        load-path = lisp
+        build-step = make autoloads
+        build-step = borg-update-autoloads
+        build-step = borg-compile
+        build-step = borg-maketexi
+        build-step = borg-makeinfo
+
 [submodule "emacsql"]
       no-byte-compile = emacsql-pg.el
 
@@ -18,14 +26,6 @@
 [submodule "vertico"]
 	load-path = .
 	load-path = extensions
-
-[submodule "org"]
-        load-path = lisp
-        build-step = make autoloads
-        build-step = borg-update-autoloads
-        build-step = borg-compile
-        build-step = borg-maketexi
-        build-step = borg-makeinfo
 
 [submodule "lsp-bridge"]
   load-path = .
