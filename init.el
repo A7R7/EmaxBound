@@ -90,6 +90,7 @@
     (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
     (evil-set-initial-state 'messages-buffer-mode 'normal)
     (evil-set-initial-state 'dashboard-mode 'normal)
+    (evil-set-undo-system 'undo-redo)
     (evil-define-key 'normal 'foo-mode "e" 'baz)
 )
 
@@ -106,14 +107,6 @@
 
 (use-package emacs
   :config (setq ring-bell-function #'ignore)
-)
-
-(use-package undo-tree
-  :after evil
-  :diminish
-  :config
-  (evil-set-undo-system 'undo-tree)
-  (global-undo-tree-mode 1)
 )
 
 (use-package meow
@@ -478,7 +471,8 @@
 (use-package emacs
 :custom-face
   (line-number ((t (:weight normal :slant normal :foreground "LightSteelBlue4" :inherit default))))
-  (line-number-current-line ((t (:inherit (hl-line default) :foreground "#ffcc66" :slant italic :weight normal))))
+  (line-number-current-line ((t (:inherit (hl-line default) :slant normal :foreground "#ffcc66"))))
+
 :config
   (defun config/toggle-line-number-nil ()      
       (interactive)
@@ -497,12 +491,12 @@
       (setq display-line-numbers 'visual)
   )
   (config/leader :infix "tl"
-      ""        '(nil                                :wk "  Line Number ")
-      "DEL"     '(which-key-undo                     :wk "󰕍 Undo key ")
-      "n"       '(config/toggle-line-number-nil      :wk "󰅖 Nil        ")
-      "a"       '(config/toggle-line-number-absolute :wk "󰯫 Absolute   ")
-      "r"       '(config/toggle-line-number-relative :wk " Relative   ")
-      "v"       '(config/toggle-line-number-visual   :wk " Visual     ")
+    ""    '(nil                                :wk "  Line Number ")
+    "DEL" '(which-key-undo                     :wk "󰕍 Undo key   ")
+    "n"   '(config/toggle-line-number-nil      :wk "󰅖 Nil        ")
+    "a"   '(config/toggle-line-number-absolute :wk "󰯫 Absolute   ")
+    "r"   '(config/toggle-line-number-relative :wk " Relative   ")
+    "v"   '(config/toggle-line-number-visual   :wk " Visual     ")
   )
 )
 
@@ -640,13 +634,21 @@
 :init
   (dirvish-override-dired-mode)
 :custom
-  (dirvish-quick-access-entries ; It's a custom option, `setq' won't work
+  (dirvish-quick-access-entries ;`setq' won't work for custom
     '(("h" "~/"                          "Home")
       ("d" "~/Downloads/"                "Downloads")
       ("m" "/mnt/"                       "Drives")
       ("t" "~/.local/share/Trash/files/" "TrashCan"))
   )
 :config
+  (dirvish-define-preview exa (file)
+  "Use `exa' to generate directory preview."
+  :require ("exa") ; tell Dirvish to check if we have the executable
+  (when (file-directory-p file) ; we only interest in directories here
+      `(shell . ("exa" "-al" "--color=always" "--icons"
+              "--group-directories-first" ,file))))
+
+  (add-to-list 'dirvish-preview-dispatchers 'exa)
   ;; (dirvish-peek-mode) ; Preview files in minibuffer
   ;; (dirvish-side-follow-mode) ; similar to `treemacs-follow-mode'
   (setq dirvish-path-separators (list "  " "  " "  "))
@@ -666,8 +668,10 @@
       "f"      '(dirvish-file-info-menu    :wk "File Info Menu")
       "y"      '(dirvish-yank-menu         :wk "Yank Menu")
       "N"      '(dirvish-narrow            :wk "Narrow")
-      "v"      '(dirvish-vc-menu           :wk "View-file") ; remapped `dired-view-file'
-      "s"      '(dirvish-quicksort         :wk "Quick-sort"); remapped `dired-sort-toggle-or-edit'
+      ;         `dired-view-file'
+      "v"      '(dirvish-vc-menu           :wk "View-file") 
+      ;         `dired-sort-toggle-or-edit'
+      "s"      '(dirvish-quicksort         :wk "Quick-sort")
 
       "M-f"    '(dirvish-history-go-forward  :wk "History-forward")
       "M-b"    '(dirvish-history-go-backward :wk "History-back")
@@ -679,26 +683,6 @@
       "M-j"    '(dirvish-fd-jump             :wk "fd-jump")
   )
 )
-;      :bind ; Bind `dirvish|dirvish-side|dirvish-dwim' as you see fit
-;      (("C-c f" . dirvish-fd)
-;       :map dirvish-mode-map ; Dirvish inherits `dired-mode-map'
-;       ("a"   . dirvish-quick-access)
-;       ("f"   . dirvish-file-info-menu)
-;       ("y"   . dirvish-yank-menu)
-;       ("N"   . dirvish-narrow)
-;       ("^"   . dirvish-history-last)
-;       ("h"   . dirvish-history-jump) ; remapped `describe-mode'
-;       ("s"   . dirvish-quicksort)    ; remapped `dired-sort-toggle-or-edit'
-;       ("v"   . dirvish-vc-menu)      ; remapped `dired-view-file'
-;       ("TAB" . dirvish-subtree-toggle)
-;       ("M-f" . dirvish-history-go-forward)
-;       ("M-b" . dirvish-history-go-backward)
-;       ("M-l" . dirvish-ls-switches-menu)
-;       ("M-m" . dirvish-mark-menu)
-;       ("M-t" . dirvish-layout-toggle)
-;       ("M-s" . dirvish-setup-menu)
-;       ("M-e" . dirvish-emerge-menu)
-;       ("M-j" . dirvish-fd-jump))
 
 (use-package diredfl
   :hook
@@ -1371,5 +1355,3 @@
 ;; indent-tabs-mode: nil
 ;; End:
 ;;; init.el ends here
-
-

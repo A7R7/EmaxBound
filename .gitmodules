@@ -4,6 +4,9 @@
 [submodule "2048-game"]
 	path = lib/2048-game
 	url = git@github.com:emacsmirror/2048-game.git
+[submodule "a7r7-laas"]
+	path = lib/a7r7-laas
+	url = https://github.com/A7R7/LaTeX-auto-activating-snippets.git
 [submodule "aas"]
 	path = lib/aas
 	url = https://github.com/ymarco/auto-activating-snippets
@@ -352,9 +355,6 @@
 [submodule "ts"]
 	path = lib/ts
 	url = https://github.com/alphapapa/ts.el
-[submodule "undo-tree"]
-	path = lib/undo-tree
-	url = https://gitlab.com/tsc25/undo-tree
 [submodule "use-package"]
 	path = lib/use-package
 	url = git@github.com:jwiegley/use-package.git
@@ -376,6 +376,9 @@
 [submodule "vterm"]
 	path = lib/vterm
 	url = https://github.com/akermu/emacs-libvterm
+[submodule "vterm-toggle"]
+	path = lib/vterm-toggle
+	url = https://github.com/jixiuf/vterm-toggle
 [submodule "vundo"]
 	path = lib/vundo
 	url = https://github.com/casouri/vundo

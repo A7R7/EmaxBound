@@ -13,6 +13,7 @@
 #+AUTHOR: A7R7
 
 #+HTML:<img alt="EmaxBound" src="assets/EmacsBound.svg" width="100%"> 
+  -----
 #+HTML:<a href="https://www.gnu.org/software/emacs/"><img alt="GNU Emacs" src="https://img.shields.io/badge/emacs-29.1-8A2BF2?logo=gnuemacs&logoColor=white"/></a>
 #+HTML:<a href="https://github.com/emacscollective/borg"><img alt="Package Manager" src="https://img.shields.io/badge/package_manager-borg-green"/></a>
 #+HTML:<a href="https://en.wikipedia.org/wiki/Linux"><img alt="Linux" src="https://img.shields.io/badge/linux-FCC624?logo=linux&logoColor=black"/></a>
@@ -62,6 +63,7 @@ Check [[https://emacsmirror.net/manual/borg/Bootstrapping-using-a-seed.html][Boo
 -  [[https://github.com/doomemacs/doomemacs][Doom Emacs]] (2023) Some best practices.
 *NOTE*: the year number after link equals to
 - =min (last time the config get's updated, last time I refered to the config)=
+
 * Earliest birds
 
 *NOTE*: codes under this heading are tangled to early-init.el
@@ -295,6 +297,7 @@ We setup keybinding framworks and basic keybindings at this place. Note that not
       (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
       (evil-set-initial-state 'messages-buffer-mode 'normal)
       (evil-set-initial-state 'dashboard-mode 'normal)
+      (evil-set-undo-system 'undo-redo)
       (evil-define-key 'normal 'foo-mode "e" 'baz)
   )
 #+end_src
@@ -320,16 +323,6 @@ We setup keybinding framworks and basic keybindings at this place. Note that not
   )
 #+end_src
 
-*** Undo-tree
-#+begin_src elisp
-  (use-package undo-tree
-    :after evil
-    :diminish
-    :config
-    (evil-set-undo-system 'undo-tree)
-    (global-undo-tree-mode 1)
-  )
-#+end_src
 
 ** Meow
 #+begin_src elisp
@@ -822,7 +815,8 @@ Dashboard is an extensible startup screen showing you recent files, bookmarks, a
   (use-package emacs
   :custom-face
     (line-number ((t (:weight normal :slant normal :foreground "LightSteelBlue4" :inherit default))))
-    (line-number-current-line ((t (:inherit (hl-line default) :foreground "#ffcc66" :slant italic :weight normal))))
+    (line-number-current-line ((t (:inherit (hl-line default) :slant normal :foreground "#ffcc66"))))
+
   :config
     (defun config/toggle-line-number-nil ()      
         (interactive)
@@ -841,12 +835,12 @@ Dashboard is an extensible startup screen showing you recent files, bookmarks, a
         (setq display-line-numbers 'visual)
     )
     (config/leader :infix "tl"
-        ""        '(nil                                :wk "  Line Number ")
-        "DEL"     '(which-key-undo                     :wk "󰕍 Undo key ")
-        "n"       '(config/toggle-line-number-nil      :wk "󰅖 Nil        ")
-        "a"       '(config/toggle-line-number-absolute :wk "󰯫 Absolute   ")
-        "r"       '(config/toggle-line-number-relative :wk " Relative   ")
-        "v"       '(config/toggle-line-number-visual   :wk " Visual     ")
+      ""    '(nil                                :wk "  Line Number ")
+      "DEL" '(which-key-undo                     :wk "󰕍 Undo key   ")
+      "n"   '(config/toggle-line-number-nil      :wk "󰅖 Nil        ")
+      "a"   '(config/toggle-line-number-absolute :wk "󰯫 Absolute   ")
+      "r"   '(config/toggle-line-number-relative :wk " Relative   ")
+      "v"   '(config/toggle-line-number-visual   :wk " Visual     ")
     )
   )
 #+end_src
@@ -1054,13 +1048,21 @@ Dropin replacement for dired.
   :init
     (dirvish-override-dired-mode)
   :custom
-    (dirvish-quick-access-entries ; It's a custom option, `setq' won't work
+    (dirvish-quick-access-entries ;`setq' won't work for custom
       '(("h" "~/"                          "Home")
         ("d" "~/Downloads/"                "Downloads")
         ("m" "/mnt/"                       "Drives")
         ("t" "~/.local/share/Trash/files/" "TrashCan"))
     )
   :config
+    (dirvish-define-preview exa (file)
+    "Use `exa' to generate directory preview."
+    :require ("exa") ; tell Dirvish to check if we have the executable
+    (when (file-directory-p file) ; we only interest in directories here
+        `(shell . ("exa" "-al" "--color=always" "--icons"
+                "--group-directories-first" ,file))))
+
+    (add-to-list 'dirvish-preview-dispatchers 'exa)
     ;; (dirvish-peek-mode) ; Preview files in minibuffer
     ;; (dirvish-side-follow-mode) ; similar to `treemacs-follow-mode'
     (setq dirvish-path-separators (list "  " "  " "  "))
@@ -1080,8 +1082,10 @@ Dropin replacement for dired.
         "f"      '(dirvish-file-info-menu    :wk "File Info Menu")
         "y"      '(dirvish-yank-menu         :wk "Yank Menu")
         "N"      '(dirvish-narrow            :wk "Narrow")
-        "v"      '(dirvish-vc-menu           :wk "View-file") ; remapped `dired-view-file'
-        "s"      '(dirvish-quicksort         :wk "Quick-sort"); remapped `dired-sort-toggle-or-edit'
+        ;         `dired-view-file'
+        "v"      '(dirvish-vc-menu           :wk "View-file") 
+        ;         `dired-sort-toggle-or-edit'
+        "s"      '(dirvish-quicksort         :wk "Quick-sort")
 
         "M-f"    '(dirvish-history-go-forward  :wk "History-forward")
         "M-b"    '(dirvish-history-go-backward :wk "History-back")
@@ -1093,27 +1097,8 @@ Dropin replacement for dired.
         "M-j"    '(dirvish-fd-jump             :wk "fd-jump")
     )
   )
-  ;      :bind ; Bind `dirvish|dirvish-side|dirvish-dwim' as you see fit
-  ;      (("C-c f" . dirvish-fd)
-  ;       :map dirvish-mode-map ; Dirvish inherits `dired-mode-map'
-  ;       ("a"   . dirvish-quick-access)
-  ;       ("f"   . dirvish-file-info-menu)
-  ;       ("y"   . dirvish-yank-menu)
-  ;       ("N"   . dirvish-narrow)
-  ;       ("^"   . dirvish-history-last)
-  ;       ("h"   . dirvish-history-jump) ; remapped `describe-mode'
-  ;       ("s"   . dirvish-quicksort)    ; remapped `dired-sort-toggle-or-edit'
-  ;       ("v"   . dirvish-vc-menu)      ; remapped `dired-view-file'
-  ;       ("TAB" . dirvish-subtree-toggle)
-  ;       ("M-f" . dirvish-history-go-forward)
-  ;       ("M-b" . dirvish-history-go-backward)
-  ;       ("M-l" . dirvish-ls-switches-menu)
-  ;       ("M-m" . dirvish-mark-menu)
-  ;       ("M-t" . dirvish-layout-toggle)
-  ;       ("M-s" . dirvish-setup-menu)
-  ;       ("M-e" . dirvish-emerge-menu)
-  ;       ("M-j" . dirvish-fd-jump))
 #+end_src
+
 #+begin_src elisp
   (use-package diredfl
     :hook
@@ -1124,12 +1109,14 @@ Dropin replacement for dired.
     (set-face-attribute 'diredfl-dir-name nil :bold t)
   )
 #+end_src
-tweaks to build dirvish
+
+Tweaks to build dirvish. Load dirvish and its extensions.
 #+begin_src toml
 [submodule "dirvish"]
 	load-path = .
 	load-path = extensions
 #+end_src
+
 ** Helpful
 [[https://github.com/Wilfred/helpful][Helpful]] adds a lot of very helpful information to Emacs' =describe-= command buffers.
 For example, if you use =describe-function=, you will not only get the documentation about the function,
@@ -2042,12 +2029,8 @@ tweaks to build eaf
 - Org mode 
     + Roam
     + GTD
-    * asdf 
     
 - Posframe for magit and others
-
-  #+begin_src elisp
-    
-  #+end_src
-
+- Line number format: see https://emacs.stackexchange.com/questions/52269/how-to-change-line-number-gutter-width-using-display-line-numbers-mode
   
+- Dirvish and olivetti-mode compativity
