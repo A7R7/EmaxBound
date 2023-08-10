@@ -40,11 +40,12 @@
 
 (use-package auto-compile
   :config
-  (setq auto-compile-display-buffer               nil)
-  (setq auto-compile-mode-line-counter            t)
-  (setq auto-compile-source-recreate-deletes-dest t)
-  (setq auto-compile-toggle-deletes-nonlib-dest   t)
-  (setq auto-compile-update-autoloads             t)
+  (setq auto-compile-display-buffer               nil
+        auto-compile-mode-line-counter            t
+        auto-compile-source-recreate-deletes-dest t
+        auto-compile-toggle-deletes-nonlib-dest   t
+        auto-compile-update-autoloads             t 
+        warning-suppress-log-types        '((comp)))
 )
 
 (use-package epkg
@@ -302,22 +303,25 @@
   ;:font "JetBrainsMono Nerd Font"
   :font "RobotoMono Nerd Font"
   ;:font "Sarasa Term SC Nerd"
+  ;:font "Sarasa Gothic SC"
   :height 155
-  ;:weight 'medium
 )
 (set-face-attribute 'variable-pitch nil
   :font "Sarasa Gothic SC"
   :height 180
 )
 (set-face-attribute 'fixed-pitch nil
-  :font "Sarasa Fixed SC"
+  ;:font "Sarasa Fixed SC"
+  :font "RobotoMono Nerd Font"
   :height 155
 )
+(set-face-attribute 'fixed-pitch-serif t
+  :family "Monospace Serif"
+  :height 180 
+)
 
-(set-face-attribute 'font-lock-comment-face nil
-  :slant 'italic)
-(set-face-attribute 'font-lock-keyword-face nil
-  :slant 'italic)
+(set-face-attribute 'font-lock-comment-face nil :slant 'italic)
+(set-face-attribute 'font-lock-keyword-face nil :slant 'italic)
 
 (use-package emacs
   :init 
@@ -325,6 +329,14 @@
     (global-set-key (kbd "C--")            'text-scale-decrease)
     (global-set-key (kbd "<C-wheel-up>")   'text-scale-increase)
     (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
+)
+
+(use-package fixed-pitch)
+
+(use-package mixed-pitch-mode
+:defer t
+:config
+  (setq  mixed-pitch-set-height t)
 )
 
 (use-package all-the-icons
@@ -344,21 +356,25 @@
 
 (use-package olivetti
 :hook (org-mode . olivetti-mode)
-        (Custom-mode . olivetti-mode)
-        (help-mode . olivetti-mode)
-        (dashboard-mode . olivetti-mode)
-        (dashboard-mode . variable-pitch-mode)
-        (olivetti-mode . visual-line-mode)
+  (Custom-mode . olivetti-mode)
+  (help-mode . olivetti-mode)
+  (dashboard-mode . olivetti-mode)
+  (dashboard-mode . variable-pitch-mode)
+  (olivetti-mode . visual-line-mode)
+:init 
+  (setq-default fill-column 90)
 :config
-    (defun config/adjust-olivetti-body-width ()
+  ;If nil (the default), use the value of fill-column + 2.
+  (setq olivetti-body-width nil
+        olivetti-style 'fancy)
+  (set-face-attribute 'olivetti-fringe nil :background "#171B24")
+  (defun config/adjust-olivetti-body-width ()
     (when (and (boundp 'mixed-pitch-mode) mixed-pitch-mode)
-        (setq olivetti-body-width 54)))
-
-    (add-hook 'olivetti-mode-hook 'config/adjust-olivetti-body-width)
-
-    (config/leader
-    "tc"  '(olivetti-mode     :wk "󰉠 Center")
-    )
+      (setq olivetti-body-width 54)))
+  (add-hook 'olivetti-mode-hook 'config/adjust-olivetti-body-width)
+  (config/leader
+  "tc"  '(olivetti-mode     :wk "󰉠 Center")
+  )
 )
 
 (use-package topspace
@@ -392,33 +408,37 @@
 
 (use-package doom-modeline
 :init 
-  (setq doom-modeline-height 37)
+  (setq 
+    doom-modeline-height 37
+    doom-modeline-enable-word-count t)
   (doom-modeline-mode 1)
 :config
+  (set-face-attribute 'doom-modeline t
+    :inherit 'variable-pitch
+  )
 )
 
 (use-package diminish)
 
 (use-package dashboard
 :init
-  (setq initial-buffer-choice 'dashboard-open)
-  (setq dashboard-set-heading-icons t)
-  (setq dashboard-set-file-icons t)
-  ;; show Dashboard in frames created with emacsclient -c
-  (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
-  ;;(setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
-  (setq dashboard-startup-banner (concat user-emacs-directory "assets/EmacsBound.xpm"))  ;; use custom image as banner
-  (setq dashboard-center-content t) ;; set to 't' for centered content
-
-  (setq dashboard-items '(
-        (recents . 5)
-        (agenda . 5 )
-        (bookmarks . 3)
-        (projects . 3)
-        (registers . 3)
-  ))
-
-  ;; (dashboard-modify-heading-icons '((recents . "file-text") (bookmarks . "book")))
+  (setq initial-buffer-choice 'dashboard-open
+        dashboard-image-banner-max-width 1000
+        dashboard-set-heading-icons t
+        dashboard-center-content t ;; set to 't' for centered content
+        dashboard-set-file-icons t
+        initial-buffer-choice 
+          (lambda () (get-buffer-create "*dashboard*"))
+        dashboard-startup-banner ;; use custom image as banner
+          (concat user-emacs-directory "assets/EmacsBound.xpm")
+        dashboard-items '(
+          (recents . 5)
+          (agenda . 5 )
+          (bookmarks . 3)
+          (projects . 3)
+          (registers . 3)
+        )
+  )
 :config
   (dashboard-setup-startup-hook)
 )
@@ -730,6 +750,11 @@
          (t posframe)
         )
   )
+  (setq vertico-count 20
+        vertico-posframe-border-width 3
+        vertico-posframe-width 140
+        vertico-resize nil)
+
   ;(vertico-multiform-mode 1)
   ;(vertico-posframe-mode 1)
 )
@@ -896,22 +921,29 @@
 )
 
 (use-package org
-:config
+:init
   (setq org-latex-preview-numbered t)
+  (plist-put org-latex-preview-options :zoom 1.25)
+  (let ((pos (assoc 'dvisvgm org-latex-preview-process-alist)))
+    (plist-put (cdr pos) :image-converter '("dvisvgm --page=1- --optimize --clipjoin --relative --no-fonts --bbox=preview -o %B-%%9p.svg %f")))
+:config
   (add-hook 'org-mode-hook #'turn-on-org-cdlatex)
 )
 
 (use-package org
-;    :hook (org-mode . mixed-pitch-mode)
-    :config
-    (set-face-attribute 'org-document-title nil :family "Cantarell" :height 2.5 :bold t)
-    (set-face-attribute 'org-level-1 nil :family "Cantarell" :height 1.8 )
-    (set-face-attribute 'org-level-2 nil :family "Cantarell" :height 1.6 )
-    (set-face-attribute 'org-level-3 nil :family "Cantarell" :height 1.4 )
-    (set-face-attribute 'org-level-4 nil :family "Cantarell" :height 1.3 )
-    (set-face-attribute 'org-level-5 nil :family "Cantarell" :height 1.2 )
-    (set-face-attribute 'org-level-6 nil :family "Cantarell" :height 1.1 )
-  )
+  ;    :hook (org-mode . mixed-pitch-mode)
+  :config
+  (set-face-attribute 'org-level-1 nil :family "Cantarell" :height 1.8 )
+  (set-face-attribute 'org-level-2 nil :family "Cantarell" :height 1.6 )
+  (set-face-attribute 'org-level-3 nil :family "Cantarell" :height 1.4 )
+  (set-face-attribute 'org-level-4 nil :family "Cantarell" :height 1.3 )
+  (set-face-attribute 'org-level-5 nil :family "Cantarell" :height 1.2 )
+  (set-face-attribute 'org-level-6 nil :family "Cantarell" :height 1.1 )
+  (set-face-attribute 'org-document-title nil :family "Cantarell" :height 2.5 :bold t)
+  (set-face-attribute 'org-document-info nil :family "Cantarell" :height 1.8 :bold t)
+  (set-face-attribute 'org-document-info-keyword nil 
+    :foreground "LightSteelBlue4" :inherit 'org-document-info)
+)
 
 (use-package org-modern
 :hook (org-mode . org-modern-mode)
@@ -927,6 +959,17 @@
         '("⚀" "⚁" "⚂" "⚃" "⚄" "⚅")
         ;'("☰" "☱" "☲" "☳" "☴" "☵" "☶" "☷")
    )
+   (setq org-modern-list ;; for '+' '-' '*' respectively
+       '((43 . "⯌") (45 . "⮚") (42 . "⊛"))
+   )
+   (setq org-modern-block-name '("⇲ " . "⇱ "))
+   (setq
+     org-modern-block-fringe nil
+     org-modern-keyword nil
+     org-modern-todo nil
+   )
+   (set-face-attribute 'org-modern-block-name nil
+      :inherit 'variable-pitch)
 )
 
 (use-package org-superstar
@@ -977,9 +1020,12 @@
 (use-package evil-org)
 
 (use-package org
+:init
+  (setq electric-indent-mode nil)
 :config
   (setq org-src-tab-acts-natively t)
   (setq org-src-preserve-indentation nil)
+  (set-face-attribute 'org-block t :extend t :inherit 'fixed-pitch)
 )
 
 (use-package org-auto-tangle
@@ -1131,8 +1177,12 @@
     "supp" nil))
 
 (use-package lsp-bridge
-  :init
+:init
   (global-lsp-bridge-mode)
+:config
+  ;(set-face-attributes 'lsp-bridge-alive-mode-line nil
+  ;  :inherit 'variable-pitch
+  ;)
 )
 
 (use-package fingertip

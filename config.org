@@ -177,15 +177,17 @@ Dash needs some tweaks to be built
 #+end_src
 
  * [[https://github.com/emacscollective/auto-compile][Auto-Compile]] automatically compile Emacs Lisp libraries
+   Suppress comp warnings.
 #+begin_src elisp
-(use-package auto-compile
-  :config
-  (setq auto-compile-display-buffer               nil)
-  (setq auto-compile-mode-line-counter            t)
-  (setq auto-compile-source-recreate-deletes-dest t)
-  (setq auto-compile-toggle-deletes-nonlib-dest   t)
-  (setq auto-compile-update-autoloads             t)
-)
+  (use-package auto-compile
+    :config
+    (setq auto-compile-display-buffer               nil
+          auto-compile-mode-line-counter            t
+          auto-compile-source-recreate-deletes-dest t
+          auto-compile-toggle-deletes-nonlib-dest   t
+          auto-compile-update-autoloads             t 
+          warning-suppress-log-types        '((comp)))
+  )
 #+end_src
 
  * [[https://github.com/emacscollective/epkg][Epkg]] allows you browse the Emacsmirror package database
@@ -244,11 +246,13 @@ tweaks to buiild emacsql
   [submodule "emacsql"]
 	no-byte-compile = emacsql-pg.el
 #+end_src
+
 ** Sqlite3
 #+begin_src toml
 [submodule "sqlite3"]
 	build-step = make
 #+end_src
+
 * Basic Kbd 
 
 We setup keybinding framworks and basic keybindings at this place. Note that not all keybindings are set here. Some package specific keybinding configs are set under where the package is configed
@@ -530,25 +534,28 @@ Defining the various fonts that Emacs will use.
     ;:font "JetBrainsMono Nerd Font"
     :font "RobotoMono Nerd Font"
     ;:font "Sarasa Term SC Nerd"
+    ;:font "Sarasa Gothic SC"
     :height 155
-    ;:weight 'medium
   )
   (set-face-attribute 'variable-pitch nil
     :font "Sarasa Gothic SC"
     :height 180
   )
   (set-face-attribute 'fixed-pitch nil
-    :font "Sarasa Fixed SC"
+    ;:font "Sarasa Fixed SC"
+    :font "RobotoMono Nerd Font"
     :height 155
+  )
+  (set-face-attribute 'fixed-pitch-serif t
+    :family "Monospace Serif"
+    :height 180 
   )
 #+end_src
 
 Makes commented text and keywords italics. Working in emacsclient but not emacs.
 #+begin_src elisp
-(set-face-attribute 'font-lock-comment-face nil
-  :slant 'italic)
-(set-face-attribute 'font-lock-keyword-face nil
-  :slant 'italic)
+(set-face-attribute 'font-lock-comment-face nil :slant 'italic)
+(set-face-attribute 'font-lock-keyword-face nil :slant 'italic)
 #+end_src
 
 *** Zooming In/Out
@@ -565,6 +572,20 @@ You can use the bindings CTRL plus =/- for zooming in/out.  You can also use CTR
  )
 #+end_src
 
+*** Pitch
+There're 2 modes that controls pitch, mixed-pitch-mode and fixed-pitch-mode.
+Personally I prefer fixed-pitch-mode.
+#+begin_src elisp
+  (use-package fixed-pitch)
+#+end_src
+
+#+begin_src elisp
+  (use-package mixed-pitch-mode
+  :defer t
+  :config
+    (setq  mixed-pitch-set-height t)
+  )
+#+end_src
 ** Icons
 *** All-the-icons
 
@@ -609,26 +630,31 @@ We have 3 modes that can help centering text in a window. But currently we only 
 
     Note that for pages with variable-pitch fonts,
     =olivetti-body-width= should be set smaller for it to look good.
-                                                                                                                                                                                                                                #+begin_src elisp
-    (use-package olivetti
-    :hook (org-mode . olivetti-mode)
-            (Custom-mode . olivetti-mode)
-            (help-mode . olivetti-mode)
-            (dashboard-mode . olivetti-mode)
-            (dashboard-mode . variable-pitch-mode)
-            (olivetti-mode . visual-line-mode)
-    :config
-        (defun config/adjust-olivetti-body-width ()
-        (when (and (boundp 'mixed-pitch-mode) mixed-pitch-mode)
-            (setq olivetti-body-width 54)))
-
-        (add-hook 'olivetti-mode-hook 'config/adjust-olivetti-body-width)
-
-        (config/leader
-        "tc"  '(olivetti-mode     :wk "󰉠 Center")
-        )
+#+begin_src elisp
+  (use-package olivetti
+  :hook (org-mode . olivetti-mode)
+    (Custom-mode . olivetti-mode)
+    (help-mode . olivetti-mode)
+    (dashboard-mode . olivetti-mode)
+    (dashboard-mode . variable-pitch-mode)
+    (olivetti-mode . visual-line-mode)
+  :init 
+    (setq-default fill-column 90)
+  :config
+    ;If nil (the default), use the value of fill-column + 2.
+    (setq olivetti-body-width nil
+          olivetti-style 'fancy)
+    (set-face-attribute 'olivetti-fringe nil :background "#171B24")
+    (defun config/adjust-olivetti-body-width ()
+      (when (and (boundp 'mixed-pitch-mode) mixed-pitch-mode)
+        (setq olivetti-body-width 54)))
+    (add-hook 'olivetti-mode-hook 'config/adjust-olivetti-body-width)
+    (config/leader
+    "tc"  '(olivetti-mode     :wk "󰉠 Center")
     )
-                                                                                                                                                                                                                                        #+end_src
+  )
+#+end_src
+
 **** Visual-fill-column
 
     [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]]  
@@ -676,15 +702,22 @@ This piece of code is taken from https://emacs-china.org/t/topic/25114/5
 (defalias 'scroll-up-command '+pixel-scroll-interpolate-down)
 (defalias 'scroll-down-command '+pixel-scroll-interpolate-up)
 #+end_src
+
 ** Modeline
+
 [[https://github.com/seagle0128/doom-modeline][Doom-modeline]] is a very attractive and rich (yet still minimal) mode line configuration for Emacs.  The default configuration is quite good but you can check out the [[https://github.com/seagle0128/doom-modeline#customize][configuration options]] for more things you can enable or disable.
 
 #+begin_src elisp
   (use-package doom-modeline
   :init 
-    (setq doom-modeline-height 37)
+    (setq 
+      doom-modeline-height 37
+      doom-modeline-enable-word-count t)
     (doom-modeline-mode 1)
   :config
+    (set-face-attribute 'doom-modeline t
+      :inherit 'variable-pitch
+    )
   )
 #+end_src
 
@@ -694,33 +727,32 @@ This piece of code is taken from https://emacs-china.org/t/topic/25114/5
 
 *** Diminish
 This package implements hiding or abbreviation of the modeline displays (lighters) of minor-modes.  With this package installed, you can add ':diminish' to any use-package block to hide that particular mode in the modeline.
-
 #+begin_src elisp
 (use-package diminish)
 #+end_src
+
 ** Dashboard
 Dashboard is an extensible startup screen showing you recent files, bookmarks, agenda items and an Emacs banner.
 #+begin_src elisp
   (use-package dashboard
   :init
-    (setq initial-buffer-choice 'dashboard-open)
-    (setq dashboard-set-heading-icons t)
-    (setq dashboard-set-file-icons t)
-    ;; show Dashboard in frames created with emacsclient -c
-    (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
-    ;;(setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
-    (setq dashboard-startup-banner (concat user-emacs-directory "assets/EmacsBound.xpm"))  ;; use custom image as banner
-    (setq dashboard-center-content t) ;; set to 't' for centered content
-
-    (setq dashboard-items '(
-          (recents . 5)
-          (agenda . 5 )
-          (bookmarks . 3)
-          (projects . 3)
-          (registers . 3)
-    ))
-
-    ;; (dashboard-modify-heading-icons '((recents . "file-text") (bookmarks . "book")))
+    (setq initial-buffer-choice 'dashboard-open
+          dashboard-image-banner-max-width 1000
+          dashboard-set-heading-icons t
+          dashboard-center-content t ;; set to 't' for centered content
+          dashboard-set-file-icons t
+          initial-buffer-choice 
+            (lambda () (get-buffer-create "*dashboard*"))
+          dashboard-startup-banner ;; use custom image as banner
+            (concat user-emacs-directory "assets/EmacsBound.xpm")
+          dashboard-items '(
+            (recents . 5)
+            (agenda . 5 )
+            (bookmarks . 3)
+            (projects . 3)
+            (registers . 3)
+          )
+    )
   :config
     (dashboard-setup-startup-hook)
   )
@@ -1148,6 +1180,11 @@ Vertico-multiform configures Vertico modes per command or completion category.
            (t posframe)
           )
     )
+    (setq vertico-count 20
+          vertico-posframe-border-width 3
+          vertico-posframe-width 140
+          vertico-resize nil)
+
     ;(vertico-multiform-mode 1)
     ;(vertico-posframe-mode 1)
   )
@@ -1343,8 +1380,12 @@ Vertico-multiform configures Vertico modes per command or completion category.
 [[https://git.tecosaur.net/tec/org-mode][Org-9.7]] (preview) did some overhaul to org-latex-preview in org mode.
 #+begin_src elisp
   (use-package org
-  :config
+  :init
     (setq org-latex-preview-numbered t)
+    (plist-put org-latex-preview-options :zoom 1.25)
+    (let ((pos (assoc 'dvisvgm org-latex-preview-process-alist)))
+      (plist-put (cdr pos) :image-converter '("dvisvgm --page=1- --optimize --clipjoin --relative --no-fonts --bbox=preview -o %B-%%9p.svg %f")))
+  :config
     (add-hook 'org-mode-hook #'turn-on-org-cdlatex)
   )
 #+end_src
@@ -1360,22 +1401,25 @@ According to the installation manual of org, we need to make autoloads before co
           build-step = borg-maketexi
           build-step = borg-makeinfo
 #+end_src
+
 ** UI
 *** Fonts
 
 Change the font size of different org-levels.
-
 #+begin_src elisp
   (use-package org
-;    :hook (org-mode . mixed-pitch-mode)
+    ;    :hook (org-mode . mixed-pitch-mode)
     :config
-    (set-face-attribute 'org-document-title nil :family "Cantarell" :height 2.5 :bold t)
     (set-face-attribute 'org-level-1 nil :family "Cantarell" :height 1.8 )
     (set-face-attribute 'org-level-2 nil :family "Cantarell" :height 1.6 )
     (set-face-attribute 'org-level-3 nil :family "Cantarell" :height 1.4 )
     (set-face-attribute 'org-level-4 nil :family "Cantarell" :height 1.3 )
     (set-face-attribute 'org-level-5 nil :family "Cantarell" :height 1.2 )
     (set-face-attribute 'org-level-6 nil :family "Cantarell" :height 1.1 )
+    (set-face-attribute 'org-document-title nil :family "Cantarell" :height 2.5 :bold t)
+    (set-face-attribute 'org-document-info nil :family "Cantarell" :height 1.8 :bold t)
+    (set-face-attribute 'org-document-info-keyword nil 
+      :foreground "LightSteelBlue4" :inherit 'org-document-info)
   )
 #+end_src
 
@@ -1399,6 +1443,17 @@ Change the font size of different org-levels.
           '("⚀" "⚁" "⚂" "⚃" "⚄" "⚅")
           ;'("☰" "☱" "☲" "☳" "☴" "☵" "☶" "☷")
      )
+     (setq org-modern-list ;; for '+' '-' '*' respectively
+         '((43 . "⯌") (45 . "⮚") (42 . "⊛"))
+     )
+     (setq org-modern-block-name '("⇲ " . "⇱ "))
+     (setq
+       org-modern-block-fringe nil
+       org-modern-keyword nil
+       org-modern-todo nil
+     )
+     (set-face-attribute 'org-modern-block-name nil
+        :inherit 'variable-pitch)
   )
 #+end_src
 
@@ -1496,15 +1551,19 @@ Use org-indent-mode to set different indenting for different levels.
   (use-package evil-org)
 #+end_src
 
-** Code-block
+** Org-block
 #+begin_src elisp
   (use-package org
+  :init
+    (setq electric-indent-mode nil)
   :config
     (setq org-src-tab-acts-natively t)
     (setq org-src-preserve-indentation nil)
+    (set-face-attribute 'org-block t :extend t :inherit 'fixed-pitch)
   )
 #+end_src
 
+*** Code block
 [[https://github.com/yilkalargaw/org-auto-tangle][Org-auto-tangle]] Automatically and Asynchronously tangles org files on save.
 Adding the option =#+auto_tangle: t= in an org file to auto-tangle.
 Or setting the =org-auto-tangle-default= variable to t to configure auto-tangle as the default behavior for all org buffers. In this case, it can be disabled for some buffers by adding =#+auto_tangle:nil=.
@@ -1542,6 +1601,7 @@ Or setting the =org-auto-tangle-default= variable to t to configure auto-tangle 
     (setq org-gtd-update-ack "3.0.0")
   )
 #+end_src
+
 ** Pandoc
 #+begin_src elisp
 ;; (use-package org-pandoc)
@@ -1641,8 +1701,10 @@ Code under :config is taken from https://emacs-china.org/t/org-mode-latex-mode/2
       (advice-add 'org-create-formula-image :around #'org-renumber-environment)
   )
 #+end_src
+
 * Coding
 ** YASnippet
+
 [[https://github.com/joaotavora/yasnippet][YASnippet]] is a template system for Emacs. It allows you to type an abbreviation and automatically expand it into function templates.
 #+begin_src elisp
 (use-package yasnippet
@@ -1651,8 +1713,8 @@ Code under :config is taken from https://emacs-china.org/t/org-mode-latex-mode/2
 )
 #+end_src
 ** AAS
-[[https://github.com/ymarco/auto-activating-snippets][AAS (Auto Activating Snippets)]] implements an engine for auto-expanding snippets. It is done by tracking your inputted chars along a tree until you complete a registered key sequence.
 
+[[https://github.com/ymarco/auto-activating-snippets][AAS (Auto Activating Snippets)]] implements an engine for auto-expanding snippets. It is done by tracking your inputted chars along a tree until you complete a registered key sequence.
 #+begin_src elisp
 (use-package aas
   :hook (LaTeX-mode . aas-activate-for-major-mode)
@@ -1687,12 +1749,17 @@ Code under :config is taken from https://emacs-china.org/t/org-mode-latex-mode/2
     "supp" nil))
 #+end_src
 ** LSP-bridge
+
 [[https://github.com/manateelazycat/lsp-bridge][lsp-bridge]] builds a high-speed cache between Emacs and the LSP server.
 #+begin_src elisp
-(use-package lsp-bridge
+  (use-package lsp-bridge
   :init
-  (global-lsp-bridge-mode)
-)
+    (global-lsp-bridge-mode)
+  :config
+    ;(set-face-attributes 'lsp-bridge-alive-mode-line nil
+    ;  :inherit 'variable-pitch
+    ;)
+  )
 #+end_src
 tweaks to build lsp-bridge
 #+begin_src toml
@@ -1703,6 +1770,7 @@ tweaks to build lsp-bridge
 
 #+end_src
 ** Fingertip
+
 fingertip.el is a plugin that provides grammatical edit base on treesit
 #+begin_src elisp
   (use-package fingertip
@@ -1779,7 +1847,6 @@ fingertip.el is a plugin that provides grammatical edit base on treesit
 #+end_src
 ** Copilot
 https://github.com/zerolfx/copilot.el
-
 
 * Languages
 ** elisp
