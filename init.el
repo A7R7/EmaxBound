@@ -371,7 +371,7 @@
 :custom-face
   (olivetti-fringe ((t (:background "#171B24"))))
 :init 
-  (setq-default fill-column 90)
+  (setq-default fill-column 72)
 :config
   ;If nil (the default), use the value of fill-column + 2.
   (setq olivetti-body-width nil
@@ -947,230 +947,6 @@
   )
 )
 
-(use-package org
-:custom-face
-  (org-latex-and-related ((t (:foreground "LightSteelBlue4" :weight bold))))
-  (org-meta-line ((t (:foreground "LightSteelBlue4"))))
-  (org-special-keyword ((t (:foreground "LightSteelBlue4"))))
-  (org-tag ((t (:foreground "LightSteelBlue4" :weight normal))))
-      :hook (org-mode . mixed-pitch-mode)
-:config
-  (set-face-attribute 'org-level-1 nil :family "Cantarell" :height 1.8 )
-  (set-face-attribute 'org-level-2 nil :family "Cantarell" :height 1.6 )
-  (set-face-attribute 'org-level-3 nil :family "Cantarell" :height 1.4 )
-  (set-face-attribute 'org-level-4 nil :family "Cantarell" :height 1.3 )
-  (set-face-attribute 'org-level-5 nil :family "Cantarell" :height 1.2 )
-  (set-face-attribute 'org-level-6 nil :family "Cantarell" :height 1.1 )
-  (set-face-attribute 'org-document-title nil :family "Cantarell" :height 2.5 :bold t)
-  (set-face-attribute 'org-document-info nil :family "Cantarell" :height 1.8 :bold t)
-  (set-face-attribute 'org-document-info-keyword nil 
-    :foreground "LightSteelBlue4" :inherit 'org-document-info)
-)
-
-(use-package org-modern
-:hook (org-mode . org-modern-mode)
-:config
-   (setq org-modern-keyword
-     (quote (("author" . "⛾")
-             ("title" . "❖")
-             ("subtitle" . "§")
-             ("html" . "󰲋 ")
-             (t . t)))) 
-   (setq org-modern-star
-        ;'("◉" "○" "◈" "◇" "✳")
-        '("⚀" "⚁" "⚂" "⚃" "⚄" "⚅")
-        ;'("☰" "☱" "☲" "☳" "☴" "☵" "☶" "☷")
-   )
-   (setq org-modern-list ;; for '+' '-' '*' respectively
-       '((43 . "⯌") (45 . "⮚") (42 . "⊛"))
-   )
-   (setq org-modern-block-name '("⇲ " . "⇱ "))
-   (setq org-modern-block-fringe nil)
-   (setq org-modern-todo nil)
-   (set-face-attribute 'org-modern-block-name nil
-      :inherit 'variable-pitch)
-)
-
-(use-package org-superstar
-:defer t
-;:hook (org-mode . org-superstar-mode)
-:init
-  (setq
-    ;;org-superstar-headline-bullets-list '("󰇊" "󰇋" "󰇌" "󰇍" "󰇎" "󰇏")
-    org-superstar-special-todo-items t
-    ;;org-ellipsis "  "
-  )
-)
-
-(use-package org-bars
-:defer t
-:commands 'org-bars-mode
-;:hook (org-mode . org-bars-mode)
-:custom-face
-  (org-visual-indent-blank-pipe-face ((t (:background "#1f2430" :foreground "#1f2430" :height 0.1 :width extra-expanded))))
-  (org-visual-indent-pipe-face ((t (:background "slate gray" :foreground "slate gray" :height 0.1))))
-:config
-  (setq org-bars-color-options '(
-        :desaturate-level-faces 100
-        :darken-level-faces 10
-  ))
-  (setq org-bars-extra-pixels-height 25)
-  (setq org-bars-stars '(:empty "" :invisible "" :visible ""))
-)
-
-(use-package org-visual-outline
-:hook (org-mode . org-visual-indent-mode)
-)
-
-(use-package hl-todo
-  :init
-  (hl-todo-mode)
-)
-
-(use-package org-fancy-priorities)
-
-(use-package org-appear
-  :hook (org-mode . org-appear-mode)
-  :init
-  (setq org-appear-autoemphasis  t)
-  ;(setq org-appear-autolinks t)
-  (setq org-appear-autosubmarkers t)
-  ;(setq org-appear-inside-latex t)
-  (setq org-hide-emphasis-markers t)
-)
-
-(use-package evil-org)
-
-(use-package org
-:init
-  (setq electric-indent-mode nil)
-:config
-  (setq org-src-tab-acts-natively t)
-  (setq org-src-preserve-indentation nil)
-  (set-face-attribute 'org-block t :extend t :inherit 'fixed-pitch)
-)
-
-(use-package org-auto-tangle
-:hook (org-mode . org-auto-tangle-mode)
-)
-
-(use-package valign
-:hook (org-mode . valign-mode)
-)
-
-(use-package org-roam
-:after org
-:init
-  (setq org-roam-directory (file-truename "~/roam"))
-  (setq org-roam-v2-ack t)
-)
-
-(use-package org
-:init
-  (setq org-latex-preview-numbered t)
-  (plist-put org-latex-preview-options :zoom 1.25)
-  (let ((pos (assoc 'dvisvgm org-latex-preview-process-alist)))
-    (plist-put (cdr pos) :image-converter '("dvisvgm --page=1- --optimize --clipjoin --relative --no-fonts --bbox=preview -o %B-%%9p.svg %f")))
-:config
-  (add-hook 'org-mode-hook #'turn-on-org-cdlatex)
-)
-
-(use-package org-fragtog
-:config
-    ;; Vertically align LaTeX preview in org mode
-    (defun my-org-latex-preview-advice (beg end &rest _args)
-    (let* ((ov (car (overlays-at (/ (+ beg end) 2) t)))
-            (img (cdr (overlay-get ov 'display)))
-            (new-img (plist-put img :ascent 95)))
-        (overlay-put ov 'display (cons 'image new-img))))
-    (advice-add 'org--make-preview-overlay
-                :after #'my-org-latex-preview-advice)
-
-    ;; from: https://kitchingroup.cheme.cmu.edu/blog/2016/11/06/
-    ;; Justifying-LaTeX-preview-fragments-in-org-mode/
-    ;; specify the justification you want
-    (plist-put org-format-latex-options :justify 'right)
-
-    (defun eli/org-justify-fragment-overlay (beg end image imagetype)
-    (let* ((position (plist-get org-format-latex-options :justify))
-            (img (create-image image 'svg t))
-            (ov (car (overlays-at (/ (+ beg end) 2) t)))
-            (width (car (image-display-size (overlay-get ov 'display))))
-            offset)
-        (cond
-        ((and (eq 'center position) 
-            (= beg (line-beginning-position)))
-        (setq offset (floor (- (/ fill-column 2)
-                                (/ width 2))))
-        (if (< offset 0)
-            (setq offset 0))
-        (overlay-put ov 'before-string (make-string offset ? )))
-        ((and (eq 'right position) 
-            (= beg (line-beginning-position)))
-        (setq offset (floor (- fill-column
-                                width)))
-        (if (< offset 0)
-            (setq offset 0))
-        (overlay-put ov 'before-string (make-string offset ? ))))))
-    (advice-add 'org--make-preview-overlay
-                :after 'eli/org-justify-fragment-overlay)
-
-    ;; from: https://kitchingroup.cheme.cmu.edu/blog/2016/11/07/
-    ;; Better-equation-numbering-in-LaTeX-fragments-in-org-mode/
-    (defun org-renumber-environment (orig-func &rest args)
-    (let ((results '()) 
-            (counter -1)
-            (numberp))
-        (setq results (cl-loop for (begin .  env) in 
-            (org-element-map (org-element-parse-buffer)
-                'latex-environment
-                (lambda (env)
-                (cons
-                    (org-element-property :begin env)
-                    (org-element-property :value env))))
-            collect
-            (cond
-                ((and (string-match "\\\\begin{equation}" env)
-                    (not (string-match "\\\\tag{" env)))
-                (cl-incf counter)
-                (cons begin counter))
-                ((and (string-match "\\\\begin{align}" env)
-                    (string-match "\\\\notag" env))
-                (cl-incf counter)
-                (cons begin counter))
-                ((string-match "\\\\begin{align}" env)
-                (prog2
-                    (cl-incf counter)
-                    (cons begin counter)                          
-                (with-temp-buffer
-                    (insert env)
-                    (goto-char (point-min))
-                    ;; \\ is used for a new line. Each one leads
-                    ;; to a number
-                    (cl-incf counter (count-matches "\\\\$"))
-                    ;; unless there are nonumbers.
-                    (goto-char (point-min))
-                    (cl-decf counter
-                            (count-matches "\\nonumber")))))
-                (t
-                (cons begin nil)))))
-        (when (setq numberp (cdr (assoc (point) results)))
-        (setf (car args)
-                (concat
-                (format "\\setcounter{equation}{%s}\n" numberp)
-                (car args)))))
-    (apply orig-func args))
-    (advice-add 'org-create-formula-image :around #'org-renumber-environment)
-)
-
-(use-package org-gtd
-:after org
-:init
-  (setq org-gtd-update-ack "3.0.0")
-)
-
-;; (use-package org-pandoc)
-
 (use-package yasnippet
   :init
   (yas-global-mode 1)
@@ -1294,6 +1070,243 @@
 )
 
 (use-package auctex)
+
+(use-package laas
+  :hook (LaTeX-mode . laas-mode))
+
+(use-package org
+:custom-face
+  (org-latex-and-related ((t (:foreground "LightSteelBlue4" :weight bold))))
+  (org-meta-line ((t (:foreground "LightSteelBlue4"))))
+  (org-special-keyword ((t (:foreground "LightSteelBlue4"))))
+  (org-tag ((t (:foreground "LightSteelBlue4" :weight normal))))
+:hook (org-mode . mixed-pitch-mode)
+:config
+  (set-face-attribute 'org-level-1 nil 
+      :family "Cantarell" :height 1.8 )
+  (set-face-attribute 'org-level-2 nil 
+      :family "Cantarell" :height 1.6 )
+  (set-face-attribute 'org-level-3 nil 
+      :family "Cantarell" :height 1.4 )
+  (set-face-attribute 'org-level-4 nil 
+      :family "Cantarell" :height 1.3 )
+  (set-face-attribute 'org-level-5 nil 
+      :family "Cantarell" :height 1.2 )
+  (set-face-attribute 'org-level-6 nil 
+      :family "Cantarell" :height 1.1 )
+  (set-face-attribute 'org-document-title nil 
+      :family "Cantarell" :height 2.5 :bold t)
+  (set-face-attribute 'org-document-info nil 
+      :family "Cantarell" :height 1.8 :bold t)
+  (set-face-attribute 'org-document-info-keyword nil 
+    :foreground "LightSteelBlue4" :inherit 'org-document-info)
+)
+
+(use-package org-modern
+:hook (org-mode . org-modern-mode)
+:config
+   (setq org-modern-keyword
+     (quote (("author" . "⛾")
+             ("title" . "❖")
+             ("subtitle" . "§")
+             ("html" . "󰲋 ")
+             (t . t)))) 
+   (setq org-modern-star
+        ;'("◉" "○" "◈" "◇" "✳")
+        '("⚀" "⚁" "⚂" "⚃" "⚄" "⚅")
+        ;'("☰" "☱" "☲" "☳" "☴" "☵" "☶" "☷")
+   )
+   (setq org-modern-list ;; for '+' '-' '*' respectively
+       '((43 . "⯌") (45 . "⮚") (42 . "⊛"))
+   )
+   (setq org-modern-block-name '("⇲ " . "⇱ "))
+   (setq org-modern-block-fringe nil)
+   (setq org-modern-todo nil)
+   (set-face-attribute 'org-modern-block-name nil
+      :inherit 'variable-pitch)
+)
+
+(use-package org-superstar
+:defer t
+;:hook (org-mode . org-superstar-mode)
+:init
+  (setq
+    ;;org-superstar-headline-bullets-list '("󰇊" "󰇋" "󰇌" "󰇍" "󰇎" "󰇏")
+    org-superstar-special-todo-items t
+    ;;org-ellipsis "  "
+  )
+)
+
+(use-package org-bars
+:defer t
+:commands 'org-bars-mode
+;:hook (org-mode . org-bars-mode)
+:custom-face
+  (org-visual-indent-blank-pipe-face ((t (:background "#1f2430" :foreground "#1f2430" :height 0.1 :width extra-expanded))))
+  (org-visual-indent-pipe-face ((t (:background "slate gray" :foreground "slate gray" :height 0.1))))
+:config
+  (setq org-bars-color-options '(
+        :desaturate-level-faces 100
+        :darken-level-faces 10
+  ))
+  (setq org-bars-extra-pixels-height 25)
+  (setq org-bars-stars '(:empty "" :invisible "" :visible ""))
+)
+
+(use-package org-visual-outline
+:hook (org-mode . org-visual-indent-mode)
+)
+
+(use-package hl-todo
+  :init
+  (hl-todo-mode)
+)
+
+(use-package org-fancy-priorities)
+
+(use-package org-appear
+  :hook (org-mode . org-appear-mode)
+  :init
+  (setq org-appear-autoemphasis  t)
+  ;(setq org-appear-autolinks t)
+  (setq org-appear-autosubmarkers t)
+  ;(setq org-appear-inside-latex t)
+  (setq org-hide-emphasis-markers t)
+)
+
+(use-package evil-org)
+
+(use-package org
+:init
+  (setq electric-indent-mode nil)
+:config
+  (setq org-src-tab-acts-natively t)
+  (setq org-src-preserve-indentation nil)
+  (set-face-attribute 'org-block t :extend t :inherit 'fixed-pitch)
+)
+
+(use-package org-auto-tangle
+:hook (org-mode . org-auto-tangle-mode)
+)
+
+(use-package valign
+:hook (org-mode . valign-mode)
+)
+
+(use-package org-roam
+:after org
+:init
+  (setq org-roam-directory (file-truename "~/roam"))
+  (setq org-roam-v2-ack t)
+)
+
+(use-package org
+:init
+  (setq org-element-cache-persistent nil)
+  (setq org-element-use-cache nil)
+  (setq org-latex-preview-numbered t)
+  (plist-put org-latex-preview-options :zoom 1.25)
+  (let ((pos (assoc 'dvisvgm org-latex-preview-process-alist)))
+    (plist-put (cdr pos) :image-converter '("dvisvgm --page=1- --optimize --clipjoin --relative --no-fonts --bbox=preview -o %B-%%9p.svg %f")))
+:config
+  (add-hook 'org-mode-hook #'turn-on-org-cdlatex)
+)
+
+(use-package org-fragtog
+:config
+    ;; Vertically align LaTeX preview in org mode
+    (defun my-org-latex-preview-advice (beg end &rest _args)
+    (let* ((ov (car (overlays-at (/ (+ beg end) 2) t)))
+            (img (cdr (overlay-get ov 'display)))
+            (new-img (plist-put img :ascent 95)))
+        (overlay-put ov 'display (cons 'image new-img))))
+    (advice-add 'org--make-preview-overlay
+                :after #'my-org-latex-preview-advice)
+
+    ;; from: https://kitchingroup.cheme.cmu.edu/blog/2016/11/06/
+    ;; Justifying-LaTeX-preview-fragments-in-org-mode/
+    ;; specify the justification you want
+    (plist-put org-format-latex-options :justify 'right)
+
+    (defun eli/org-justify-fragment-overlay (beg end image imagetype)
+    (let* ((position (plist-get org-format-latex-options :justify))
+            (img (create-image image 'svg t))
+            (ov (car (overlays-at (/ (+ beg end) 2) t)))
+            (width (car (image-display-size (overlay-get ov 'display))))
+            offset)
+        (cond
+        ((and (eq 'center position) 
+            (= beg (line-beginning-position)))
+        (setq offset (floor (- (/ fill-column 2)
+                                (/ width 2))))
+        (if (< offset 0)
+            (setq offset 0))
+        (overlay-put ov 'before-string (make-string offset ? )))
+        ((and (eq 'right position) 
+            (= beg (line-beginning-position)))
+        (setq offset (floor (- fill-column
+                                width)))
+        (if (< offset 0)
+            (setq offset 0))
+        (overlay-put ov 'before-string (make-string offset ? ))))))
+    (advice-add 'org--make-preview-overlay
+                :after 'eli/org-justify-fragment-overlay)
+
+    ;; from: https://kitchingroup.cheme.cmu.edu/blog/2016/11/07/
+    ;; Better-equation-numbering-in-LaTeX-fragments-in-org-mode/
+    (defun org-renumber-environment (orig-func &rest args)
+    (let ((results '()) 
+            (counter -1)
+            (numberp))
+        (setq results (cl-loop for (begin .  env) in 
+            (org-element-map (org-element-parse-buffer)
+                'latex-environment
+                (lambda (env)
+                (cons
+                    (org-element-property :begin env)
+                    (org-element-property :value env))))
+            collect
+            (cond
+                ((and (string-match "\\\\begin{equation}" env)
+                    (not (string-match "\\\\tag{" env)))
+                (cl-incf counter)
+                (cons begin counter))
+                ((and (string-match "\\\\begin{align}" env)
+                    (string-match "\\\\notag" env))
+                (cl-incf counter)
+                (cons begin counter))
+                ((string-match "\\\\begin{align}" env)
+                (prog2
+                    (cl-incf counter)
+                    (cons begin counter)                          
+                (with-temp-buffer
+                    (insert env)
+                    (goto-char (point-min))
+                    ;; \\ is used for a new line. Each one leads
+                    ;; to a number
+                    (cl-incf counter (count-matches "\\\\$"))
+                    ;; unless there are nonumbers.
+                    (goto-char (point-min))
+                    (cl-decf counter
+                            (count-matches "\\nonumber")))))
+                (t
+                (cons begin nil)))))
+        (when (setq numberp (cdr (assoc (point) results)))
+        (setf (car args)
+                (concat
+                (format "\\setcounter{equation}{%s}\n" numberp)
+                (car args)))))
+    (apply orig-func args))
+    (advice-add 'org-create-formula-image :around #'org-renumber-environment)
+)
+
+(use-package org-gtd
+:after org
+:init
+  (setq org-gtd-update-ack "3.0.0")
+)
+
+;; (use-package org-pandoc)
 
 (use-package elfeed
 :config

@@ -163,9 +163,6 @@
 [submodule "js2-mode"]
 	path = lib/js2-mode
 	url = https://github.com/mooz/js2-mode
-[submodule "laas"]
-	path = lib/laas
-	url = https://github.com/tecosaur/LaTeX-auto-activating-snippets
 [submodule "leaf"]
 	path = lib/leaf
 	url = https://github.com/conao3/leaf.el
@@ -376,6 +373,9 @@
 [submodule "vscode-icon"]
 	path = lib/vscode-icon
 	url = https://github.com/jojojames/vscode-icon-emacs
+[submodule "vterm"]
+	path = lib/vterm
+	url = https://github.com/akermu/emacs-libvterm
 [submodule "vundo"]
 	path = lib/vundo
 	url = https://github.com/casouri/vundo

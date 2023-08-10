@@ -48,10 +48,10 @@ Check [[https://emacsmirror.net/manual/borg/Bootstrapping-using-a-seed.html][Boo
 
 - Firstly, I generated the structure from the seed.
 - Then, I copied and pasted all the original code from init.el and early-init.el to this org file.
-- Last, most further config does not go beyond the following 2 steps:
+- Last, most further config does not go beyond the following 3 steps:
   + Run [[elisp: borg-assimilate][M-x borg-assimilate]] and input the name of the package to install this package.
-  + Write config codes into this org file, then run [[elisp:org-babel-tangle][M-x org-babel-tangle]] so that emacs writes the codes into the corresponding file.
-  + For some packages, specify its load path or build method in ~.borgconfig~ for them to be load or built as expected.
+  + Write config codes into this org file, then run [[elisp:org-babel-tangle][M-x org-babel-tangle]] so that emacs writes the codes into the corresponding file. (Tangle is done automatically on save)
+  + For some packages, specify its load path or build method in ~.borgconfig~ for them to be load or built as expected. This is auto tangled as well.
 
 ** References
 -  [[https://github.com/lccambiaghi/vanilla-emacs][Luca's vanilla-emacs]] (2023) detailed org config file.
@@ -670,7 +670,7 @@ We have 3 modes that can help centering text in a window. But currently we only 
   :custom-face
     (olivetti-fringe ((t (:background "#171B24"))))
   :init 
-    (setq-default fill-column 90)
+    (setq-default fill-column 72)
   :config
     ;If nil (the default), use the value of fill-column + 2.
     (setq olivetti-body-width nil
@@ -1428,6 +1428,196 @@ Vertico-multiform configures Vertico modes per command or completion category.
 #+end_src
 ** Popweb 
 
+* Coding
+** YASnippet
+
+[[https://github.com/joaotavora/yasnippet][YASnippet]] is a template system for Emacs. It allows you to type an abbreviation and automatically expand it into function templates.
+#+begin_src elisp
+(use-package yasnippet
+  :init
+  (yas-global-mode 1)
+)
+#+end_src
+
+** AAS
+
+[[https://github.com/ymarco/auto-activating-snippets][AAS (Auto Activating Snippets)]] implements an engine for auto-expanding snippets. It is done by tracking your inputted chars along a tree until you complete a registered key sequence.
+#+begin_src elisp
+(use-package aas
+  :hook (LaTeX-mode . aas-activate-for-major-mode)
+  :hook (org-mode . aas-activate-for-major-mode)
+  :config
+  (aas-set-snippets 'text-mode
+    ;; expand unconditionally
+    ";o-" "ō"
+    ";i-" "ī"
+    ";a-" "ā"
+    ";u-" "ū"
+    ";e-" "ē")
+  (aas-set-snippets 'latex-mode
+    ;; set condition!
+    :cond #'texmathp ; expand only while in math
+    "supp" "\\supp"
+    "On" "O(n)"
+    "O1" "O(1)"
+    "Olog" "O(\\log n)"
+    "Olon" "O(n \\log n)"
+    ;; Use YAS/Tempel snippets with ease!
+    "amin" '(yas "\\argmin_{$1}") ; YASnippet snippet shorthand form
+    "amax" '(tempel "\\argmax_{" p "}") ; Tempel snippet shorthand form
+    ;; bind to functions!
+    ";ig" #'insert-register
+    ";call-sin"
+    (lambda (angle) ; Get as fancy as you like
+      (interactive "sAngle: ")
+      (insert (format "%s" (sin (string-to-number angle))))))
+  ;; disable snippets by redefining them with a nil expansion
+  (aas-set-snippets 'latex-mode
+    "supp" nil))
+#+end_src
+
+** LSP-bridge
+
+[[https://github.com/manateelazycat/lsp-bridge][lsp-bridge]] builds a high-speed cache between Emacs and the LSP server.
+#+begin_src elisp
+  (use-package lsp-bridge
+  :init
+    (global-lsp-bridge-mode)
+  :config
+    ;(set-face-attributes 'lsp-bridge-alive-mode-line nil
+    ;  :inherit 'variable-pitch
+    ;)
+  )
+#+end_src
+tweaks to build lsp-bridge
+#+begin_src toml
+[submodule "lsp-bridge"]
+  load-path = .
+  load-path = acm
+  load-path = core
+#+end_src
+
+** Fingertip
+
+fingertip.el is a plugin that provides grammatical edit base on treesit
+#+begin_src elisp
+  (use-package fingertip
+  :config
+    (dolist (hook (list
+                'c-mode-common-hook 'c-mode-hook 'c++-mode-hook
+                'c-ts-mode-hook 'c++-ts-mode-hook
+                'cmake-ts-mode-hook
+                'java-mode-hook
+                'haskell-mode-hook
+                'emacs-lisp-mode-hook 'lisp-interaction-mode-hook 'lisp-mode-hook
+                'maxima-mode-hook
+                'ielm-mode-hook
+                'bash-ts-mode-hook 'sh-mode-hook
+                'makefile-gmake-mode-hook
+                'php-mode-hook
+                'python-mode-hook 'python-ts-mode-hook
+                'js-mode-hook
+                'go-mode-hook
+                'qml-mode-hook
+                'jade-mode-hook
+                'css-mode-hook 'css-ts-mode-hook
+                'ruby-mode-hook
+                'coffee-mode-hook
+                'rust-mode-hook 'rust-ts-mode-hook
+                'qmake-mode-hook
+                'lua-mode-hook
+                'swift-mode-hook
+                'web-mode-hook
+                'markdown-mode-hook
+                'llvm-mode-hook
+                'conf-toml-mode-hook 'toml-ts-mode-hook
+                'nim-mode-hook
+                'typescript-mode-hook 'typescript-ts-mode-hook
+                'js-ts-mode-hook 'json-ts-mode-hook
+                ))
+    (add-hook hook #'(lambda () (fingertip-mode 1))))
+    (general-def 
+      :keymaps 'fingertip-mode-map
+        "(" 'fingertip-open-round
+        "[" 'fingertip-open-bracket
+        "{" 'fingertip-open-curly
+        ")" 'fingertip-close-round
+        "]" 'fingertip-close-bracket
+        "}" 'fingertip-close-curly
+        "=" 'fingertip-equal
+
+        "%" 'fingertip-match-paren
+        "\"" 'fingertip-double-quote
+        "'" 'fingertip-single-quote
+
+        "SPC" 'fingertip-space
+        "RET" 'fingertip-newline
+
+        "M-o" 'fingertip-backward-delete
+        "C-d" 'fingertip-forward-delete
+        "C-k" 'fingertip-kill
+
+        "M-\"" 'fingertip-wrap-double-quote
+        "M-'" 'fingertip-wrap-single-quote
+        "M-[" 'fingertip-wrap-bracket
+        "M-{" 'fingertip-wrap-curly
+        "M-(" 'fingertip-wrap-round
+        "M-)" 'fingertip-unwrap
+
+        "M-p" 'fingertip-jump-right
+        "M-n" 'fingertip-jump-left
+        "M-:" 'fingertip-jump-out-pair-and-newline
+
+        "C-j" 'fingertip-jump-up
+    )
+  )
+
+#+end_src
+
+** Copilot
+https://github.com/zerolfx/copilot.el
+
+* Languages
+** elisp
+- buttercup
+- elisp-def
+- elisp-demos
+- [[highlight-quoted]]
+- macrostep
+- oversee
+** LaTeX
+*** AUCTeX
+#+begin_src elisp
+  (use-package lsp-bridge
+  :config
+    (setq lsp-bridge-tex-lsp-server "digestif")
+  )
+#+end_src
+#+begin_src elisp
+(use-package auctex)
+#+end_src
+AucTex needs some tweaks to be built.
+#+begin_src toml :tangle .borgconfig
+[submodule "auctex"]
+	load-path = .
+	build-step = ./autogen.sh
+	build-step = ./configure
+	build-step = make
+	build-step = make doc
+	build-step = borg-maketexi
+	build-step = borg-makeinfo
+	build-step = borg-update-autoloads
+#+end_src
+*** CDTeX
+
+*** LAAS
+[[https://github.com/tecosaur/LaTeX-auto-activating-snippets][LASS (LaTeX Auto Activating Snippets)]] is a chunky set of LaTeX snippets for the auto-activating-snippets engine.
+
+#+begin_src elisp
+(use-package laas
+  :hook (LaTeX-mode . laas-mode))
+#+end_src
+
 * Org
 ** UI
 *** Fonts
@@ -1440,16 +1630,24 @@ Change the font size of different org-levels.
     (org-meta-line ((t (:foreground "LightSteelBlue4"))))
     (org-special-keyword ((t (:foreground "LightSteelBlue4"))))
     (org-tag ((t (:foreground "LightSteelBlue4" :weight normal))))
-        :hook (org-mode . mixed-pitch-mode)
+  :hook (org-mode . mixed-pitch-mode)
   :config
-    (set-face-attribute 'org-level-1 nil :family "Cantarell" :height 1.8 )
-    (set-face-attribute 'org-level-2 nil :family "Cantarell" :height 1.6 )
-    (set-face-attribute 'org-level-3 nil :family "Cantarell" :height 1.4 )
-    (set-face-attribute 'org-level-4 nil :family "Cantarell" :height 1.3 )
-    (set-face-attribute 'org-level-5 nil :family "Cantarell" :height 1.2 )
-    (set-face-attribute 'org-level-6 nil :family "Cantarell" :height 1.1 )
-    (set-face-attribute 'org-document-title nil :family "Cantarell" :height 2.5 :bold t)
-    (set-face-attribute 'org-document-info nil :family "Cantarell" :height 1.8 :bold t)
+    (set-face-attribute 'org-level-1 nil 
+        :family "Cantarell" :height 1.8 )
+    (set-face-attribute 'org-level-2 nil 
+        :family "Cantarell" :height 1.6 )
+    (set-face-attribute 'org-level-3 nil 
+        :family "Cantarell" :height 1.4 )
+    (set-face-attribute 'org-level-4 nil 
+        :family "Cantarell" :height 1.3 )
+    (set-face-attribute 'org-level-5 nil 
+        :family "Cantarell" :height 1.2 )
+    (set-face-attribute 'org-level-6 nil 
+        :family "Cantarell" :height 1.1 )
+    (set-face-attribute 'org-document-title nil 
+        :family "Cantarell" :height 2.5 :bold t)
+    (set-face-attribute 'org-document-info nil 
+        :family "Cantarell" :height 1.8 :bold t)
     (set-face-attribute 'org-document-info-keyword nil 
       :foreground "LightSteelBlue4" :inherit 'org-document-info)
   )
@@ -1631,6 +1829,8 @@ Or setting the =org-auto-tangle-default= variable to t to configure auto-tangle 
 #+begin_src elisp
   (use-package org
   :init
+    (setq org-element-cache-persistent nil)
+    (setq org-element-use-cache nil)
     (setq org-latex-preview-numbered t)
     (plist-put org-latex-preview-options :zoom 1.25)
     (let ((pos (assoc 'dvisvgm org-latex-preview-process-alist)))
@@ -1747,185 +1947,6 @@ Code under :config is taken from https://emacs-china.org/t/org-mode-latex-mode/2
 #+begin_src elisp
 ;; (use-package org-pandoc)
 #+end_src
-
-* Coding
-** YASnippet
-
-[[https://github.com/joaotavora/yasnippet][YASnippet]] is a template system for Emacs. It allows you to type an abbreviation and automatically expand it into function templates.
-#+begin_src elisp
-(use-package yasnippet
-  :init
-  (yas-global-mode 1)
-)
-#+end_src
-** AAS
-
-[[https://github.com/ymarco/auto-activating-snippets][AAS (Auto Activating Snippets)]] implements an engine for auto-expanding snippets. It is done by tracking your inputted chars along a tree until you complete a registered key sequence.
-#+begin_src elisp
-(use-package aas
-  :hook (LaTeX-mode . aas-activate-for-major-mode)
-  :hook (org-mode . aas-activate-for-major-mode)
-  :config
-  (aas-set-snippets 'text-mode
-    ;; expand unconditionally
-    ";o-" "ō"
-    ";i-" "ī"
-    ";a-" "ā"
-    ";u-" "ū"
-    ";e-" "ē")
-  (aas-set-snippets 'latex-mode
-    ;; set condition!
-    :cond #'texmathp ; expand only while in math
-    "supp" "\\supp"
-    "On" "O(n)"
-    "O1" "O(1)"
-    "Olog" "O(\\log n)"
-    "Olon" "O(n \\log n)"
-    ;; Use YAS/Tempel snippets with ease!
-    "amin" '(yas "\\argmin_{$1}") ; YASnippet snippet shorthand form
-    "amax" '(tempel "\\argmax_{" p "}") ; Tempel snippet shorthand form
-    ;; bind to functions!
-    ";ig" #'insert-register
-    ";call-sin"
-    (lambda (angle) ; Get as fancy as you like
-      (interactive "sAngle: ")
-      (insert (format "%s" (sin (string-to-number angle))))))
-  ;; disable snippets by redefining them with a nil expansion
-  (aas-set-snippets 'latex-mode
-    "supp" nil))
-#+end_src
-** LSP-bridge
-
-[[https://github.com/manateelazycat/lsp-bridge][lsp-bridge]] builds a high-speed cache between Emacs and the LSP server.
-#+begin_src elisp
-  (use-package lsp-bridge
-  :init
-    (global-lsp-bridge-mode)
-  :config
-    ;(set-face-attributes 'lsp-bridge-alive-mode-line nil
-    ;  :inherit 'variable-pitch
-    ;)
-  )
-#+end_src
-tweaks to build lsp-bridge
-#+begin_src toml
-[submodule "lsp-bridge"]
-  load-path = .
-  load-path = acm
-  load-path = core
-
-#+end_src
-** Fingertip
-
-fingertip.el is a plugin that provides grammatical edit base on treesit
-#+begin_src elisp
-  (use-package fingertip
-  :config
-    (dolist (hook (list
-                'c-mode-common-hook 'c-mode-hook 'c++-mode-hook
-                'c-ts-mode-hook 'c++-ts-mode-hook
-                'cmake-ts-mode-hook
-                'java-mode-hook
-                'haskell-mode-hook
-                'emacs-lisp-mode-hook 'lisp-interaction-mode-hook 'lisp-mode-hook
-                'maxima-mode-hook
-                'ielm-mode-hook
-                'bash-ts-mode-hook 'sh-mode-hook
-                'makefile-gmake-mode-hook
-                'php-mode-hook
-                'python-mode-hook 'python-ts-mode-hook
-                'js-mode-hook
-                'go-mode-hook
-                'qml-mode-hook
-                'jade-mode-hook
-                'css-mode-hook 'css-ts-mode-hook
-                'ruby-mode-hook
-                'coffee-mode-hook
-                'rust-mode-hook 'rust-ts-mode-hook
-                'qmake-mode-hook
-                'lua-mode-hook
-                'swift-mode-hook
-                'web-mode-hook
-                'markdown-mode-hook
-                'llvm-mode-hook
-                'conf-toml-mode-hook 'toml-ts-mode-hook
-                'nim-mode-hook
-                'typescript-mode-hook 'typescript-ts-mode-hook
-                'js-ts-mode-hook 'json-ts-mode-hook
-                ))
-    (add-hook hook #'(lambda () (fingertip-mode 1))))
-    (general-def 
-      :keymaps 'fingertip-mode-map
-        "(" 'fingertip-open-round
-        "[" 'fingertip-open-bracket
-        "{" 'fingertip-open-curly
-        ")" 'fingertip-close-round
-        "]" 'fingertip-close-bracket
-        "}" 'fingertip-close-curly
-        "=" 'fingertip-equal
-
-        "%" 'fingertip-match-paren
-        "\"" 'fingertip-double-quote
-        "'" 'fingertip-single-quote
-
-        "SPC" 'fingertip-space
-        "RET" 'fingertip-newline
-
-        "M-o" 'fingertip-backward-delete
-        "C-d" 'fingertip-forward-delete
-        "C-k" 'fingertip-kill
-
-        "M-\"" 'fingertip-wrap-double-quote
-        "M-'" 'fingertip-wrap-single-quote
-        "M-[" 'fingertip-wrap-bracket
-        "M-{" 'fingertip-wrap-curly
-        "M-(" 'fingertip-wrap-round
-        "M-)" 'fingertip-unwrap
-
-        "M-p" 'fingertip-jump-right
-        "M-n" 'fingertip-jump-left
-        "M-:" 'fingertip-jump-out-pair-and-newline
-
-        "C-j" 'fingertip-jump-up
-    )
-  )
-
-#+end_src
-** Copilot
-https://github.com/zerolfx/copilot.el
-
-* Languages
-** elisp
-- buttercup
-- elisp-def
-- elisp-demos
-- [[highlight-quoted]]
-- macrostep
-- oversee
-** LaTeX
-*** AUCTeX
-#+begin_src elisp
-  (use-package lsp-bridge
-  :config
-    (setq lsp-bridge-tex-lsp-server "digestif")
-  )
-#+end_src
-#+begin_src elisp
-(use-package auctex)
-#+end_src
-AucTex needs some tweaks to be built.
-#+begin_src toml :tangle .borgconfig
-[submodule "auctex"]
-	load-path = .
-	build-step = ./autogen.sh
-	build-step = ./configure
-	build-step = make
-	build-step = make doc
-	build-step = borg-maketexi
-	build-step = borg-makeinfo
-	build-step = borg-update-autoloads
-#+end_src
-*** CDTeX
 
 * Emacs OS
 ** Elfeed
