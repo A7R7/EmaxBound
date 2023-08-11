@@ -13,10 +13,20 @@
      "http://www.50ply.com/atom.xml"
      ("http://nedroid.com/feed/" webcomic)))
  '(mixed-pitch-fixed-pitch-faces
-   '(diff-added diff-context diff-file-header diff-function diff-header diff-hunk-header diff-removed font-latex-math-face font-latex-sedate-face font-latex-warning-face font-latex-sectioning-5-face font-lock-builtin-face font-lock-comment-delimiter-face font-lock-constant-face font-lock-doc-face font-lock-function-name-face font-lock-keyword-face font-lock-negation-char-face font-lock-preprocessor-face font-lock-regexp-grouping-backslash font-lock-regexp-grouping-construct font-lock-string-face font-lock-type-face font-lock-variable-name-face line-number line-number-current-line line-number-major-tick line-number-minor-tick markdown-code-face markdown-gfm-checkbox-face markdown-inline-code-face markdown-language-info-face markdown-language-keyword-face markdown-math-face message-header-name message-header-to message-header-cc message-header-newsgroups message-header-xheader message-header-subject message-header-other mu4e-header-key-face mu4e-header-value-face mu4e-link-face mu4e-contact-face mu4e-compose-separator-face mu4e-compose-header-face org-block org-document-info-keyword org-code org-indent org-latex-and-related org-checkbox org-formula org-meta-line org-special-keyword org-table org-verbatim)))
+   '(diff-added diff-context diff-file-header diff-function diff-header diff-hunk-header diff-removed font-latex-math-face font-latex-sedate-face font-latex-warning-face font-latex-sectioning-5-face font-lock-builtin-face font-lock-comment-delimiter-face font-lock-constant-face font-lock-doc-face font-lock-function-name-face font-lock-keyword-face font-lock-negation-char-face font-lock-preprocessor-face font-lock-regexp-grouping-backslash font-lock-regexp-grouping-construct font-lock-string-face font-lock-type-face font-lock-variable-name-face line-number line-number-current-line line-number-major-tick line-number-minor-tick markdown-code-face markdown-gfm-checkbox-face markdown-inline-code-face markdown-language-info-face markdown-language-keyword-face markdown-math-face message-header-name message-header-to message-header-cc message-header-newsgroups message-header-xheader message-header-subject message-header-other mu4e-header-key-face mu4e-header-value-face mu4e-link-face mu4e-contact-face mu4e-compose-separator-face mu4e-compose-header-face org-block org-document-info-keyword org-code org-indent org-latex-and-related org-checkbox org-formula org-meta-line org-special-keyword org-table org-verbatim))
+ '(mixed-pitch-set-height nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(outline-2 ((t (:extend t :foreground "#b0b0ff" :weight bold)))))
+ '(default ((t (:inherit nil :extend nil :stipple nil :background "#1f2430" :foreground "#c9cfcf" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight regular :height 181 :width normal :foundry "GOOG" :family "RobotoMono Nerd Font"))))
+ '(dashboard-items-face ((t nil)))
+ '(dashboard-no-items-face ((t (:inherit dashboard-items-face))))
+ '(org-block-begin-line ((t (:foreground "#353d5d" :extend t :inherit variable-pitch))))
+ '(org-block-end-line ((t (:extend t :inherit org-block-begin-line))))
+ '(org-meta-line ((t (:foreground "LightSteelBlue4" :height 0.8))))
+ '(org-modern-horizontal-rule ((t (:strike-through "LightSteelBlue4" :inherit org-hide))))
+ '(org-table ((t (:foreground "#bccbff"))))
+ '(outline-2 ((t (:extend t :foreground "#b0baff" :weight bold))))
+ '(variable-pitch ((t (:slant normal :weight regular :height 180 :width normal :family "Sarasa Gothic SC")))))

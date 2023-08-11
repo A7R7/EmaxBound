@@ -20,19 +20,17 @@
 
 * Screenshots
 #+HTML:<img alt="Dashboard" src="assets/dashboard.png" width="100%">
-#+HTML:<img alt="Org Mode" src="assets/org_mode.png" width="80%" style="box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">
+#+HTML:<img alt="Org Mode" src="assets/org_mode.png" width="80%">
 * Introduction
 ** How to deploy this config
 
 This config file is still in its early stages of development, *Everything is unstable!*
 To play around with my config files, clone this repo anywhere you like on your system.
-
 #+begin_src bash
 git clone --depth=1 https://github.com/A7R7/EmaxBound.git
 #+end_src
 
 Then, simply execute these make rules inside the repo directory.
-
 #+begin_src bash
 make bootstrap-borg  # bootstrap borg itself
 make bootstrap       # bootstrap collective or new drones
@@ -63,7 +61,7 @@ Check [[https://emacsmirror.net/manual/borg/Bootstrapping-using-a-seed.html][Boo
 -  [[https://github.com/doomemacs/doomemacs][Doom Emacs]] (2023) Some best practices.
 *NOTE*: the year number after link equals to
 - =min (last time the config get's updated, last time I refered to the config)=
-
+  
 * Earliest birds
 
 *NOTE*: codes under this heading are tangled to early-init.el
@@ -323,7 +321,6 @@ We setup keybinding framworks and basic keybindings at this place. Note that not
   )
 #+end_src
 
-
 ** Meow
 #+begin_src elisp
   (use-package meow
@@ -549,16 +546,16 @@ Defining the various fonts that Emacs will use.
     :font "RobotoMono Nerd Font"
     ;:font "Sarasa Term SC Nerd"
     ;:font "Sarasa Gothic SC"
-    :height 155
+    :height 180
   )
   (set-face-attribute 'variable-pitch nil
     :font "Sarasa Gothic SC"
     :height 180
   )
   (set-face-attribute 'fixed-pitch nil
-    ;:font "Sarasa Fixed SC"
-    :font "RobotoMono Nerd Font"
-    :height 155
+    :font "Sarasa Fixed SC"
+    ;:font "RobotoMono Nerd Font"
+    :height 180
   )
   (set-face-attribute 'fixed-pitch-serif t
     :family "Monospace Serif"
@@ -568,15 +565,15 @@ Defining the various fonts that Emacs will use.
 
 Makes commented text and keywords italics. Working in emacsclient but not emacs.
 #+begin_src elisp
-(set-face-attribute 'font-lock-comment-face nil 
-  :foreground "LightSteelBlue4" :slant 'italic)
-(set-face-attribute 'font-lock-keyword-face nil :slant 'italic)
+  (set-face-attribute 'font-lock-comment-face nil 
+    :foreground "LightSteelBlue4" :slant 'italic)
+  (set-face-attribute 'font-lock-keyword-face nil :slant 'italic)
 #+end_src
 
 links
-
 #+begin_src elisp
-(set-face-attribute 'link nil :foreground "#ffcc66" :underline t :bold nil)
+  (set-face-attribute 'link nil 
+    :foreground "#ffcc66" :underline t :bold nil)
 #+end_src
 
 *** Zooming In/Out
@@ -613,7 +610,7 @@ Personally I prefer fixed-pitch-mode.
 
 [[https://github.com/domtronn/all-the-icons.el][All-the-icons]] is an icon set that can be used with dashboard, dired, ibuffer and other Emacs programs.
 
-#+begin_src emacs-lisp
+#+begin_src elisp
 (use-package all-the-icons
   :ensure t
   :if (display-graphic-p))
@@ -663,7 +660,7 @@ We have 3 modes that can help centering text in a window. But currently we only 
   :custom-face
     (olivetti-fringe ((t (:background "#171B24"))))
   :init 
-    (setq-default fill-column 72)
+    (setq-default fill-column 74)
   :config
     ;If nil (the default), use the value of fill-column + 2.
     (setq olivetti-body-width nil
@@ -691,7 +688,7 @@ We have 3 modes that can help centering text in a window. But currently we only 
 [[https://github.com/trevorpogue/topspace][Topspace]] recenter line 1 with scrollable upper margin/padding
 #+begin_src elisp
   (use-package topspace
-  :hook (dashboard-mode . topspace-mode)
+  :init (global-topspace-mode)
   )
 #+end_src
 
@@ -803,7 +800,7 @@ Dashboard is an extensible startup screen showing you recent files, bookmarks, a
       )
       (centaur-tabs-mode t)
     :config
-      (centaur-tabs-change-fonts "Cantarell" 160)
+      (centaur-tabs-change-fonts "Sarasa Gothic SC" 160)
       ;; (centaur-tabs-headline-match)
       ;; (centaur-tabs-group-by-projectile-project)
 
@@ -1047,6 +1044,8 @@ Dropin replacement for dired.
   (use-package dirvish
   :init
     (dirvish-override-dired-mode)
+  :hook
+    (dired-mode . solaire-mode)
   :custom
     (dirvish-quick-access-entries ;`setq' won't work for custom
       '(("h" "~/"                          "Home")
@@ -1606,6 +1605,15 @@ AucTex needs some tweaks to be built.
 #+end_src
 
 * Org
+** Kbd
+*** Evil-org
+#+begin_src elisp
+  (use-package evil-org
+  :after org
+  :hook (org-mode . evil-org-mode)
+  )
+#+end_src
+
 ** UI
 *** Fonts
 
@@ -1620,23 +1628,25 @@ Change the font size of different org-levels.
   :hook (org-mode . mixed-pitch-mode)
   :config
     (set-face-attribute 'org-level-1 nil 
-        :family "Cantarell" :height 1.8 )
+        :family "Sarasa Gothic SC" :height 1.8 )
     (set-face-attribute 'org-level-2 nil 
-        :family "Cantarell" :height 1.6 )
+        :family "Sarasa Gothic SC" :height 1.6 )
     (set-face-attribute 'org-level-3 nil 
-        :family "Cantarell" :height 1.4 )
+        :family "Sarasa Gothic SC" :height 1.4 )
     (set-face-attribute 'org-level-4 nil 
-        :family "Cantarell" :height 1.3 )
+        :family "Sarasa Gothic SC" :height 1.3 )
     (set-face-attribute 'org-level-5 nil 
-        :family "Cantarell" :height 1.2 )
+        :family "Sarasa Gothic SC" :height 1.2 )
     (set-face-attribute 'org-level-6 nil 
-        :family "Cantarell" :height 1.1 )
+        :family "Sarasa Gothic SC" :height 1.1 )
     (set-face-attribute 'org-document-title nil 
-        :family "Cantarell" :height 2.5 :bold t)
+        :family "Sarasa Gothic SC" :height 2.5 :bold t)
     (set-face-attribute 'org-document-info nil 
-        :family "Cantarell" :height 1.8 :bold t)
+        :family "Sarasa Gothic SC" :height 1.8 :bold t)
     (set-face-attribute 'org-document-info-keyword nil 
       :foreground "LightSteelBlue4" :inherit 'org-document-info)
+    (set-face-attribute 'org-block t 
+      :extend t :inherit 'fixed-pitch)
   )
 #+end_src
 
@@ -1662,11 +1672,12 @@ Change the font size of different org-levels.
      (setq org-modern-list ;; for '+' '-' '*' respectively
          '((43 . "⯌") (45 . "⮚") (42 . "⊛"))
      )
-     (setq org-modern-block-name '("⇲ " . "⇱ "))
      (setq org-modern-block-fringe nil)
      (setq org-modern-todo nil)
+     (setq org-modern-block-name '("⇲ " . "⇱ "))
      (set-face-attribute 'org-modern-block-name nil
         :inherit 'variable-pitch)
+     (setq org-modern-table nil)
   )
 #+end_src
 
@@ -1719,23 +1730,19 @@ Have drawbacks when using mixed-pitch-mode.
   )
 #+end_src
 
-*** Text arrangement
+*** valign
 
-Use [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]] to center =org-mode= buffers for a more pleasing writing experience as it centers the contents of the buffer horizontally to seem more like you are editing a document.
-Use visual-line-mode to wrap text.
-Use org-indent-mode to set different indenting for different levels.
-
-#+begin_src elisp :tangle no
-    (add-hook 'org-mode-hook
-      (defun config/org-mode-text-arrangement ()
-        (config/window-center 100)
-        (org-indent-mode)
-  ;      (variable-pitch-mode 1)
-      )
-    )
+This package provides visual alignment for Org Mode, Markdown and table.el tables on GUI Emacs. It can properly align tables containing variable-pitch font, CJK characters and images. Meanwhile, the text-based alignment generated by Org mode (or Markdown mode) is left untouched.
+#+begin_src elisp
+  (use-package valign
+  :hook (org-mode . valign-mode)
+  :config
+    (setq valign-fancy-bar t)
+  )
 #+end_src
 
 *** Highlight TODO
+
 #+begin_src elisp
   (use-package hl-todo
     :init
@@ -1762,13 +1769,9 @@ Use org-indent-mode to set different indenting for different levels.
   )
 #+end_src
 
-** Kbd
-*** Evil-org
-#+begin_src elisp
-  (use-package evil-org)
-#+end_src
+** Blocks
 
-** Org-block
+*** Code block
 #+begin_src elisp
   (use-package org
   :init
@@ -1776,11 +1779,8 @@ Use org-indent-mode to set different indenting for different levels.
   :config
     (setq org-src-tab-acts-natively t)
     (setq org-src-preserve-indentation nil)
-    (set-face-attribute 'org-block t :extend t :inherit 'fixed-pitch)
   )
 #+end_src
-
-*** Code block
 
 [[https://github.com/yilkalargaw/org-auto-tangle][Org-auto-tangle]] Automatically and Asynchronously tangles org files on save.
 Adding the option =#+auto_tangle: t= in an org file to auto-tangle.
@@ -1791,13 +1791,10 @@ Or setting the =org-auto-tangle-default= variable to t to configure auto-tangle 
   )
 #+end_src
 
-** Table-block
+*** Table-block
 [[https://github.com/casouri/valign][Valign]] provides visual alignment for Org Mode, Markdown and table.el tables on GUI Emacs. It can properly align tables containing variable-pitch font, CJK characters and images. Meanwhile, the text-based alignment generated by Org mode (or Markdown mode) is left untouched.
-#+begin_src elisp
-  (use-package valign
-  :hook (org-mode . valign-mode)
-  )
-#+end_src
+Disabled cause org-modern already does the job.
+
 [[https://github.com/tbanel/orgaggregate][Orgtbl-aggregate]] can creat a new table by computing sums, averages, and so on, out of material from the first table.
 
 ** Roam
@@ -2031,6 +2028,8 @@ tweaks to build eaf
     + GTD
     
 - Posframe for magit and others
-- Line number format: see https://emacs.stackexchange.com/questions/52269/how-to-change-line-number-gutter-width-using-display-line-numbers-mode
+- Line number format: see
+ https://emacs.stackexchange.com/questions/52269/how-to-change-line-number-gutter-width-using-display-line-numbers-mode
+
   
 - Dirvish and olivetti-mode compativity

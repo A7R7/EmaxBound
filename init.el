@@ -301,16 +301,16 @@
   :font "RobotoMono Nerd Font"
   ;:font "Sarasa Term SC Nerd"
   ;:font "Sarasa Gothic SC"
-  :height 155
+  :height 180
 )
 (set-face-attribute 'variable-pitch nil
   :font "Sarasa Gothic SC"
   :height 180
 )
 (set-face-attribute 'fixed-pitch nil
-  ;:font "Sarasa Fixed SC"
-  :font "RobotoMono Nerd Font"
-  :height 155
+  :font "Sarasa Fixed SC"
+  ;:font "RobotoMono Nerd Font"
+  :height 180
 )
 (set-face-attribute 'fixed-pitch-serif t
   :family "Monospace Serif"
@@ -321,7 +321,8 @@
   :foreground "LightSteelBlue4" :slant 'italic)
 (set-face-attribute 'font-lock-keyword-face nil :slant 'italic)
 
-(set-face-attribute 'link nil :foreground "#ffcc66" :underline t :bold nil)
+(set-face-attribute 'link nil 
+  :foreground "#ffcc66" :underline t :bold nil)
 
 (use-package emacs
   :init 
@@ -364,7 +365,7 @@
 :custom-face
   (olivetti-fringe ((t (:background "#171B24"))))
 :init 
-  (setq-default fill-column 72)
+  (setq-default fill-column 74)
 :config
   ;If nil (the default), use the value of fill-column + 2.
   (setq olivetti-body-width nil
@@ -381,7 +382,7 @@
 )
 
 (use-package topspace
-:hook (dashboard-mode . topspace-mode)
+:init (global-topspace-mode)
 )
 
 (set-frame-parameter nil 'alpha-background 96)
@@ -462,7 +463,7 @@
     )
     (centaur-tabs-mode t)
   :config
-    (centaur-tabs-change-fonts "Cantarell" 160)
+    (centaur-tabs-change-fonts "Sarasa Gothic SC" 160)
     ;; (centaur-tabs-headline-match)
     ;; (centaur-tabs-group-by-projectile-project)
 
@@ -633,6 +634,8 @@
 (use-package dirvish
 :init
   (dirvish-override-dired-mode)
+:hook
+  (dired-mode . solaire-mode)
 :custom
   (dirvish-quick-access-entries ;`setq' won't work for custom
     '(("h" "~/"                          "Home")
@@ -1058,6 +1061,11 @@
 (use-package laas
   :hook (LaTeX-mode . laas-mode))
 
+(use-package evil-org
+:after org
+:hook (org-mode . evil-org-mode)
+)
+
 (use-package org
 :custom-face
   (org-latex-and-related ((t (:foreground "LightSteelBlue4" :weight bold))))
@@ -1067,23 +1075,25 @@
 :hook (org-mode . mixed-pitch-mode)
 :config
   (set-face-attribute 'org-level-1 nil 
-      :family "Cantarell" :height 1.8 )
+      :family "Sarasa Gothic SC" :height 1.8 )
   (set-face-attribute 'org-level-2 nil 
-      :family "Cantarell" :height 1.6 )
+      :family "Sarasa Gothic SC" :height 1.6 )
   (set-face-attribute 'org-level-3 nil 
-      :family "Cantarell" :height 1.4 )
+      :family "Sarasa Gothic SC" :height 1.4 )
   (set-face-attribute 'org-level-4 nil 
-      :family "Cantarell" :height 1.3 )
+      :family "Sarasa Gothic SC" :height 1.3 )
   (set-face-attribute 'org-level-5 nil 
-      :family "Cantarell" :height 1.2 )
+      :family "Sarasa Gothic SC" :height 1.2 )
   (set-face-attribute 'org-level-6 nil 
-      :family "Cantarell" :height 1.1 )
+      :family "Sarasa Gothic SC" :height 1.1 )
   (set-face-attribute 'org-document-title nil 
-      :family "Cantarell" :height 2.5 :bold t)
+      :family "Sarasa Gothic SC" :height 2.5 :bold t)
   (set-face-attribute 'org-document-info nil 
-      :family "Cantarell" :height 1.8 :bold t)
+      :family "Sarasa Gothic SC" :height 1.8 :bold t)
   (set-face-attribute 'org-document-info-keyword nil 
     :foreground "LightSteelBlue4" :inherit 'org-document-info)
+  (set-face-attribute 'org-block t 
+    :extend t :inherit 'fixed-pitch)
 )
 
 (use-package org-modern
@@ -1103,11 +1113,12 @@
    (setq org-modern-list ;; for '+' '-' '*' respectively
        '((43 . "⯌") (45 . "⮚") (42 . "⊛"))
    )
-   (setq org-modern-block-name '("⇲ " . "⇱ "))
    (setq org-modern-block-fringe nil)
    (setq org-modern-todo nil)
+   (setq org-modern-block-name '("⇲ " . "⇱ "))
    (set-face-attribute 'org-modern-block-name nil
       :inherit 'variable-pitch)
+   (setq org-modern-table nil)
 )
 
 (use-package org-superstar
@@ -1141,6 +1152,12 @@
 :hook (org-mode . org-visual-indent-mode)
 )
 
+(use-package valign
+:hook (org-mode . valign-mode)
+:config
+  (setq valign-fancy-bar t)
+)
+
 (use-package hl-todo
   :init
   (hl-todo-mode)
@@ -1158,23 +1175,16 @@
   (setq org-hide-emphasis-markers t)
 )
 
-(use-package evil-org)
-
 (use-package org
 :init
   (setq electric-indent-mode nil)
 :config
   (setq org-src-tab-acts-natively t)
   (setq org-src-preserve-indentation nil)
-  (set-face-attribute 'org-block t :extend t :inherit 'fixed-pitch)
 )
 
 (use-package org-auto-tangle
 :hook (org-mode . org-auto-tangle-mode)
-)
-
-(use-package valign
-:hook (org-mode . valign-mode)
 )
 
 (use-package org-roam
