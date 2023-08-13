@@ -10,6 +10,9 @@
 [submodule "aas"]
 	path = lib/aas
 	url = https://github.com/ymarco/auto-activating-snippets
+[submodule "aggressive-indent"]
+	path = lib/aggressive-indent
+	url = https://github.com/Malabarba/aggressive-indent-mode
 [submodule "aio"]
 	path = lib/aio
 	url = https://github.com/skeeto/emacs-aio
@@ -118,6 +121,9 @@
 [submodule "evil-collection"]
 	path = lib/evil-collection
 	url = https://github.com/emacs-evil/evil-collection
+[submodule "evil-nerd-commenter"]
+	path = lib/evil-nerd-commenter
+	url = https://github.com/redguardtoo/evil-nerd-commenter
 [submodule "evil-org"]
 	path = lib/evil-org
 	url = https://github.com/Somelauw/evil-org-mode
@@ -154,9 +160,15 @@
 [submodule "helpful"]
 	path = lib/helpful
 	url = https://github.com/Wilfred/helpful
+[submodule "highlight-indent-guides"]
+	path = lib/highlight-indent-guides
+	url = https://github.com/DarthFennec/highlight-indent-guides
 [submodule "hl-todo"]
 	path = lib/hl-todo
 	url = https://github.com/tarsius/hl-todo
+[submodule "holo-layer"]
+	path = lib/holo-layer
+	url = https://github.com/manateelazycat/holo-layer
 [submodule "ht"]
 	path = lib/ht
 	url = https://github.com/Wilfred/ht.el
@@ -301,6 +313,9 @@
 [submodule "queue"]
 	path = lib/queue
 	url = git@github.com:emacsmirror/queue.git
+[submodule "rainbow-delimiters"]
+	path = lib/rainbow-delimiters
+	url = https://github.com/Fanael/rainbow-delimiters
 [submodule "rainbow-mode"]
 	path = lib/rainbow-mode
 	url = git@github.com:emacsmirror/rainbow-mode.git
@@ -322,6 +337,9 @@
 [submodule "skewer-mode"]
 	path = lib/skewer-mode
 	url = https://github.com/skeeto/skewer-mode
+[submodule "smartparens"]
+	path = lib/smartparens
+	url = https://github.com/Fuco1/smartparens
 [submodule "solaire-mode"]
 	path = lib/solaire-mode
 	url = https://github.com/hlissner/emacs-solaire-mode

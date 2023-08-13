@@ -1,26 +1,27 @@
 ;;; init.el --- user-init-file
 
 ;;; -*- lexical-binding: t; no-byte-compile: t -*-
-  (progn ;     startup
-    (defvar before-user-init-time (current-time)
-      "Value of `current-time' when Emacs begins loading `user-init-file'.")
-    (message "Loading Emacs...done (%fs)"
-             (float-time (time-subtract before-user-init-time
-                                        before-init-time)))
-    (setq user-init-file (or load-file-name buffer-file-name))
-    (setq user-emacs-directory (file-name-directory user-init-file))
-    (message "Loading %s..." user-init-file)
+(progn ;     startup
+  (defvar before-user-init-time (current-time)
+    "Value of `current-time' when Emacs begins loading `user-init-file'.")
+  (message "Loading Emacs...done (%fs)"
+  	   (float-time (time-subtract before-user-init-time
+  				      before-init-time)))
+  (setq user-init-file (or load-file-name buffer-file-name))
+  (setq user-emacs-directory (file-name-directory user-init-file))
+  (message "Loading %s..." user-init-file)
 
-    (setq inhibit-startup-buffer-menu t)
-    (setq inhibit-startup-screen t)
-    (setq inhibit-startup-echo-area-message "locutus")
-    (setq initial-buffer-choice t)
-    (setq initial-scratch-message "")
-    ;; Defer garbage collection further back in the startup process
-    (setq gc-cons-threshold most-positive-fixnum)
-    ;; Prevent flashing of unstyled modeline at startup
-    (setq-default mode-line-format nil)
-  )
+  (setq inhibit-startup-buffer-menu t)
+  (setq inhibit-startup-screen t)
+  (setq inhibit-startup-echo-area-message "locutus")
+  (setq initial-buffer-choice t)
+  (setq initial-scratch-message "")
+  ;; Defer garbage collection further back in the startup process
+  (setq gc-cons-threshold most-positive-fixnum)
+  ;; Prevent flashing of unstyled modeline at startup
+  (setq-default mode-line-format nil)
+  (setq confirm-kill-emacs t)
+)
 
 (eval-and-compile ; `borg'
   (add-to-list 'load-path (expand-file-name "lib/borg" user-emacs-directory))
@@ -41,20 +42,20 @@
 (use-package auto-compile
   :config
   (setq auto-compile-display-buffer               nil
-        auto-compile-mode-line-counter            t
-        auto-compile-source-recreate-deletes-dest t
-        auto-compile-toggle-deletes-nonlib-dest   t
-        auto-compile-update-autoloads             t 
-        warning-suppress-log-types        '((comp)))
+	auto-compile-mode-line-counter            t
+	auto-compile-source-recreate-deletes-dest t
+	auto-compile-toggle-deletes-nonlib-dest   t
+	auto-compile-update-autoloads             t
+	warning-suppress-log-types        '((comp)))
 )
 
 (use-package epkg
   :defer t
   :init
   (setq epkg-repository
-        (expand-file-name "var/epkgs/" user-emacs-directory))
+	(expand-file-name "var/epkgs/" user-emacs-directory))
   (setq epkg-database-connector
-        (if (>= emacs-major-version 29) 'sqlite-builtin 'sqlite-module)))
+	(if (>= emacs-major-version 29) 'sqlite-builtin 'sqlite-module)))
 
 (use-package custom
   :no-require t
@@ -71,7 +72,7 @@
 
 (progn ;     startup
   (message "Loading early birds...done (%fs)"
-           (float-time (time-subtract (current-time) before-user-init-time))))
+	   (float-time (time-subtract (current-time) before-user-init-time))))
 
 (use-package shrink-path :demand t)
 
@@ -109,6 +110,16 @@
   :config (setq ring-bell-function #'ignore)
 )
 
+(use-package evil-surround
+:after evil
+:config
+  (global-evil-surround-mode 1))
+
+(use-package evil-nerd-commenter
+:after evil
+:config
+)
+
 (use-package meow
 :defer t
 :custom-face
@@ -124,15 +135,18 @@
      ;; SPC j/k will run the original command in MOTION state.
      '("j" . "H-j") '("k" . "H-k")
      ;; Use SPC (0-9) for digit arguments.
-     '("1" . meow-digit-argument) '("2" . meow-digit-argument) '("3" . meow-digit-argument)
-     '("4" . meow-digit-argument) '("5" . meow-digit-argument) '("6" . meow-digit-argument)
-     '("7" . meow-digit-argument) '("8" . meow-digit-argument) '("9" . meow-digit-argument)
-     '("0" . meow-digit-argument) '("/" . meow-keypad-describe-key) '("?" . meow-cheatsheet))
+     '("1" . meow-digit-argument) '("2" . meow-digit-argument) 
+     '("3" . meow-digit-argument) '("4" . meow-digit-argument) 
+     '("5" . meow-digit-argument) '("6" . meow-digit-argument)
+     '("7" . meow-digit-argument) '("8" . meow-digit-argument) 
+     '("9" . meow-digit-argument) '("0" . meow-digit-argument) 
+     '("/" . meow-keypad-describe-key) '("?" . meow-cheatsheet))
     (meow-normal-define-key
-     '("1" . meow-expand-1) '("2" . meow-expand-2) '("3" . meow-expand-3)
-     '("4" . meow-expand-4) '("5" . meow-expand-5) '("6" . meow-expand-6)
-     '("7" . meow-expand-7) '("8" . meow-expand-8) '("9" . meow-expand-9)
-     '("0" . meow-expand-0)
+     '("1" . meow-expand-1) '("2" . meow-expand-2) 
+     '("3" . meow-expand-3) '("4" . meow-expand-4) 
+     '("5" . meow-expand-5) '("6" . meow-expand-6)
+     '("7" . meow-expand-7) '("8" . meow-expand-8) 
+     '("9" . meow-expand-9) '("0" . meow-expand-0)
      '("-" . negative-argument) '(";" . meow-reverse)
      '("," . meow-inner-of-thing) '("." . meow-bounds-of-thing)
      '("[" . meow-beginning-of-thing) '("]" . meow-end-of-thing)
@@ -185,6 +199,7 @@
   (config/leader
       "DEL"     '(which-key-undo                 :wk "󰕍 Undo key"))
 
+  ; buffers
   (config/leader :infix "b"
       ""        '(nil                            :wk "  Buffer ")
       "DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
@@ -194,13 +209,14 @@
       "["       '(previous-buffer                :wk " Prev ")
       "]"       '(next-buffer                    :wk " Next ")
   )
+  ; centaur tabs
   (config/leader
       "{"       '(centaur-tabs-backward-group    :wk " Prev Group")
       "}"       '(centaur-tabs-forward-group     :wk " Next Group")
       "["       '(centaur-tabs-backward          :wk " Prev Buffer ")
       "]"       '(centaur-tabs-forward           :wk " Next Buffer ")
   )
-
+  ; builtin-tabs
   (config/leader :infix "TAB"
       ""        '(nil                            :wk " 󰓩 Tab ")
       "DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
@@ -209,25 +225,21 @@
       "["       '(tab-previous                   :wk " Prev ")
       "]"       '(tab-next                       :wk " Next ")
   )
-
+  ; windows
   (config/leader :infix "w"
       ""        '(nil                            :wk " 󰓩 Tab ")
       "DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
       "d"       '(delete-window                  :wk "󰅖 Delete  ")
       "v"       '(split-window-vertically        :wk "󰤻 Split   ")
       "s"       '(split-window-horizontally      :wk "󰤼 Split   ")
+      "\\"      '(split-window-vertically        :wk "󰤻 Split   ")
+      "|"       '(split-window-horizontally      :wk "󰤼 Split   ")
       "h"       '(evil-window-left               :wk " Focus H ")
       "j"       '(evil-window-down               :wk " Focus J ")
       "k"       '(evil-window-up                 :wk " Focus K ")
       "l"       '(evil-window-right              :wk " Focus L ")
-      "\\"      '(split-window-vertically        :wk "󰤻 Split   ")
-      "|"       '(split-window-horizontally      :wk "󰤼 Split   ")
   )
-  (config/leader :infix "w"
-      "\\"      '(split-window-vertically        :wk "󰤻 Split   ")
-      "|"       '(split-window-horizontally      :wk "󰤼 Split   ")
-  )
-
+  ; Borg
   (config/leader :infix "B"
       ""        '(nil                            :wk " 󰏗 Borg      ")
       "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
@@ -237,28 +249,31 @@
       "c"       '(borg-clone                     :wk " Clone      ")
       "r"       '(borg-remove                    :wk "󱧖 Remove     ")
   )
-
+  ; toggle
   (config/leader :infix "t"
       ""        '(nil                            :wk " 󰭩 Toggle    ")
       "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
   )
-
+  ; quit
   (config/leader :infix "q"
       ""        '(nil                            :wk " 󰗼 Quit      ")
       "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
       "q"       '(save-buffers-kill-terminal     :wk "󰗼 Quit Emacs ")
   )
-
+  ; Git
   (config/leader :infix "g"
       ""        '(nil                            :wk " 󰊢 Git       ")
       "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
       "g"       '(magit                          :wk " Magit      ")
   )
-
-  (config/leader 
+  ; dired
+  (config/leader
       "e"       '(dirvish-side                   :wk "󰙅 Dirvish-side ")
       "E"       '(dirvish                        :wk " Dirvish      ")
       ;"qe"      '(save-buffers-kill-emacs         :wk "Quit Emacs ")
+  )
+  (config/leader
+      "/"       '(evilnc-comment-or-uncomment-lines :wk "󱀢 Comment ")
   )
 )
 
@@ -314,18 +329,18 @@
 )
 (set-face-attribute 'fixed-pitch-serif t
   :family "Monospace Serif"
-  :height 180 
+  :height 180
 )
 
-(set-face-attribute 'font-lock-comment-face nil 
+(set-face-attribute 'font-lock-comment-face nil
   :foreground "LightSteelBlue4" :slant 'italic)
 (set-face-attribute 'font-lock-keyword-face nil :slant 'italic)
 
-(set-face-attribute 'link nil 
+(set-face-attribute 'link nil
   :foreground "#ffcc66" :underline t :bold nil)
 
 (use-package emacs
-  :init 
+  :init
     (global-set-key (kbd "C-=")            'text-scale-increase)
     (global-set-key (kbd "C--")            'text-scale-decrease)
     (global-set-key (kbd "<C-wheel-up>")   'text-scale-increase)
@@ -362,20 +377,14 @@
   (dashboard-mode . olivetti-mode)
   (dashboard-mode . variable-pitch-mode)
   (olivetti-mode . visual-line-mode)
-:custom-face
-  (olivetti-fringe ((t (:background "#171B24"))))
-:init 
+:init
   (setq-default fill-column 74)
 :config
   ;If nil (the default), use the value of fill-column + 2.
   (setq olivetti-body-width nil
-        olivetti-style 'fancy)
+	       olivetti-style 'fancy)
   (set-face-attribute 'olivetti-fringe nil :background "#171B24")
 
-  (defun config/adjust-olivetti-body-width ()
-    (when (and (boundp 'mixed-pitch-mode) mixed-pitch-mode)
-      (setq olivetti-body-width 54)))
-  ;(add-hook 'olivetti-mode-hook 'config/adjust-olivetti-body-width)
   (config/leader
     "tc"  '(olivetti-mode     :wk "󰉠 Center")
   )
@@ -383,6 +392,43 @@
 
 (use-package topspace
 :init (global-topspace-mode)
+)
+
+(use-package emacs
+:custom-face
+  (line-number ((t (:weight normal :slant normal :foreground "LightSteelBlue4" :inherit default))))
+  (line-number-current-line ((t (:inherit (hl-line default) :slant normal :foreground "#ffcc66"))))
+
+:config
+  (defun config/toggle-line-number-nil ()
+      (interactive)
+      (setq display-line-numbers nil)
+  )
+  (defun config/toggle-line-number-absolute ()
+      (interactive)
+      (setq display-line-numbers t)
+  )
+  (defun config/toggle-line-number-relative ()
+      (interactive)
+      (setq display-line-numbers 'relative)
+  )
+  (defun config/toggle-line-number-visual ()
+      (interactive)
+      (setq display-line-numbers 'visual)
+  )
+  (config/leader :infix "tl"
+    ""    '(nil                                :wk "  Line Number ")
+    "DEL" '(which-key-undo                     :wk "󰕍 Undo key   ")
+    "n"   '(config/toggle-line-number-nil      :wk "󰅖 Nil        ")
+    "a"   '(config/toggle-line-number-absolute :wk "󰱇 Absolute   ")
+    "r"   '(config/toggle-line-number-relative :wk "󰰠 Relative   ")
+    "v"   '(config/toggle-line-number-visual   :wk " Visual     ")
+    "h"   '(hl-line-mode                       :wk "󰸱 Hl-line")
+  )
+)
+
+(config/leader :infix "t"
+  "SPC"  '(whitespace-mode  :wk "󰡭 Show Space")
 )
 
 (set-frame-parameter nil 'alpha-background 96)
@@ -411,8 +457,8 @@
 (defalias 'scroll-down-command '+pixel-scroll-interpolate-up)
 
 (use-package doom-modeline
-:init 
-  (setq 
+:init
+  (setq
     doom-modeline-height 37
     doom-modeline-enable-word-count t)
   (doom-modeline-mode 1)
@@ -427,21 +473,21 @@
 (use-package dashboard
 :init
   (setq initial-buffer-choice 'dashboard-open
-        dashboard-image-banner-max-width 1000
-        dashboard-set-heading-icons t
-        dashboard-center-content t ;; set to 't' for centered content
-        dashboard-set-file-icons t
-        initial-buffer-choice 
-          (lambda () (get-buffer-create "*dashboard*"))
-        dashboard-startup-banner ;; use custom image as banner
-          (concat user-emacs-directory "assets/EmacsBound.xpm")
-        dashboard-items '(
-          (recents . 5)
-          (agenda . 5 )
-          (bookmarks . 3)
-          (projects . 3)
-          (registers . 3)
-        )
+	dashboard-image-banner-max-width 1000
+	dashboard-set-heading-icons t
+	dashboard-center-content t ;; set to 't' for centered content
+	dashboard-set-file-icons t
+	initial-buffer-choice
+	  (lambda () (get-buffer-create "*dashboard*"))
+	dashboard-startup-banner ;; use custom image as banner
+	  (concat user-emacs-directory "assets/EmacsBound.xpm")
+	dashboard-items '(
+	  (recents . 5)
+	  (agenda . 5 )
+	  (bookmarks . 3)
+	  (projects . 3)
+	  (registers . 3)
+	)
   )
 :config
   (dashboard-setup-startup-hook)
@@ -455,11 +501,11 @@
     (dashboard-mode . centaur-tabs-local-mode)
   :init
     (setq centaur-tabs-set-icons t
-          centaur-tabs-set-modified-marker t
-          centaur-tabs-modified-marker "M"
-          centaur-tabs-cycle-scope 'tabs
-          centaur-tabs-set-bar 'over
-          centaur-tabs-enable-ido-completion nil
+	  centaur-tabs-set-modified-marker t
+	  centaur-tabs-modified-marker "M"
+	  centaur-tabs-cycle-scope 'tabs
+	  centaur-tabs-set-bar 'over
+	  centaur-tabs-enable-ido-completion nil
     )
     (centaur-tabs-mode t)
   :config
@@ -467,38 +513,6 @@
     ;; (centaur-tabs-headline-match)
     ;; (centaur-tabs-group-by-projectile-project)
 
-)
-
-(use-package emacs
-:custom-face
-  (line-number ((t (:weight normal :slant normal :foreground "LightSteelBlue4" :inherit default))))
-  (line-number-current-line ((t (:inherit (hl-line default) :slant normal :foreground "#ffcc66"))))
-
-:config
-  (defun config/toggle-line-number-nil ()      
-      (interactive)
-      (setq display-line-numbers nil)
-  )
-  (defun config/toggle-line-number-absolute () 
-      (interactive)
-      (setq display-line-numbers t)
-  )
-  (defun config/toggle-line-number-relative () 
-      (interactive)
-      (setq display-line-numbers 'relative)
-  )
-  (defun config/toggle-line-number-visual ()   
-      (interactive)
-      (setq display-line-numbers 'visual)
-  )
-  (config/leader :infix "tl"
-    ""    '(nil                                :wk "  Line Number ")
-    "DEL" '(which-key-undo                     :wk "󰕍 Undo key   ")
-    "n"   '(config/toggle-line-number-nil      :wk "󰅖 Nil        ")
-    "a"   '(config/toggle-line-number-absolute :wk "󰯫 Absolute   ")
-    "r"   '(config/toggle-line-number-relative :wk " Relative   ")
-    "v"   '(config/toggle-line-number-visual   :wk " Visual     ")
-  )
 )
 
 (use-package emacs
@@ -513,7 +527,7 @@
   (setq mini-frame-detach-on-hide nil)
   ;(setq mini-frame-standalone 't)
   ;(setq mini-frame-resize-min-height 10)
-  (setq mini-frame-ignore-commands 
+  (setq mini-frame-ignore-commands
     (append mini-frame-ignore-commands
      '(evil-window-split evil-window-vsplit evil-ex)))
 )
@@ -535,7 +549,13 @@
 :config
   (setq diff-hl-draw-borders nil)
   (global-diff-hl-mode)
+  (diff-hl-margin-mode) 
   (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
+)
+
+(use-package holo-layer
+  :config 
+  (holo-layer-enable)
 )
 
 (use-package diff-mode
@@ -574,9 +594,9 @@
   :commands (magit-add-section-hook)
   :config
   (magit-add-section-hook 'magit-status-sections-hook
-                          'magit-insert-modules
-                          'magit-insert-stashes
-                          'append))
+			  'magit-insert-modules
+			  'magit-insert-stashes
+			  'append))
 
 (use-package man
   :defer t
@@ -621,11 +641,11 @@
   (add-to-list 'tramp-default-proxies-alist '(nil "\\`root\\'" "/ssh:%h:"))
   (add-to-list 'tramp-default-proxies-alist '("localhost" nil nil))
   (add-to-list 'tramp-default-proxies-alist
-               (list (regexp-quote (system-name)) nil nil))
+	       (list (regexp-quote (system-name)) nil nil))
   (setq vc-ignore-dir-regexp
-        (format "\\(%s\\)\\|\\(%s\\)"
-                vc-ignore-dir-regexp
-                tramp-file-name-regexp)))
+	(format "\\(%s\\)\\|\\(%s\\)"
+		vc-ignore-dir-regexp
+		tramp-file-name-regexp)))
 
 (use-package tramp-sh
   :defer t
@@ -649,20 +669,21 @@
   :require ("exa") ; tell Dirvish to check if we have the executable
   (when (file-directory-p file) ; we only interest in directories here
       `(shell . ("exa" "-al" "--color=always" "--icons"
-              "--group-directories-first" ,file))))
+	      "--group-directories-first" ,file))))
 
   (add-to-list 'dirvish-preview-dispatchers 'exa)
   ;; (dirvish-peek-mode) ; Preview files in minibuffer
   ;; (dirvish-side-follow-mode) ; similar to `treemacs-follow-mode'
   (setq dirvish-path-separators (list "  " "  " "  "))
   (setq dirvish-mode-line-format
-          '(:left (sort symlink) :right (omit yank index)))
+	  '(:left (sort symlink) :right (omit yank index)))
   (setq dirvish-attributes
-          '(all-the-icons file-time file-size collapse subtree-state vc-state git-msg))
+	  '(all-the-icons file-time file-size collapse subtree-state vc-state git-msg))
   (setq delete-by-moving-to-trash t)
   (setq dired-listing-switches
-          "-l --almost-all --human-readable --group-directories-first --no-group")
+	  "-l --almost-all --human-readable --group-directories-first --no-group")
   (nmap dirvish-mode-map
+      "?"      '(dirvish-dispatch          :wk "Dispatch")
       "TAB"    '(dirvish-subtree-toggle    :wk "Subtre-toggle")
       "q"      '(dirvish-quit              :wk "Quit")
       "h"      '(dired-up-directory        :wk "Up-dir")
@@ -672,7 +693,7 @@
       "y"      '(dirvish-yank-menu         :wk "Yank Menu")
       "N"      '(dirvish-narrow            :wk "Narrow")
       ;         `dired-view-file'
-      "v"      '(dirvish-vc-menu           :wk "View-file") 
+      "v"      '(dirvish-vc-menu           :wk "View-file")
       ;         `dired-sort-toggle-or-edit'
       "s"      '(dirvish-quicksort         :wk "Quick-sort")
 
@@ -738,9 +759,9 @@
   :after vertico
   ;; More convenient directory navigation commands
   :bind (:map vertico-map
-              ("RET" . vertico-directory-enter)
-              ("DEL" . vertico-directory-delete-char)
-              ("M-DEL" . vertico-directory-delete-word))
+	      ("RET" . vertico-directory-enter)
+	      ("DEL" . vertico-directory-delete-char)
+	      ("M-DEL" . vertico-directory-delete-word))
   ;; Tidy shadowed file names
   :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
 
@@ -752,22 +773,22 @@
 (use-package vertico-posframe
 :disabled
 :after vertico-multiform
-:init 
+:init
   (setq vertico-multiform-commands
        '((consult-line posframe
-            (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
-            ;(vertico-posframe-fallback-mode . vertico-buffer-mode)
-            (vertico-posframe-width . 50))
-         (execute-extended-command
-            (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
-            (vertico-posframe-fallback-mode . vertico-buffer-mode))
-         (t posframe)
-        )
+	    (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
+	    ;(vertico-posframe-fallback-mode . vertico-buffer-mode)
+	    (vertico-posframe-width . 50))
+	 (execute-extended-command
+	    (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
+	    (vertico-posframe-fallback-mode . vertico-buffer-mode))
+	 (t posframe)
+	)
   )
   (setq vertico-count 20
-        vertico-posframe-border-width 3
-        vertico-posframe-width 140
-        vertico-resize nil)
+	vertico-posframe-border-width 3
+	vertico-posframe-width 140
+	vertico-resize nil)
 
   ;(vertico-multiform-mode 1)
   ;(vertico-posframe-mode 1)
@@ -785,16 +806,16 @@
       ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
       (defun crm-indicator (args)
       (cons (format "[CRM%s] %s"
-                      (replace-regexp-in-string
-                      "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
-                      crm-separator)
-                      (car args))
-              (cdr args)))
+		      (replace-regexp-in-string
+		      "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+		      crm-separator)
+		      (car args))
+	      (cdr args)))
       (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
 
       ;; Do not allow the cursor in the minibuffer prompt
       (setq minibuffer-prompt-properties
-          '(read-only t cursor-intangible t face minibuffer-prompt))
+	  '(read-only t cursor-intangible t face minibuffer-prompt))
       (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
 
       ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
@@ -807,56 +828,56 @@
 (use-package consult
   ;; Replace bindings. Lazily loaded due by `use-package'.
   :bind (;; C-c bindings in `mode-specific-map'
-         ("C-c M-x" . consult-mode-command)
-         ("C-c h" . consult-history)
-         ("C-c k" . consult-kmacro)
-         ("C-c m" . consult-man)
-         ("C-c i" . consult-info)
-         ([remap Info-search] . consult-info)
-         ;; C-x bindings in `ctl-x-map'
-         ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
-         ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
-         ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
-         ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
-         ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
-         ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
-         ;; Custom M-# bindings for fast register access
-         ("M-#" . consult-register-load)
-         ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
-         ("C-M-#" . consult-register)
-         ;; Other custom bindings
-         ("M-y" . consult-yank-pop)                ;; orig. yank-pop
-         ;; M-g bindings in `goto-map'
-         ("M-g e" . consult-compile-error)
-         ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
-         ("M-g g" . consult-goto-line)             ;; orig. goto-line
-         ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
-         ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
-         ("M-g m" . consult-mark)
-         ("M-g k" . consult-global-mark)
-         ("M-g i" . consult-imenu)
-         ("M-g I" . consult-imenu-multi)
-         ;; M-s bindings in `search-map'
-         ("M-s d" . consult-find)
-         ("M-s D" . consult-locate)
-         ("M-s g" . consult-grep)
-         ("M-s G" . consult-git-grep)
-         ("M-s r" . consult-ripgrep)
-         ("M-s l" . consult-line)
-         ("M-s L" . consult-line-multi)
-         ("M-s k" . consult-keep-lines)
-         ("M-s u" . consult-focus-lines)
-         ;; Isearch integration
-         ("M-s e" . consult-isearch-history)
-         :map isearch-mode-map
-         ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
-         ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
-         ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
-         ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
-         ;; Minibuffer history
-         :map minibuffer-local-map
-         ("M-s" . consult-history)                 ;; orig. next-matching-history-element
-         ("M-r" . consult-history))                ;; orig. previous-matching-history-element
+	 ("C-c M-x" . consult-mode-command)
+	 ("C-c h" . consult-history)
+	 ("C-c k" . consult-kmacro)
+	 ("C-c m" . consult-man)
+	 ("C-c i" . consult-info)
+	 ([remap Info-search] . consult-info)
+	 ;; C-x bindings in `ctl-x-map'
+	 ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+	 ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
+	 ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+	 ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
+	 ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
+	 ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
+	 ;; Custom M-# bindings for fast register access
+	 ("M-#" . consult-register-load)
+	 ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+	 ("C-M-#" . consult-register)
+	 ;; Other custom bindings
+	 ("M-y" . consult-yank-pop)                ;; orig. yank-pop
+	 ;; M-g bindings in `goto-map'
+	 ("M-g e" . consult-compile-error)
+	 ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+	 ("M-g g" . consult-goto-line)             ;; orig. goto-line
+	 ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
+	 ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+	 ("M-g m" . consult-mark)
+	 ("M-g k" . consult-global-mark)
+	 ("M-g i" . consult-imenu)
+	 ("M-g I" . consult-imenu-multi)
+	 ;; M-s bindings in `search-map'
+	 ("M-s d" . consult-find)
+	 ("M-s D" . consult-locate)
+	 ("M-s g" . consult-grep)
+	 ("M-s G" . consult-git-grep)
+	 ("M-s r" . consult-ripgrep)
+	 ("M-s l" . consult-line)
+	 ("M-s L" . consult-line-multi)
+	 ("M-s k" . consult-keep-lines)
+	 ("M-s u" . consult-focus-lines)
+	 ;; Isearch integration
+	 ("M-s e" . consult-isearch-history)
+	 :map isearch-mode-map
+	 ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
+	 ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
+	 ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+	 ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
+	 ;; Minibuffer history
+	 :map minibuffer-local-map
+	 ("M-s" . consult-history)                 ;; orig. next-matching-history-element
+	 ("M-r" . consult-history))                ;; orig. previous-matching-history-element
 
   ;; Enable automatic preview at point in the *Completions* buffer. This is
   ;; relevant when you use the default completion UI.
@@ -869,7 +890,7 @@
   ;; preview for `consult-register', `consult-register-load',
   ;; `consult-register-store' and the Emacs built-ins.
   (setq register-preview-delay 0.5
-        register-preview-function #'consult-register-format)
+	register-preview-function #'consult-register-format)
 
   ;; Optionally tweak the register preview window.
   ;; This adds thin lines, sorting and hides the mode line of the window.
@@ -877,7 +898,7 @@
 
   ;; Use Consult to select xref locations with preview
   (setq xref-show-xrefs-function #'consult-xref
-        xref-show-definitions-function #'consult-xref)
+	xref-show-definitions-function #'consult-xref)
 
   ;; Configure other variables and modes in the :config section,
   ;; after lazily loading the package.
@@ -983,39 +1004,39 @@
 (use-package fingertip
 :config
   (dolist (hook (list
-              'c-mode-common-hook 'c-mode-hook 'c++-mode-hook
-              'c-ts-mode-hook 'c++-ts-mode-hook
-              'cmake-ts-mode-hook
-              'java-mode-hook
-              'haskell-mode-hook
-              'emacs-lisp-mode-hook 'lisp-interaction-mode-hook 'lisp-mode-hook
-              'maxima-mode-hook
-              'ielm-mode-hook
-              'bash-ts-mode-hook 'sh-mode-hook
-              'makefile-gmake-mode-hook
-              'php-mode-hook
-              'python-mode-hook 'python-ts-mode-hook
-              'js-mode-hook
-              'go-mode-hook
-              'qml-mode-hook
-              'jade-mode-hook
-              'css-mode-hook 'css-ts-mode-hook
-              'ruby-mode-hook
-              'coffee-mode-hook
-              'rust-mode-hook 'rust-ts-mode-hook
-              'qmake-mode-hook
-              'lua-mode-hook
-              'swift-mode-hook
-              'web-mode-hook
-              'markdown-mode-hook
-              'llvm-mode-hook
-              'conf-toml-mode-hook 'toml-ts-mode-hook
-              'nim-mode-hook
-              'typescript-mode-hook 'typescript-ts-mode-hook
-              'js-ts-mode-hook 'json-ts-mode-hook
-              ))
+	      'c-mode-common-hook 'c-mode-hook 'c++-mode-hook
+	      'c-ts-mode-hook 'c++-ts-mode-hook
+	      'cmake-ts-mode-hook
+	      'java-mode-hook
+	      'haskell-mode-hook
+	      'emacs-lisp-mode-hook 'lisp-interaction-mode-hook 'lisp-mode-hook
+	      'maxima-mode-hook
+	      'ielm-mode-hook
+	      'bash-ts-mode-hook 'sh-mode-hook
+	      'makefile-gmake-mode-hook
+	      'php-mode-hook
+	      'python-mode-hook 'python-ts-mode-hook
+	      'js-mode-hook
+	      'go-mode-hook
+	      'qml-mode-hook
+	      'jade-mode-hook
+	      'css-mode-hook 'css-ts-mode-hook
+	      'ruby-mode-hook
+	      'coffee-mode-hook
+	      'rust-mode-hook 'rust-ts-mode-hook
+	      'qmake-mode-hook
+	      'lua-mode-hook
+	      'swift-mode-hook
+	      'web-mode-hook
+	      'markdown-mode-hook
+	      'llvm-mode-hook
+	      'conf-toml-mode-hook 'toml-ts-mode-hook
+	      'nim-mode-hook
+	      'typescript-mode-hook 'typescript-ts-mode-hook
+	      'js-ts-mode-hook 'json-ts-mode-hook
+	      ))
   (add-hook hook #'(lambda () (fingertip-mode 1))))
-  (general-def 
+  (general-def
     :keymaps 'fingertip-mode-map
       "(" 'fingertip-open-round
       "[" 'fingertip-open-bracket
@@ -1074,25 +1095,25 @@
   (org-tag ((t (:foreground "LightSteelBlue4" :weight normal))))
 :hook (org-mode . mixed-pitch-mode)
 :config
-  (set-face-attribute 'org-level-1 nil 
+  (set-face-attribute 'org-level-1 nil
       :family "Sarasa Gothic SC" :height 1.8 )
-  (set-face-attribute 'org-level-2 nil 
+  (set-face-attribute 'org-level-2 nil
       :family "Sarasa Gothic SC" :height 1.6 )
-  (set-face-attribute 'org-level-3 nil 
+  (set-face-attribute 'org-level-3 nil
       :family "Sarasa Gothic SC" :height 1.4 )
-  (set-face-attribute 'org-level-4 nil 
+  (set-face-attribute 'org-level-4 nil
       :family "Sarasa Gothic SC" :height 1.3 )
-  (set-face-attribute 'org-level-5 nil 
+  (set-face-attribute 'org-level-5 nil
       :family "Sarasa Gothic SC" :height 1.2 )
-  (set-face-attribute 'org-level-6 nil 
+  (set-face-attribute 'org-level-6 nil
       :family "Sarasa Gothic SC" :height 1.1 )
-  (set-face-attribute 'org-document-title nil 
+  (set-face-attribute 'org-document-title nil
       :family "Sarasa Gothic SC" :height 2.5 :bold t)
-  (set-face-attribute 'org-document-info nil 
+  (set-face-attribute 'org-document-info nil
       :family "Sarasa Gothic SC" :height 1.8 :bold t)
-  (set-face-attribute 'org-document-info-keyword nil 
+  (set-face-attribute 'org-document-info-keyword nil
     :foreground "LightSteelBlue4" :inherit 'org-document-info)
-  (set-face-attribute 'org-block t 
+  (set-face-attribute 'org-block t
     :extend t :inherit 'fixed-pitch)
 )
 
@@ -1101,14 +1122,14 @@
 :config
    (setq org-modern-keyword
      (quote (("author" . "⛾")
-             ("title" . "❖")
-             ("subtitle" . "§")
-             ("html" . "󰲋 ")
-             (t . t)))) 
+	     ("title" . "❖")
+	     ("subtitle" . "◈")
+	     ("html" . "󰅱 ")
+	     (t . t))))
    (setq org-modern-star
-        ;'("◉" "○" "◈" "◇" "✳")
-        '("⚀" "⚁" "⚂" "⚃" "⚄" "⚅")
-        ;'("☰" "☱" "☲" "☳" "☴" "☵" "☶" "☷")
+	;'("◉" "○" "◈" "◇" "✳")
+	'("⚀" "⚁" "⚂" "⚃" "⚄" "⚅")
+	;'("☰" "☱" "☲" "☳" "☴" "☵" "☶" "☷")
    )
    (setq org-modern-list ;; for '+' '-' '*' respectively
        '((43 . "⯌") (45 . "⮚") (42 . "⊛"))
@@ -1141,8 +1162,8 @@
   (org-visual-indent-pipe-face ((t (:background "slate gray" :foreground "slate gray" :height 0.1))))
 :config
   (setq org-bars-color-options '(
-        :desaturate-level-faces 100
-        :darken-level-faces 10
+	:desaturate-level-faces 100
+	:darken-level-faces 10
   ))
   (setq org-bars-extra-pixels-height 25)
   (setq org-bars-stars '(:empty "" :invisible "" :visible ""))
@@ -1168,11 +1189,14 @@
 (use-package org-appear
   :hook (org-mode . org-appear-mode)
   :init
-  (setq org-appear-autoemphasis  t)
-  ;(setq org-appear-autolinks t)
-  (setq org-appear-autosubmarkers t)
-  ;(setq org-appear-inside-latex t)
-  (setq org-hide-emphasis-markers t)
+  (setq org-appear-autoemphasis  t
+        ;org-appear-autolinks t
+        org-appear-autosubmarkers t
+        org-appear-autoentities t
+        org-appear-autokeywords t
+        org-appear-inside-latex t
+        org-hide-emphasis-markers t
+  )
 )
 
 (use-package org
@@ -1211,11 +1235,11 @@
     ;; Vertically align LaTeX preview in org mode
     (defun my-org-latex-preview-advice (beg end &rest _args)
     (let* ((ov (car (overlays-at (/ (+ beg end) 2) t)))
-            (img (cdr (overlay-get ov 'display)))
-            (new-img (plist-put img :ascent 95)))
-        (overlay-put ov 'display (cons 'image new-img))))
+	    (img (cdr (overlay-get ov 'display)))
+	    (new-img (plist-put img :ascent 95)))
+	(overlay-put ov 'display (cons 'image new-img))))
     (advice-add 'org--make-preview-overlay
-                :after #'my-org-latex-preview-advice)
+		:after #'my-org-latex-preview-advice)
 
     ;; from: https://kitchingroup.cheme.cmu.edu/blog/2016/11/06/
     ;; Justifying-LaTeX-preview-fragments-in-org-mode/
@@ -1224,72 +1248,72 @@
 
     (defun eli/org-justify-fragment-overlay (beg end image imagetype)
     (let* ((position (plist-get org-format-latex-options :justify))
-            (img (create-image image 'svg t))
-            (ov (car (overlays-at (/ (+ beg end) 2) t)))
-            (width (car (image-display-size (overlay-get ov 'display))))
-            offset)
-        (cond
-        ((and (eq 'center position) 
-            (= beg (line-beginning-position)))
-        (setq offset (floor (- (/ fill-column 2)
-                                (/ width 2))))
-        (if (< offset 0)
-            (setq offset 0))
-        (overlay-put ov 'before-string (make-string offset ? )))
-        ((and (eq 'right position) 
-            (= beg (line-beginning-position)))
-        (setq offset (floor (- fill-column
-                                width)))
-        (if (< offset 0)
-            (setq offset 0))
-        (overlay-put ov 'before-string (make-string offset ? ))))))
+	    (img (create-image image 'svg t))
+	    (ov (car (overlays-at (/ (+ beg end) 2) t)))
+	    (width (car (image-display-size (overlay-get ov 'display))))
+	    offset)
+	(cond
+	((and (eq 'center position)
+	    (= beg (line-beginning-position)))
+	(setq offset (floor (- (/ fill-column 2)
+				(/ width 2))))
+	(if (< offset 0)
+	    (setq offset 0))
+	(overlay-put ov 'before-string (make-string offset ? )))
+	((and (eq 'right position)
+	    (= beg (line-beginning-position)))
+	(setq offset (floor (- fill-column
+				width)))
+	(if (< offset 0)
+	    (setq offset 0))
+	(overlay-put ov 'before-string (make-string offset ? ))))))
     (advice-add 'org--make-preview-overlay
-                :after 'eli/org-justify-fragment-overlay)
+		:after 'eli/org-justify-fragment-overlay)
 
     ;; from: https://kitchingroup.cheme.cmu.edu/blog/2016/11/07/
     ;; Better-equation-numbering-in-LaTeX-fragments-in-org-mode/
     (defun org-renumber-environment (orig-func &rest args)
-    (let ((results '()) 
-            (counter -1)
-            (numberp))
-        (setq results (cl-loop for (begin .  env) in 
-            (org-element-map (org-element-parse-buffer)
-                'latex-environment
-                (lambda (env)
-                (cons
-                    (org-element-property :begin env)
-                    (org-element-property :value env))))
-            collect
-            (cond
-                ((and (string-match "\\\\begin{equation}" env)
-                    (not (string-match "\\\\tag{" env)))
-                (cl-incf counter)
-                (cons begin counter))
-                ((and (string-match "\\\\begin{align}" env)
-                    (string-match "\\\\notag" env))
-                (cl-incf counter)
-                (cons begin counter))
-                ((string-match "\\\\begin{align}" env)
-                (prog2
-                    (cl-incf counter)
-                    (cons begin counter)                          
-                (with-temp-buffer
-                    (insert env)
-                    (goto-char (point-min))
-                    ;; \\ is used for a new line. Each one leads
-                    ;; to a number
-                    (cl-incf counter (count-matches "\\\\$"))
-                    ;; unless there are nonumbers.
-                    (goto-char (point-min))
-                    (cl-decf counter
-                            (count-matches "\\nonumber")))))
-                (t
-                (cons begin nil)))))
-        (when (setq numberp (cdr (assoc (point) results)))
-        (setf (car args)
-                (concat
-                (format "\\setcounter{equation}{%s}\n" numberp)
-                (car args)))))
+    (let ((results '())
+	    (counter -1)
+	    (numberp))
+	(setq results (cl-loop for (begin .  env) in
+	    (org-element-map (org-element-parse-buffer)
+		'latex-environment
+		(lambda (env)
+		(cons
+		    (org-element-property :begin env)
+		    (org-element-property :value env))))
+	    collect
+	    (cond
+		((and (string-match "\\\\begin{equation}" env)
+		    (not (string-match "\\\\tag{" env)))
+		(cl-incf counter)
+		(cons begin counter))
+		((and (string-match "\\\\begin{align}" env)
+		    (string-match "\\\\notag" env))
+		(cl-incf counter)
+		(cons begin counter))
+		((string-match "\\\\begin{align}" env)
+		(prog2
+		    (cl-incf counter)
+		    (cons begin counter)
+		(with-temp-buffer
+		    (insert env)
+		    (goto-char (point-min))
+		    ;; \\ is used for a new line. Each one leads
+		    ;; to a number
+		    (cl-incf counter (count-matches "\\\\$"))
+		    ;; unless there are nonumbers.
+		    (goto-char (point-min))
+		    (cl-decf counter
+			    (count-matches "\\nonumber")))))
+		(t
+		(cons begin nil)))))
+	(when (setq numberp (cdr (assoc (point) results)))
+	(setf (car args)
+		(concat
+		(format "\\setcounter{equation}{%s}\n" numberp)
+		(car args)))))
     (apply orig-func args))
     (advice-add 'org-create-formula-image :around #'org-renumber-environment)
 )
@@ -1345,19 +1369,19 @@
 
 (progn ;     startup
   (message "Loading %s...done (%fs)" user-init-file
-           (float-time (time-subtract (current-time)
-                                      before-user-init-time)))
+	   (float-time (time-subtract (current-time)
+				      before-user-init-time)))
   (add-hook 'after-init-hook
-            (lambda ()
-              (message
-               "Loading %s...done (%fs) [after-init]" user-init-file
-               (float-time (time-subtract (current-time)
-                                          before-user-init-time))))
-            t))
+	    (lambda ()
+	      (message
+	       "Loading %s...done (%fs) [after-init]" user-init-file
+	       (float-time (time-subtract (current-time)
+					  before-user-init-time))))
+	    t))
 
 (progn ;     personalize
   (let ((file (expand-file-name (concat (user-real-login-name) ".el")
-                                user-emacs-directory)))
+				user-emacs-directory)))
     (when (file-exists-p file)
       (load file))))
 

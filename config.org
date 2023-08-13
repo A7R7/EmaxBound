@@ -12,7 +12,7 @@
 #+TITLE: EmaxBound Configuration
 #+AUTHOR: A7R7
 
-#+HTML:<img alt="EmaxBound" src="assets/EmacsBound.svg" width="100%"> 
+#+HTML:<img alt="EmaxBound" src="assets/EmacsBound.svg" width="100%">
   -----
 #+HTML:<a href="https://www.gnu.org/software/emacs/"><img alt="GNU Emacs" src="https://img.shields.io/badge/emacs-29.1-8A2BF2?logo=gnuemacs&logoColor=white"/></a>
 #+HTML:<a href="https://github.com/emacscollective/borg"><img alt="Package Manager" src="https://img.shields.io/badge/package_manager-borg-green"/></a>
@@ -53,6 +53,7 @@ Check [[https://emacsmirror.net/manual/borg/Bootstrapping-using-a-seed.html][Boo
   + For some packages, specify its load path or build method in ~.borgconfig~ for them to be load or built as expected. This is auto tangled as well.
 
 ** References
+
 -  [[https://github.com/lccambiaghi/vanilla-emacs][Luca's vanilla-emacs]] (2023) detailed org config file.
 -  [[https://gitlab.com/dwt1/configuring-emacs][DistroTube's Configuring Emacs]] (2023) easy to follow.
 -  [[https://github.com/seagle0128/.emacs.d][seagle0128's Centaur Emacs]] (2023) be morden.
@@ -61,7 +62,7 @@ Check [[https://emacsmirror.net/manual/borg/Bootstrapping-using-a-seed.html][Boo
 -  [[https://github.com/doomemacs/doomemacs][Doom Emacs]] (2023) Some best practices.
 *NOTE*: the year number after link equals to
 - =min (last time the config get's updated, last time I refered to the config)=
-  
+
 * Earliest birds
 
 *NOTE*: codes under this heading are tangled to early-init.el
@@ -107,18 +108,18 @@ Borg seed generated configs.
 
 Disable byte compile for init.el, according to the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html][emacs manual]].
 #+begin_src elisp
-;;; init.el --- user-init-file
+  ;;; init.el --- user-init-file
 #+end_src
 
 Calculating time used loading emacs excutable, as well as setting some variables.
 #+begin_src elisp
-;;; -*- lexical-binding: t; no-byte-compile: t -*-
+  ;;; -*- lexical-binding: t; no-byte-compile: t -*-
   (progn ;     startup
     (defvar before-user-init-time (current-time)
       "Value of `current-time' when Emacs begins loading `user-init-file'.")
     (message "Loading Emacs...done (%fs)"
-             (float-time (time-subtract before-user-init-time
-                                        before-init-time)))
+  	     (float-time (time-subtract before-user-init-time
+  					before-init-time)))
     (setq user-init-file (or load-file-name buffer-file-name))
     (setq user-emacs-directory (file-name-directory user-init-file))
     (message "Loading %s..." user-init-file)
@@ -132,6 +133,7 @@ Calculating time used loading emacs excutable, as well as setting some variables
     (setq gc-cons-threshold most-positive-fixnum)
     ;; Prevent flashing of unstyled modeline at startup
     (setq-default mode-line-format nil)
+    (setq confirm-kill-emacs t)
   )
 #+end_src
 
@@ -183,11 +185,11 @@ Dash needs some tweaks to be built
   (use-package auto-compile
     :config
     (setq auto-compile-display-buffer               nil
-          auto-compile-mode-line-counter            t
-          auto-compile-source-recreate-deletes-dest t
-          auto-compile-toggle-deletes-nonlib-dest   t
-          auto-compile-update-autoloads             t 
-          warning-suppress-log-types        '((comp)))
+	  auto-compile-mode-line-counter            t
+	  auto-compile-source-recreate-deletes-dest t
+	  auto-compile-toggle-deletes-nonlib-dest   t
+	  auto-compile-update-autoloads             t
+	  warning-suppress-log-types        '((comp)))
   )
 #+end_src
 
@@ -197,9 +199,9 @@ Dash needs some tweaks to be built
   :defer t
   :init
   (setq epkg-repository
-        (expand-file-name "var/epkgs/" user-emacs-directory))
+	(expand-file-name "var/epkgs/" user-emacs-directory))
   (setq epkg-database-connector
-        (if (>= emacs-major-version 29) 'sqlite-builtin 'sqlite-module)))
+	(if (>= emacs-major-version 29) 'sqlite-builtin 'sqlite-module)))
 #+end_src
 
  * [[https://www.emacswiki.org/emacs/CustomizingAndSaving#Customize][Customize system]] of emacs. Set the file path used for storing customization information.
@@ -226,21 +228,21 @@ Dash needs some tweaks to be built
 
 All the .el files are placed in the ./lisp/ folder.
 According to the installation manual of org, we need to make autoloads before compile.
-#+begin_src toml 
+#+begin_src toml
   [submodule "org"]
-          load-path = lisp
-          build-step = make autoloads
-          build-step = borg-update-autoloads
-          build-step = borg-compile
-          build-step = borg-maketexi
-          build-step = borg-makeinfo
+	  load-path = lisp
+	  build-step = make autoloads
+	  build-step = borg-update-autoloads
+	  build-step = borg-compile
+	  build-step = borg-maketexi
+	  build-step = borg-makeinfo
 #+end_src
 
  * End of early birds, calculate load time.
 #+begin_src elisp
 (progn ;     startup
   (message "Loading early birds...done (%fs)"
-           (float-time (time-subtract (current-time) before-user-init-time))))
+	   (float-time (time-subtract (current-time) before-user-init-time))))
 #+end_src
 
 * Libraries
@@ -271,10 +273,12 @@ tweaks to buiild emacsql
 	build-step = make
 #+end_src
 
-* Basic Kbd 
+* Basic Kbd
 
-We setup keybinding framworks and basic keybindings at this place. Note that not all keybindings are set here. Some package specific keybinding configs are set under where the package is configed
+We setup keybinding framworks and basic keybindings at this place. Note that not all keybindings are set here. Some package specific keybinding configs are set under where the package is configured.
+
 ** Evil
+I guess evil surround and evil nerd commentor should be better to put under Coding.
 *** Evil mode
 
 [[https://github.com/emacs-evil/evil][Evil mode]] that turns you into an evil.
@@ -290,7 +294,7 @@ We setup keybinding framworks and basic keybindings at this place. Note that not
 
     :config
       (evil-mode 1)
-        ;; Use visual line motions even outside of visual-line-mode buffers
+	;; Use visual line motions even outside of visual-line-mode buffers
       (evil-global-set-key 'motion "j" 'evil-next-visual-line)
       (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
       (evil-set-initial-state 'messages-buffer-mode 'normal)
@@ -321,6 +325,21 @@ We setup keybinding framworks and basic keybindings at this place. Note that not
   )
 #+end_src
 
+*** Evil Surround
+#+begin_src elisp
+  (use-package evil-surround
+  :after evil
+  :config
+    (global-evil-surround-mode 1))
+#+end_src
+*** Evil Nerd commenter
+[[https://github.com/redguardtoo/evil-nerd-commenter][Evi Nerd Commenter]] helps you comment code efficiently!
+#+begin_src elisp
+  (use-package evil-nerd-commenter
+  :after evil
+  :config
+  )
+#+end_src
 ** Meow
 #+begin_src elisp
   (use-package meow
@@ -338,15 +357,18 @@ We setup keybinding framworks and basic keybindings at this place. Note that not
        ;; SPC j/k will run the original command in MOTION state.
        '("j" . "H-j") '("k" . "H-k")
        ;; Use SPC (0-9) for digit arguments.
-       '("1" . meow-digit-argument) '("2" . meow-digit-argument) '("3" . meow-digit-argument)
-       '("4" . meow-digit-argument) '("5" . meow-digit-argument) '("6" . meow-digit-argument)
-       '("7" . meow-digit-argument) '("8" . meow-digit-argument) '("9" . meow-digit-argument)
-       '("0" . meow-digit-argument) '("/" . meow-keypad-describe-key) '("?" . meow-cheatsheet))
+       '("1" . meow-digit-argument) '("2" . meow-digit-argument) 
+       '("3" . meow-digit-argument) '("4" . meow-digit-argument) 
+       '("5" . meow-digit-argument) '("6" . meow-digit-argument)
+       '("7" . meow-digit-argument) '("8" . meow-digit-argument) 
+       '("9" . meow-digit-argument) '("0" . meow-digit-argument) 
+       '("/" . meow-keypad-describe-key) '("?" . meow-cheatsheet))
       (meow-normal-define-key
-       '("1" . meow-expand-1) '("2" . meow-expand-2) '("3" . meow-expand-3)
-       '("4" . meow-expand-4) '("5" . meow-expand-5) '("6" . meow-expand-6)
-       '("7" . meow-expand-7) '("8" . meow-expand-8) '("9" . meow-expand-9)
-       '("0" . meow-expand-0)
+       '("1" . meow-expand-1) '("2" . meow-expand-2) 
+       '("3" . meow-expand-3) '("4" . meow-expand-4) 
+       '("5" . meow-expand-5) '("6" . meow-expand-6)
+       '("7" . meow-expand-7) '("8" . meow-expand-8) 
+       '("9" . meow-expand-9) '("0" . meow-expand-0)
        '("-" . negative-argument) '(";" . meow-reverse)
        '("," . meow-inner-of-thing) '("." . meow-bounds-of-thing)
        '("[" . meow-beginning-of-thing) '("]" . meow-end-of-thing)
@@ -377,7 +399,7 @@ We setup keybinding framworks and basic keybindings at this place. Note that not
        '("y" . meow-save) '("Y" . meow-sync-grab)
        '("z" . meow-pop-selection)
        '("'" . repeat) '("<escape>" . ignore)))
-        (meow-setup)
+	(meow-setup)
   )
 #+end_src
 
@@ -405,82 +427,83 @@ We setup keybinding framworks and basic keybindings at this place. Note that not
       :global-prefix "M-SPC") ;; access leader in insert mode
 
     (config/leader
-        "DEL"     '(which-key-undo                 :wk "󰕍 Undo key"))
+	"DEL"     '(which-key-undo                 :wk "󰕍 Undo key"))
 
+    ; buffers
     (config/leader :infix "b"
-        ""        '(nil                            :wk "  Buffer ")
-        "DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
-        "b"       '(switch-to-buffer               :wk " Switch ")
-        "d"       '(kill-this-buffer               :wk "󰅖 Delete ")
-        "r"       '(revert-buffer                  :wk "󰑓 Reload ")
-        "["       '(previous-buffer                :wk " Prev ")
-        "]"       '(next-buffer                    :wk " Next ")
+	""        '(nil                            :wk "  Buffer ")
+	"DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
+	"b"       '(switch-to-buffer               :wk " Switch ")
+	"d"       '(kill-this-buffer               :wk "󰅖 Delete ")
+	"r"       '(revert-buffer                  :wk "󰑓 Reload ")
+	"["       '(previous-buffer                :wk " Prev ")
+	"]"       '(next-buffer                    :wk " Next ")
+    )
+    ; centaur tabs
+    (config/leader
+	"{"       '(centaur-tabs-backward-group    :wk " Prev Group")
+	"}"       '(centaur-tabs-forward-group     :wk " Next Group")
+	"["       '(centaur-tabs-backward          :wk " Prev Buffer ")
+	"]"       '(centaur-tabs-forward           :wk " Next Buffer ")
+    )
+    ; builtin-tabs
+    (config/leader :infix "TAB"
+	""        '(nil                            :wk " 󰓩 Tab ")
+	"DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
+	"TAB"     '(tab-new                        :wk "󰝜 Tab New ")
+	"d"       '(tab-close                      :wk "󰭌 Tab Del ")
+	"["       '(tab-previous                   :wk " Prev ")
+	"]"       '(tab-next                       :wk " Next ")
+    )
+    ; windows
+    (config/leader :infix "w"
+	""        '(nil                            :wk " 󰓩 Tab ")
+	"DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
+	"d"       '(delete-window                  :wk "󰅖 Delete  ")
+	"v"       '(split-window-vertically        :wk "󰤻 Split   ")
+	"s"       '(split-window-horizontally      :wk "󰤼 Split   ")
+	"\\"      '(split-window-vertically        :wk "󰤻 Split   ")
+	"|"       '(split-window-horizontally      :wk "󰤼 Split   ")
+	"h"       '(evil-window-left               :wk " Focus H ")
+	"j"       '(evil-window-down               :wk " Focus J ")
+	"k"       '(evil-window-up                 :wk " Focus K ")
+	"l"       '(evil-window-right              :wk " Focus L ")
+    )
+    ; Borg
+    (config/leader :infix "B"
+	""        '(nil                            :wk " 󰏗 Borg      ")
+	"DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
+	"a"       '(borg-assimilate                :wk "󱧕 Assimilate ")
+	"A"       '(borg-activate                  :wk " Activate   ")
+	"b"       '(borg-build                     :wk "󱇝 Build      ")
+	"c"       '(borg-clone                     :wk " Clone      ")
+	"r"       '(borg-remove                    :wk "󱧖 Remove     ")
+    )
+    ; toggle
+    (config/leader :infix "t"
+	""        '(nil                            :wk " 󰭩 Toggle    ")
+	"DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
+    )
+    ; quit
+    (config/leader :infix "q"
+	""        '(nil                            :wk " 󰗼 Quit      ")
+	"DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
+	"q"       '(save-buffers-kill-terminal     :wk "󰗼 Quit Emacs ")
+    )
+    ; Git
+    (config/leader :infix "g"
+	""        '(nil                            :wk " 󰊢 Git       ")
+	"DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
+	"g"       '(magit                          :wk " Magit      ")
+    )
+    ; dired
+    (config/leader
+	"e"       '(dirvish-side                   :wk "󰙅 Dirvish-side ")
+	"E"       '(dirvish                        :wk " Dirvish      ")
+	;"qe"      '(save-buffers-kill-emacs         :wk "Quit Emacs ")
     )
     (config/leader
-        "{"       '(centaur-tabs-backward-group    :wk " Prev Group")
-        "}"       '(centaur-tabs-forward-group     :wk " Next Group")
-        "["       '(centaur-tabs-backward          :wk " Prev Buffer ")
-        "]"       '(centaur-tabs-forward           :wk " Next Buffer ")
-    )
-
-    (config/leader :infix "TAB"
-        ""        '(nil                            :wk " 󰓩 Tab ")
-        "DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
-        "TAB"     '(tab-new                        :wk "󰝜 Tab New ")
-        "d"       '(tab-close                      :wk "󰭌 Tab Del ")
-        "["       '(tab-previous                   :wk " Prev ")
-        "]"       '(tab-next                       :wk " Next ")
-    )
-
-    (config/leader :infix "w"
-        ""        '(nil                            :wk " 󰓩 Tab ")
-        "DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
-        "d"       '(delete-window                  :wk "󰅖 Delete  ")
-        "v"       '(split-window-vertically        :wk "󰤻 Split   ")
-        "s"       '(split-window-horizontally      :wk "󰤼 Split   ")
-        "h"       '(evil-window-left               :wk " Focus H ")
-        "j"       '(evil-window-down               :wk " Focus J ")
-        "k"       '(evil-window-up                 :wk " Focus K ")
-        "l"       '(evil-window-right              :wk " Focus L ")
-        "\\"      '(split-window-vertically        :wk "󰤻 Split   ")
-        "|"       '(split-window-horizontally      :wk "󰤼 Split   ")
-    )
-    (config/leader :infix "w"
-        "\\"      '(split-window-vertically        :wk "󰤻 Split   ")
-        "|"       '(split-window-horizontally      :wk "󰤼 Split   ")
-    )
-
-    (config/leader :infix "B"
-        ""        '(nil                            :wk " 󰏗 Borg      ")
-        "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
-        "a"       '(borg-assimilate                :wk "󱧕 Assimilate ")
-        "A"       '(borg-activate                  :wk " Activate   ")
-        "b"       '(borg-build                     :wk "󱇝 Build      ")
-        "c"       '(borg-clone                     :wk " Clone      ")
-        "r"       '(borg-remove                    :wk "󱧖 Remove     ")
-    )
-
-    (config/leader :infix "t"
-        ""        '(nil                            :wk " 󰭩 Toggle    ")
-        "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
-    )
-
-    (config/leader :infix "q"
-        ""        '(nil                            :wk " 󰗼 Quit      ")
-        "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
-        "q"       '(save-buffers-kill-terminal     :wk "󰗼 Quit Emacs ")
-    )
-
-    (config/leader :infix "g"
-        ""        '(nil                            :wk " 󰊢 Git       ")
-        "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
-        "g"       '(magit                          :wk " Magit      ")
-    )
-
-    (config/leader 
-        "e"       '(dirvish-side                   :wk "󰙅 Dirvish-side ")
-        "E"       '(dirvish                        :wk " Dirvish      ")
-        ;"qe"      '(save-buffers-kill-emacs         :wk "Quit Emacs ")
+	"/"       '(evilnc-comment-or-uncomment-lines :wk "󱀢 Comment ")
     )
   )
 #+end_src
@@ -518,7 +541,7 @@ We setup keybinding framworks and basic keybindings at this place. Note that not
   )
 #+end_src
 
-[[https://github.com/yanghaoxie/which-key-posframe][Which-key-posframe]] use posframe to show which-key popup. 
+[[https://github.com/yanghaoxie/which-key-posframe][Which-key-posframe]] use posframe to show which-key popup.
 options for =which-key-posframe-poshandler=:
 ~posframe-poshandler-[frame/window/point]-[top/bottom/]-[center/left-corner/right-corner]~
 #+begin_src elisp
@@ -534,7 +557,7 @@ options for =which-key-posframe-poshandler=:
 
 * Basic UI
 
-We setup UI for basic emacs widgets at this place. Again, not all UI's are set here. 
+We setup UI for basic emacs widgets at this place. Again, not all UI's are set here.
 Some package specific UI configs are set under where the package is configed.
 
 ** Fonts
@@ -559,20 +582,20 @@ Defining the various fonts that Emacs will use.
   )
   (set-face-attribute 'fixed-pitch-serif t
     :family "Monospace Serif"
-    :height 180 
+    :height 180
   )
 #+end_src
 
 Makes commented text and keywords italics. Working in emacsclient but not emacs.
 #+begin_src elisp
-  (set-face-attribute 'font-lock-comment-face nil 
+  (set-face-attribute 'font-lock-comment-face nil
     :foreground "LightSteelBlue4" :slant 'italic)
   (set-face-attribute 'font-lock-keyword-face nil :slant 'italic)
 #+end_src
 
 links
 #+begin_src elisp
-  (set-face-attribute 'link nil 
+  (set-face-attribute 'link nil
     :foreground "#ffcc66" :underline t :bold nil)
 #+end_src
 
@@ -582,7 +605,7 @@ You can use the bindings CTRL plus =/- for zooming in/out.  You can also use CTR
 
 #+begin_src elisp
  (use-package emacs
-   :init 
+   :init
      (global-set-key (kbd "C-=")            'text-scale-increase)
      (global-set-key (kbd "C--")            'text-scale-decrease)
      (global-set-key (kbd "<C-wheel-up>")   'text-scale-increase)
@@ -637,7 +660,7 @@ Run [[elisp:nerd-icons-install-fonts][M-x nerd-icons-install-fonts]] to install 
 ** Theme
 [[https://github.com/hlissner/emacs-doom-themes][Doom-themes]] is a great set of themes with a lot of variety and support for many different Emacs modes. Taking a look at the [[https://github.com/hlissner/emacs-doom-themes/tree/screenshots][screenshots]] might help you decide which one you like best.  You can also run =M-x counsel-load-theme= to choose between them easily.
 
-** Text Arrangement
+** Page
 *** Centering
 
 We have 3 modes that can help centering text in a window. But currently we only use olivetti mode.
@@ -657,20 +680,14 @@ We have 3 modes that can help centering text in a window. But currently we only 
     (dashboard-mode . olivetti-mode)
     (dashboard-mode . variable-pitch-mode)
     (olivetti-mode . visual-line-mode)
-  :custom-face
-    (olivetti-fringe ((t (:background "#171B24"))))
-  :init 
+  :init
     (setq-default fill-column 74)
   :config
     ;If nil (the default), use the value of fill-column + 2.
     (setq olivetti-body-width nil
-          olivetti-style 'fancy)
+	         olivetti-style 'fancy)
     (set-face-attribute 'olivetti-fringe nil :background "#171B24")
 
-    (defun config/adjust-olivetti-body-width ()
-      (when (and (boundp 'mixed-pitch-mode) mixed-pitch-mode)
-        (setq olivetti-body-width 54)))
-    ;(add-hook 'olivetti-mode-hook 'config/adjust-olivetti-body-width)
     (config/leader
       "tc"  '(olivetti-mode     :wk "󰉠 Center")
     )
@@ -679,11 +696,11 @@ We have 3 modes that can help centering text in a window. But currently we only 
 
 **** Visual-fill-column
 
-    [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]]  
-    
+    [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]]
+
 **** Writeroom-mode
 
-*** Spacing 
+*** Spacing
 
 [[https://github.com/trevorpogue/topspace][Topspace]] recenter line 1 with scrollable upper margin/padding
 #+begin_src elisp
@@ -692,6 +709,50 @@ We have 3 modes that can help centering text in a window. But currently we only 
   )
 #+end_src
 
+*** Line Number
+#+begin_src elisp
+  (use-package emacs
+  :custom-face
+    (line-number ((t (:weight normal :slant normal :foreground "LightSteelBlue4" :inherit default))))
+    (line-number-current-line ((t (:inherit (hl-line default) :slant normal :foreground "#ffcc66"))))
+
+  :config
+    (defun config/toggle-line-number-nil ()
+	(interactive)
+	(setq display-line-numbers nil)
+    )
+    (defun config/toggle-line-number-absolute ()
+	(interactive)
+	(setq display-line-numbers t)
+    )
+    (defun config/toggle-line-number-relative ()
+	(interactive)
+	(setq display-line-numbers 'relative)
+    )
+    (defun config/toggle-line-number-visual ()
+	(interactive)
+	(setq display-line-numbers 'visual)
+    )
+    (config/leader :infix "tl"
+      ""    '(nil                                :wk "  Line Number ")
+      "DEL" '(which-key-undo                     :wk "󰕍 Undo key   ")
+      "n"   '(config/toggle-line-number-nil      :wk "󰅖 Nil        ")
+      "a"   '(config/toggle-line-number-absolute :wk "󰱇 Absolute   ")
+      "r"   '(config/toggle-line-number-relative :wk "󰰠 Relative   ")
+      "v"   '(config/toggle-line-number-visual   :wk " Visual     ")
+      "h"   '(hl-line-mode                       :wk "󰸱 Hl-line")
+    )
+  )
+#+end_src
+
+*** Whitespace mode
+
+[[https://www.emacswiki.org/emacs/WhiteSpace][Whitespace mode]] is a built in mode of emacs that visualizes whitespaces, tab symbols, indentations and related stuffs.
+#+begin_src elisp
+  (config/leader :infix "t"
+    "SPC"  '(whitespace-mode  :wk "󰡭 Show Space")
+  )
+#+end_src
 ** Transparency
 
 Set background Transparency, according to [[https://www.emacswiki.org/emacs/TransparentEmacs][this page]].
@@ -733,8 +794,8 @@ This piece of code is taken from https://emacs-china.org/t/topic/25114/5
 
 #+begin_src elisp
   (use-package doom-modeline
-  :init 
-    (setq 
+  :init
+    (setq
       doom-modeline-height 37
       doom-modeline-enable-word-count t)
     (doom-modeline-mode 1)
@@ -761,21 +822,21 @@ Dashboard is an extensible startup screen showing you recent files, bookmarks, a
   (use-package dashboard
   :init
     (setq initial-buffer-choice 'dashboard-open
-          dashboard-image-banner-max-width 1000
-          dashboard-set-heading-icons t
-          dashboard-center-content t ;; set to 't' for centered content
-          dashboard-set-file-icons t
-          initial-buffer-choice 
-            (lambda () (get-buffer-create "*dashboard*"))
-          dashboard-startup-banner ;; use custom image as banner
-            (concat user-emacs-directory "assets/EmacsBound.xpm")
-          dashboard-items '(
-            (recents . 5)
-            (agenda . 5 )
-            (bookmarks . 3)
-            (projects . 3)
-            (registers . 3)
-          )
+	  dashboard-image-banner-max-width 1000
+	  dashboard-set-heading-icons t
+	  dashboard-center-content t ;; set to 't' for centered content
+	  dashboard-set-file-icons t
+	  initial-buffer-choice
+	    (lambda () (get-buffer-create "*dashboard*"))
+	  dashboard-startup-banner ;; use custom image as banner
+	    (concat user-emacs-directory "assets/EmacsBound.xpm")
+	  dashboard-items '(
+	    (recents . 5)
+	    (agenda . 5 )
+	    (bookmarks . 3)
+	    (projects . 3)
+	    (registers . 3)
+	  )
     )
   :config
     (dashboard-setup-startup-hook)
@@ -792,11 +853,11 @@ Dashboard is an extensible startup screen showing you recent files, bookmarks, a
       (dashboard-mode . centaur-tabs-local-mode)
     :init
       (setq centaur-tabs-set-icons t
-            centaur-tabs-set-modified-marker t
-            centaur-tabs-modified-marker "M"
-            centaur-tabs-cycle-scope 'tabs
-            centaur-tabs-set-bar 'over
-            centaur-tabs-enable-ido-completion nil
+	    centaur-tabs-set-modified-marker t
+	    centaur-tabs-modified-marker "M"
+	    centaur-tabs-cycle-scope 'tabs
+	    centaur-tabs-set-bar 'over
+	    centaur-tabs-enable-ido-completion nil
       )
       (centaur-tabs-mode t)
     :config
@@ -804,41 +865,6 @@ Dashboard is an extensible startup screen showing you recent files, bookmarks, a
       ;; (centaur-tabs-headline-match)
       ;; (centaur-tabs-group-by-projectile-project)
 
-  )
-#+end_src
-
-** Line Number
-#+begin_src elisp
-  (use-package emacs
-  :custom-face
-    (line-number ((t (:weight normal :slant normal :foreground "LightSteelBlue4" :inherit default))))
-    (line-number-current-line ((t (:inherit (hl-line default) :slant normal :foreground "#ffcc66"))))
-
-  :config
-    (defun config/toggle-line-number-nil ()      
-        (interactive)
-        (setq display-line-numbers nil)
-    )
-    (defun config/toggle-line-number-absolute () 
-        (interactive)
-        (setq display-line-numbers t)
-    )
-    (defun config/toggle-line-number-relative () 
-        (interactive)
-        (setq display-line-numbers 'relative)
-    )
-    (defun config/toggle-line-number-visual ()   
-        (interactive)
-        (setq display-line-numbers 'visual)
-    )
-    (config/leader :infix "tl"
-      ""    '(nil                                :wk "  Line Number ")
-      "DEL" '(which-key-undo                     :wk "󰕍 Undo key   ")
-      "n"   '(config/toggle-line-number-nil      :wk "󰅖 Nil        ")
-      "a"   '(config/toggle-line-number-absolute :wk "󰯫 Absolute   ")
-      "r"   '(config/toggle-line-number-relative :wk " Relative   ")
-      "v"   '(config/toggle-line-number-visual   :wk " Visual     ")
-    )
   )
 #+end_src
 
@@ -862,7 +888,7 @@ Dashboard is an extensible startup screen showing you recent files, bookmarks, a
     (setq mini-frame-detach-on-hide nil)
     ;(setq mini-frame-standalone 't)
     ;(setq mini-frame-resize-min-height 10)
-    (setq mini-frame-ignore-commands 
+    (setq mini-frame-ignore-commands
       (append mini-frame-ignore-commands
        '(evil-window-split evil-window-vsplit evil-ex)))
   )
@@ -895,13 +921,22 @@ Use olivetti to center text in minibuffer!
   :config
     (setq diff-hl-draw-borders nil)
     (global-diff-hl-mode)
+    (diff-hl-margin-mode) 
     (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
   )
 #+end_src
 
 ** Posframe
-[[https://github.com/tumashu/posframe][Posframe]] can pop up a frame at point, this *posframe* is a child-frame connected to its root window's buffer. 
+[[https://github.com/tumashu/posframe][Posframe]] can pop up a frame at point, this *posframe* is a child-frame connected to its root window's buffer.
 
+** Holo-layer
+[[https://github.com/manateelazycat/holo-layer][Holo-layer]] is developed based on PyQt, aiming to significantly enhance the visual experience of Emacs. 
+#+begin_src elisp
+  (use-package holo-layer
+    :config 
+    (holo-layer-enable)
+  )
+#+end_src
 * Facilities
 ** Long tail
 #+begin_src elisp
@@ -954,9 +989,9 @@ Use olivetti to center text in minibuffer!
   :commands (magit-add-section-hook)
   :config
   (magit-add-section-hook 'magit-status-sections-hook
-                          'magit-insert-modules
-                          'magit-insert-stashes
-                          'append))
+			  'magit-insert-modules
+			  'magit-insert-stashes
+			  'append))
 #+end_src
     - tweaks to build magit
 #+begin_src toml
@@ -1025,11 +1060,11 @@ Use olivetti to center text in minibuffer!
   (add-to-list 'tramp-default-proxies-alist '(nil "\\`root\\'" "/ssh:%h:"))
   (add-to-list 'tramp-default-proxies-alist '("localhost" nil nil))
   (add-to-list 'tramp-default-proxies-alist
-               (list (regexp-quote (system-name)) nil nil))
+	       (list (regexp-quote (system-name)) nil nil))
   (setq vc-ignore-dir-regexp
-        (format "\\(%s\\)\\|\\(%s\\)"
-                vc-ignore-dir-regexp
-                tramp-file-name-regexp)))
+	(format "\\(%s\\)\\|\\(%s\\)"
+		vc-ignore-dir-regexp
+		tramp-file-name-regexp)))
 #+end_src
 
 #+begin_src elisp
@@ -1049,51 +1084,52 @@ Dropin replacement for dired.
   :custom
     (dirvish-quick-access-entries ;`setq' won't work for custom
       '(("h" "~/"                          "Home")
-        ("d" "~/Downloads/"                "Downloads")
-        ("m" "/mnt/"                       "Drives")
-        ("t" "~/.local/share/Trash/files/" "TrashCan"))
+	("d" "~/Downloads/"                "Downloads")
+	("m" "/mnt/"                       "Drives")
+	("t" "~/.local/share/Trash/files/" "TrashCan"))
     )
   :config
     (dirvish-define-preview exa (file)
     "Use `exa' to generate directory preview."
     :require ("exa") ; tell Dirvish to check if we have the executable
     (when (file-directory-p file) ; we only interest in directories here
-        `(shell . ("exa" "-al" "--color=always" "--icons"
-                "--group-directories-first" ,file))))
+	`(shell . ("exa" "-al" "--color=always" "--icons"
+		"--group-directories-first" ,file))))
 
     (add-to-list 'dirvish-preview-dispatchers 'exa)
     ;; (dirvish-peek-mode) ; Preview files in minibuffer
     ;; (dirvish-side-follow-mode) ; similar to `treemacs-follow-mode'
     (setq dirvish-path-separators (list "  " "  " "  "))
     (setq dirvish-mode-line-format
-            '(:left (sort symlink) :right (omit yank index)))
+	    '(:left (sort symlink) :right (omit yank index)))
     (setq dirvish-attributes
-            '(all-the-icons file-time file-size collapse subtree-state vc-state git-msg))
+	    '(all-the-icons file-time file-size collapse subtree-state vc-state git-msg))
     (setq delete-by-moving-to-trash t)
     (setq dired-listing-switches
-            "-l --almost-all --human-readable --group-directories-first --no-group")
+	    "-l --almost-all --human-readable --group-directories-first --no-group")
     (nmap dirvish-mode-map
-        "TAB"    '(dirvish-subtree-toggle    :wk "Subtre-toggle")
-        "q"      '(dirvish-quit              :wk "Quit")
-        "h"      '(dired-up-directory        :wk "Up-dir")
-        "l"      '(dired-find-file           :wk "Open/Toggle")
-        "a"      '(dirvish-quick-access      :wk "Access")
-        "f"      '(dirvish-file-info-menu    :wk "File Info Menu")
-        "y"      '(dirvish-yank-menu         :wk "Yank Menu")
-        "N"      '(dirvish-narrow            :wk "Narrow")
-        ;         `dired-view-file'
-        "v"      '(dirvish-vc-menu           :wk "View-file") 
-        ;         `dired-sort-toggle-or-edit'
-        "s"      '(dirvish-quicksort         :wk "Quick-sort")
+	"?"      '(dirvish-dispatch          :wk "Dispatch")
+	"TAB"    '(dirvish-subtree-toggle    :wk "Subtre-toggle")
+	"q"      '(dirvish-quit              :wk "Quit")
+	"h"      '(dired-up-directory        :wk "Up-dir")
+	"l"      '(dired-find-file           :wk "Open/Toggle")
+	"a"      '(dirvish-quick-access      :wk "Access")
+	"f"      '(dirvish-file-info-menu    :wk "File Info Menu")
+	"y"      '(dirvish-yank-menu         :wk "Yank Menu")
+	"N"      '(dirvish-narrow            :wk "Narrow")
+	;         `dired-view-file'
+	"v"      '(dirvish-vc-menu           :wk "View-file")
+	;         `dired-sort-toggle-or-edit'
+	"s"      '(dirvish-quicksort         :wk "Quick-sort")
 
-        "M-f"    '(dirvish-history-go-forward  :wk "History-forward")
-        "M-b"    '(dirvish-history-go-backward :wk "History-back")
-        "M-l"    '(dirvish-ls-switches-menu    :wk "ls Switch Menu")
-        "M-m"    '(dirvish-mark-menu           :wk "Mark Menu")
-        "M-t"    '(dirvish-layout-toggle       :wk "Layout-toggle")
-        "M-s"    '(dirvish-setup-menu          :wk "Setup-Menu")
-        "M-e"    '(dirvish-emerge-menu         :wk "Emerge-Menu")
-        "M-j"    '(dirvish-fd-jump             :wk "fd-jump")
+	"M-f"    '(dirvish-history-go-forward  :wk "History-forward")
+	"M-b"    '(dirvish-history-go-backward :wk "History-back")
+	"M-l"    '(dirvish-ls-switches-menu    :wk "ls Switch Menu")
+	"M-m"    '(dirvish-mark-menu           :wk "Mark Menu")
+	"M-t"    '(dirvish-layout-toggle       :wk "Layout-toggle")
+	"M-s"    '(dirvish-setup-menu          :wk "Setup-Menu")
+	"M-e"    '(dirvish-emerge-menu         :wk "Emerge-Menu")
+	"M-j"    '(dirvish-fd-jump             :wk "fd-jump")
     )
   )
 #+end_src
@@ -1148,7 +1184,7 @@ It is very useful for figuring out how things work in Emacs.
 
 ** Vertico
 
-[[https://github.com/minad/vertico#extensions][Vertico]] provides a performant and minimalistic vertical completion UI based on the default completion system. 
+[[https://github.com/minad/vertico#extensions][Vertico]] provides a performant and minimalistic vertical completion UI based on the default completion system.
 
 #+begin_src elisp
   (use-package vertico
@@ -1156,7 +1192,7 @@ It is very useful for figuring out how things work in Emacs.
     (setq completion-styles '(orderless))
     (setq orderless-component-separator #'orderless-escapable-split-on-space)
     (setq orderless-matching-styles
-        '(orderless-initialism orderless-prefixes orderless-regexp))
+	'(orderless-initialism orderless-prefixes orderless-regexp))
     ;; Different scroll margin
     ;(setq vertico-scroll-margin 1)
     ;; Show more candidates
@@ -1183,9 +1219,9 @@ tweaks to build vertico
   :after vertico
   ;; More convenient directory navigation commands
   :bind (:map vertico-map
-              ("RET" . vertico-directory-enter)
-              ("DEL" . vertico-directory-delete-char)
-              ("M-DEL" . vertico-directory-delete-word))
+	      ("RET" . vertico-directory-enter)
+	      ("DEL" . vertico-directory-delete-char)
+	      ("M-DEL" . vertico-directory-delete-word))
   ;; Tidy shadowed file names
   :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
 #+end_src
@@ -1208,22 +1244,22 @@ Vertico-multiform configures Vertico modes per command or completion category.
   (use-package vertico-posframe
   :disabled
   :after vertico-multiform
-  :init 
+  :init
     (setq vertico-multiform-commands
-         '((consult-line posframe
-              (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
-              ;(vertico-posframe-fallback-mode . vertico-buffer-mode)
-              (vertico-posframe-width . 50))
-           (execute-extended-command
-              (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
-              (vertico-posframe-fallback-mode . vertico-buffer-mode))
-           (t posframe)
-          )
+	 '((consult-line posframe
+	      (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
+	      ;(vertico-posframe-fallback-mode . vertico-buffer-mode)
+	      (vertico-posframe-width . 50))
+	   (execute-extended-command
+	      (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
+	      (vertico-posframe-fallback-mode . vertico-buffer-mode))
+	   (t posframe)
+	  )
     )
     (setq vertico-count 20
-          vertico-posframe-border-width 3
-          vertico-posframe-width 140
-          vertico-resize nil)
+	  vertico-posframe-border-width 3
+	  vertico-posframe-width 140
+	  vertico-resize nil)
 
     ;(vertico-multiform-mode 1)
     ;(vertico-posframe-mode 1)
@@ -1235,36 +1271,36 @@ Vertico-multiform configures Vertico modes per command or completion category.
 #+begin_src elisp
   ;; Persist history over Emacs restarts. Vertico sorts by history position.
     (use-package savehist
-        :init
-        (savehist-mode))
+	:init
+	(savehist-mode))
 #+end_src
 
 #+begin_src elisp
   ;; A few more useful configurations...
     (use-package emacs
-        :init
-        ;; Add prompt indicator to `completing-read-multiple'.
-        ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
-        (defun crm-indicator (args)
-        (cons (format "[CRM%s] %s"
-                        (replace-regexp-in-string
-                        "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
-                        crm-separator)
-                        (car args))
-                (cdr args)))
-        (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+	:init
+	;; Add prompt indicator to `completing-read-multiple'.
+	;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
+	(defun crm-indicator (args)
+	(cons (format "[CRM%s] %s"
+			(replace-regexp-in-string
+			"\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+			crm-separator)
+			(car args))
+		(cdr args)))
+	(advice-add #'completing-read-multiple :filter-args #'crm-indicator)
 
-        ;; Do not allow the cursor in the minibuffer prompt
-        (setq minibuffer-prompt-properties
-            '(read-only t cursor-intangible t face minibuffer-prompt))
-        (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+	;; Do not allow the cursor in the minibuffer prompt
+	(setq minibuffer-prompt-properties
+	    '(read-only t cursor-intangible t face minibuffer-prompt))
+	(add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
 
-        ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
-        ;; Vertico commands are hidden in normal buffers.
-        ;; (setq read-extended-command-predicate
-        ;;       #'command-completion-default-include-p)
-        ;; Enable recursive minibuffers
-        (setq enable-recursive-minibuffers t))
+	;; Emacs 28: Hide commands in M-x which do not work in the current mode.
+	;; Vertico commands are hidden in normal buffers.
+	;; (setq read-extended-command-predicate
+	;;       #'command-completion-default-include-p)
+	;; Enable recursive minibuffers
+	(setq enable-recursive-minibuffers t))
 #+end_src
 
 ** Consult
@@ -1275,56 +1311,56 @@ Vertico-multiform configures Vertico modes per command or completion category.
 (use-package consult
   ;; Replace bindings. Lazily loaded due by `use-package'.
   :bind (;; C-c bindings in `mode-specific-map'
-         ("C-c M-x" . consult-mode-command)
-         ("C-c h" . consult-history)
-         ("C-c k" . consult-kmacro)
-         ("C-c m" . consult-man)
-         ("C-c i" . consult-info)
-         ([remap Info-search] . consult-info)
-         ;; C-x bindings in `ctl-x-map'
-         ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
-         ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
-         ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
-         ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
-         ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
-         ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
-         ;; Custom M-# bindings for fast register access
-         ("M-#" . consult-register-load)
-         ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
-         ("C-M-#" . consult-register)
-         ;; Other custom bindings
-         ("M-y" . consult-yank-pop)                ;; orig. yank-pop
-         ;; M-g bindings in `goto-map'
-         ("M-g e" . consult-compile-error)
-         ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
-         ("M-g g" . consult-goto-line)             ;; orig. goto-line
-         ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
-         ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
-         ("M-g m" . consult-mark)
-         ("M-g k" . consult-global-mark)
-         ("M-g i" . consult-imenu)
-         ("M-g I" . consult-imenu-multi)
-         ;; M-s bindings in `search-map'
-         ("M-s d" . consult-find)
-         ("M-s D" . consult-locate)
-         ("M-s g" . consult-grep)
-         ("M-s G" . consult-git-grep)
-         ("M-s r" . consult-ripgrep)
-         ("M-s l" . consult-line)
-         ("M-s L" . consult-line-multi)
-         ("M-s k" . consult-keep-lines)
-         ("M-s u" . consult-focus-lines)
-         ;; Isearch integration
-         ("M-s e" . consult-isearch-history)
-         :map isearch-mode-map
-         ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
-         ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
-         ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
-         ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
-         ;; Minibuffer history
-         :map minibuffer-local-map
-         ("M-s" . consult-history)                 ;; orig. next-matching-history-element
-         ("M-r" . consult-history))                ;; orig. previous-matching-history-element
+	 ("C-c M-x" . consult-mode-command)
+	 ("C-c h" . consult-history)
+	 ("C-c k" . consult-kmacro)
+	 ("C-c m" . consult-man)
+	 ("C-c i" . consult-info)
+	 ([remap Info-search] . consult-info)
+	 ;; C-x bindings in `ctl-x-map'
+	 ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+	 ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
+	 ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+	 ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
+	 ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
+	 ("C-x p b" . consult-project-buffer)      ;; orig. project-switch-to-buffer
+	 ;; Custom M-# bindings for fast register access
+	 ("M-#" . consult-register-load)
+	 ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+	 ("C-M-#" . consult-register)
+	 ;; Other custom bindings
+	 ("M-y" . consult-yank-pop)                ;; orig. yank-pop
+	 ;; M-g bindings in `goto-map'
+	 ("M-g e" . consult-compile-error)
+	 ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+	 ("M-g g" . consult-goto-line)             ;; orig. goto-line
+	 ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
+	 ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+	 ("M-g m" . consult-mark)
+	 ("M-g k" . consult-global-mark)
+	 ("M-g i" . consult-imenu)
+	 ("M-g I" . consult-imenu-multi)
+	 ;; M-s bindings in `search-map'
+	 ("M-s d" . consult-find)
+	 ("M-s D" . consult-locate)
+	 ("M-s g" . consult-grep)
+	 ("M-s G" . consult-git-grep)
+	 ("M-s r" . consult-ripgrep)
+	 ("M-s l" . consult-line)
+	 ("M-s L" . consult-line-multi)
+	 ("M-s k" . consult-keep-lines)
+	 ("M-s u" . consult-focus-lines)
+	 ;; Isearch integration
+	 ("M-s e" . consult-isearch-history)
+	 :map isearch-mode-map
+	 ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
+	 ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
+	 ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+	 ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
+	 ;; Minibuffer history
+	 :map minibuffer-local-map
+	 ("M-s" . consult-history)                 ;; orig. next-matching-history-element
+	 ("M-r" . consult-history))                ;; orig. previous-matching-history-element
 
   ;; Enable automatic preview at point in the *Completions* buffer. This is
   ;; relevant when you use the default completion UI.
@@ -1337,7 +1373,7 @@ Vertico-multiform configures Vertico modes per command or completion category.
   ;; preview for `consult-register', `consult-register-load',
   ;; `consult-register-store' and the Emacs built-ins.
   (setq register-preview-delay 0.5
-        register-preview-function #'consult-register-format)
+	register-preview-function #'consult-register-format)
 
   ;; Optionally tweak the register preview window.
   ;; This adds thin lines, sorting and hides the mode line of the window.
@@ -1345,7 +1381,7 @@ Vertico-multiform configures Vertico modes per command or completion category.
 
   ;; Use Consult to select xref locations with preview
   (setq xref-show-xrefs-function #'consult-xref
-        xref-show-definitions-function #'consult-xref)
+	xref-show-definitions-function #'consult-xref)
 
   ;; Configure other variables and modes in the :config section,
   ;; after lazily loading the package.
@@ -1391,7 +1427,7 @@ Vertico-multiform configures Vertico modes per command or completion category.
 )
 #+end_src
 
-** Blink search 
+** Blink search
 
 [[https://github.com/manateelazycat/blink-search][Blink-search]] is the fastest multi-source search framework for Emacs.
 
@@ -1412,7 +1448,7 @@ Vertico-multiform configures Vertico modes per command or completion category.
     )
   )
 #+end_src
-** Popweb 
+** Popweb
 
 * Coding
 ** YASnippet
@@ -1490,71 +1526,71 @@ fingertip.el is a plugin that provides grammatical edit base on treesit
   (use-package fingertip
   :config
     (dolist (hook (list
-                'c-mode-common-hook 'c-mode-hook 'c++-mode-hook
-                'c-ts-mode-hook 'c++-ts-mode-hook
-                'cmake-ts-mode-hook
-                'java-mode-hook
-                'haskell-mode-hook
-                'emacs-lisp-mode-hook 'lisp-interaction-mode-hook 'lisp-mode-hook
-                'maxima-mode-hook
-                'ielm-mode-hook
-                'bash-ts-mode-hook 'sh-mode-hook
-                'makefile-gmake-mode-hook
-                'php-mode-hook
-                'python-mode-hook 'python-ts-mode-hook
-                'js-mode-hook
-                'go-mode-hook
-                'qml-mode-hook
-                'jade-mode-hook
-                'css-mode-hook 'css-ts-mode-hook
-                'ruby-mode-hook
-                'coffee-mode-hook
-                'rust-mode-hook 'rust-ts-mode-hook
-                'qmake-mode-hook
-                'lua-mode-hook
-                'swift-mode-hook
-                'web-mode-hook
-                'markdown-mode-hook
-                'llvm-mode-hook
-                'conf-toml-mode-hook 'toml-ts-mode-hook
-                'nim-mode-hook
-                'typescript-mode-hook 'typescript-ts-mode-hook
-                'js-ts-mode-hook 'json-ts-mode-hook
-                ))
+		'c-mode-common-hook 'c-mode-hook 'c++-mode-hook
+		'c-ts-mode-hook 'c++-ts-mode-hook
+		'cmake-ts-mode-hook
+		'java-mode-hook
+		'haskell-mode-hook
+		'emacs-lisp-mode-hook 'lisp-interaction-mode-hook 'lisp-mode-hook
+		'maxima-mode-hook
+		'ielm-mode-hook
+		'bash-ts-mode-hook 'sh-mode-hook
+		'makefile-gmake-mode-hook
+		'php-mode-hook
+		'python-mode-hook 'python-ts-mode-hook
+		'js-mode-hook
+		'go-mode-hook
+		'qml-mode-hook
+		'jade-mode-hook
+		'css-mode-hook 'css-ts-mode-hook
+		'ruby-mode-hook
+		'coffee-mode-hook
+		'rust-mode-hook 'rust-ts-mode-hook
+		'qmake-mode-hook
+		'lua-mode-hook
+		'swift-mode-hook
+		'web-mode-hook
+		'markdown-mode-hook
+		'llvm-mode-hook
+		'conf-toml-mode-hook 'toml-ts-mode-hook
+		'nim-mode-hook
+		'typescript-mode-hook 'typescript-ts-mode-hook
+		'js-ts-mode-hook 'json-ts-mode-hook
+		))
     (add-hook hook #'(lambda () (fingertip-mode 1))))
-    (general-def 
+    (general-def
       :keymaps 'fingertip-mode-map
-        "(" 'fingertip-open-round
-        "[" 'fingertip-open-bracket
-        "{" 'fingertip-open-curly
-        ")" 'fingertip-close-round
-        "]" 'fingertip-close-bracket
-        "}" 'fingertip-close-curly
-        "=" 'fingertip-equal
+	"(" 'fingertip-open-round
+	"[" 'fingertip-open-bracket
+	"{" 'fingertip-open-curly
+	")" 'fingertip-close-round
+	"]" 'fingertip-close-bracket
+	"}" 'fingertip-close-curly
+	"=" 'fingertip-equal
 
-        "%" 'fingertip-match-paren
-        "\"" 'fingertip-double-quote
-        "'" 'fingertip-single-quote
+	"%" 'fingertip-match-paren
+	"\"" 'fingertip-double-quote
+	"'" 'fingertip-single-quote
 
-        "SPC" 'fingertip-space
-        "RET" 'fingertip-newline
+	"SPC" 'fingertip-space
+	"RET" 'fingertip-newline
 
-        "M-o" 'fingertip-backward-delete
-        "C-d" 'fingertip-forward-delete
-        "C-k" 'fingertip-kill
+	"M-o" 'fingertip-backward-delete
+	"C-d" 'fingertip-forward-delete
+	"C-k" 'fingertip-kill
 
-        "M-\"" 'fingertip-wrap-double-quote
-        "M-'" 'fingertip-wrap-single-quote
-        "M-[" 'fingertip-wrap-bracket
-        "M-{" 'fingertip-wrap-curly
-        "M-(" 'fingertip-wrap-round
-        "M-)" 'fingertip-unwrap
+	"M-\"" 'fingertip-wrap-double-quote
+	"M-'" 'fingertip-wrap-single-quote
+	"M-[" 'fingertip-wrap-bracket
+	"M-{" 'fingertip-wrap-curly
+	"M-(" 'fingertip-wrap-round
+	"M-)" 'fingertip-unwrap
 
-        "M-p" 'fingertip-jump-right
-        "M-n" 'fingertip-jump-left
-        "M-:" 'fingertip-jump-out-pair-and-newline
+	"M-p" 'fingertip-jump-right
+	"M-n" 'fingertip-jump-left
+	"M-:" 'fingertip-jump-out-pair-and-newline
 
-        "C-j" 'fingertip-jump-up
+	"C-j" 'fingertip-jump-up
     )
   )
 
@@ -1627,32 +1663,32 @@ Change the font size of different org-levels.
     (org-tag ((t (:foreground "LightSteelBlue4" :weight normal))))
   :hook (org-mode . mixed-pitch-mode)
   :config
-    (set-face-attribute 'org-level-1 nil 
-        :family "Sarasa Gothic SC" :height 1.8 )
-    (set-face-attribute 'org-level-2 nil 
-        :family "Sarasa Gothic SC" :height 1.6 )
-    (set-face-attribute 'org-level-3 nil 
-        :family "Sarasa Gothic SC" :height 1.4 )
-    (set-face-attribute 'org-level-4 nil 
-        :family "Sarasa Gothic SC" :height 1.3 )
-    (set-face-attribute 'org-level-5 nil 
-        :family "Sarasa Gothic SC" :height 1.2 )
-    (set-face-attribute 'org-level-6 nil 
-        :family "Sarasa Gothic SC" :height 1.1 )
-    (set-face-attribute 'org-document-title nil 
-        :family "Sarasa Gothic SC" :height 2.5 :bold t)
-    (set-face-attribute 'org-document-info nil 
-        :family "Sarasa Gothic SC" :height 1.8 :bold t)
-    (set-face-attribute 'org-document-info-keyword nil 
+    (set-face-attribute 'org-level-1 nil
+	:family "Sarasa Gothic SC" :height 1.8 )
+    (set-face-attribute 'org-level-2 nil
+	:family "Sarasa Gothic SC" :height 1.6 )
+    (set-face-attribute 'org-level-3 nil
+	:family "Sarasa Gothic SC" :height 1.4 )
+    (set-face-attribute 'org-level-4 nil
+	:family "Sarasa Gothic SC" :height 1.3 )
+    (set-face-attribute 'org-level-5 nil
+	:family "Sarasa Gothic SC" :height 1.2 )
+    (set-face-attribute 'org-level-6 nil
+	:family "Sarasa Gothic SC" :height 1.1 )
+    (set-face-attribute 'org-document-title nil
+	:family "Sarasa Gothic SC" :height 2.5 :bold t)
+    (set-face-attribute 'org-document-info nil
+	:family "Sarasa Gothic SC" :height 1.8 :bold t)
+    (set-face-attribute 'org-document-info-keyword nil
       :foreground "LightSteelBlue4" :inherit 'org-document-info)
-    (set-face-attribute 'org-block t 
+    (set-face-attribute 'org-block t
       :extend t :inherit 'fixed-pitch)
   )
 #+end_src
 
 *** Bullets
 
-[[https://github.com/minad/org-modern][Org-modern]] implements a modern style for Org buffers using font locking and text properties. The package styles =headlines=, =keywords=, =tables= and =source blocks=. 
+[[https://github.com/minad/org-modern][Org-modern]] implements a modern style for Org buffers using font locking and text properties. The package styles =headlines=, =keywords=, =tables= and =source blocks=.
 
 #+begin_src elisp
   (use-package org-modern
@@ -1660,23 +1696,23 @@ Change the font size of different org-levels.
   :config
      (setq org-modern-keyword
        (quote (("author" . "⛾")
-               ("title" . "❖")
-               ("subtitle" . "§")
-               ("html" . "󰲋 ")
-               (t . t)))) 
+	       ("title" . "❖")
+	       ("subtitle" . "◈")
+	       ("html" . "󰅱 ")
+	       (t . t))))
      (setq org-modern-star
-          ;'("◉" "○" "◈" "◇" "✳")
-          '("⚀" "⚁" "⚂" "⚃" "⚄" "⚅")
-          ;'("☰" "☱" "☲" "☳" "☴" "☵" "☶" "☷")
+	  ;'("◉" "○" "◈" "◇" "✳")
+	  '("⚀" "⚁" "⚂" "⚃" "⚄" "⚅")
+	  ;'("☰" "☱" "☲" "☳" "☴" "☵" "☶" "☷")
      )
      (setq org-modern-list ;; for '+' '-' '*' respectively
-         '((43 . "⯌") (45 . "⮚") (42 . "⊛"))
+	 '((43 . "⯌") (45 . "⮚") (42 . "⊛"))
      )
      (setq org-modern-block-fringe nil)
      (setq org-modern-todo nil)
      (setq org-modern-block-name '("⇲ " . "⇱ "))
      (set-face-attribute 'org-modern-block-name nil
-        :inherit 'variable-pitch)
+	:inherit 'variable-pitch)
      (setq org-modern-table nil)
   )
 #+end_src
@@ -1712,8 +1748,8 @@ Have drawbacks when using mixed-pitch-mode.
     (org-visual-indent-pipe-face ((t (:background "slate gray" :foreground "slate gray" :height 0.1))))
   :config
     (setq org-bars-color-options '(
-          :desaturate-level-faces 100
-          :darken-level-faces 10
+	  :desaturate-level-faces 100
+	  :darken-level-faces 10
     ))
     (setq org-bars-extra-pixels-height 25)
     (setq org-bars-stars '(:empty "" :invisible "" :visible ""))
@@ -1761,11 +1797,14 @@ This package provides visual alignment for Org Mode, Markdown and table.el table
   (use-package org-appear
     :hook (org-mode . org-appear-mode)
     :init
-    (setq org-appear-autoemphasis  t)
-    ;(setq org-appear-autolinks t)
-    (setq org-appear-autosubmarkers t)
-    ;(setq org-appear-inside-latex t)
-    (setq org-hide-emphasis-markers t)
+    (setq org-appear-autoemphasis  t
+          ;org-appear-autolinks t
+          org-appear-autosubmarkers t
+          org-appear-autoentities t
+          org-appear-autokeywords t
+          org-appear-inside-latex t
+          org-hide-emphasis-markers t
+    )
   )
 #+end_src
 
@@ -1834,11 +1873,11 @@ Code under :config is taken from https://emacs-china.org/t/org-mode-latex-mode/2
       ;; Vertically align LaTeX preview in org mode
       (defun my-org-latex-preview-advice (beg end &rest _args)
       (let* ((ov (car (overlays-at (/ (+ beg end) 2) t)))
-              (img (cdr (overlay-get ov 'display)))
-              (new-img (plist-put img :ascent 95)))
-          (overlay-put ov 'display (cons 'image new-img))))
+	      (img (cdr (overlay-get ov 'display)))
+	      (new-img (plist-put img :ascent 95)))
+	  (overlay-put ov 'display (cons 'image new-img))))
       (advice-add 'org--make-preview-overlay
-                  :after #'my-org-latex-preview-advice)
+		  :after #'my-org-latex-preview-advice)
 
       ;; from: https://kitchingroup.cheme.cmu.edu/blog/2016/11/06/
       ;; Justifying-LaTeX-preview-fragments-in-org-mode/
@@ -1847,72 +1886,72 @@ Code under :config is taken from https://emacs-china.org/t/org-mode-latex-mode/2
 
       (defun eli/org-justify-fragment-overlay (beg end image imagetype)
       (let* ((position (plist-get org-format-latex-options :justify))
-              (img (create-image image 'svg t))
-              (ov (car (overlays-at (/ (+ beg end) 2) t)))
-              (width (car (image-display-size (overlay-get ov 'display))))
-              offset)
-          (cond
-          ((and (eq 'center position) 
-              (= beg (line-beginning-position)))
-          (setq offset (floor (- (/ fill-column 2)
-                                  (/ width 2))))
-          (if (< offset 0)
-              (setq offset 0))
-          (overlay-put ov 'before-string (make-string offset ? )))
-          ((and (eq 'right position) 
-              (= beg (line-beginning-position)))
-          (setq offset (floor (- fill-column
-                                  width)))
-          (if (< offset 0)
-              (setq offset 0))
-          (overlay-put ov 'before-string (make-string offset ? ))))))
+	      (img (create-image image 'svg t))
+	      (ov (car (overlays-at (/ (+ beg end) 2) t)))
+	      (width (car (image-display-size (overlay-get ov 'display))))
+	      offset)
+	  (cond
+	  ((and (eq 'center position)
+	      (= beg (line-beginning-position)))
+	  (setq offset (floor (- (/ fill-column 2)
+				  (/ width 2))))
+	  (if (< offset 0)
+	      (setq offset 0))
+	  (overlay-put ov 'before-string (make-string offset ? )))
+	  ((and (eq 'right position)
+	      (= beg (line-beginning-position)))
+	  (setq offset (floor (- fill-column
+				  width)))
+	  (if (< offset 0)
+	      (setq offset 0))
+	  (overlay-put ov 'before-string (make-string offset ? ))))))
       (advice-add 'org--make-preview-overlay
-                  :after 'eli/org-justify-fragment-overlay)
+		  :after 'eli/org-justify-fragment-overlay)
 
       ;; from: https://kitchingroup.cheme.cmu.edu/blog/2016/11/07/
       ;; Better-equation-numbering-in-LaTeX-fragments-in-org-mode/
       (defun org-renumber-environment (orig-func &rest args)
-      (let ((results '()) 
-              (counter -1)
-              (numberp))
-          (setq results (cl-loop for (begin .  env) in 
-              (org-element-map (org-element-parse-buffer)
-                  'latex-environment
-                  (lambda (env)
-                  (cons
-                      (org-element-property :begin env)
-                      (org-element-property :value env))))
-              collect
-              (cond
-                  ((and (string-match "\\\\begin{equation}" env)
-                      (not (string-match "\\\\tag{" env)))
-                  (cl-incf counter)
-                  (cons begin counter))
-                  ((and (string-match "\\\\begin{align}" env)
-                      (string-match "\\\\notag" env))
-                  (cl-incf counter)
-                  (cons begin counter))
-                  ((string-match "\\\\begin{align}" env)
-                  (prog2
-                      (cl-incf counter)
-                      (cons begin counter)                          
-                  (with-temp-buffer
-                      (insert env)
-                      (goto-char (point-min))
-                      ;; \\ is used for a new line. Each one leads
-                      ;; to a number
-                      (cl-incf counter (count-matches "\\\\$"))
-                      ;; unless there are nonumbers.
-                      (goto-char (point-min))
-                      (cl-decf counter
-                              (count-matches "\\nonumber")))))
-                  (t
-                  (cons begin nil)))))
-          (when (setq numberp (cdr (assoc (point) results)))
-          (setf (car args)
-                  (concat
-                  (format "\\setcounter{equation}{%s}\n" numberp)
-                  (car args)))))
+      (let ((results '())
+	      (counter -1)
+	      (numberp))
+	  (setq results (cl-loop for (begin .  env) in
+	      (org-element-map (org-element-parse-buffer)
+		  'latex-environment
+		  (lambda (env)
+		  (cons
+		      (org-element-property :begin env)
+		      (org-element-property :value env))))
+	      collect
+	      (cond
+		  ((and (string-match "\\\\begin{equation}" env)
+		      (not (string-match "\\\\tag{" env)))
+		  (cl-incf counter)
+		  (cons begin counter))
+		  ((and (string-match "\\\\begin{align}" env)
+		      (string-match "\\\\notag" env))
+		  (cl-incf counter)
+		  (cons begin counter))
+		  ((string-match "\\\\begin{align}" env)
+		  (prog2
+		      (cl-incf counter)
+		      (cons begin counter)
+		  (with-temp-buffer
+		      (insert env)
+		      (goto-char (point-min))
+		      ;; \\ is used for a new line. Each one leads
+		      ;; to a number
+		      (cl-incf counter (count-matches "\\\\$"))
+		      ;; unless there are nonumbers.
+		      (goto-char (point-min))
+		      (cl-decf counter
+			      (count-matches "\\nonumber")))))
+		  (t
+		  (cons begin nil)))))
+	  (when (setq numberp (cdr (assoc (point) results)))
+	  (setf (car args)
+		  (concat
+		  (format "\\setcounter{equation}{%s}\n" numberp)
+		  (car args)))))
       (apply orig-func args))
       (advice-add 'org-create-formula-image :around #'org-renumber-environment)
   )
@@ -1938,9 +1977,9 @@ Code under :config is taken from https://emacs-china.org/t/org-mode-latex-mode/2
   (use-package elfeed
   :config
     (setq elfeed-feeds '(
-        ("http://nullprogram.com/feed/" blog emacs)
-        "http://www.50ply.com/atom.xml"  ; no autotagging
-        ("http://nedroid.com/feed/" webcomic)
+	("http://nullprogram.com/feed/" blog emacs)
+	"http://www.50ply.com/atom.xml"  ; no autotagging
+	("http://nedroid.com/feed/" webcomic)
       )
     )
   )
@@ -1948,7 +1987,7 @@ Code under :config is taken from https://emacs-china.org/t/org-mode-latex-mode/2
 ** Eaf
 
 [[https://github.com/emacs-eaf/emacs-application-framework][EAF]] is an extensible framework that revolutionizes the graphical capabilities of Emacs.
-#+begin_src elisp 
+#+begin_src elisp
   (use-package eaf
   :disabled
   :custom
@@ -1998,19 +2037,19 @@ tweaks to build eaf
 #+begin_src elisp
 (progn ;     startup
   (message "Loading %s...done (%fs)" user-init-file
-           (float-time (time-subtract (current-time)
-                                      before-user-init-time)))
+	   (float-time (time-subtract (current-time)
+				      before-user-init-time)))
   (add-hook 'after-init-hook
-            (lambda ()
-              (message
-               "Loading %s...done (%fs) [after-init]" user-init-file
-               (float-time (time-subtract (current-time)
-                                          before-user-init-time))))
-            t))
+	    (lambda ()
+	      (message
+	       "Loading %s...done (%fs) [after-init]" user-init-file
+	       (float-time (time-subtract (current-time)
+					  before-user-init-time))))
+	    t))
 
 (progn ;     personalize
   (let ((file (expand-file-name (concat (user-real-login-name) ".el")
-                                user-emacs-directory)))
+				user-emacs-directory)))
     (when (file-exists-p file)
       (load file))))
 
@@ -2023,13 +2062,13 @@ tweaks to build eaf
 * TODOs
 - pixel-scroll-precision-mode for evil scroll
 - vertico-buffer & minibuffer
-- Org mode 
+- Org mode
     + Roam
     + GTD
-    
+
 - Posframe for magit and others
 - Line number format: see
  https://emacs.stackexchange.com/questions/52269/how-to-change-line-number-gutter-width-using-display-line-numbers-mode
 
-  
+
 - Dirvish and olivetti-mode compativity
