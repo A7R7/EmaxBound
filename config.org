@@ -2,7 +2,7 @@
 # Tangle by default to init.el, which is the most common case
 #+PROPERTY: header-args:elisp :tangle init.el :language elisp
 #+PROPERTY: header-args:emacs-lisp :tangle init.el :language elisp
-#+PROPERTY: header-args:toml :tangle .borgconfig :language toml
+#+PROPERTY: header-args:conf :tangle .borgconfig :language conf
 #+PROPERTY: header-args:mkdirp yes :comments no
 #+STARTUP: fold
 #+OPTIONS: toc:2
@@ -133,7 +133,7 @@ Calculating time used loading emacs excutable, as well as setting some variables
     (setq gc-cons-threshold most-positive-fixnum)
     ;; Prevent flashing of unstyled modeline at startup
     (setq-default mode-line-format nil)
-    (setq confirm-kill-emacs t)
+    (setq confirm-kill-emacs 'y-or-n-p)
   )
 #+end_src
 
@@ -168,7 +168,7 @@ Calculating time used loading emacs excutable, as well as setting some variables
 #+end_src
 
 Dash needs some tweaks to be built
-#+begin_src toml
+#+begin_src conf
 [submodule "dash"]
 	no-byte-compile = dash-functional.el
 	no-makeinfo = dash-template.texi
@@ -184,7 +184,7 @@ Dash needs some tweaks to be built
 #+begin_src elisp
   (use-package auto-compile
     :config
-    (setq auto-compile-display-buffer               nil
+    (setq auto-compile-display-buffer             nil
 	  auto-compile-mode-line-counter            t
 	  auto-compile-source-recreate-deletes-dest t
 	  auto-compile-toggle-deletes-nonlib-dest   t
@@ -228,7 +228,7 @@ Dash needs some tweaks to be built
 
 All the .el files are placed in the ./lisp/ folder.
 According to the installation manual of org, we need to make autoloads before compile.
-#+begin_src toml
+#+begin_src conf
   [submodule "org"]
 	  load-path = lisp
 	  build-step = make autoloads
@@ -262,13 +262,13 @@ According to the installation manual of org, we need to make autoloads before co
 
 ** Emacsql
 tweaks to buiild emacsql
-#+begin_src toml
+#+begin_src conf
   [submodule "emacsql"]
 	no-byte-compile = emacsql-pg.el
 #+end_src
 
 ** Sqlite3
-#+begin_src toml
+#+begin_src conf
 [submodule "sqlite3"]
 	build-step = make
 #+end_src
@@ -558,7 +558,7 @@ options for =which-key-posframe-poshandler=:
 * Basic UI
 
 We setup UI for basic emacs widgets at this place. Again, not all UI's are set here.
-Some package specific UI configs are set under where the package is configed.
+Some package specific UI configs are set under where the package is configured.
 
 ** Fonts
 
@@ -921,7 +921,7 @@ Use olivetti to center text in minibuffer!
   :config
     (setq diff-hl-draw-borders nil)
     (global-diff-hl-mode)
-    (diff-hl-margin-mode) 
+    ;(diff-hl-margin-mode) 
     (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
   )
 #+end_src
@@ -931,8 +931,10 @@ Use olivetti to center text in minibuffer!
 
 ** Holo-layer
 [[https://github.com/manateelazycat/holo-layer][Holo-layer]] is developed based on PyQt, aiming to significantly enhance the visual experience of Emacs. 
+Disabled because it cannot run perfectly on hyprland.
 #+begin_src elisp
   (use-package holo-layer
+    :disabled
     :config 
     (holo-layer-enable)
   )
@@ -994,7 +996,7 @@ Use olivetti to center text in minibuffer!
 			  'append))
 #+end_src
     - tweaks to build magit
-#+begin_src toml
+#+begin_src conf
 [submodule "magit"]
 	no-byte-compile = lisp/magit-libgit.el
 #+end_src
@@ -1146,7 +1148,7 @@ Dropin replacement for dired.
 #+end_src
 
 Tweaks to build dirvish. Load dirvish and its extensions.
-#+begin_src toml
+#+begin_src conf
 [submodule "dirvish"]
 	load-path = .
 	load-path = extensions
@@ -1207,7 +1209,7 @@ It is very useful for figuring out how things work in Emacs.
   )
 #+end_src
 tweaks to build vertico
-#+begin_src toml
+#+begin_src conf
 [submodule "vertico"]
 	load-path = .
 	load-path = extensions
@@ -1512,7 +1514,7 @@ Vertico-multiform configures Vertico modes per command or completion category.
   )
 #+end_src
 tweaks to build lsp-bridge
-#+begin_src toml
+#+begin_src conf
 [submodule "lsp-bridge"]
   load-path = .
   load-path = acm
@@ -1552,7 +1554,7 @@ fingertip.el is a plugin that provides grammatical edit base on treesit
 		'web-mode-hook
 		'markdown-mode-hook
 		'llvm-mode-hook
-		'conf-toml-mode-hook 'toml-ts-mode-hook
+		'conf-conf-mode-hook 'conf-ts-mode-hook
 		'nim-mode-hook
 		'typescript-mode-hook 'typescript-ts-mode-hook
 		'js-ts-mode-hook 'json-ts-mode-hook
@@ -1619,7 +1621,7 @@ https://github.com/zerolfx/copilot.el
 (use-package auctex)
 #+end_src
 AucTex needs some tweaks to be built.
-#+begin_src toml :tangle .borgconfig
+#+begin_src conf :tangle .borgconfig
 [submodule "auctex"]
 	load-path = .
 	build-step = ./autogen.sh
@@ -2008,7 +2010,7 @@ Code under :config is taken from https://emacs-china.org/t/org-mode-latex-mode/2
   ;(use-package eaf-pdf-viewer)
 #+end_src
 tweaks to build eaf
-#+begin_src toml
+#+begin_src conf
 [submodule "eaf"]
   load-path = .
   load-path = core

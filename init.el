@@ -20,7 +20,7 @@
   (setq gc-cons-threshold most-positive-fixnum)
   ;; Prevent flashing of unstyled modeline at startup
   (setq-default mode-line-format nil)
-  (setq confirm-kill-emacs t)
+  (setq confirm-kill-emacs 'y-or-n-p)
 )
 
 (eval-and-compile ; `borg'
@@ -41,7 +41,7 @@
 
 (use-package auto-compile
   :config
-  (setq auto-compile-display-buffer               nil
+  (setq auto-compile-display-buffer             nil
 	auto-compile-mode-line-counter            t
 	auto-compile-source-recreate-deletes-dest t
 	auto-compile-toggle-deletes-nonlib-dest   t
@@ -549,11 +549,12 @@
 :config
   (setq diff-hl-draw-borders nil)
   (global-diff-hl-mode)
-  (diff-hl-margin-mode) 
+  ;(diff-hl-margin-mode) 
   (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
 )
 
 (use-package holo-layer
+  :disabled
   :config 
   (holo-layer-enable)
 )
@@ -1030,7 +1031,7 @@
 	      'web-mode-hook
 	      'markdown-mode-hook
 	      'llvm-mode-hook
-	      'conf-toml-mode-hook 'toml-ts-mode-hook
+	      'conf-conf-mode-hook 'conf-ts-mode-hook
 	      'nim-mode-hook
 	      'typescript-mode-hook 'typescript-ts-mode-hook
 	      'js-ts-mode-hook 'json-ts-mode-hook

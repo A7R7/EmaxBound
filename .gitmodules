@@ -178,6 +178,12 @@
 [submodule "js2-mode"]
 	path = lib/js2-mode
 	url = https://github.com/mooz/js2-mode
+[submodule "json-mode"]
+	path = lib/json-mode
+	url = https://github.com/joshwnj/json-mode
+[submodule "json-snatcher"]
+	path = lib/json-snatcher
+	url = https://github.com/Sterlingg/json-snatcher
 [submodule "leaf"]
 	path = lib/leaf
 	url = https://github.com/conao3/leaf.el
