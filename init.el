@@ -16,8 +16,12 @@
   (setq inhibit-startup-echo-area-message "locutus")
   (setq initial-buffer-choice t)
   (setq initial-scratch-message "")
+  ;; smooth window on startup
+  (setq frame-inhibit-implied-resize t)
   ;; Defer garbage collection further back in the startup process
   (setq gc-cons-threshold most-positive-fixnum)
+  ;; copied from lazycat
+  (setq gc-cons-percentage 0.6)
   ;; Prevent flashing of unstyled modeline at startup
   (setq-default mode-line-format nil)
   (setq confirm-kill-emacs 'y-or-n-p)
@@ -199,7 +203,7 @@
   (config/leader
     "DEL"     '(which-key-undo                 :wk "󰕍 Undo key"))
 
-  				      ; buffers
+  ;; buffers
   (config/leader :infix "b"
     ""        '(nil                            :wk "  Buffer ")
     "DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
@@ -209,14 +213,14 @@
     "["       '(previous-buffer                :wk " Prev ")
     "]"       '(next-buffer                    :wk " Next ")
     )
-  				      ; centaur tabs
+  ;; centaur tabs
   (config/leader
     "{"       '(centaur-tabs-backward-group    :wk " Prev Group")
     "}"       '(centaur-tabs-forward-group     :wk " Next Group")
     "["       '(centaur-tabs-backward          :wk " Prev Buffer ")
     "]"       '(centaur-tabs-forward           :wk " Next Buffer ")
     )
-  				      ; builtin-tabs
+  ;; builtin-tabs
   (config/leader :infix "TAB"
     ""        '(nil                            :wk " 󰓩 Tab ")
     "DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
@@ -225,7 +229,7 @@
     "["       '(tab-previous                   :wk " Prev ")
     "]"       '(tab-next                       :wk " Next ")
     )
-  				      ; windows
+  ;; windows
   (config/leader :infix "w"
     ""        '(nil                            :wk " 󰓩 Tab ")
     "DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
@@ -239,7 +243,7 @@
     "k"       '(evil-window-up                 :wk " Focus K ")
     "l"       '(evil-window-right              :wk " Focus L ")
     )
-  				      ; Borg
+  ;; Borg
   (config/leader :infix "B"
     ""        '(nil                            :wk " 󰏗 Borg      ")
     "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
@@ -249,24 +253,24 @@
     "c"       '(borg-clone                     :wk " Clone      ")
     "r"       '(borg-remove                    :wk "󱧖 Remove     ")
     )
-  				      ; toggle
+  ;; toggle
   (config/leader :infix "t"
     ""        '(nil                            :wk " 󰭩 Toggle    ")
     "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
     )
-  				      ; quit
+  ;; quit
   (config/leader :infix "q"
     ""        '(nil                            :wk " 󰗼 Quit      ")
     "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
     "q"       '(save-buffers-kill-terminal     :wk "󰗼 Quit Emacs ")
     )
-  				      ; Git
+  ;; Git
   (config/leader :infix "g"
     ""        '(nil                            :wk " 󰊢 Git       ")
     "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
     "g"       '(magit                          :wk " Magit      ")
     )
-  				      ; dired
+  ;; dired
   (config/leader
     "e"       '(dirvish-side                   :wk "󰙅 Dirvish-side ")
     ;;"E"       '(dirvish                        :wk " Dirvish      ")
@@ -324,8 +328,8 @@
   :height 180
 )
 (set-face-attribute 'fixed-pitch nil
-  :font "Sarasa Fixed SC"
-  ;:font "RobotoMono Nerd Font"
+  ;:font "Sarasa Fixed SC"
+  :font "RobotoMono Nerd Font"
   :height 180
 )
 (set-face-attribute 'fixed-pitch-serif t
@@ -353,6 +357,7 @@
 (use-package mixed-pitch-mode
 :defer t
 :config
+:hook (Custom-mode . mixed-pitch-mode)
   (setq  mixed-pitch-set-height t)
 )
 
@@ -1041,6 +1046,116 @@
   )
 )
 
+(use-package lsp-bridge
+:init
+  (global-lsp-bridge-mode)
+:config
+  ;(set-face-attributes 'lsp-bridge-alive-mode-line nil
+  ;  :inherit 'variable-pitch
+  ;)
+)
+
+(use-package treesit
+:commands (treesit-install-language-grammar  
+           config/treesit-install-all-languages)
+:init
+  (setq treesit-language-source-alist
+    '((bash . ("https://github.com/tree-sitter/tree-sitter-bash"))
+      (c . ("https://github.com/tree-sitter/tree-sitter-c"))
+      (cpp . ("https://github.com/tree-sitter/tree-sitter-cpp"))
+      (css . ("https://github.com/tree-sitter/tree-sitter-css"))
+      (cmake . ("https://github.com/uyha/tree-sitter-cmake"))
+      (common-lisp . 
+        ("https://github.com/theHamsta/tree-sitter-commonlisp"))
+      (csharp     . 
+        ("https://github.com/tree-sitter/tree-sitter-c-sharp.git"))
+      (dockerfile . 
+        ("https://github.com/camdencheek/tree-sitter-dockerfile"))
+      (elisp . ("https://github.com/Wilfred/tree-sitter-elisp"))
+      (go . ("https://github.com/tree-sitter/tree-sitter-go"))
+      (gomod      . 
+        ("https://github.com/camdencheek/tree-sitter-go-mod.git"))
+      (html . ("https://github.com/tree-sitter/tree-sitter-html"))
+      (java       . 
+        ("https://github.com/tree-sitter/tree-sitter-java.git"))
+      (javascript .   
+        ("https://github.com/tree-sitter/tree-sitter-javascript"))
+      (json . ("https://github.com/tree-sitter/tree-sitter-json"))
+      (lua . ("https://github.com/Azganoth/tree-sitter-lua"))
+      (make . ("https://github.com/alemuller/tree-sitter-make"))
+      (markdown . 
+        ("https://github.com/MDeiml/tree-sitter-markdown" nil   
+        "tree-sitter-markdown/src"))
+      (ocaml . 
+          ("https://github.com/tree-sitter/tree-sitter-ocaml" nil 
+          "ocaml/src"))
+      (org . ("https://github.com/milisims/tree-sitter-org"))
+      (python . ("https://github.com/tree-sitter/tree-sitter-python"))
+      (php . ("https://github.com/tree-sitter/tree-sitter-php"))
+      (typescript . 
+          ("https://github.com/tree-sitter/tree-sitter-typescript" nil 
+          "typescript/src"))
+      (tsx . 
+          ("https://github.com/tree-sitter/tree-sitter-typescript" nil 
+          "tsx/src"))
+      (ruby . ("https://github.com/tree-sitter/tree-sitter-ruby"))
+      (rust . ("https://github.com/tree-sitter/tree-sitter-rust"))
+      (sql . ("https://github.com/m-novikov/tree-sitter-sql"))
+      (vue . ("https://github.com/merico-dev/tree-sitter-vue"))
+      (yaml . ("https://github.com/ikatyang/tree-sitter-yaml"))
+      (toml . ("https://github.com/tree-sitter/tree-sitter-toml"))
+      (zig . ("https://github.com/GrayJack/tree-sitter-zig"))))
+:config
+(defun config/treesit-install-all-languages ()
+  "Install all languages specified by `treesit-language-source-alist'."
+  (interactive)
+  (let ((languages (mapcar 'car treesit-language-source-alist)))
+    (dolist (lang languages)
+      (treesit-install-language-grammar lang)
+      (message "`%s' parser was installed." lang)
+      (sit-for 0.75)))))
+;; stolen from lazycat
+(setq major-mode-remap-alist
+      '((c-mode          . c-ts-mode)
+        (c++-mode        . c++-ts-mode)
+        (cmake-mode      . cmake-ts-mode)
+        (conf-toml-mode  . toml-ts-mode)
+        (css-mode        . css-ts-mode)
+        (js-mode         . js-ts-mode)
+        (js-json-mode    . json-ts-mode)
+        (python-mode     . python-ts-mode)
+        (sh-mode         . bash-ts-mode)
+        (typescript-mode . typescript-ts-mode)
+        (rust-mode       . rust-ts-mode)
+        ))
+
+(add-hook 'markdown-mode-hook #'(lambda () 
+  				(treesit-parser-create 'markdown)))
+
+(add-hook 'web-mode-hook #'(lambda ()
+  			   (let ((file-name (buffer-file-name)))
+  			     (when file-name
+  			       (treesit-parser-create
+  				(pcase (file-name-extension file-name)
+  				  ("vue" 'vue)
+  				  ("html" 'html)
+  				  ("php" 'php))))
+  			     )))
+
+(add-hook 'emacs-lisp-mode-hook #'(lambda () (treesit-parser-create 'elisp)))
+(add-hook 'ielm-mode-hook #'(lambda () (treesit-parser-create 'elisp)))
+(add-hook 'json-mode-hook #'(lambda () (treesit-parser-create 'json)))
+(add-hook 'go-mode-hook #'(lambda () (treesit-parser-create 'go)))
+(add-hook 'java-mode-hook #'(lambda () (treesit-parser-create 'java)))
+(add-hook 'java-ts-mode-hook #'(lambda () (treesit-parser-create 'java)))
+(add-hook 'php-mode-hook #'(lambda () (treesit-parser-create 'php)))
+(add-hook 'php-ts-mode-hook #'(lambda () (treesit-parser-create 'php)))
+
+(use-package treesit-auto
+:disabled
+:config
+  (global-treesit-auto-mode))
+
 (use-package emacs
 :custom-face
   (line-number ((t (
@@ -1110,7 +1225,8 @@
 	      'cmake-ts-mode-hook
 	      'java-mode-hook
 	      'haskell-mode-hook
-	      'emacs-lisp-mode-hook 'lisp-interaction-mode-hook 'lisp-mode-hook
+	      'emacs-lisp-mode-hook 
+           'lisp-interaction-mode-hook 'lisp-mode-hook
 	      'maxima-mode-hook
 	      'ielm-mode-hook
 	      'bash-ts-mode-hook 'sh-mode-hook
@@ -1214,15 +1330,6 @@
   ;; disable snippets by redefining them with a nil expansion
   (aas-set-snippets 'latex-mode
     "supp" nil))
-
-(use-package lsp-bridge
-:init
-  (global-lsp-bridge-mode)
-:config
-  ;(set-face-attributes 'lsp-bridge-alive-mode-line nil
-  ;  :inherit 'variable-pitch
-  ;)
-)
 
 (use-package lsp-bridge
 :config
@@ -1487,8 +1594,6 @@
     )
   )
 )
-
-
 
 (use-package eaf
 :disabled

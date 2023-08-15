@@ -128,8 +128,12 @@ Calculating time used loading emacs excutable, as well as setting some variables
     (setq inhibit-startup-echo-area-message "locutus")
     (setq initial-buffer-choice t)
     (setq initial-scratch-message "")
+    ;; smooth window on startup
+    (setq frame-inhibit-implied-resize t)
     ;; Defer garbage collection further back in the startup process
     (setq gc-cons-threshold most-positive-fixnum)
+    ;; copied from lazycat
+    (setq gc-cons-percentage 0.6)
     ;; Prevent flashing of unstyled modeline at startup
     (setq-default mode-line-format nil)
     (setq confirm-kill-emacs 'y-or-n-p)
@@ -432,7 +436,7 @@ I guess evil surround and evil nerd commentor should be better to put under Codi
     (config/leader
       "DEL"     '(which-key-undo                 :wk "󰕍 Undo key"))
 
-  					; buffers
+    ;; buffers
     (config/leader :infix "b"
       ""        '(nil                            :wk "  Buffer ")
       "DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
@@ -442,14 +446,14 @@ I guess evil surround and evil nerd commentor should be better to put under Codi
       "["       '(previous-buffer                :wk " Prev ")
       "]"       '(next-buffer                    :wk " Next ")
       )
-  					; centaur tabs
+    ;; centaur tabs
     (config/leader
       "{"       '(centaur-tabs-backward-group    :wk " Prev Group")
       "}"       '(centaur-tabs-forward-group     :wk " Next Group")
       "["       '(centaur-tabs-backward          :wk " Prev Buffer ")
       "]"       '(centaur-tabs-forward           :wk " Next Buffer ")
       )
-  					; builtin-tabs
+    ;; builtin-tabs
     (config/leader :infix "TAB"
       ""        '(nil                            :wk " 󰓩 Tab ")
       "DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
@@ -458,7 +462,7 @@ I guess evil surround and evil nerd commentor should be better to put under Codi
       "["       '(tab-previous                   :wk " Prev ")
       "]"       '(tab-next                       :wk " Next ")
       )
-  					; windows
+    ;; windows
     (config/leader :infix "w"
       ""        '(nil                            :wk " 󰓩 Tab ")
       "DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
@@ -472,7 +476,7 @@ I guess evil surround and evil nerd commentor should be better to put under Codi
       "k"       '(evil-window-up                 :wk " Focus K ")
       "l"       '(evil-window-right              :wk " Focus L ")
       )
-  					; Borg
+    ;; Borg
     (config/leader :infix "B"
       ""        '(nil                            :wk " 󰏗 Borg      ")
       "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
@@ -482,24 +486,24 @@ I guess evil surround and evil nerd commentor should be better to put under Codi
       "c"       '(borg-clone                     :wk " Clone      ")
       "r"       '(borg-remove                    :wk "󱧖 Remove     ")
       )
-  					; toggle
+    ;; toggle
     (config/leader :infix "t"
       ""        '(nil                            :wk " 󰭩 Toggle    ")
       "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
       )
-  					; quit
+    ;; quit
     (config/leader :infix "q"
       ""        '(nil                            :wk " 󰗼 Quit      ")
       "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
       "q"       '(save-buffers-kill-terminal     :wk "󰗼 Quit Emacs ")
       )
-  					; Git
+    ;; Git
     (config/leader :infix "g"
       ""        '(nil                            :wk " 󰊢 Git       ")
       "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
       "g"       '(magit                          :wk " Magit      ")
       )
-  					; dired
+    ;; dired
     (config/leader
       "e"       '(dirvish-side                   :wk "󰙅 Dirvish-side ")
       ;;"E"       '(dirvish                        :wk " Dirvish      ")
@@ -567,6 +571,7 @@ Some package specific UI configs are set under where the package is configured.
 ** Fonts
 
 Defining the various fonts that Emacs will use.
+Note that monospace fonts are not always fixed-pitch [[https://stackoverflow.com/questions/70797173/monospace-font-characters-are-not-fixed-width][Monospace vs fixed-width]].
 #+begin_src elisp
   (set-face-attribute 'default nil
     ;:font "JetBrainsMono Nerd Font"
@@ -580,8 +585,8 @@ Defining the various fonts that Emacs will use.
     :height 180
   )
   (set-face-attribute 'fixed-pitch nil
-    :font "Sarasa Fixed SC"
-    ;:font "RobotoMono Nerd Font"
+    ;:font "Sarasa Fixed SC"
+    :font "RobotoMono Nerd Font"
     :height 180
   )
   (set-face-attribute 'fixed-pitch-serif t
@@ -619,7 +624,6 @@ You can use the bindings CTRL plus =/- for zooming in/out.  You can also use CTR
 
 *** Pitch
 There're 2 modes that controls pitch, mixed-pitch-mode and fixed-pitch-mode.
-Personally I prefer fixed-pitch-mode.
 #+begin_src elisp
   (use-package fixed-pitch)
 #+end_src
@@ -628,6 +632,7 @@ Personally I prefer fixed-pitch-mode.
   (use-package mixed-pitch-mode
   :defer t
   :config
+  :hook (Custom-mode . mixed-pitch-mode)
     (setq  mixed-pitch-set-height t)
   )
 #+end_src
@@ -1548,6 +1553,135 @@ Vertico-multiform configures Vertico modes per command or completion category.
 ** Popweb
 
 * Coding
+** LSP-bridge
+[[https://github.com/manateelazycat/lsp-bridge][lsp-bridge]] builds a high-speed cache between Emacs and the LSP server.
+#+begin_src elisp
+  (use-package lsp-bridge
+  :init
+    (global-lsp-bridge-mode)
+  :config
+    ;(set-face-attributes 'lsp-bridge-alive-mode-line nil
+    ;  :inherit 'variable-pitch
+    ;)
+  )
+#+end_src
+tweaks to build lsp-bridge
+#+begin_src conf
+[submodule "lsp-bridge"]
+  load-path = .
+  load-path = acm
+  load-path = core
+#+end_src
+
+** Treesit
+You can find the addresses of language parsers at [[https://tree-sitter.github.io/tree-sitter/][treesitter's official doc]].
+#+begin_src elisp 
+  (use-package treesit
+  :commands (treesit-install-language-grammar  
+             config/treesit-install-all-languages)
+  :init
+    (setq treesit-language-source-alist
+      '((bash . ("https://github.com/tree-sitter/tree-sitter-bash"))
+        (c . ("https://github.com/tree-sitter/tree-sitter-c"))
+        (cpp . ("https://github.com/tree-sitter/tree-sitter-cpp"))
+        (css . ("https://github.com/tree-sitter/tree-sitter-css"))
+        (cmake . ("https://github.com/uyha/tree-sitter-cmake"))
+        (common-lisp . 
+          ("https://github.com/theHamsta/tree-sitter-commonlisp"))
+        (csharp     . 
+          ("https://github.com/tree-sitter/tree-sitter-c-sharp.git"))
+        (dockerfile . 
+          ("https://github.com/camdencheek/tree-sitter-dockerfile"))
+        (elisp . ("https://github.com/Wilfred/tree-sitter-elisp"))
+        (go . ("https://github.com/tree-sitter/tree-sitter-go"))
+        (gomod      . 
+          ("https://github.com/camdencheek/tree-sitter-go-mod.git"))
+        (html . ("https://github.com/tree-sitter/tree-sitter-html"))
+        (java       . 
+          ("https://github.com/tree-sitter/tree-sitter-java.git"))
+        (javascript .   
+          ("https://github.com/tree-sitter/tree-sitter-javascript"))
+        (json . ("https://github.com/tree-sitter/tree-sitter-json"))
+        (lua . ("https://github.com/Azganoth/tree-sitter-lua"))
+        (make . ("https://github.com/alemuller/tree-sitter-make"))
+        (markdown . 
+          ("https://github.com/MDeiml/tree-sitter-markdown" nil   
+          "tree-sitter-markdown/src"))
+        (ocaml . 
+            ("https://github.com/tree-sitter/tree-sitter-ocaml" nil 
+            "ocaml/src"))
+        (org . ("https://github.com/milisims/tree-sitter-org"))
+        (python . ("https://github.com/tree-sitter/tree-sitter-python"))
+        (php . ("https://github.com/tree-sitter/tree-sitter-php"))
+        (typescript . 
+            ("https://github.com/tree-sitter/tree-sitter-typescript" nil 
+            "typescript/src"))
+        (tsx . 
+            ("https://github.com/tree-sitter/tree-sitter-typescript" nil 
+            "tsx/src"))
+        (ruby . ("https://github.com/tree-sitter/tree-sitter-ruby"))
+        (rust . ("https://github.com/tree-sitter/tree-sitter-rust"))
+        (sql . ("https://github.com/m-novikov/tree-sitter-sql"))
+        (vue . ("https://github.com/merico-dev/tree-sitter-vue"))
+        (yaml . ("https://github.com/ikatyang/tree-sitter-yaml"))
+        (toml . ("https://github.com/tree-sitter/tree-sitter-toml"))
+        (zig . ("https://github.com/GrayJack/tree-sitter-zig"))))
+  :config
+  (defun config/treesit-install-all-languages ()
+    "Install all languages specified by `treesit-language-source-alist'."
+    (interactive)
+    (let ((languages (mapcar 'car treesit-language-source-alist)))
+      (dolist (lang languages)
+        (treesit-install-language-grammar lang)
+        (message "`%s' parser was installed." lang)
+        (sit-for 0.75)))))
+  ;; stolen from lazycat
+  (setq major-mode-remap-alist
+        '((c-mode          . c-ts-mode)
+          (c++-mode        . c++-ts-mode)
+          (cmake-mode      . cmake-ts-mode)
+          (conf-toml-mode  . toml-ts-mode)
+          (css-mode        . css-ts-mode)
+          (js-mode         . js-ts-mode)
+          (js-json-mode    . json-ts-mode)
+          (python-mode     . python-ts-mode)
+          (sh-mode         . bash-ts-mode)
+          (typescript-mode . typescript-ts-mode)
+          (rust-mode       . rust-ts-mode)
+          ))
+
+  (add-hook 'markdown-mode-hook #'(lambda () 
+  				  (treesit-parser-create 'markdown)))
+
+  (add-hook 'web-mode-hook #'(lambda ()
+  			     (let ((file-name (buffer-file-name)))
+  			       (when file-name
+  				 (treesit-parser-create
+  				  (pcase (file-name-extension file-name)
+  				    ("vue" 'vue)
+  				    ("html" 'html)
+  				    ("php" 'php))))
+  			       )))
+
+  (add-hook 'emacs-lisp-mode-hook #'(lambda () (treesit-parser-create 'elisp)))
+  (add-hook 'ielm-mode-hook #'(lambda () (treesit-parser-create 'elisp)))
+  (add-hook 'json-mode-hook #'(lambda () (treesit-parser-create 'json)))
+  (add-hook 'go-mode-hook #'(lambda () (treesit-parser-create 'go)))
+  (add-hook 'java-mode-hook #'(lambda () (treesit-parser-create 'java)))
+  (add-hook 'java-ts-mode-hook #'(lambda () (treesit-parser-create 'java)))
+  (add-hook 'php-mode-hook #'(lambda () (treesit-parser-create 'php)))
+  (add-hook 'php-ts-mode-hook #'(lambda () (treesit-parser-create 'php)))
+
+#+end_src
+
+[[https://github.com/renzmann/treesit-auto][Treesit-auto]] automatically installs and uses tree-sitter major modes in Emacs 29+. If the tree-sitter version can't be used, fall back to the original major mode.
+Disabled because I use lazycat's method instead.
+#+begin_src elisp
+  (use-package treesit-auto
+  :disabled
+  :config
+    (global-treesit-auto-mode))
+#+end_src
 ** UI
 *** Line Number
 #+begin_src elisp
@@ -1640,7 +1774,8 @@ fingertip.el is a plugin that provides grammatical edit base on treesit
 		'cmake-ts-mode-hook
 		'java-mode-hook
 		'haskell-mode-hook
-		'emacs-lisp-mode-hook 'lisp-interaction-mode-hook 'lisp-mode-hook
+		'emacs-lisp-mode-hook 
+             'lisp-interaction-mode-hook 'lisp-mode-hook
 		'maxima-mode-hook
 		'ielm-mode-hook
 		'bash-ts-mode-hook 'sh-mode-hook
@@ -1758,26 +1893,6 @@ than `electric-indent-mode'.
   ;; disable snippets by redefining them with a nil expansion
   (aas-set-snippets 'latex-mode
     "supp" nil))
-#+end_src
-
-** LSP-bridge
-[[https://github.com/manateelazycat/lsp-bridge][lsp-bridge]] builds a high-speed cache between Emacs and the LSP server.
-#+begin_src elisp
-  (use-package lsp-bridge
-  :init
-    (global-lsp-bridge-mode)
-  :config
-    ;(set-face-attributes 'lsp-bridge-alive-mode-line nil
-    ;  :inherit 'variable-pitch
-    ;)
-  )
-#+end_src
-tweaks to build lsp-bridge
-#+begin_src conf
-[submodule "lsp-bridge"]
-  load-path = .
-  load-path = acm
-  load-path = core
 #+end_src
 
 ** Copilot
@@ -2175,9 +2290,6 @@ Code under :config is taken from https://emacs-china.org/t/org-mode-latex-mode/2
     build-step = make -C mu4e > /dev/null
     build-step = borg-update-autoloads
     load-path = build/mu4e
-#+end_src
-#+begin_src elisp
-  
 #+end_src
 ** Eaf
 

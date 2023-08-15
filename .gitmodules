@@ -391,6 +391,9 @@
 [submodule "treepy"]
 	path = lib/treepy
 	url = https://github.com/volrath/treepy.el
+[submodule "treesit-auto"]
+	path = lib/treesit-auto
+	url = https://github.com/renzmann/treesit-auto
 [submodule "ts"]
 	path = lib/ts
 	url = https://github.com/alphapapa/ts.el
