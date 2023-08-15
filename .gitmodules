@@ -217,6 +217,9 @@
 [submodule "mixed-pitch"]
 	path = lib/mixed-pitch
 	url = https://gitlab.com/jabranham/mixed-pitch
+[submodule "mu4e"]
+	path = lib/mu4e
+	url = https://github.com/djcb/mu
 [submodule "nano-theme"]
 	path = lib/nano-theme
 	url = https://github.com/rougier/nano-theme
@@ -304,6 +307,15 @@
 [submodule "peg"]
 	path = lib/peg
 	url = git@github.com:emacsmirror/peg.git
+[submodule "persp-mode"]
+	path = lib/persp-mode
+	url = https://github.com/Bad-ptr/persp-mode.el
+[submodule "perspective"]
+	path = lib/perspective
+	url = https://github.com/nex3/perspective-el
+[submodule "pfuture"]
+	path = lib/pfuture
+	url = https://github.com/Alexander-Miller/pfuture
 [submodule "popper"]
 	path = lib/popper
 	url = https://github.com/karthink/popper

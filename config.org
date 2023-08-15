@@ -1,5 +1,4 @@
 :DOC-CONFIG:
-# Tangle by default to init.el, which is the most common case
 #+PROPERTY: header-args:elisp :tangle init.el :language elisp
 #+PROPERTY: header-args:emacs-lisp :tangle init.el :language elisp
 #+PROPERTY: header-args:conf :tangle .borgconfig :language conf
@@ -19,7 +18,7 @@
 #+HTML:<a href="https://en.wikipedia.org/wiki/Linux"><img alt="Linux" src="https://img.shields.io/badge/linux-FCC624?logo=linux&logoColor=black"/></a>
 
 * Screenshots
-#+HTML:<img alt="Dashboard" src="assets/dashboard.png" width="100%">
+#+HTML:<img alt="Dashboard" src="assets/dashboard.png" width="80">
 #+HTML:<img alt="Org Mode" src="assets/org_mode.png" width="80%">
 * Introduction
 ** How to deploy this config
@@ -54,12 +53,14 @@ Check [[https://emacsmirror.net/manual/borg/Bootstrapping-using-a-seed.html][Boo
 
 ** References
 
--  [[https://github.com/lccambiaghi/vanilla-emacs][Luca's vanilla-emacs]] (2023) detailed org config file.
--  [[https://gitlab.com/dwt1/configuring-emacs][DistroTube's Configuring Emacs]] (2023) easy to follow.
--  [[https://github.com/seagle0128/.emacs.d][seagle0128's Centaur Emacs]] (2023) be morden.
--  [[https://github.com/daviwil/emacs-from-scratch][Daviwell's Emacs from scratch]] (2021) intuitive.
--  [[https://github.com/lijigang/100-questions-about-orgmode][lijigang's 100-questions-about-orgmode]] (2023) for org mode of course.
--  [[https://github.com/doomemacs/doomemacs][Doom Emacs]] (2023) Some best practices.
+- [[https://github.com/lccambiaghi/vanilla-emacs][Luca's vanilla-emacs]] (2023) detailed org config file.
+- [[https://gitlab.com/dwt1/configuring-emacs][DistroTube's Configuring Emacs]] (2023) easy to follow.
+- [[https://github.com/seagle0128/.emacs.d][seagle0128's Centaur Emacs]] (2023) be morden.
+- [[https://github.com/daviwil/emacs-from-scratch][Daviwell's Emacs from scratch]] (2021) intuitive.
+- [[https://github.com/lijigang/100-questions-about-orgmode][lijigang's 100-questions-about-orgmode]] (2023) for org mode of course.
+- [[https://github.com/doomemacs/doomemacs][Doom Emacs]] (2023) Some best practices.
+- [[https://github.com/dakra/dmacs][Dakra's Dmacs]] (2023) Another Emacs Literate configuration with borg
+
 *NOTE*: the year number after link equals to
 - =min (last time the config get's updated, last time I refered to the config)=
 
@@ -414,8 +415,8 @@ I guess evil surround and evil nerd commentor should be better to put under Codi
   (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
   (use-package general
-  :after evil
-  :config
+    :after evil
+    :config
     ;; (general-evil-setup)
     ;; set up 'SPC' as the global leader key
 
@@ -427,85 +428,86 @@ I guess evil surround and evil nerd commentor should be better to put under Codi
       :global-prefix "M-SPC") ;; access leader in insert mode
 
     (config/leader
-	"DEL"     '(which-key-undo                 :wk "󰕍 Undo key"))
+      "DEL"     '(which-key-undo                 :wk "󰕍 Undo key"))
 
-    ; buffers
+  					; buffers
     (config/leader :infix "b"
-	""        '(nil                            :wk "  Buffer ")
-	"DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
-	"b"       '(switch-to-buffer               :wk " Switch ")
-	"d"       '(kill-this-buffer               :wk "󰅖 Delete ")
-	"r"       '(revert-buffer                  :wk "󰑓 Reload ")
-	"["       '(previous-buffer                :wk " Prev ")
-	"]"       '(next-buffer                    :wk " Next ")
-    )
-    ; centaur tabs
+      ""        '(nil                            :wk "  Buffer ")
+      "DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
+      "b"       '(switch-to-buffer               :wk " Switch ")
+      "d"       '(kill-this-buffer               :wk "󰅖 Delete ")
+      "r"       '(revert-buffer                  :wk "󰑓 Reload ")
+      "["       '(previous-buffer                :wk " Prev ")
+      "]"       '(next-buffer                    :wk " Next ")
+      )
+  					; centaur tabs
     (config/leader
-	"{"       '(centaur-tabs-backward-group    :wk " Prev Group")
-	"}"       '(centaur-tabs-forward-group     :wk " Next Group")
-	"["       '(centaur-tabs-backward          :wk " Prev Buffer ")
-	"]"       '(centaur-tabs-forward           :wk " Next Buffer ")
-    )
-    ; builtin-tabs
+      "{"       '(centaur-tabs-backward-group    :wk " Prev Group")
+      "}"       '(centaur-tabs-forward-group     :wk " Next Group")
+      "["       '(centaur-tabs-backward          :wk " Prev Buffer ")
+      "]"       '(centaur-tabs-forward           :wk " Next Buffer ")
+      )
+  					; builtin-tabs
     (config/leader :infix "TAB"
-	""        '(nil                            :wk " 󰓩 Tab ")
-	"DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
-	"TAB"     '(tab-new                        :wk "󰝜 Tab New ")
-	"d"       '(tab-close                      :wk "󰭌 Tab Del ")
-	"["       '(tab-previous                   :wk " Prev ")
-	"]"       '(tab-next                       :wk " Next ")
-    )
-    ; windows
+      ""        '(nil                            :wk " 󰓩 Tab ")
+      "DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
+      "TAB"     '(tab-new                        :wk "󰝜 Tab New ")
+      "d"       '(tab-close                      :wk "󰭌 Tab Del ")
+      "["       '(tab-previous                   :wk " Prev ")
+      "]"       '(tab-next                       :wk " Next ")
+      )
+  					; windows
     (config/leader :infix "w"
-	""        '(nil                            :wk " 󰓩 Tab ")
-	"DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
-	"d"       '(delete-window                  :wk "󰅖 Delete  ")
-	"v"       '(split-window-vertically        :wk "󰤻 Split   ")
-	"s"       '(split-window-horizontally      :wk "󰤼 Split   ")
-	"\\"      '(split-window-vertically        :wk "󰤻 Split   ")
-	"|"       '(split-window-horizontally      :wk "󰤼 Split   ")
-	"h"       '(evil-window-left               :wk " Focus H ")
-	"j"       '(evil-window-down               :wk " Focus J ")
-	"k"       '(evil-window-up                 :wk " Focus K ")
-	"l"       '(evil-window-right              :wk " Focus L ")
-    )
-    ; Borg
+      ""        '(nil                            :wk " 󰓩 Tab ")
+      "DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
+      "d"       '(delete-window                  :wk "󰅖 Delete  ")
+      "v"       '(split-window-vertically        :wk "󰤻 Split   ")
+      "s"       '(split-window-horizontally      :wk "󰤼 Split   ")
+      "\\"      '(split-window-vertically        :wk "󰤻 Split   ")
+      "|"       '(split-window-horizontally      :wk "󰤼 Split   ")
+      "h"       '(evil-window-left               :wk " Focus H ")
+      "j"       '(evil-window-down               :wk " Focus J ")
+      "k"       '(evil-window-up                 :wk " Focus K ")
+      "l"       '(evil-window-right              :wk " Focus L ")
+      )
+  					; Borg
     (config/leader :infix "B"
-	""        '(nil                            :wk " 󰏗 Borg      ")
-	"DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
-	"a"       '(borg-assimilate                :wk "󱧕 Assimilate ")
-	"A"       '(borg-activate                  :wk " Activate   ")
-	"b"       '(borg-build                     :wk "󱇝 Build      ")
-	"c"       '(borg-clone                     :wk " Clone      ")
-	"r"       '(borg-remove                    :wk "󱧖 Remove     ")
-    )
-    ; toggle
+      ""        '(nil                            :wk " 󰏗 Borg      ")
+      "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
+      "a"       '(borg-assimilate                :wk "󱧕 Assimilate ")
+      "A"       '(borg-activate                  :wk " Activate   ")
+      "b"       '(borg-build                     :wk "󱇝 Build      ")
+      "c"       '(borg-clone                     :wk " Clone      ")
+      "r"       '(borg-remove                    :wk "󱧖 Remove     ")
+      )
+  					; toggle
     (config/leader :infix "t"
-	""        '(nil                            :wk " 󰭩 Toggle    ")
-	"DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
-    )
-    ; quit
+      ""        '(nil                            :wk " 󰭩 Toggle    ")
+      "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
+      )
+  					; quit
     (config/leader :infix "q"
-	""        '(nil                            :wk " 󰗼 Quit      ")
-	"DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
-	"q"       '(save-buffers-kill-terminal     :wk "󰗼 Quit Emacs ")
-    )
-    ; Git
+      ""        '(nil                            :wk " 󰗼 Quit      ")
+      "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
+      "q"       '(save-buffers-kill-terminal     :wk "󰗼 Quit Emacs ")
+      )
+  					; Git
     (config/leader :infix "g"
-	""        '(nil                            :wk " 󰊢 Git       ")
-	"DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
-	"g"       '(magit                          :wk " Magit      ")
-    )
-    ; dired
+      ""        '(nil                            :wk " 󰊢 Git       ")
+      "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
+      "g"       '(magit                          :wk " Magit      ")
+      )
+  					; dired
     (config/leader
-	"e"       '(dirvish-side                   :wk "󰙅 Dirvish-side ")
-	"E"       '(dirvish                        :wk " Dirvish      ")
-	;"qe"      '(save-buffers-kill-emacs         :wk "Quit Emacs ")
-    )
+      ;;"e"       '(dirvish-side                   :wk "󰙅 Dirvish-side ")
+      ;;"E"       '(dirvish                        :wk " Dirvish      ")
+      ;;"qe"      '(save-buffers-kill-emacs         :wk "Quit Emacs ")
+      "e"       '(treemacs                        :wk "󰙅 Treemacs ")
+      )
     (config/leader
-	"/"       '(evilnc-comment-or-uncomment-lines :wk "󱀢 Comment ")
+      "/"       '(evilnc-comment-or-uncomment-lines :wk "󱀢 Comment ")
+      )
     )
-  )
 #+end_src
 
 ** Which-key
@@ -635,7 +637,6 @@ Personally I prefer fixed-pitch-mode.
 
 #+begin_src elisp
 (use-package all-the-icons
-  :ensure t
   :if (display-graphic-p))
 
 ;(use-package all-the-icons-dired
@@ -926,6 +927,12 @@ Use olivetti to center text in minibuffer!
   )
 #+end_src
 
+** Rainbow-mode
+
+This minor mode sets background color to strings that match color names.
+#+begin_src elisp
+   
+#+end_src
 ** Posframe
 [[https://github.com/tumashu/posframe][Posframe]] can pop up a frame at point, this *posframe* is a child-frame connected to its root window's buffer.
 
@@ -1075,10 +1082,138 @@ Disabled because it cannot run perfectly on hyprland.
   :config (cl-pushnew 'tramp-own-remote-path tramp-remote-path))
 #+end_src
 
+** Treemacs
+#+begin_src elisp
+  (use-package treemacs
+  :init
+  (with-eval-after-load 'winum
+    (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
+  :config
+  (progn
+    (setq treemacs-collapse-dirs                   
+            (if treemacs-python-executable 3 0)
+          treemacs-deferred-git-apply-delay        0.5
+          treemacs-directory-name-transformer      #'identity
+          treemacs-display-in-side-window          t
+          treemacs-eldoc-display                   'simple
+          treemacs-file-event-delay                2000
+          treemacs-file-extension-regex   
+            treemacs-last-period-regex-value
+          treemacs-file-follow-delay               0.2
+          treemacs-file-name-transformer           #'identity
+          treemacs-follow-after-init               t
+          treemacs-expand-after-init               t
+          treemacs-find-workspace-method
+            'find-for-file-or-pick-first
+          treemacs-git-command-pipe                ""
+          treemacs-goto-tag-strategy               'refetch-index
+          treemacs-header-scroll-indicators        '(nil . "^^^^^^")
+          treemacs-hide-dot-git-directory          t
+          treemacs-indentation                     2
+          treemacs-indentation-string              " "
+          treemacs-is-never-other-window           nil
+          treemacs-max-git-entries                 5000
+          treemacs-missing-project-action          'ask
+          treemacs-move-forward-on-expand          nil
+          treemacs-no-png-images                   nil
+          treemacs-no-delete-other-windows         t
+          treemacs-project-follow-cleanup          nil
+          treemacs-persist-file                    
+            (expand-file-name ".cache/treemacs-persist"             
+             user-emacs-directory)
+          treemacs-position                        'left
+          treemacs-read-string-input               'from-child-frame
+          treemacs-recenter-distance               0.1
+          treemacs-recenter-after-file-follow      nil
+          treemacs-recenter-after-tag-follow       nil
+          treemacs-recenter-after-project-jump     'always
+          treemacs-recenter-after-project-expand   'on-distance
+          treemacs-litter-directories              
+             '("/node_modules" "/.venv" "/.cask")
+          treemacs-project-follow-into-home        nil
+          treemacs-show-cursor                     nil
+          treemacs-show-hidden-files               t
+          treemacs-silent-filewatch                nil
+          treemacs-silent-refresh                  nil
+          treemacs-sorting                         'alphabetic-asc
+          treemacs-select-when-already-in-treemacs 'move-back
+          treemacs-space-between-root-nodes        t
+          treemacs-tag-follow-cleanup              t
+          treemacs-tag-follow-delay                1.5
+          treemacs-text-scale                      nil
+          treemacs-user-mode-line-format           nil
+          treemacs-user-header-line-format         nil
+          treemacs-wide-toggle-width               70
+          treemacs-width                           35
+          treemacs-width-increment                 1
+          treemacs-width-is-initially-locked       t
+          treemacs-workspace-switch-cleanup        nil)
+
+    ;; The default width and height of the icons is 22 pixels. If you are
+    ;; using a Hi-DPI display, uncomment this to double the icon size.
+    ;;(treemacs-resize-icons 44)
+
+    (treemacs-follow-mode t)
+    (treemacs-filewatch-mode t)
+    (treemacs-fringe-indicator-mode 'always)
+    (when treemacs-python-executable
+      (treemacs-git-commit-diff-mode t))
+
+    (pcase (cons (not (null (executable-find "git")))
+                 (not (null treemacs-python-executable)))
+      (`(t . t)
+       (treemacs-git-mode 'deferred))
+      (`(t . _)
+       (treemacs-git-mode 'simple)))
+
+    (treemacs-hide-gitignored-files-mode nil))
+  :bind
+  (:map global-map
+        ("M-0"       . treemacs-select-window)
+        ("C-x t 1"   . treemacs-delete-other-windows)
+        ("C-x t t"   . treemacs)
+        ("C-x t d"   . treemacs-select-directory)
+        ("C-x t B"   . treemacs-bookmark)
+        ("C-x t C-t" . treemacs-find-file)
+        ("C-x t M-t" . treemacs-find-tag)))
+
+(use-package treemacs-evil
+  :after (treemacs evil)
+  )
+
+(use-package treemacs-projectile
+  :after (treemacs projectile)
+  )
+
+(use-package treemacs-icons-dired
+  :hook (dired-mode . treemacs-icons-dired-enable-once)
+  )
+
+(use-package treemacs-magit
+  :after (treemacs magit)
+  )
+
+(use-package treemacs-persp ;;treemacs-perspective if you use perspective.el vs. persp-mode
+  :after (treemacs persp-mode) ;;or perspective vs. persp-mode
+  :config (treemacs-set-scope-type 'Perspectives))
+
+(use-package treemacs-tab-bar ;;treemacs-tab-bar if you use tab-bar-mode
+  :after (treemacs)
+  :config (treemacs-set-scope-type 'Tabs))
+#+end_src
+
+All the el files in treemacs are in =src/elisp= and =src/extra=
+#+begin_src conf
+  [submodule "treemacs"]
+    load-path = src/elisp
+    load-path = src/extra
+#+end_src
 ** Dirvish
 Dropin replacement for dired.
+Disabled because I'm not getting used to it.
 #+begin_src elisp
   (use-package dirvish
+  :disabled
   :init
     (dirvish-override-dired-mode)
   :hook
@@ -1086,52 +1221,52 @@ Dropin replacement for dired.
   :custom
     (dirvish-quick-access-entries ;`setq' won't work for custom
       '(("h" "~/"                          "Home")
-	("d" "~/Downloads/"                "Downloads")
-	("m" "/mnt/"                       "Drives")
-	("t" "~/.local/share/Trash/files/" "TrashCan"))
+  	("d" "~/Downloads/"                "Downloads")
+  	("m" "/mnt/"                       "Drives")
+  	("t" "~/.local/share/Trash/files/" "TrashCan"))
     )
   :config
     (dirvish-define-preview exa (file)
     "Use `exa' to generate directory preview."
     :require ("exa") ; tell Dirvish to check if we have the executable
     (when (file-directory-p file) ; we only interest in directories here
-	`(shell . ("exa" "-al" "--color=always" "--icons"
-		"--group-directories-first" ,file))))
+  	`(shell . ("exa" "-al" "--color=always" "--icons"
+  		"--group-directories-first" ,file))))
 
     (add-to-list 'dirvish-preview-dispatchers 'exa)
     ;; (dirvish-peek-mode) ; Preview files in minibuffer
     ;; (dirvish-side-follow-mode) ; similar to `treemacs-follow-mode'
     (setq dirvish-path-separators (list "  " "  " "  "))
     (setq dirvish-mode-line-format
-	    '(:left (sort symlink) :right (omit yank index)))
+  	    '(:left (sort symlink) :right (omit yank index)))
     (setq dirvish-attributes
-	    '(all-the-icons file-time file-size collapse subtree-state vc-state git-msg))
+  	    '(all-the-icons file-time file-size collapse subtree-state vc-state git-msg))
     (setq delete-by-moving-to-trash t)
     (setq dired-listing-switches
-	    "-l --almost-all --human-readable --group-directories-first --no-group")
+  	    "-l --almost-all --human-readable --group-directories-first --no-group")
     (nmap dirvish-mode-map
-	"?"      '(dirvish-dispatch          :wk "Dispatch")
-	"TAB"    '(dirvish-subtree-toggle    :wk "Subtre-toggle")
-	"q"      '(dirvish-quit              :wk "Quit")
-	"h"      '(dired-up-directory        :wk "Up-dir")
-	"l"      '(dired-find-file           :wk "Open/Toggle")
-	"a"      '(dirvish-quick-access      :wk "Access")
-	"f"      '(dirvish-file-info-menu    :wk "File Info Menu")
-	"y"      '(dirvish-yank-menu         :wk "Yank Menu")
-	"N"      '(dirvish-narrow            :wk "Narrow")
-	;         `dired-view-file'
-	"v"      '(dirvish-vc-menu           :wk "View-file")
-	;         `dired-sort-toggle-or-edit'
-	"s"      '(dirvish-quicksort         :wk "Quick-sort")
+  	"?"      '(dirvish-dispatch          :wk "Dispatch")
+  	"TAB"    '(dirvish-subtree-toggle    :wk "Subtre-toggle")
+  	"q"      '(dirvish-quit              :wk "Quit")
+  	"h"      '(dired-up-directory        :wk "Up-dir")
+  	"l"      '(dired-find-file           :wk "Open/Toggle")
+  	"a"      '(dirvish-quick-access      :wk "Access")
+  	"f"      '(dirvish-file-info-menu    :wk "File Info Menu")
+  	"y"      '(dirvish-yank-menu         :wk "Yank Menu")
+  	"N"      '(dirvish-narrow            :wk "Narrow")
+  	;         `dired-view-file'
+  	"v"      '(dirvish-vc-menu           :wk "View-file")
+  	;         `dired-sort-toggle-or-edit'
+  	"s"      '(dirvish-quicksort         :wk "Quick-sort")
 
-	"M-f"    '(dirvish-history-go-forward  :wk "History-forward")
-	"M-b"    '(dirvish-history-go-backward :wk "History-back")
-	"M-l"    '(dirvish-ls-switches-menu    :wk "ls Switch Menu")
-	"M-m"    '(dirvish-mark-menu           :wk "Mark Menu")
-	"M-t"    '(dirvish-layout-toggle       :wk "Layout-toggle")
-	"M-s"    '(dirvish-setup-menu          :wk "Setup-Menu")
-	"M-e"    '(dirvish-emerge-menu         :wk "Emerge-Menu")
-	"M-j"    '(dirvish-fd-jump             :wk "fd-jump")
+  	"M-f"    '(dirvish-history-go-forward  :wk "History-forward")
+  	"M-b"    '(dirvish-history-go-backward :wk "History-back")
+  	"M-l"    '(dirvish-ls-switches-menu    :wk "ls Switch Menu")
+  	"M-m"    '(dirvish-mark-menu           :wk "Mark Menu")
+  	"M-t"    '(dirvish-layout-toggle       :wk "Layout-toggle")
+  	"M-s"    '(dirvish-setup-menu          :wk "Setup-Menu")
+  	"M-e"    '(dirvish-emerge-menu         :wk "Emerge-Menu")
+  	"M-j"    '(dirvish-fd-jump             :wk "fd-jump")
     )
   )
 #+end_src
@@ -1454,7 +1589,6 @@ Vertico-multiform configures Vertico modes per command or completion category.
 
 * Coding
 ** YASnippet
-
 [[https://github.com/joaotavora/yasnippet][YASnippet]] is a template system for Emacs. It allows you to type an abbreviation and automatically expand it into function templates.
 #+begin_src elisp
 (use-package yasnippet
@@ -1464,7 +1598,6 @@ Vertico-multiform configures Vertico modes per command or completion category.
 #+end_src
 
 ** AAS
-
 [[https://github.com/ymarco/auto-activating-snippets][AAS (Auto Activating Snippets)]] implements an engine for auto-expanding snippets. It is done by tracking your inputted chars along a tree until you complete a registered key sequence.
 #+begin_src elisp
 (use-package aas
@@ -1501,7 +1634,6 @@ Vertico-multiform configures Vertico modes per command or completion category.
 #+end_src
 
 ** LSP-bridge
-
 [[https://github.com/manateelazycat/lsp-bridge][lsp-bridge]] builds a high-speed cache between Emacs and the LSP server.
 #+begin_src elisp
   (use-package lsp-bridge
@@ -1601,6 +1733,33 @@ fingertip.el is a plugin that provides grammatical edit base on treesit
 ** Copilot
 https://github.com/zerolfx/copilot.el
 
+** Rainbow-Delimiters
+[[https://github.com/Fanael/rainbow-delimiters][Rainbow-delimiters]] is a "rainbow parentheses"-like mode which highlights
+parentheses, brackets, and braces according to their depth.
+#+begin_src elisp
+  (use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode)
+  )
+#+end_src
+** Smartparens
+[[https://github.com/Fuco1/smartparens][Smartparens]] is minor mode for Emacs that deals with parens pairs
+and tries to be smart about it.
+#+begin_src elisp
+  (use-package smartparens
+  :config
+    (smartparens-global-mode)
+  ) 
+#+end_src
+** Aggressive-Indent
+[[https://github.com/Malabarba/aggressive-indent-mode][Aggressive-indent-mode]] is a minor mode that keeps your code always
+indented.  It reindents after every change, making it more reliable
+than `electric-indent-mode'.
+#+begin_src elisp
+  (use-package aggressive-indent
+  :config
+    (global-aggressive-indent-mode 1)
+  ) 
+#+end_src
 * Languages
 ** elisp
 - buttercup

@@ -184,8 +184,8 @@
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 (use-package general
-:after evil
-:config
+  :after evil
+  :config
   ;; (general-evil-setup)
   ;; set up 'SPC' as the global leader key
 
@@ -197,85 +197,86 @@
     :global-prefix "M-SPC") ;; access leader in insert mode
 
   (config/leader
-      "DEL"     '(which-key-undo                 :wk "󰕍 Undo key"))
+    "DEL"     '(which-key-undo                 :wk "󰕍 Undo key"))
 
-  ; buffers
+  				      ; buffers
   (config/leader :infix "b"
-      ""        '(nil                            :wk "  Buffer ")
-      "DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
-      "b"       '(switch-to-buffer               :wk " Switch ")
-      "d"       '(kill-this-buffer               :wk "󰅖 Delete ")
-      "r"       '(revert-buffer                  :wk "󰑓 Reload ")
-      "["       '(previous-buffer                :wk " Prev ")
-      "]"       '(next-buffer                    :wk " Next ")
-  )
-  ; centaur tabs
+    ""        '(nil                            :wk "  Buffer ")
+    "DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
+    "b"       '(switch-to-buffer               :wk " Switch ")
+    "d"       '(kill-this-buffer               :wk "󰅖 Delete ")
+    "r"       '(revert-buffer                  :wk "󰑓 Reload ")
+    "["       '(previous-buffer                :wk " Prev ")
+    "]"       '(next-buffer                    :wk " Next ")
+    )
+  				      ; centaur tabs
   (config/leader
-      "{"       '(centaur-tabs-backward-group    :wk " Prev Group")
-      "}"       '(centaur-tabs-forward-group     :wk " Next Group")
-      "["       '(centaur-tabs-backward          :wk " Prev Buffer ")
-      "]"       '(centaur-tabs-forward           :wk " Next Buffer ")
-  )
-  ; builtin-tabs
+    "{"       '(centaur-tabs-backward-group    :wk " Prev Group")
+    "}"       '(centaur-tabs-forward-group     :wk " Next Group")
+    "["       '(centaur-tabs-backward          :wk " Prev Buffer ")
+    "]"       '(centaur-tabs-forward           :wk " Next Buffer ")
+    )
+  				      ; builtin-tabs
   (config/leader :infix "TAB"
-      ""        '(nil                            :wk " 󰓩 Tab ")
-      "DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
-      "TAB"     '(tab-new                        :wk "󰝜 Tab New ")
-      "d"       '(tab-close                      :wk "󰭌 Tab Del ")
-      "["       '(tab-previous                   :wk " Prev ")
-      "]"       '(tab-next                       :wk " Next ")
-  )
-  ; windows
+    ""        '(nil                            :wk " 󰓩 Tab ")
+    "DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
+    "TAB"     '(tab-new                        :wk "󰝜 Tab New ")
+    "d"       '(tab-close                      :wk "󰭌 Tab Del ")
+    "["       '(tab-previous                   :wk " Prev ")
+    "]"       '(tab-next                       :wk " Next ")
+    )
+  				      ; windows
   (config/leader :infix "w"
-      ""        '(nil                            :wk " 󰓩 Tab ")
-      "DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
-      "d"       '(delete-window                  :wk "󰅖 Delete  ")
-      "v"       '(split-window-vertically        :wk "󰤻 Split   ")
-      "s"       '(split-window-horizontally      :wk "󰤼 Split   ")
-      "\\"      '(split-window-vertically        :wk "󰤻 Split   ")
-      "|"       '(split-window-horizontally      :wk "󰤼 Split   ")
-      "h"       '(evil-window-left               :wk " Focus H ")
-      "j"       '(evil-window-down               :wk " Focus J ")
-      "k"       '(evil-window-up                 :wk " Focus K ")
-      "l"       '(evil-window-right              :wk " Focus L ")
-  )
-  ; Borg
+    ""        '(nil                            :wk " 󰓩 Tab ")
+    "DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
+    "d"       '(delete-window                  :wk "󰅖 Delete  ")
+    "v"       '(split-window-vertically        :wk "󰤻 Split   ")
+    "s"       '(split-window-horizontally      :wk "󰤼 Split   ")
+    "\\"      '(split-window-vertically        :wk "󰤻 Split   ")
+    "|"       '(split-window-horizontally      :wk "󰤼 Split   ")
+    "h"       '(evil-window-left               :wk " Focus H ")
+    "j"       '(evil-window-down               :wk " Focus J ")
+    "k"       '(evil-window-up                 :wk " Focus K ")
+    "l"       '(evil-window-right              :wk " Focus L ")
+    )
+  				      ; Borg
   (config/leader :infix "B"
-      ""        '(nil                            :wk " 󰏗 Borg      ")
-      "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
-      "a"       '(borg-assimilate                :wk "󱧕 Assimilate ")
-      "A"       '(borg-activate                  :wk " Activate   ")
-      "b"       '(borg-build                     :wk "󱇝 Build      ")
-      "c"       '(borg-clone                     :wk " Clone      ")
-      "r"       '(borg-remove                    :wk "󱧖 Remove     ")
-  )
-  ; toggle
+    ""        '(nil                            :wk " 󰏗 Borg      ")
+    "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
+    "a"       '(borg-assimilate                :wk "󱧕 Assimilate ")
+    "A"       '(borg-activate                  :wk " Activate   ")
+    "b"       '(borg-build                     :wk "󱇝 Build      ")
+    "c"       '(borg-clone                     :wk " Clone      ")
+    "r"       '(borg-remove                    :wk "󱧖 Remove     ")
+    )
+  				      ; toggle
   (config/leader :infix "t"
-      ""        '(nil                            :wk " 󰭩 Toggle    ")
-      "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
-  )
-  ; quit
+    ""        '(nil                            :wk " 󰭩 Toggle    ")
+    "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
+    )
+  				      ; quit
   (config/leader :infix "q"
-      ""        '(nil                            :wk " 󰗼 Quit      ")
-      "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
-      "q"       '(save-buffers-kill-terminal     :wk "󰗼 Quit Emacs ")
-  )
-  ; Git
+    ""        '(nil                            :wk " 󰗼 Quit      ")
+    "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
+    "q"       '(save-buffers-kill-terminal     :wk "󰗼 Quit Emacs ")
+    )
+  				      ; Git
   (config/leader :infix "g"
-      ""        '(nil                            :wk " 󰊢 Git       ")
-      "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
-      "g"       '(magit                          :wk " Magit      ")
-  )
-  ; dired
+    ""        '(nil                            :wk " 󰊢 Git       ")
+    "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
+    "g"       '(magit                          :wk " Magit      ")
+    )
+  				      ; dired
   (config/leader
-      "e"       '(dirvish-side                   :wk "󰙅 Dirvish-side ")
-      "E"       '(dirvish                        :wk " Dirvish      ")
-      ;"qe"      '(save-buffers-kill-emacs         :wk "Quit Emacs ")
-  )
+    ;;"e"       '(dirvish-side                   :wk "󰙅 Dirvish-side ")
+    ;;"E"       '(dirvish                        :wk " Dirvish      ")
+    ;;"qe"      '(save-buffers-kill-emacs         :wk "Quit Emacs ")
+    "e"       '(treemacs                        :wk "󰙅 Treemacs ")
+    )
   (config/leader
-      "/"       '(evilnc-comment-or-uncomment-lines :wk "󱀢 Comment ")
+    "/"       '(evilnc-comment-or-uncomment-lines :wk "󱀢 Comment ")
+    )
   )
-)
 
 (use-package which-key
 :after general
@@ -356,7 +357,6 @@
 )
 
 (use-package all-the-icons
-  :ensure t
   :if (display-graphic-p))
 
 ;(use-package all-the-icons-dired
@@ -553,6 +553,8 @@
   (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
 )
 
+
+
 (use-package holo-layer
   :disabled
   :config 
@@ -652,7 +654,125 @@
   :defer t
   :config (cl-pushnew 'tramp-own-remote-path tramp-remote-path))
 
+(use-package treemacs
+  :init
+  (with-eval-after-load 'winum
+    (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
+  :config
+  (progn
+    (setq treemacs-collapse-dirs                   
+            (if treemacs-python-executable 3 0)
+          treemacs-deferred-git-apply-delay        0.5
+          treemacs-directory-name-transformer      #'identity
+          treemacs-display-in-side-window          t
+          treemacs-eldoc-display                   'simple
+          treemacs-file-event-delay                2000
+          treemacs-file-extension-regex   
+            treemacs-last-period-regex-value
+          treemacs-file-follow-delay               0.2
+          treemacs-file-name-transformer           #'identity
+          treemacs-follow-after-init               t
+          treemacs-expand-after-init               t
+          treemacs-find-workspace-method
+            'find-for-file-or-pick-first
+          treemacs-git-command-pipe                ""
+          treemacs-goto-tag-strategy               'refetch-index
+          treemacs-header-scroll-indicators        '(nil . "^^^^^^")
+          treemacs-hide-dot-git-directory          t
+          treemacs-indentation                     2
+          treemacs-indentation-string              " "
+          treemacs-is-never-other-window           nil
+          treemacs-max-git-entries                 5000
+          treemacs-missing-project-action          'ask
+          treemacs-move-forward-on-expand          nil
+          treemacs-no-png-images                   nil
+          treemacs-no-delete-other-windows         t
+          treemacs-project-follow-cleanup          nil
+          treemacs-persist-file                    
+            (expand-file-name ".cache/treemacs-persist"             
+             user-emacs-directory)
+          treemacs-position                        'left
+          treemacs-read-string-input               'from-child-frame
+          treemacs-recenter-distance               0.1
+          treemacs-recenter-after-file-follow      nil
+          treemacs-recenter-after-tag-follow       nil
+          treemacs-recenter-after-project-jump     'always
+          treemacs-recenter-after-project-expand   'on-distance
+          treemacs-litter-directories              
+             '("/node_modules" "/.venv" "/.cask")
+          treemacs-project-follow-into-home        nil
+          treemacs-show-cursor                     nil
+          treemacs-show-hidden-files               t
+          treemacs-silent-filewatch                nil
+          treemacs-silent-refresh                  nil
+          treemacs-sorting                         'alphabetic-asc
+          treemacs-select-when-already-in-treemacs 'move-back
+          treemacs-space-between-root-nodes        t
+          treemacs-tag-follow-cleanup              t
+          treemacs-tag-follow-delay                1.5
+          treemacs-text-scale                      nil
+          treemacs-user-mode-line-format           nil
+          treemacs-user-header-line-format         nil
+          treemacs-wide-toggle-width               70
+          treemacs-width                           35
+          treemacs-width-increment                 1
+          treemacs-width-is-initially-locked       t
+          treemacs-workspace-switch-cleanup        nil)
+
+    ;; The default width and height of the icons is 22 pixels. If you are
+    ;; using a Hi-DPI display, uncomment this to double the icon size.
+    ;;(treemacs-resize-icons 44)
+
+    (treemacs-follow-mode t)
+    (treemacs-filewatch-mode t)
+    (treemacs-fringe-indicator-mode 'always)
+    (when treemacs-python-executable
+      (treemacs-git-commit-diff-mode t))
+
+    (pcase (cons (not (null (executable-find "git")))
+                 (not (null treemacs-python-executable)))
+      (`(t . t)
+       (treemacs-git-mode 'deferred))
+      (`(t . _)
+       (treemacs-git-mode 'simple)))
+
+    (treemacs-hide-gitignored-files-mode nil))
+  :bind
+  (:map global-map
+        ("M-0"       . treemacs-select-window)
+        ("C-x t 1"   . treemacs-delete-other-windows)
+        ("C-x t t"   . treemacs)
+        ("C-x t d"   . treemacs-select-directory)
+        ("C-x t B"   . treemacs-bookmark)
+        ("C-x t C-t" . treemacs-find-file)
+        ("C-x t M-t" . treemacs-find-tag)))
+
+(use-package treemacs-evil
+  :after (treemacs evil)
+  )
+
+(use-package treemacs-projectile
+  :after (treemacs projectile)
+  )
+
+(use-package treemacs-icons-dired
+  :hook (dired-mode . treemacs-icons-dired-enable-once)
+  )
+
+(use-package treemacs-magit
+  :after (treemacs magit)
+  )
+
+(use-package treemacs-persp ;;treemacs-perspective if you use perspective.el vs. persp-mode
+  :after (treemacs persp-mode) ;;or perspective vs. persp-mode
+  :config (treemacs-set-scope-type 'Perspectives))
+
+(use-package treemacs-tab-bar ;;treemacs-tab-bar if you use tab-bar-mode
+  :after (treemacs)
+  :config (treemacs-set-scope-type 'Tabs))
+
 (use-package dirvish
+:disabled
 :init
   (dirvish-override-dired-mode)
 :hook
@@ -670,19 +790,19 @@
   :require ("exa") ; tell Dirvish to check if we have the executable
   (when (file-directory-p file) ; we only interest in directories here
       `(shell . ("exa" "-al" "--color=always" "--icons"
-	      "--group-directories-first" ,file))))
+  	      "--group-directories-first" ,file))))
 
   (add-to-list 'dirvish-preview-dispatchers 'exa)
   ;; (dirvish-peek-mode) ; Preview files in minibuffer
   ;; (dirvish-side-follow-mode) ; similar to `treemacs-follow-mode'
   (setq dirvish-path-separators (list "  " "  " "  "))
   (setq dirvish-mode-line-format
-	  '(:left (sort symlink) :right (omit yank index)))
+  	  '(:left (sort symlink) :right (omit yank index)))
   (setq dirvish-attributes
-	  '(all-the-icons file-time file-size collapse subtree-state vc-state git-msg))
+  	  '(all-the-icons file-time file-size collapse subtree-state vc-state git-msg))
   (setq delete-by-moving-to-trash t)
   (setq dired-listing-switches
-	  "-l --almost-all --human-readable --group-directories-first --no-group")
+  	  "-l --almost-all --human-readable --group-directories-first --no-group")
   (nmap dirvish-mode-map
       "?"      '(dirvish-dispatch          :wk "Dispatch")
       "TAB"    '(dirvish-subtree-toggle    :wk "Subtre-toggle")
@@ -1071,6 +1191,20 @@
 
       "C-j" 'fingertip-jump-up
   )
+)
+
+(use-package rainbow-delimiters
+:hook (prog-mode . rainbow-delimiters-mode)
+)
+
+(use-package smartparens
+:config
+  (smartparens-global-mode)
+)
+
+(use-package aggressive-indent
+:config
+  (global-aggressive-indent-mode 1)
 )
 
 (use-package lsp-bridge
