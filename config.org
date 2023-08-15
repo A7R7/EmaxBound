@@ -18,7 +18,7 @@
 #+HTML:<a href="https://en.wikipedia.org/wiki/Linux"><img alt="Linux" src="https://img.shields.io/badge/linux-FCC624?logo=linux&logoColor=black"/></a>
 
 * Screenshots
-#+HTML:<img alt="Dashboard" src="assets/dashboard.png" width="80">
+#+HTML:<img alt="Dashboard" src="assets/dashboard.png" width="80%">
 #+HTML:<img alt="Org Mode" src="assets/org_mode.png" width="80%">
 * Introduction
 ** How to deploy this config
@@ -141,7 +141,6 @@ Calculating time used loading emacs excutable, as well as setting some variables
 #+end_src
 
 * Core units
-
 ** Borg
  [[https://github.com/emacscollective/borg][Borg]] assimilate Emacs packages as Git submodules. Core of the core units.
    =borg-initialize= should be called in init.el for borg to initialize assimilated drones using =borg-activate=.
@@ -965,22 +964,6 @@ Disabled because it cannot run perfectly on hyprland.
   (add-hook 'lisp-interaction-mode-hook 'indent-spaces-mode))
 #+end_src
 
- * [[https://github.com/magit/magit][Magit]] is a VERY powerful git client.
-#+begin_src elisp
-(use-package magit
-  :defer t
-  :commands (magit-add-section-hook)
-  :config
-  (magit-add-section-hook 'magit-status-sections-hook
-			  'magit-insert-modules
-			  'magit-insert-stashes
-			  'append))
-#+end_src
-    - tweaks to build magit
-#+begin_src conf
-[submodule "magit"]
-	no-byte-compile = lisp/magit-libgit.el
-#+end_src
 #+begin_src elisp
 (use-package man
   :defer t
@@ -1056,6 +1039,25 @@ Disabled because it cannot run perfectly on hyprland.
   :config (cl-pushnew 'tramp-own-remote-path tramp-remote-path))
 #+end_src
 
+** Magit
+[[https://github.com/magit/magit][Magit]] is a VERY powerful git client.
+#+begin_src elisp
+  (use-package magit
+    :defer t
+    :commands (magit-add-section-hook)
+    :hook (magit-mode . solaire-mode) (magit-mode . olivetti-mode)
+    :config
+    (magit-add-section-hook 'magit-status-sections-hook
+  			  'magit-insert-modules
+  			  'magit-insert-stashes
+  			  'append))
+#+end_src
+
+- tweaks to build magit
+#+begin_src conf
+[submodule "magit"]
+	no-byte-compile = lisp/magit-libgit.el
+#+end_src
 ** Treemacs
 #+begin_src elisp
   (use-package treemacs

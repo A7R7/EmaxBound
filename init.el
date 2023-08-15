@@ -562,15 +562,6 @@
     (setq indent-tabs-mode nil))
   (add-hook 'lisp-interaction-mode-hook 'indent-spaces-mode))
 
-(use-package magit
-  :defer t
-  :commands (magit-add-section-hook)
-  :config
-  (magit-add-section-hook 'magit-status-sections-hook
-			  'magit-insert-modules
-			  'magit-insert-stashes
-			  'append))
-
 (use-package man
   :defer t
   :config (setq Man-width 80))
@@ -623,6 +614,16 @@
 (use-package tramp-sh
   :defer t
   :config (cl-pushnew 'tramp-own-remote-path tramp-remote-path))
+
+(use-package magit
+  :defer t
+  :commands (magit-add-section-hook)
+  :hook (magit-mode . solaire-mode) (magit-mode . olivetti-mode)
+  :config
+  (magit-add-section-hook 'magit-status-sections-hook
+  			'magit-insert-modules
+  			'magit-insert-stashes
+  			'append))
 
 (use-package treemacs
   :disabled
