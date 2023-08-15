@@ -54,13 +54,13 @@
   :init
   (setq epkg-repository
 	(expand-file-name "var/epkgs/" user-emacs-directory))
-  (setq epkg-database-connector
-	(if (>= emacs-major-version 29) 'sqlite-builtin 'sqlite-module)))
+  (setq epkg-database-connector 'sqlite-builtin ))
 
 (use-package custom
   :no-require t
   :config
   (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+  (setf custom-safe-themes t) ;Treat all themes as safe
   (when (file-exists-p custom-file)
     (load custom-file)))
 
@@ -268,10 +268,10 @@
     )
   				      ; dired
   (config/leader
-    ;;"e"       '(dirvish-side                   :wk "󰙅 Dirvish-side ")
+    "e"       '(dirvish-side                   :wk "󰙅 Dirvish-side ")
     ;;"E"       '(dirvish                        :wk " Dirvish      ")
     ;;"qe"      '(save-buffers-kill-emacs         :wk "Quit Emacs ")
-    "e"       '(treemacs                        :wk "󰙅 Treemacs ")
+    ;;"e"       '(treemacs                        :wk "󰙅 Treemacs ")
     )
   (config/leader
     "/"       '(evilnc-comment-or-uncomment-lines :wk "󱀢 Comment ")
@@ -392,39 +392,6 @@
 
 (use-package topspace
 :init (global-topspace-mode)
-)
-
-(use-package emacs
-:custom-face
-  (line-number ((t (:weight normal :slant normal :foreground "LightSteelBlue4" :inherit default))))
-  (line-number-current-line ((t (:inherit (hl-line default) :slant normal :foreground "#ffcc66"))))
-
-:config
-  (defun config/toggle-line-number-nil ()
-      (interactive)
-      (setq display-line-numbers nil)
-  )
-  (defun config/toggle-line-number-absolute ()
-      (interactive)
-      (setq display-line-numbers t)
-  )
-  (defun config/toggle-line-number-relative ()
-      (interactive)
-      (setq display-line-numbers 'relative)
-  )
-  (defun config/toggle-line-number-visual ()
-      (interactive)
-      (setq display-line-numbers 'visual)
-  )
-  (config/leader :infix "tl"
-    ""    '(nil                                :wk "  Line Number ")
-    "DEL" '(which-key-undo                     :wk "󰕍 Undo key   ")
-    "n"   '(config/toggle-line-number-nil      :wk "󰅖 Nil        ")
-    "a"   '(config/toggle-line-number-absolute :wk "󰱇 Absolute   ")
-    "r"   '(config/toggle-line-number-relative :wk "󰰠 Relative   ")
-    "v"   '(config/toggle-line-number-visual   :wk " Visual     ")
-    "h"   '(hl-line-mode                       :wk "󰸱 Hl-line")
-  )
 )
 
 (config/leader :infix "t"
@@ -553,8 +520,6 @@
   (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
 )
 
-
-
 (use-package holo-layer
   :disabled
   :config 
@@ -655,19 +620,20 @@
   :config (cl-pushnew 'tramp-own-remote-path tramp-remote-path))
 
 (use-package treemacs
+  :disabled
   :init
   (with-eval-after-load 'winum
     (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
   :config
   (progn
-    (setq treemacs-collapse-dirs                   
+    (setq treemacs-collapse-dirs
             (if treemacs-python-executable 3 0)
           treemacs-deferred-git-apply-delay        0.5
           treemacs-directory-name-transformer      #'identity
           treemacs-display-in-side-window          t
           treemacs-eldoc-display                   'simple
           treemacs-file-event-delay                2000
-          treemacs-file-extension-regex   
+          treemacs-file-extension-regex
             treemacs-last-period-regex-value
           treemacs-file-follow-delay               0.2
           treemacs-file-name-transformer           #'identity
@@ -688,8 +654,8 @@
           treemacs-no-png-images                   nil
           treemacs-no-delete-other-windows         t
           treemacs-project-follow-cleanup          nil
-          treemacs-persist-file                    
-            (expand-file-name ".cache/treemacs-persist"             
+          treemacs-persist-file
+            (expand-file-name ".cache/treemacs-persist"
              user-emacs-directory)
           treemacs-position                        'left
           treemacs-read-string-input               'from-child-frame
@@ -698,7 +664,7 @@
           treemacs-recenter-after-tag-follow       nil
           treemacs-recenter-after-project-jump     'always
           treemacs-recenter-after-project-expand   'on-distance
-          treemacs-litter-directories              
+          treemacs-litter-directories
              '("/node_modules" "/.venv" "/.cask")
           treemacs-project-follow-into-home        nil
           treemacs-show-cursor                     nil
@@ -772,7 +738,6 @@
   :config (treemacs-set-scope-type 'Tabs))
 
 (use-package dirvish
-:disabled
 :init
   (dirvish-override-dired-mode)
 :hook
@@ -1076,50 +1041,65 @@
   )
 )
 
-(use-package yasnippet
-  :init
-  (yas-global-mode 1)
+(use-package emacs
+:custom-face
+  (line-number ((t (
+    :weight normal :slant normal :foreground "LightSteelBlue4"     
+    :inherit default))))
+  (line-number-current-line ((t (
+    :inherit (hl-line default) :slant normal :foreground "#ffcc66"))))
+:hook (prog-mode . config/toggle-line-number-absolute)
+:config
+  (defun config/toggle-line-number-nil ()
+    (interactive)
+    (setq display-line-numbers nil)
+  )
+  (defun config/toggle-line-number-absolute ()
+    (interactive)
+    (setq display-line-numbers t)
+  )
+  (defun config/toggle-line-number-relative ()
+    (interactive)
+    (setq display-line-numbers 'relative)
+  )
+  (defun config/toggle-line-number-visual ()
+    (interactive)
+    (setq display-line-numbers 'visual)
+  )
+  (config/leader :infix "tl"
+    ""    '(nil                                :wk "  Line Number ")
+    "DEL" '(which-key-undo                     :wk "󰕍 Undo key   ")
+    "n"   '(config/toggle-line-number-nil      :wk "󰅖 Nil        ")
+    "a"   '(config/toggle-line-number-absolute :wk "󰱇 Absolute   ")
+    "r"   '(config/toggle-line-number-relative :wk "󰰠 Relative   ")
+    "v"   '(config/toggle-line-number-visual   :wk " Visual     ")
+    "h"   '(hl-line-mode                       :wk "󰸱 Hl-line")
+  )
 )
 
-(use-package aas
-  :hook (LaTeX-mode . aas-activate-for-major-mode)
-  :hook (org-mode . aas-activate-for-major-mode)
-  :config
-  (aas-set-snippets 'text-mode
-    ;; expand unconditionally
-    ";o-" "ō"
-    ";i-" "ī"
-    ";a-" "ā"
-    ";u-" "ū"
-    ";e-" "ē")
-  (aas-set-snippets 'latex-mode
-    ;; set condition!
-    :cond #'texmathp ; expand only while in math
-    "supp" "\\supp"
-    "On" "O(n)"
-    "O1" "O(1)"
-    "Olog" "O(\\log n)"
-    "Olon" "O(n \\log n)"
-    ;; Use YAS/Tempel snippets with ease!
-    "amin" '(yas "\\argmin_{$1}") ; YASnippet snippet shorthand form
-    "amax" '(tempel "\\argmax_{" p "}") ; Tempel snippet shorthand form
-    ;; bind to functions!
-    ";ig" #'insert-register
-    ";call-sin"
-    (lambda (angle) ; Get as fancy as you like
-      (interactive "sAngle: ")
-      (insert (format "%s" (sin (string-to-number angle))))))
-  ;; disable snippets by redefining them with a nil expansion
-  (aas-set-snippets 'latex-mode
-    "supp" nil))
 
-(use-package lsp-bridge
-:init
-  (global-lsp-bridge-mode)
+
+(use-package rainbow-delimiters
+:hook (prog-mode . rainbow-delimiters-mode)
+)
+
+(use-package highlight-indent-guides
+:hook (prog-mode . highlight-indent-guides-mode)
 :config
-  ;(set-face-attributes 'lsp-bridge-alive-mode-line nil
-  ;  :inherit 'variable-pitch
-  ;)
+  (setq highlight-indent-guides-method 'character
+        highlight-indent-guides-character 9474 
+        highlight-indent-guides-auto-enabled nil
+  )
+  (set-face-attribute 'highlight-indent-guides-character-face nil
+    :foreground "LightSteelBlue4")
+  (set-face-attribute 'highlight-indent-guides-top-character-face nil
+    :foreground "#ffcc66")
+
+)
+
+(use-package smartparens
+:config
+  (smartparens-global-mode)
 )
 
 (use-package fingertip
@@ -1193,18 +1173,55 @@
   )
 )
 
-(use-package rainbow-delimiters
-:hook (prog-mode . rainbow-delimiters-mode)
-)
-
-(use-package smartparens
-:config
-  (smartparens-global-mode)
-)
-
 (use-package aggressive-indent
 :config
   (global-aggressive-indent-mode 1)
+)
+
+(use-package yasnippet
+  :init
+  (yas-global-mode 1)
+)
+
+(use-package aas
+  :hook (LaTeX-mode . aas-activate-for-major-mode)
+  :hook (org-mode . aas-activate-for-major-mode)
+  :config
+  (aas-set-snippets 'text-mode
+    ;; expand unconditionally
+    ";o-" "ō"
+    ";i-" "ī"
+    ";a-" "ā"
+    ";u-" "ū"
+    ";e-" "ē")
+  (aas-set-snippets 'latex-mode
+    ;; set condition!
+    :cond #'texmathp ; expand only while in math
+    "supp" "\\supp"
+    "On" "O(n)"
+    "O1" "O(1)"
+    "Olog" "O(\\log n)"
+    "Olon" "O(n \\log n)"
+    ;; Use YAS/Tempel snippets with ease!
+    "amin" '(yas "\\argmin_{$1}") ; YASnippet snippet shorthand form
+    "amax" '(tempel "\\argmax_{" p "}") ; Tempel snippet shorthand form
+    ;; bind to functions!
+    ";ig" #'insert-register
+    ";call-sin"
+    (lambda (angle) ; Get as fancy as you like
+      (interactive "sAngle: ")
+      (insert (format "%s" (sin (string-to-number angle))))))
+  ;; disable snippets by redefining them with a nil expansion
+  (aas-set-snippets 'latex-mode
+    "supp" nil))
+
+(use-package lsp-bridge
+:init
+  (global-lsp-bridge-mode)
+:config
+  ;(set-face-attributes 'lsp-bridge-alive-mode-line nil
+  ;  :inherit 'variable-pitch
+  ;)
 )
 
 (use-package lsp-bridge
@@ -1470,6 +1487,8 @@
     )
   )
 )
+
+
 
 (use-package eaf
 :disabled

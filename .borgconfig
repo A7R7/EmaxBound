@@ -16,6 +16,9 @@
 [submodule "sqlite3"]
 	build-step = make
 
+[submodule "evil"]
+  info-path = doc/build/texinfo
+
 [submodule "magit"]
 	no-byte-compile = lisp/magit-libgit.el
 
@@ -45,6 +48,12 @@
 	build-step = borg-maketexi
 	build-step = borg-makeinfo
 	build-step = borg-update-autoloads
+
+[submodule "mu4e"]
+  build-step = ./autogen.sh
+  build-step = make -C mu4e > /dev/null
+  build-step = borg-update-autoloads
+  load-path = build/mu4e
 
 [submodule "eaf"]
   load-path = .

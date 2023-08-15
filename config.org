@@ -22,7 +22,6 @@
 #+HTML:<img alt="Org Mode" src="assets/org_mode.png" width="80%">
 * Introduction
 ** How to deploy this config
-
 This config file is still in its early stages of development, *Everything is unstable!*
 To play around with my config files, clone this repo anywhere you like on your system.
 #+begin_src bash
@@ -35,8 +34,7 @@ make bootstrap-borg  # bootstrap borg itself
 make bootstrap       # bootstrap collective or new drones
 #+end_src
 
-If you're using emacs29 or above, run ~emacs --init-directory=<path-of-the-repo>~ (replace the path).
-Else, you can have a look at [[https://github.com/plexus/chemacs2][chemacs2]], which makes it easy to run multiple Emacs configurations side by side.
+Last, run ~emacs --init-directory=<path-of-the-repo>~ (replace the path).
 
 ** How I built this config from seed
 
@@ -105,7 +103,7 @@ Borg seed generated configs.
 
 * Early birds
 
-*NOTE*: Starting from here, codes are tangled to init.el !
+*NOTE*: Starting from here, elisp codes are tangled to init.el !
 
 Disable byte compile for init.el, according to the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html][emacs manual]].
 #+begin_src elisp
@@ -194,25 +192,25 @@ Dash needs some tweaks to be built
   )
 #+end_src
 
- * [[https://github.com/emacscollective/epkg][Epkg]] allows you browse the Emacsmirror package database
+ * [[https://github.com/emacscollective/epkg][Epkg]] allows you browse the Emacsmirror package database. We're using emacs >= 29 which has builtin support for sqlite, so we let epkg-database-connector to use builtin sqlite.
 #+begin_src elisp
 (use-package epkg
   :defer t
   :init
   (setq epkg-repository
 	(expand-file-name "var/epkgs/" user-emacs-directory))
-  (setq epkg-database-connector
-	(if (>= emacs-major-version 29) 'sqlite-builtin 'sqlite-module)))
+  (setq epkg-database-connector 'sqlite-builtin ))
 #+end_src
 
  * [[https://www.emacswiki.org/emacs/CustomizingAndSaving#Customize][Customize system]] of emacs. Set the file path used for storing customization information.
 #+begin_src elisp
-(use-package custom
-  :no-require t
-  :config
-  (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-  (when (file-exists-p custom-file)
-    (load custom-file)))
+  (use-package custom
+    :no-require t
+    :config
+    (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+    (setf custom-safe-themes t) ;Treat all themes as safe
+    (when (file-exists-p custom-file)
+      (load custom-file)))
 #+end_src
 
  * Server allows Emacs to operate as a server for other processes. Built in.
@@ -255,6 +253,7 @@ According to the installation manual of org, we need to make autoloads before co
 
 ** Annalist
 [[https://github.com/noctuid/annalist.el][annalist.el]] is a library that can be used to record information and later print that information using org-mode headings and tables. It allows defining different types of things that can be recorded (e.g. keybindings, settings, hooks, and advice) and supports custom filtering, sorting, and formatting. annalist is primarily intended for use in other packages like general and evil-collection, but it can also be used directly in a user’s configuration.
+
 ** Shrink path
 [[https://github.com/zbelial/shrink-path.el][Shrink path]] is a small utility functions that allow for fish-style trunctated directories in eshell and for example modeline.
 #+begin_src elisp
@@ -304,7 +303,10 @@ I guess evil surround and evil nerd commentor should be better to put under Codi
       (evil-define-key 'normal 'foo-mode "e" 'baz)
   )
 #+end_src
-
+#+begin_src conf
+  [submodule "evil"]
+    info-path = doc/build/texinfo
+#+end_src
 *** Evil collection
 
 [[https://github.com/emacs-evil/evil-collection][Evil-collection]] automatically configures various Emacs modes with Vi-like keybindings.
@@ -499,10 +501,10 @@ I guess evil surround and evil nerd commentor should be better to put under Codi
       )
   					; dired
     (config/leader
-      ;;"e"       '(dirvish-side                   :wk "󰙅 Dirvish-side ")
+      "e"       '(dirvish-side                   :wk "󰙅 Dirvish-side ")
       ;;"E"       '(dirvish                        :wk " Dirvish      ")
       ;;"qe"      '(save-buffers-kill-emacs         :wk "Quit Emacs ")
-      "e"       '(treemacs                        :wk "󰙅 Treemacs ")
+      ;;"e"       '(treemacs                        :wk "󰙅 Treemacs ")
       )
     (config/leader
       "/"       '(evilnc-comment-or-uncomment-lines :wk "󱀢 Comment ")
@@ -710,42 +712,6 @@ We have 3 modes that can help centering text in a window. But currently we only 
   )
 #+end_src
 
-*** Line Number
-#+begin_src elisp
-  (use-package emacs
-  :custom-face
-    (line-number ((t (:weight normal :slant normal :foreground "LightSteelBlue4" :inherit default))))
-    (line-number-current-line ((t (:inherit (hl-line default) :slant normal :foreground "#ffcc66"))))
-
-  :config
-    (defun config/toggle-line-number-nil ()
-	(interactive)
-	(setq display-line-numbers nil)
-    )
-    (defun config/toggle-line-number-absolute ()
-	(interactive)
-	(setq display-line-numbers t)
-    )
-    (defun config/toggle-line-number-relative ()
-	(interactive)
-	(setq display-line-numbers 'relative)
-    )
-    (defun config/toggle-line-number-visual ()
-	(interactive)
-	(setq display-line-numbers 'visual)
-    )
-    (config/leader :infix "tl"
-      ""    '(nil                                :wk "  Line Number ")
-      "DEL" '(which-key-undo                     :wk "󰕍 Undo key   ")
-      "n"   '(config/toggle-line-number-nil      :wk "󰅖 Nil        ")
-      "a"   '(config/toggle-line-number-absolute :wk "󰱇 Absolute   ")
-      "r"   '(config/toggle-line-number-relative :wk "󰰠 Relative   ")
-      "v"   '(config/toggle-line-number-visual   :wk " Visual     ")
-      "h"   '(hl-line-mode                       :wk "󰸱 Hl-line")
-    )
-  )
-#+end_src
-
 *** Whitespace mode
 
 [[https://www.emacswiki.org/emacs/WhiteSpace][Whitespace mode]] is a built in mode of emacs that visualizes whitespaces, tab symbols, indentations and related stuffs.
@@ -927,12 +893,6 @@ Use olivetti to center text in minibuffer!
   )
 #+end_src
 
-** Rainbow-mode
-
-This minor mode sets background color to strings that match color names.
-#+begin_src elisp
-   
-#+end_src
 ** Posframe
 [[https://github.com/tumashu/posframe][Posframe]] can pop up a frame at point, this *posframe* is a child-frame connected to its root window's buffer.
 
@@ -1085,19 +1045,20 @@ Disabled because it cannot run perfectly on hyprland.
 ** Treemacs
 #+begin_src elisp
   (use-package treemacs
+  :disabled
   :init
   (with-eval-after-load 'winum
     (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
   :config
   (progn
-    (setq treemacs-collapse-dirs                   
+    (setq treemacs-collapse-dirs
             (if treemacs-python-executable 3 0)
           treemacs-deferred-git-apply-delay        0.5
           treemacs-directory-name-transformer      #'identity
           treemacs-display-in-side-window          t
           treemacs-eldoc-display                   'simple
           treemacs-file-event-delay                2000
-          treemacs-file-extension-regex   
+          treemacs-file-extension-regex
             treemacs-last-period-regex-value
           treemacs-file-follow-delay               0.2
           treemacs-file-name-transformer           #'identity
@@ -1118,8 +1079,8 @@ Disabled because it cannot run perfectly on hyprland.
           treemacs-no-png-images                   nil
           treemacs-no-delete-other-windows         t
           treemacs-project-follow-cleanup          nil
-          treemacs-persist-file                    
-            (expand-file-name ".cache/treemacs-persist"             
+          treemacs-persist-file
+            (expand-file-name ".cache/treemacs-persist"
              user-emacs-directory)
           treemacs-position                        'left
           treemacs-read-string-input               'from-child-frame
@@ -1128,7 +1089,7 @@ Disabled because it cannot run perfectly on hyprland.
           treemacs-recenter-after-tag-follow       nil
           treemacs-recenter-after-project-jump     'always
           treemacs-recenter-after-project-expand   'on-distance
-          treemacs-litter-directories              
+          treemacs-litter-directories
              '("/node_modules" "/.venv" "/.cask")
           treemacs-project-follow-into-home        nil
           treemacs-show-cursor                     nil
@@ -1210,10 +1171,9 @@ All the el files in treemacs are in =src/elisp= and =src/extra=
 #+end_src
 ** Dirvish
 Dropin replacement for dired.
-Disabled because I'm not getting used to it.
+
 #+begin_src elisp
   (use-package dirvish
-  :disabled
   :init
     (dirvish-override-dired-mode)
   :hook
@@ -1588,71 +1548,86 @@ Vertico-multiform configures Vertico modes per command or completion category.
 ** Popweb
 
 * Coding
-** YASnippet
-[[https://github.com/joaotavora/yasnippet][YASnippet]] is a template system for Emacs. It allows you to type an abbreviation and automatically expand it into function templates.
+** UI
+*** Line Number
 #+begin_src elisp
-(use-package yasnippet
-  :init
-  (yas-global-mode 1)
-)
-#+end_src
-
-** AAS
-[[https://github.com/ymarco/auto-activating-snippets][AAS (Auto Activating Snippets)]] implements an engine for auto-expanding snippets. It is done by tracking your inputted chars along a tree until you complete a registered key sequence.
-#+begin_src elisp
-(use-package aas
-  :hook (LaTeX-mode . aas-activate-for-major-mode)
-  :hook (org-mode . aas-activate-for-major-mode)
+  (use-package emacs
+  :custom-face
+    (line-number ((t (
+      :weight normal :slant normal :foreground "LightSteelBlue4"     
+      :inherit default))))
+    (line-number-current-line ((t (
+      :inherit (hl-line default) :slant normal :foreground "#ffcc66"))))
+  :hook (prog-mode . config/toggle-line-number-absolute)
   :config
-  (aas-set-snippets 'text-mode
-    ;; expand unconditionally
-    ";o-" "ō"
-    ";i-" "ī"
-    ";a-" "ā"
-    ";u-" "ū"
-    ";e-" "ē")
-  (aas-set-snippets 'latex-mode
-    ;; set condition!
-    :cond #'texmathp ; expand only while in math
-    "supp" "\\supp"
-    "On" "O(n)"
-    "O1" "O(1)"
-    "Olog" "O(\\log n)"
-    "Olon" "O(n \\log n)"
-    ;; Use YAS/Tempel snippets with ease!
-    "amin" '(yas "\\argmin_{$1}") ; YASnippet snippet shorthand form
-    "amax" '(tempel "\\argmax_{" p "}") ; Tempel snippet shorthand form
-    ;; bind to functions!
-    ";ig" #'insert-register
-    ";call-sin"
-    (lambda (angle) ; Get as fancy as you like
-      (interactive "sAngle: ")
-      (insert (format "%s" (sin (string-to-number angle))))))
-  ;; disable snippets by redefining them with a nil expansion
-  (aas-set-snippets 'latex-mode
-    "supp" nil))
-#+end_src
-
-** LSP-bridge
-[[https://github.com/manateelazycat/lsp-bridge][lsp-bridge]] builds a high-speed cache between Emacs and the LSP server.
-#+begin_src elisp
-  (use-package lsp-bridge
-  :init
-    (global-lsp-bridge-mode)
-  :config
-    ;(set-face-attributes 'lsp-bridge-alive-mode-line nil
-    ;  :inherit 'variable-pitch
-    ;)
+    (defun config/toggle-line-number-nil ()
+      (interactive)
+      (setq display-line-numbers nil)
+    )
+    (defun config/toggle-line-number-absolute ()
+      (interactive)
+      (setq display-line-numbers t)
+    )
+    (defun config/toggle-line-number-relative ()
+      (interactive)
+      (setq display-line-numbers 'relative)
+    )
+    (defun config/toggle-line-number-visual ()
+      (interactive)
+      (setq display-line-numbers 'visual)
+    )
+    (config/leader :infix "tl"
+      ""    '(nil                                :wk "  Line Number ")
+      "DEL" '(which-key-undo                     :wk "󰕍 Undo key   ")
+      "n"   '(config/toggle-line-number-nil      :wk "󰅖 Nil        ")
+      "a"   '(config/toggle-line-number-absolute :wk "󰱇 Absolute   ")
+      "r"   '(config/toggle-line-number-relative :wk "󰰠 Relative   ")
+      "v"   '(config/toggle-line-number-visual   :wk " Visual     ")
+      "h"   '(hl-line-mode                       :wk "󰸱 Hl-line")
+    )
   )
 #+end_src
-tweaks to build lsp-bridge
-#+begin_src conf
-[submodule "lsp-bridge"]
-  load-path = .
-  load-path = acm
-  load-path = core
-#+end_src
 
+*** Rainbow-mode
+
+This minor mode sets background color to strings that match color names.
+#+begin_src elisp
+   
+#+end_src
+*** Rainbow-Delimiters
+[[https://github.com/Fanael/rainbow-delimiters][Rainbow-delimiters]] is a "rainbow parentheses"-like mode which highlights
+parentheses, brackets, and braces according to their depth.
+#+begin_src elisp
+  (use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode)
+  )
+#+end_src
+*** Highlight-Indent-Guides
+[[https://github.com/DarthFennec/highlight-indent-guides][Highlight-Indent-Guides]] is a minor mode that highlights indentation levels via font-lock.
+#+begin_src elisp
+  (use-package highlight-indent-guides
+  :hook (prog-mode . highlight-indent-guides-mode)
+  :config
+    (setq highlight-indent-guides-method 'character
+          highlight-indent-guides-character 9474 
+          highlight-indent-guides-auto-enabled nil
+    )
+    (set-face-attribute 'highlight-indent-guides-character-face nil
+      :foreground "LightSteelBlue4")
+    (set-face-attribute 'highlight-indent-guides-top-character-face nil
+      :foreground "#ffcc66")
+
+  )
+#+end_src
+** Smartparens
+[[https://github.com/Fuco1/smartparens][Smartparens]] is minor mode for Emacs that deals with parens pairs
+and tries to be smart about it.
+#+begin_src elisp
+  (use-package smartparens
+  :config
+    (smartparens-global-mode)
+  ) 
+#+end_src
 ** Fingertip
 
 fingertip.el is a plugin that provides grammatical edit base on treesit
@@ -1730,26 +1705,6 @@ fingertip.el is a plugin that provides grammatical edit base on treesit
 
 #+end_src
 
-** Copilot
-https://github.com/zerolfx/copilot.el
-
-** Rainbow-Delimiters
-[[https://github.com/Fanael/rainbow-delimiters][Rainbow-delimiters]] is a "rainbow parentheses"-like mode which highlights
-parentheses, brackets, and braces according to their depth.
-#+begin_src elisp
-  (use-package rainbow-delimiters
-  :hook (prog-mode . rainbow-delimiters-mode)
-  )
-#+end_src
-** Smartparens
-[[https://github.com/Fuco1/smartparens][Smartparens]] is minor mode for Emacs that deals with parens pairs
-and tries to be smart about it.
-#+begin_src elisp
-  (use-package smartparens
-  :config
-    (smartparens-global-mode)
-  ) 
-#+end_src
 ** Aggressive-Indent
 [[https://github.com/Malabarba/aggressive-indent-mode][Aggressive-indent-mode]] is a minor mode that keeps your code always
 indented.  It reindents after every change, making it more reliable
@@ -1760,6 +1715,74 @@ than `electric-indent-mode'.
     (global-aggressive-indent-mode 1)
   ) 
 #+end_src
+** YASnippet
+[[https://github.com/joaotavora/yasnippet][YASnippet]] is a template system for Emacs. It allows you to type an abbreviation and automatically expand it into function templates.
+#+begin_src elisp
+(use-package yasnippet
+  :init
+  (yas-global-mode 1)
+)
+#+end_src
+
+** AAS
+[[https://github.com/ymarco/auto-activating-snippets][AAS (Auto Activating Snippets)]] implements an engine for auto-expanding snippets. It is done by tracking your inputted chars along a tree until you complete a registered key sequence.
+#+begin_src elisp
+(use-package aas
+  :hook (LaTeX-mode . aas-activate-for-major-mode)
+  :hook (org-mode . aas-activate-for-major-mode)
+  :config
+  (aas-set-snippets 'text-mode
+    ;; expand unconditionally
+    ";o-" "ō"
+    ";i-" "ī"
+    ";a-" "ā"
+    ";u-" "ū"
+    ";e-" "ē")
+  (aas-set-snippets 'latex-mode
+    ;; set condition!
+    :cond #'texmathp ; expand only while in math
+    "supp" "\\supp"
+    "On" "O(n)"
+    "O1" "O(1)"
+    "Olog" "O(\\log n)"
+    "Olon" "O(n \\log n)"
+    ;; Use YAS/Tempel snippets with ease!
+    "amin" '(yas "\\argmin_{$1}") ; YASnippet snippet shorthand form
+    "amax" '(tempel "\\argmax_{" p "}") ; Tempel snippet shorthand form
+    ;; bind to functions!
+    ";ig" #'insert-register
+    ";call-sin"
+    (lambda (angle) ; Get as fancy as you like
+      (interactive "sAngle: ")
+      (insert (format "%s" (sin (string-to-number angle))))))
+  ;; disable snippets by redefining them with a nil expansion
+  (aas-set-snippets 'latex-mode
+    "supp" nil))
+#+end_src
+
+** LSP-bridge
+[[https://github.com/manateelazycat/lsp-bridge][lsp-bridge]] builds a high-speed cache between Emacs and the LSP server.
+#+begin_src elisp
+  (use-package lsp-bridge
+  :init
+    (global-lsp-bridge-mode)
+  :config
+    ;(set-face-attributes 'lsp-bridge-alive-mode-line nil
+    ;  :inherit 'variable-pitch
+    ;)
+  )
+#+end_src
+tweaks to build lsp-bridge
+#+begin_src conf
+[submodule "lsp-bridge"]
+  load-path = .
+  load-path = acm
+  load-path = core
+#+end_src
+
+** Copilot
+https://github.com/zerolfx/copilot.el
+
 * Languages
 ** elisp
 - buttercup
@@ -2144,6 +2167,17 @@ Code under :config is taken from https://emacs-china.org/t/org-mode-latex-mode/2
       )
     )
   )
+#+end_src
+** Mu4e
+#+begin_src conf
+  [submodule "mu4e"]
+    build-step = ./autogen.sh
+    build-step = make -C mu4e > /dev/null
+    build-step = borg-update-autoloads
+    load-path = build/mu4e
+#+end_src
+#+begin_src elisp
+  
 #+end_src
 ** Eaf
 
