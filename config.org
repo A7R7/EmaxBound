@@ -142,7 +142,8 @@ Calculating time used loading emacs excutable, as well as setting some variables
 
 * Core units
 
- * [[https://github.com/emacscollective/borg][Borg]] assimilate Emacs packages as Git submodules. Core of the core units.
+** Borg
+ [[https://github.com/emacscollective/borg][Borg]] assimilate Emacs packages as Git submodules. Core of the core units.
    =borg-initialize= should be called in init.el for borg to initialize assimilated drones using =borg-activate=.
     To skip the activation of the drone named DRONE, temporarily disable it by setting the value of the Git variable submodule.DRONE.disabled to true in ~/.config/emacs/.gitmodules.
 
@@ -154,7 +155,8 @@ Calculating time used loading emacs excutable, as well as setting some variables
 )
 #+end_src
 
- * Use-package is built-in since emacs-29! Uncomment the comment if running below29.
+** Use-package
+Use-package is built-in since emacs-29! Uncomment the comment if running below29.
 #+begin_src elisp
 (setq use-package-verbose t)
   ;(eval-and-compile ; `use-package'
@@ -162,7 +164,8 @@ Calculating time used loading emacs excutable, as well as setting some variables
   ;  (setq use-package-verbose t))
 #+end_src
 
- * [[https://github.com/magnars/dash.el][Dash]] is a modern list library for Emacs See its overview at [[https://github.com/magnars/dash.el#functions][dash.el - functions]].
+** Dash
+ [[https://github.com/magnars/dash.el][Dash]] is a modern list library for Emacs See its overview at [[https://github.com/magnars/dash.el#functions][dash.el - functions]].
     =Dash-Fontify mode= is a buffer-local minor mode intended for Emacs Lisp buffers.  Enabling it causes the special variables bound in anaphoric Dash macros to be fontified.  These anaphoras include ‘it’, ‘it-index’, ‘acc’, and ‘other’.  In older Emacs versions which do not dynamically detect macros, Dash-Fontify mode additionally fontifies Dash macro calls.
 
 #+begin_src elisp
@@ -177,12 +180,14 @@ Dash needs some tweaks to be built
 	no-makeinfo = dash-template.texi
 #+end_src
 
- * [[https://www.gnu.org/software/emacs][EIEIO]] is a series of Lisp routines which implements a subset of CLOS, the Common Lisp Object System. In addition, EIEIO also adds a few new features which help it integrate more strongly with the Emacs running environment.
+** EIEIO
+[[https://www.gnu.org/software/emacs][EIEIO]] is a series of Lisp routines which implements a subset of CLOS, the Common Lisp Object System. In addition, EIEIO also adds a few new features which help it integrate more strongly with the Emacs running environment.
 #+begin_src elisp
 (use-package eieio)
 #+end_src
 
- * [[https://github.com/emacscollective/auto-compile][Auto-Compile]] automatically compile Emacs Lisp libraries
+** Auto-Compile
+[[https://github.com/emacscollective/auto-compile][Auto-Compile]] automatically compile Emacs Lisp libraries
    Suppress comp warnings.
 #+begin_src elisp
   (use-package auto-compile
@@ -196,6 +201,7 @@ Dash needs some tweaks to be built
   )
 #+end_src
 
+** Epkg
  * [[https://github.com/emacscollective/epkg][Epkg]] allows you browse the Emacsmirror package database. We're using emacs >= 29 which has builtin support for sqlite, so we let epkg-database-connector to use builtin sqlite.
 #+begin_src elisp
 (use-package epkg
@@ -205,8 +211,8 @@ Dash needs some tweaks to be built
 	(expand-file-name "var/epkgs/" user-emacs-directory))
   (setq epkg-database-connector 'sqlite-builtin ))
 #+end_src
-
- * [[https://www.emacswiki.org/emacs/CustomizingAndSaving#Customize][Customize system]] of emacs. Set the file path used for storing customization information.
+** Custom
+[[https://www.emacswiki.org/emacs/CustomizingAndSaving#Customize][Custom]], the customize system of emacs. Set the file path used for storing customization information.
 #+begin_src elisp
   (use-package custom
     :no-require t
@@ -217,14 +223,16 @@ Dash needs some tweaks to be built
       (load custom-file)))
 #+end_src
 
- * Server allows Emacs to operate as a server for other processes. Built in.
+** Server
+Server allows Emacs to operate as a server for other processes. Built in.
 #+begin_src elisp
 (use-package server
   :commands (server-running-p)
   :config (or (server-running-p) (server-mode)))
 #+end_src
 
- * [[https://git.tecosaur.net/tec/org-mode][Org-9.7]] (preview) did some overhaul to org-latex-preview in org mode. Load External org before the built in org is loaded.
+** Org
+ [[https://git.tecosaur.net/tec/org-mode][Org-9.7]] (preview) did some overhaul to org-latex-preview in org mode. Load External org before the built in org is loaded.
 #+begin_src elisp
   (use-package org)
 #+end_src
@@ -241,7 +249,8 @@ According to the installation manual of org, we need to make autoloads before co
 	  build-step = borg-makeinfo
 #+end_src
 
- * End of early birds, calculate load time.
+** End of early birds
+Calculate load time.
 #+begin_src elisp
 (progn ;     startup
   (message "Loading early birds...done (%fs)"
