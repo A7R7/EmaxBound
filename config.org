@@ -356,9 +356,9 @@ I guess evil surround and evil nerd commentor should be better to put under Codi
   )
 #+end_src
 ** Meow
+[[https://github.com/meow-edit/meow][Meow]] is yet another modal editing.
 #+begin_src elisp
   (use-package meow
-  :defer t
   :custom-face
     (meow-cheatsheet-command ((t (:height 180 :inherit fixed-pitch))))
   :config
@@ -419,7 +419,6 @@ I guess evil surround and evil nerd commentor should be better to put under Codi
 #+end_src
 
 ** General
-
 [[https://github.com/noctuid/general.el][General]] provides a more convenient method for binding keys in emacs
 (for both evil and non-evil users).
 
@@ -525,7 +524,6 @@ I guess evil surround and evil nerd commentor should be better to put under Codi
 #+end_src
 
 ** Which-key
-
 [[https://github.com/justbur/emacs-which-key][Which-key]] is a minor mode for Emacs that displays the key bindings following your currently entered incomplete command (a prefix) in a popup.
 #+begin_src elisp
   (use-package which-key
@@ -559,7 +557,6 @@ I guess evil surround and evil nerd commentor should be better to put under Codi
 
 [[https://github.com/yanghaoxie/which-key-posframe][Which-key-posframe]] use posframe to show which-key popup.
 options for =which-key-posframe-poshandler=:
-~posframe-poshandler-[frame/window/point]-[top/bottom/]-[center/left-corner/right-corner]~
 #+begin_src elisp
   (use-package which-key-posframe
   :config
@@ -569,8 +566,24 @@ options for =which-key-posframe-poshandler=:
 #+end_src
 
 ** Hydra
+ 
+#+begin_src elisp
+#+end_src
+** Transient
+
+#+begin_src 
+#+end_src
 ** Mouse
 
+** Key-echo
+[[https://github.com/manateelazycat/key-echo][Key-Echo]] is an Emacs plugin that uses XRecord technology to listen to system key events.
+#+begin_src elisp
+  (use-package key-echo
+  :disabled
+  :config
+    (key-echo-enable)
+  ) 
+#+end_src
 * Basic UI
 
 We setup UI for basic emacs widgets at this place. Again, not all UI's are set here.
@@ -677,9 +690,9 @@ Run [[elisp:nerd-icons-install-fonts][M-x nerd-icons-install-fonts]] to install 
 [[https://github.com/hlissner/emacs-doom-themes][Doom-themes]] is a great set of themes with a lot of variety and support for many different Emacs modes. Taking a look at the [[https://github.com/hlissner/emacs-doom-themes/tree/screenshots][screenshots]] might help you decide which one you like best.  You can also run =M-x counsel-load-theme= to choose between them easily.
 
 ** Page
-*** Centering
-
-We have 3 modes that can help centering text in a window. But currently we only use olivetti mode.
+*** Margin
+We have 3 modes that can help centering text in a window. 
+But currently we only use olivetti mode.
 
 **** Olivetti
 
@@ -747,25 +760,32 @@ Set background Transparency, according to [[https://www.emacswiki.org/emacs/Tran
 #+end_src
 
 ** Scroll
-
-This piece of code is taken from https://emacs-china.org/t/topic/25114/5
 #+begin_src elisp
-(pixel-scroll-precision-mode 1)
-(setq pixel-scroll-precision-interpolate-page t)
-(defun +pixel-scroll-interpolate-down (&optional lines)
-  (interactive)
-  (if lines
-      (pixel-scroll-precision-interpolate (* -1 lines (pixel-line-height)))
-    (pixel-scroll-interpolate-down)))
+  (use-package emacs
+  :config
+    (setq scroll-conservatively 97)
+    (setq scroll-preserve-screen-position 1)
+    (setq mouse-wheel-progressive-speed nil)
+    ;; The following piece of code is stolen from
+    ;; https://emacs-china.org/t/topic/25114/5
+    (pixel-scroll-precision-mode 1)
+    (setq pixel-scroll-precision-interpolate-page t)
+    (defun +pixel-scroll-interpolate-down (&optional lines)
+        (interactive)
+        (if lines
+            (pixel-scroll-precision-interpolate (* -1 lines (pixel-line-height)))
+        (pixel-scroll-interpolate-down)))
 
-(defun +pixel-scroll-interpolate-up (&optional lines)
-  (interactive)
-  (if lines
-      (pixel-scroll-precision-interpolate (* lines (pixel-line-height))))
-  (pixel-scroll-interpolate-up))
+    (defun +pixel-scroll-interpolate-up (&optional lines)
+        (interactive)
+        (if lines
+            (pixel-scroll-precision-interpolate (* lines  
+            (pixel-line-height))))
+        (pixel-scroll-interpolate-up))
 
-(defalias 'scroll-up-command '+pixel-scroll-interpolate-down)
-(defalias 'scroll-down-command '+pixel-scroll-interpolate-up)
+    (defalias 'scroll-up-command '+pixel-scroll-interpolate-down)
+    (defalias 'scroll-down-command '+pixel-scroll-interpolate-up)
+  )
 #+end_src
 
 ** Modeline
@@ -802,21 +822,21 @@ Dashboard is an extensible startup screen showing you recent files, bookmarks, a
   (use-package dashboard
   :init
     (setq initial-buffer-choice 'dashboard-open
-	  dashboard-image-banner-max-width 1000
-	  dashboard-set-heading-icons t
-	  dashboard-center-content t ;; set to 't' for centered content
-	  dashboard-set-file-icons t
-	  initial-buffer-choice
-	    (lambda () (get-buffer-create "*dashboard*"))
-	  dashboard-startup-banner ;; use custom image as banner
-	    (concat user-emacs-directory "assets/EmacsBound.xpm")
-	  dashboard-items '(
-	    (recents . 5)
-	    (agenda . 5 )
-	    (bookmarks . 3)
-	    (projects . 3)
-	    (registers . 3)
-	  )
+  	dashboard-image-banner-max-width 1000
+  	dashboard-set-heading-icons t
+  	dashboard-center-content t ;; set to 't' for centered content
+  	dashboard-set-file-icons t
+  	initial-buffer-choice
+  	    (lambda () (get-buffer-create "*dashboard*"))
+  	dashboard-startup-banner ;; use custom image as banner
+  	    (concat user-emacs-directory "assets/EmacsBound.xpm")
+  	dashboard-items '(
+  	    (recents . 5)
+  	    (agenda . 5 )
+  	    (bookmarks . 3)
+  	    (projects . 3)
+  	    (registers . 3)
+  	)
     )
   :config
     (dashboard-setup-startup-hook)
@@ -848,13 +868,18 @@ Dashboard is an extensible startup screen showing you recent files, bookmarks, a
   )
 #+end_src
 
-** Scrolling
+** Diff
 #+begin_src elisp
-  (use-package emacs
+  (use-package diff-hl
+  :custom-face
+    (diff-hl-change ((t (:background "#2c5f72" :foreground "#77a8d9"))))
+    (diff-hl-delete ((t (:background "#844953" :foreground "#f27983"))))
+    (diff-hl-insert ((t (:background "#5E734A" :foreground "#a6cc70"))))
   :config
-    (setq scroll-conservatively 97)
-    (setq scroll-preserve-screen-position 1)
-    (setq mouse-wheel-progressive-speed nil)
+    (setq diff-hl-draw-borders nil)
+    (global-diff-hl-mode)
+    ;(diff-hl-margin-mode) 
+    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
   )
 #+end_src
 
@@ -891,24 +916,31 @@ Use olivetti to center text in minibuffer!
   )
 #+end_src
 
-** Diff
-#+begin_src elisp
-  (use-package diff-hl
-  :custom-face
-    (diff-hl-change ((t (:background "#2c5f72" :foreground "#77a8d9"))))
-    (diff-hl-delete ((t (:background "#844953" :foreground "#f27983"))))
-    (diff-hl-insert ((t (:background "#5E734A" :foreground "#a6cc70"))))
-  :config
-    (setq diff-hl-draw-borders nil)
-    (global-diff-hl-mode)
-    ;(diff-hl-margin-mode) 
-    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
-  )
-#+end_src
-
 ** Posframe
 [[https://github.com/tumashu/posframe][Posframe]] can pop up a frame at point, this *posframe* is a child-frame connected to its root window's buffer.
 
+The builtin poshandler functions are listed below:
+#+begin_example
+1.  `posframe-poshandler-frame-center'
+2.  `posframe-poshandler-frame-top-center'
+3.  `posframe-poshandler-frame-top-left-corner'
+4.  `posframe-poshandler-frame-top-right-corner'
+5.  `posframe-poshandler-frame-top-left-or-right-other-corner'
+6.  `posframe-poshandler-frame-bottom-center'
+7.  `posframe-poshandler-frame-bottom-left-corner'
+8.  `posframe-poshandler-frame-bottom-right-corner'
+9.  `posframe-poshandler-window-center'
+10. `posframe-poshandler-window-top-center'
+11. `posframe-poshandler-window-top-left-corner'
+12. `posframe-poshandler-window-top-right-corner'
+13. `posframe-poshandler-window-bottom-center'
+14. `posframe-poshandler-window-bottom-left-corner'
+15. `posframe-poshandler-window-bottom-right-corner'
+16. `posframe-poshandler-point-top-left-corner'
+17. `posframe-poshandler-point-bottom-left-corner'
+18. `posframe-poshandler-point-bottom-left-corner-upward'
+19. `posframe-poshandler-point-window-center'
+#+end_example
 ** Holo-layer
 [[https://github.com/manateelazycat/holo-layer][Holo-layer]] is developed based on PyQt, aiming to significantly enhance the visual experience of Emacs. 
 Disabled because it cannot run perfectly on hyprland.
@@ -1282,6 +1314,7 @@ It is very useful for figuring out how things work in Emacs.
 #+end_src
 
 ** Marginalia
+[[https://github.com/minad/marginalia][Marginalia]] enriches existing commands with completion annotations
 #+begin_src elisp
   (use-package marginalia
   :general
@@ -1355,27 +1388,33 @@ Vertico-multiform configures Vertico modes per command or completion category.
 
 #+begin_src elisp
   (use-package vertico-posframe
-  :disabled
+  ;:disabled
   :after vertico-multiform
   :init
-    (setq vertico-multiform-commands
-	 '((consult-line posframe
-	      (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
-	      ;(vertico-posframe-fallback-mode . vertico-buffer-mode)
-	      (vertico-posframe-width . 50))
-	   (execute-extended-command
-	      (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
-	      (vertico-posframe-fallback-mode . vertico-buffer-mode))
-	   (t posframe)
-	  )
-    )
-    (setq vertico-count 20
-	  vertico-posframe-border-width 3
-	  vertico-posframe-width 140
-	  vertico-resize nil)
+    (setq vertico-multiform-commands '(
+          (execute-extended-command ; M-x
+            (vertico-posframe-poshandler .
+               posframe-poshandler-frame-top-center)
+          )
+          (org-insert-link posframe ; M-x
+            (vertico-posframe-poshandler .
+               posframe-poshandler-point-top-left-corner)
+            (vertico-posframe-width . 70)
+          )
+          (consult-line posframe
+            (vertico-posframe-poshandler . 
+               posframe-poshandler-frame-top-center)
+            (vertico-posframe-fallback-mode . vertico-buffer-mode)
+            (vertico-posframe-width . 70))
+          (t posframe)
+    ))
+    (setq vertico-count 15
+  	  vertico-posframe-border-width 3
+  	  vertico-posframe-width 140
+  	  vertico-resize nil)
 
-    ;(vertico-multiform-mode 1)
-    ;(vertico-posframe-mode 1)
+    (vertico-multiform-mode 1)
+    (vertico-posframe-mode 1)
   )
 #+end_src
 
@@ -1910,7 +1949,7 @@ than `electric-indent-mode'.
 https://github.com/zerolfx/copilot.el
 
 * Languages
-** elisp
+** Elisp
 - buttercup
 - elisp-def
 - elisp-demos
@@ -2119,7 +2158,6 @@ This package provides visual alignment for Org Mode, Markdown and table.el table
 #+end_src
 
 ** Blocks
-
 *** Code block
 #+begin_src elisp
   (use-package org

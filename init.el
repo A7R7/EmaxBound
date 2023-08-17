@@ -125,7 +125,6 @@
 )
 
 (use-package meow
-:defer t
 :custom-face
   (meow-cheatsheet-command ((t (:height 180 :inherit fixed-pitch))))
 :config
@@ -316,6 +315,14 @@
   (which-key-posframe-mode)
 )
 
+
+
+(use-package key-echo
+:disabled
+:config
+  (key-echo-enable)
+)
+
 (set-face-attribute 'default nil
   ;:font "JetBrainsMono Nerd Font"
   :font "RobotoMono Nerd Font"
@@ -411,22 +418,31 @@
   (interactive "nTransparency Value 0 - 100 opaque:")
   (set-frame-parameter nil 'alpha-background value))
 
-(pixel-scroll-precision-mode 1)
-(setq pixel-scroll-precision-interpolate-page t)
-(defun +pixel-scroll-interpolate-down (&optional lines)
-  (interactive)
-  (if lines
-      (pixel-scroll-precision-interpolate (* -1 lines (pixel-line-height)))
-    (pixel-scroll-interpolate-down)))
+(use-package emacs
+:config
+  (setq scroll-conservatively 97)
+  (setq scroll-preserve-screen-position 1)
+  (setq mouse-wheel-progressive-speed nil)
+  ;; The following piece of code is stolen from
+  ;; https://emacs-china.org/t/topic/25114/5
+  (pixel-scroll-precision-mode 1)
+  (setq pixel-scroll-precision-interpolate-page t)
+  (defun +pixel-scroll-interpolate-down (&optional lines)
+      (interactive)
+      (if lines
+          (pixel-scroll-precision-interpolate (* -1 lines (pixel-line-height)))
+      (pixel-scroll-interpolate-down)))
 
-(defun +pixel-scroll-interpolate-up (&optional lines)
-  (interactive)
-  (if lines
-      (pixel-scroll-precision-interpolate (* lines (pixel-line-height))))
-  (pixel-scroll-interpolate-up))
+  (defun +pixel-scroll-interpolate-up (&optional lines)
+      (interactive)
+      (if lines
+          (pixel-scroll-precision-interpolate (* lines  
+          (pixel-line-height))))
+      (pixel-scroll-interpolate-up))
 
-(defalias 'scroll-up-command '+pixel-scroll-interpolate-down)
-(defalias 'scroll-down-command '+pixel-scroll-interpolate-up)
+  (defalias 'scroll-up-command '+pixel-scroll-interpolate-down)
+  (defalias 'scroll-down-command '+pixel-scroll-interpolate-up)
+)
 
 (use-package doom-modeline
 :init
@@ -445,21 +461,21 @@
 (use-package dashboard
 :init
   (setq initial-buffer-choice 'dashboard-open
-	dashboard-image-banner-max-width 1000
-	dashboard-set-heading-icons t
-	dashboard-center-content t ;; set to 't' for centered content
-	dashboard-set-file-icons t
-	initial-buffer-choice
-	  (lambda () (get-buffer-create "*dashboard*"))
-	dashboard-startup-banner ;; use custom image as banner
-	  (concat user-emacs-directory "assets/EmacsBound.xpm")
-	dashboard-items '(
-	  (recents . 5)
-	  (agenda . 5 )
-	  (bookmarks . 3)
-	  (projects . 3)
-	  (registers . 3)
-	)
+      dashboard-image-banner-max-width 1000
+      dashboard-set-heading-icons t
+      dashboard-center-content t ;; set to 't' for centered content
+      dashboard-set-file-icons t
+      initial-buffer-choice
+  	  (lambda () (get-buffer-create "*dashboard*"))
+      dashboard-startup-banner ;; use custom image as banner
+  	  (concat user-emacs-directory "assets/EmacsBound.xpm")
+      dashboard-items '(
+  	  (recents . 5)
+  	  (agenda . 5 )
+  	  (bookmarks . 3)
+  	  (projects . 3)
+  	  (registers . 3)
+      )
   )
 :config
   (dashboard-setup-startup-hook)
@@ -487,11 +503,16 @@
 
 )
 
-(use-package emacs
+(use-package diff-hl
+:custom-face
+  (diff-hl-change ((t (:background "#2c5f72" :foreground "#77a8d9"))))
+  (diff-hl-delete ((t (:background "#844953" :foreground "#f27983"))))
+  (diff-hl-insert ((t (:background "#5E734A" :foreground "#a6cc70"))))
 :config
-  (setq scroll-conservatively 97)
-  (setq scroll-preserve-screen-position 1)
-  (setq mouse-wheel-progressive-speed nil)
+  (setq diff-hl-draw-borders nil)
+  (global-diff-hl-mode)
+  ;(diff-hl-margin-mode) 
+  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
 )
 
 (use-package mini-frame
@@ -511,18 +532,6 @@
     (setq olivetti-body-width 140)
     (olivetti-mode)
   )
-)
-
-(use-package diff-hl
-:custom-face
-  (diff-hl-change ((t (:background "#2c5f72" :foreground "#77a8d9"))))
-  (diff-hl-delete ((t (:background "#844953" :foreground "#f27983"))))
-  (diff-hl-insert ((t (:background "#5E734A" :foreground "#a6cc70"))))
-:config
-  (setq diff-hl-draw-borders nil)
-  (global-diff-hl-mode)
-  ;(diff-hl-margin-mode) 
-  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
 )
 
 (use-package holo-layer
@@ -863,27 +872,33 @@
 )
 
 (use-package vertico-posframe
-:disabled
+;:disabled
 :after vertico-multiform
 :init
-  (setq vertico-multiform-commands
-       '((consult-line posframe
-	    (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
-	    ;(vertico-posframe-fallback-mode . vertico-buffer-mode)
-	    (vertico-posframe-width . 50))
-	 (execute-extended-command
-	    (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
-	    (vertico-posframe-fallback-mode . vertico-buffer-mode))
-	 (t posframe)
-	)
-  )
-  (setq vertico-count 20
-	vertico-posframe-border-width 3
-	vertico-posframe-width 140
-	vertico-resize nil)
+  (setq vertico-multiform-commands '(
+        (execute-extended-command ; M-x
+          (vertico-posframe-poshandler .
+             posframe-poshandler-frame-top-center)
+        )
+        (org-insert-link posframe ; M-x
+          (vertico-posframe-poshandler .
+             posframe-poshandler-point-top-left-corner)
+          (vertico-posframe-width . 70)
+        )
+        (consult-line posframe
+          (vertico-posframe-poshandler . 
+             posframe-poshandler-frame-top-center)
+          (vertico-posframe-fallback-mode . vertico-buffer-mode)
+          (vertico-posframe-width . 70))
+        (t posframe)
+  ))
+  (setq vertico-count 15
+  	vertico-posframe-border-width 3
+  	vertico-posframe-width 140
+  	vertico-resize nil)
 
-  ;(vertico-multiform-mode 1)
-  ;(vertico-posframe-mode 1)
+  (vertico-multiform-mode 1)
+  (vertico-posframe-mode 1)
 )
 
 ;; Persist history over Emacs restarts. Vertico sorts by history position.

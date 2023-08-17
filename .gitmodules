@@ -187,6 +187,9 @@
 [submodule "json-snatcher"]
 	path = lib/json-snatcher
 	url = https://github.com/Sterlingg/json-snatcher
+[submodule "key-echo"]
+	path = lib/key-echo
+	url = https://github.com/manateelazycat/key-echo.git
 [submodule "leaf"]
 	path = lib/leaf
 	url = https://github.com/conao3/leaf.el
