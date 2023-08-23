@@ -151,6 +151,9 @@
 [submodule "git-modes"]
 	path = lib/git-modes
 	url = https://github.com/magit/git-modes
+[submodule "grip-mode"]
+	path = lib/grip-mode
+	url = https://github.com/seagle0128/grip-mode
 [submodule "helm"]
 	path = lib/helm
 	url = https://github.com/emacs-helm/helm
@@ -304,6 +307,9 @@
 [submodule "ov"]
 	path = lib/ov
 	url = https://github.com/emacsorphanage/ov
+[submodule "ox-gfm"]
+	path = lib/ox-gfm
+	url = https://github.com/larstvei/ox-gfm
 [submodule "pacmacs"]
 	path = lib/pacmacs
 	url = https://github.com/codingteam/pacmacs.el

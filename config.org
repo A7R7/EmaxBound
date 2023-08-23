@@ -560,7 +560,10 @@ options for =which-key-posframe-poshandler=:
 #+begin_src elisp
   (use-package which-key-posframe
   :config
-    (setq which-key-posframe-poshandler 'posframe-poshandler-frame-bottom-center)
+    (setq which-key-posframe-poshandler
+        'posframe-poshandler-window-bottom-center
+        ;'posframe-poshandler-frame-bottom-center
+    )
     (which-key-posframe-mode)
   )
 #+end_src
@@ -570,11 +573,15 @@ options for =which-key-posframe-poshandler=:
 #+begin_src elisp
 #+end_src
 ** Transient
-
-#+begin_src 
+[[https://github.com/yanghaoxie/transient-posframe][Transient-posframe]] display transient popups using a posframe.
+#+begin_src elisp
+  (use-package transient-posframe
+  :after transient
+  :config
+    (setq transient-posframe-min-height 1)
+    (setq transient-posframe-mode t) 
+  )
 #+end_src
-** Mouse
-
 ** Key-echo
 [[https://github.com/manateelazycat/key-echo][Key-Echo]] is an Emacs plugin that uses XRecord technology to listen to system key events.
 #+begin_src elisp
@@ -885,7 +892,6 @@ Dashboard is an extensible startup screen showing you recent files, bookmarks, a
 
 ** Minibuffer
 *** Mini-frame
-
 [[https://github.com/muffinmad/emacs-mini-frame][Mini-Frame]], similar to posframe, shows minibuffer in child frame on read-from-minibuffer.
 #+begin_src elisp
   (use-package mini-frame
@@ -898,16 +904,16 @@ Dashboard is an extensible startup screen showing you recent files, bookmarks, a
        '(evil-window-split evil-window-vsplit evil-ex)))
   )
 #+end_src
-*** Solaire mode
 
+*** Solaire mode
 Darken the background of minibuffer using solaire-mode.
 #+begin_src elisp
   ;(add-hook 'minibuffer-setup-hook 'solaire-mode)
 #+end_src
-*** Center text
 
+*** Center text
 Use olivetti to center text in minibuffer!
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (add-hook 'minibuffer-setup-hook
     (defun config/set-minibuffer-margin ()
       (setq olivetti-body-width 140)
@@ -2314,11 +2320,25 @@ Code under :config is taken from https://emacs-china.org/t/org-mode-latex-mode/2
   )
 #+end_src
 
-** Pandoc
+** Export
+*** Pandoc
 #+begin_src elisp
 ;; (use-package org-pandoc)
 #+end_src
 
+*** ox-gfm
+#+begin_src elisp
+  (use-package ox-gfm
+  :after org
+  )
+#+end_src
+
+*** grip-mode
+#+begin_src elisp
+  (use-package grip-mode
+  :after org
+  )
+#+end_src
 * Emacs OS
 ** Elfeed
 #+begin_src elisp

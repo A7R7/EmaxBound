@@ -311,11 +311,21 @@
 
 (use-package which-key-posframe
 :config
-  (setq which-key-posframe-poshandler 'posframe-poshandler-frame-bottom-center)
+  (setq which-key-posframe-poshandler
+      'posframe-poshandler-window-bottom-center
+      ;'posframe-poshandler-frame-bottom-center
+  )
   (which-key-posframe-mode)
 )
 
 
+
+(use-package transient-posframe
+:after transient
+:config
+  (setq transient-posframe-min-height 1)
+  (setq transient-posframe-mode t) 
+)
 
 (use-package key-echo
 :disabled
@@ -526,13 +536,6 @@
 )
 
 ;(add-hook 'minibuffer-setup-hook 'solaire-mode)
-
-(add-hook 'minibuffer-setup-hook
-  (defun config/set-minibuffer-margin ()
-    (setq olivetti-body-width 140)
-    (olivetti-mode)
-  )
-)
 
 (use-package holo-layer
   :disabled
@@ -1600,6 +1603,14 @@
 )
 
 ;; (use-package org-pandoc)
+
+(use-package ox-gfm
+:after org
+)
+
+(use-package grip-mode
+:after org
+)
 
 (use-package elfeed
 :config
