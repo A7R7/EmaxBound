@@ -8,16 +8,18 @@
  '(display-line-numbers-width 4)
  '(elfeed-feeds
    '("https://manateelazycat.github.io/feed.xml"
-     ("http://nullprogram.com/feed/" blog emacs)
-     "http://www.50ply.com/atom.xml"
-     ("http://nedroid.com/feed/" webcomic)))
+	 ("http://nullprogram.com/feed/" blog emacs)
+	 "http://www.50ply.com/atom.xml"
+	 ("http://nedroid.com/feed/" webcomic)))
  '(highlight-indent-guides-delay 0.01)
  '(highlight-indent-guides-responsive 'top)
  '(mixed-pitch-fixed-pitch-faces
    '(diff-added diff-context diff-file-header diff-function diff-header diff-hunk-header diff-removed font-latex-math-face font-latex-sedate-face font-latex-warning-face font-latex-sectioning-5-face font-lock-builtin-face font-lock-comment-delimiter-face font-lock-constant-face font-lock-doc-face font-lock-function-name-face font-lock-keyword-face font-lock-negation-char-face font-lock-preprocessor-face font-lock-regexp-grouping-backslash font-lock-regexp-grouping-construct font-lock-string-face font-lock-type-face font-lock-variable-name-face line-number line-number-current-line line-number-major-tick line-number-minor-tick markdown-code-face markdown-gfm-checkbox-face markdown-inline-code-face markdown-language-info-face markdown-language-keyword-face markdown-math-face message-header-name message-header-to message-header-cc message-header-newsgroups message-header-xheader message-header-subject message-header-other mu4e-header-key-face mu4e-header-value-face mu4e-link-face mu4e-contact-face mu4e-compose-separator-face mu4e-compose-header-face org-block org-document-info-keyword org-code org-indent org-latex-and-related org-checkbox org-formula org-meta-line org-special-keyword org-table org-verbatim widget-field))
  '(mixed-pitch-set-height nil)
  '(org-pretty-entities t)
- '(org-return-follows-link t))
+ '(org-return-follows-link t)
+ '(tab-width 4)
+ '(which-key-posframe-border-width 3))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -48,6 +50,8 @@
  '(treemacs-git-modified-face ((t (:foreground "#dccbff" :inherit treemacs-file-face))))
  '(treemacs-window-background-face ((t nil)))
  '(variable-pitch ((t (:family "Sarasa Gothic SC" :foundry "????" :width normal :height 180 :weight regular :slant normal :inherit default))))
+ '(vertico-posframe-border ((t (:background "LightSteelBlue4"))))
+ '(which-key-posframe-border ((t (:background "LightSteelBlue4"))))
  '(whitespace-empty ((t (:extend t :background "#1b202b" :foreground "SlateGray4"))))
  '(whitespace-indentation ((t (:foreground "#3b405b"))))
  '(whitespace-line ((t (:background "unspecified" :foreground "unspecified" :weight regular))))

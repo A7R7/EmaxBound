@@ -55,6 +55,8 @@
 
 (use-package epkg
   :defer t
+  :bind
+     ([remap describe-package] . epkg-describe-package)
   :init
   (setq epkg-repository
 	(expand-file-name "var/epkgs/" user-emacs-directory))
@@ -80,114 +82,106 @@
 
 (use-package shrink-path :demand t)
 
-(use-package evil
-  :init
-    (setq evil-want-integration t) ;; t by default
-    (setq evil-want-keybinding nil)
-    (setq evil-vsplit-window-right t)
-    (setq evil-split-window-below t)
-    (setq evil-want-C-u-scroll t)
-
-  :config
-    (evil-mode 1)
-      ;; Use visual line motions even outside of visual-line-mode buffers
-    (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-    (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
-    (evil-set-initial-state 'messages-buffer-mode 'normal)
-    (evil-set-initial-state 'dashboard-mode 'normal)
-    (evil-set-undo-system 'undo-redo)
-    (evil-define-key 'normal 'foo-mode "e" 'baz)
-)
-
-(use-package evil-collection
-  ;; :demand t
-  :after evil
-  :custom (evil-collection-setup-minibuffer t)
-  :config
-  ;(setq evil-collection-mode-list '(dashboard dired ibuffer))
-  (evil-collection-init))
-
-(use-package evil-tutor
-  :demand t)
-
-(use-package emacs
-  :config (setq ring-bell-function #'ignore)
-)
-
-(use-package evil-surround
-:after evil
-:config
-  (global-evil-surround-mode 1))
-
-(use-package evil-nerd-commenter
-:after evil
-:config
-)
-
 (use-package meow
-:custom-face
+  :custom-face
   (meow-cheatsheet-command ((t (:height 180 :inherit fixed-pitch))))
-:config
+  :config
+  ;; Replicate the behavior of vi's
+  (defun my-meow-append ()
+    "Move to the end of selection, switch to INSERT state."
+    (interactive)
+    (if meow--temp-normal
+      (progn
+  	(message "Quit temporary normal mode")
+  	(meow--switch-state 'motion))
+      (if (not (region-active-p))
+  	(when (and (not (use-region-p))
+  		   (< (point) (point-max)))
+  	  (forward-char 1))
+      (meow--direction-forward)
+      (meow--cancel-selection))
+      (meow--switch-state 'insert)))
+  (advice-add 'meow-append :override #'my-meow-append)
+
+  (setq meow-replace-state-name-list
+          '((normal . "🅝")
+            (beacon . "🅑")
+            (insert . "🅘")
+            (motion . "🅜")
+            (keypad . "🅚")))
+  (setq meow-keypad-self-insert-undefined nil)
+  (setq meow-selection-command-fallback '(
+        (meow-change . meow-change-char)
+        (meow-kill . meow-delete)
+        (meow-cancel-selection . keyboard-quit)
+        (meow-pop-selection . meow-pop-grab)
+        (meow-beacon-change . meow-beacon-change-char)
+        (meow-replace . meow-yank)
+        (meow-reverse . negative-argument)
+  ))
   (defun meow-setup ()
     (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
+
     (meow-motion-overwrite-define-key
-     '("j" . meow-next)
-     '("k" . meow-prev)
      '("<escape>" . ignore))
+
     (meow-leader-define-key
      ;; SPC j/k will run the original command in MOTION state.
-     '("j" . "H-j") '("k" . "H-k")
+     '("i" . meow-open-above)
+     '("j" . meow-insert)
+     '("k" . meow-open-below)
+     '("l" . meow-append) 
+
      ;; Use SPC (0-9) for digit arguments.
-     '("1" . meow-digit-argument) '("2" . meow-digit-argument) 
-     '("3" . meow-digit-argument) '("4" . meow-digit-argument) 
+     '("1" . meow-digit-argument) '("2" . meow-digit-argument)
+     '("3" . meow-digit-argument) '("4" . meow-digit-argument)
      '("5" . meow-digit-argument) '("6" . meow-digit-argument)
-     '("7" . meow-digit-argument) '("8" . meow-digit-argument) 
-     '("9" . meow-digit-argument) '("0" . meow-digit-argument) 
+     '("7" . meow-digit-argument) '("8" . meow-digit-argument)
+     '("9" . meow-digit-argument) '("0" . meow-digit-argument)
      '("/" . meow-keypad-describe-key) '("?" . meow-cheatsheet))
+
     (meow-normal-define-key
-     '("1" . meow-expand-1) '("2" . meow-expand-2) 
-     '("3" . meow-expand-3) '("4" . meow-expand-4) 
+     '("1" . meow-expand-1) '("2" . meow-expand-2)
+     '("3" . meow-expand-3) '("4" . meow-expand-4)
      '("5" . meow-expand-5) '("6" . meow-expand-6)
-     '("7" . meow-expand-7) '("8" . meow-expand-8) 
+     '("7" . meow-expand-7) '("8" . meow-expand-8)
      '("9" . meow-expand-9) '("0" . meow-expand-0)
      '("-" . negative-argument) '(";" . meow-reverse)
      '("," . meow-inner-of-thing) '("." . meow-bounds-of-thing)
+     '("/" . meow-visit)
      '("[" . meow-beginning-of-thing) '("]" . meow-end-of-thing)
-     '("a" . meow-append) '("A" . meow-open-below)
-     '("b" . meow-back-word) '("B" . meow-back-symbol)
-     '("c" . meow-change) '("d" . meow-delete)
-     '("D" . meow-backward-delete)
-     '("e" . meow-next-word) '("E" . meow-next-symbol)
-     '("f" . meow-find)
-     '("g" . meow-cancel-selection) '("G" . meow-grab)
-     '("h" . meow-left) '("H" . meow-left-expand)
-     '("i" . meow-insert) '("I" . meow-open-above)
-     '("j" . meow-next) '("J" . meow-next-expand)
-     '("k" . meow-prev) '("K" . meow-prev-expand)
+     '("b" . meow-block) '("B" . meow-to-block)
+     '("c" . meow-save) '("C" . meow-sync-grab)
+     '("D" . meow-open-below)
+     '("E" . meow-open-above)
+     '("F" . meow-append)
+     '("g" . meow-find) '("G" . meow-grab)
+     '("h" . meow-line) '("H" . meow-goto-line)
+     '("i" . meow-prev) '("I" . meow-prev-expand)
+     '("j" . meow-left) '("J" . meow-left-expand)
+     '("k" . meow-next) '("K" . meow-next-expand)
      '("l" . meow-right) '("L" . meow-right-expand)
-     '("m" . meow-join)
+     '("m" . meow-mark-word) '("M" . meow-mark-symbol)
      '("n" . meow-search)
-     '("o" . meow-block) '("O" . meow-to-block)
-     '("p" . meow-yank)
-     '("q" . meow-quit) '("Q" . meow-goto-line)
-     '("r" . meow-replace) '("R" . meow-swap-grab)
-     '("s" . meow-kill)
+     '("o" . meow-next-word) '("O" . meow-next-symbol)
+     '("p" . meow-pop-selection)
+     '("q" . meow-quit)
+     '("S" . meow-insert)
      '("t" . meow-till)
-     '("u" . meow-undo) '("U" . meow-undo-in-selection)
-     '("v" . meow-visit)
-     '("w" . meow-mark-word) '("W" . meow-mark-symbol)
-     '("x" . meow-line) '("X" . meow-goto-line)
-     '("y" . meow-save) '("Y" . meow-sync-grab)
-     '("z" . meow-pop-selection)
-     '("'" . repeat) '("<escape>" . ignore)))
-      (meow-setup)
-)
+     '("u" . meow-back-word) '("U" . meow-back-symbol)
+     '("v" . meow-replace) '("V" . meow-yank-pop)
+     '("x" . meow-kill)
+     '("y" . meow-join)
+     '("z" . meow-undo) '("Z" . meow-undo-in-selection)
+     '("'" . repeat) '("<escape>" . meow-cancel-selection)))
+  (meow-setup)
+  (meow-global-mode)
+  )
 
 ;; Make ESC quit prompts
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 (use-package general
-  :after evil
   :config
   ;; (general-evil-setup)
   ;; set up 'SPC' as the global leader key
@@ -195,9 +189,11 @@
   (general-evil-setup t)
   (general-create-definer config/leader
     :states '(normal insert visual emacs)
+    ;:keymaps 'meow-keypad-state-keymap
     :keymaps 'override
-    :prefix "SPC" ;; set leader
-    :global-prefix "M-SPC") ;; access leader in insert mode
+    ;:prefix "SPC" ;; set leader
+    :global-prefix "M-SPC" ;; access leader in insert mode
+  )
 
   (config/leader
     "DEL"     '(which-key-undo                 :wk "󰕍 Undo key"))
@@ -301,7 +297,8 @@
     which-key-separator " "
     Which-key-show-early-on-C-h t
     which-key-sort-order 'which-key-prefix-then-key-order
-  )
+    which-key-show-transient-maps t
+ )
   ;(general-define-key
   ;:keymaps 'which-key-mode-map
   ;  "DEL" '(which-key-undo :wk "undo")
@@ -316,15 +313,6 @@
       ;'posframe-poshandler-frame-bottom-center
   )
   (which-key-posframe-mode)
-)
-
-
-
-(use-package transient-posframe
-:after transient
-:config
-  (setq transient-posframe-min-height 1)
-  (setq transient-posframe-mode t) 
 )
 
 (use-package key-echo
@@ -415,6 +403,12 @@
 (use-package topspace
 :init (global-topspace-mode)
 )
+
+(use-package solaire-mode
+  :hook (minibuffer-setup . solaire-mode)
+        (help-mode . solaire-mode)
+        (Helpful-mode . solaire-mode)
+  )
 
 (config/leader :infix "t"
   "SPC"  '(whitespace-mode  :wk "󰡭 Show Space")
@@ -525,6 +519,11 @@
   (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
 )
 
+(use-package beacon
+:config  
+  (beacon-mode)
+)
+
 (use-package mini-frame
 :config
   (setq mini-frame-detach-on-hide nil)
@@ -534,8 +533,6 @@
     (append mini-frame-ignore-commands
      '(evil-window-split evil-window-vsplit evil-ex)))
 )
-
-;(add-hook 'minibuffer-setup-hook 'solaire-mode)
 
 (use-package holo-layer
   :disabled
@@ -878,28 +875,55 @@
 ;:disabled
 :after vertico-multiform
 :init
+  (setq vertico-posframe-poshandler
+        'posframe-poshandler-frame-top-center)
+  (setq vertico-count 15
+        vertico-posframe-border-width 3
+        vertico-posframe-width 140
+        vertico-resize nil)
+  (setq vertico-posframe-parameters
+       '((left-fringe . 20)
+         (right-fringe . 20)))
   (setq vertico-multiform-commands '(
         (execute-extended-command ; M-x
           (vertico-posframe-poshandler .
              posframe-poshandler-frame-top-center)
+          (vertico-posframe-width . 120)
         )
-        (org-insert-link posframe ; M-x
+        (meow-visit
+          (vertico-posframe-poshandler .
+             posframe-poshandler-window-top-right-corner)
+          (vertico-posframe-width . 50)
+        )
+        (meow-yank-pop; M-x
+          (vertico-posframe-poshandler .
+             posframe-poshandler-point-window-center)
+          (vertico-posframe-width . 50)
+        )
+        (find-file
+          (vertico-count . 25)
+          (vertico-posframe-width . 70)
+          (vertico-posframe-poshandler .
+             posframe-poshandler-window-center)
+        )
+        (org-insert-link; M-x
           (vertico-posframe-poshandler .
              posframe-poshandler-point-top-left-corner)
           (vertico-posframe-width . 70)
         )
-        (consult-line posframe
+        (consult-line
           (vertico-posframe-poshandler . 
              posframe-poshandler-frame-top-center)
           (vertico-posframe-fallback-mode . vertico-buffer-mode)
           (vertico-posframe-width . 70))
-        (t posframe)
+        (t
+          (vertico-posframe-poshandler .
+             posframe-poshandler-frame-top-center)
+          (vertico-posframe-width . 120)
+        )
   ))
-  (setq vertico-count 15
-  	vertico-posframe-border-width 3
-  	vertico-posframe-width 140
-  	vertico-resize nil)
 
+:config
   (vertico-multiform-mode 1)
   (vertico-posframe-mode 1)
 )
@@ -1361,6 +1385,7 @@
   :hook (LaTeX-mode . laas-mode))
 
 (use-package evil-org
+:disabled
 :after org
 :hook (org-mode . evil-org-mode)
 )
@@ -1602,11 +1627,17 @@
   (setq org-gtd-update-ack "3.0.0")
 )
 
+
+
 ;; (use-package org-pandoc)
 
 (use-package ox-gfm
 :after org
 )
+
+(use-package ox-hugo
+  :config
+  )
 
 (use-package grip-mode
 :after org
