@@ -70,6 +70,9 @@
 [submodule "dashboard"]
 	path = lib/dashboard
 	url = https://github.com/emacs-dashboard/emacs-dashboard
+[submodule "deferred"]
+	path = lib/deferred
+	url = https://github.com/kiwanami/emacs-deferred
 [submodule "diff-hl"]
 	path = lib/diff-hl
 	url = https://github.com/dgutov/diff-hl
@@ -91,6 +94,9 @@
 [submodule "eaf"]
 	path = lib/eaf
 	url = https://github.com/emacs-eaf/emacs-application-framework
+[submodule "easy-hugo"]
+	path = lib/easy-hugo
+	url = https://github.com/masasam/emacs-easy-hugo
 [submodule "edit-indirect"]
 	path = lib/edit-indirect
 	url = https://github.com/Fanael/edit-indirect
@@ -175,6 +181,9 @@
 [submodule "ht"]
 	path = lib/ht
 	url = https://github.com/Wilfred/ht.el
+[submodule "htmlize"]
+	path = lib/htmlize
+	url = https://github.com/hniksic/emacs-htmlize
 [submodule "hydra"]
 	path = lib/hydra
 	url = https://github.com/abo-abo/hydra
@@ -310,6 +319,15 @@
 [submodule "ox-gfm"]
 	path = lib/ox-gfm
 	url = https://github.com/larstvei/ox-gfm
+[submodule "ox-hugo"]
+	path = lib/ox-hugo
+	url = https://github.com/kaushalmodi/ox-hugo
+[submodule "ox-pandoc"]
+	path = lib/ox-pandoc
+	url = https://github.com/emacsorphanage/ox-pandoc
+[submodule "ox-reveal"]
+	path = lib/ox-reveal
+	url = https://github.com/yjwen/org-reveal
 [submodule "pacmacs"]
 	path = lib/pacmacs
 	url = https://github.com/codingteam/pacmacs.el
@@ -349,6 +367,9 @@
 [submodule "rainbow-mode"]
 	path = lib/rainbow-mode
 	url = git@github.com:emacsmirror/rainbow-mode.git
+[submodule "request"]
+	path = lib/request
+	url = https://github.com/tkf/emacs-request
 [submodule "ripgrep"]
 	path = lib/ripgrep
 	url = https://github.com/nlamirault/ripgrep.el
@@ -385,6 +406,9 @@
 [submodule "tablist"]
 	path = lib/tablist
 	url = https://github.com/emacsorphanage/tablist
+[submodule "tomelr"]
+	path = lib/tomelr
+	url = https://github.com/kaushalmodi/tomelr
 [submodule "topspace"]
 	path = lib/topspace
 	url = https://github.com/trevorpogue/topspace

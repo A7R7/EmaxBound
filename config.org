@@ -5,7 +5,13 @@
 #+PROPERTY: header-args:mkdirp yes :comments no
 #+STARTUP: fold
 #+OPTIONS: toc:2
-#+auto_tangle: t
+#+AUTO_TANGLE: t
+#+HUGO_BASE_DIR: ~/Blog
+#+HUGO_SECTION: posts
+#+HUGO_PUBLISHDATE: 2023-08-29
+#+HUGO_CUSTOM_FRONT_MATTER: :hide - header - footer
+#+TOC: headlines 2
+#+FILETAGS: :Emacs:Org-mode:
 :END:
 
 #+TITLE: EmaxBound Configuration
@@ -61,7 +67,7 @@ Check [[https://emacsmirror.net/manual/borg/Bootstrapping-using-a-seed.html][Boo
 - [[https://github.com/DogLooksGood/meomacs][DogLooksGood/Meomacs]] (2023) Meow modal editing, emacs native friendly
 
 *NOTE*: the year number after link equals to
-- =min (last time the config get's updated, last time I refered to the config)=
+- min (last time the config get's updated, last time I refered to the config)
 
 * Earliest birds
 
@@ -193,11 +199,12 @@ Dash needs some tweaks to be built
   (use-package auto-compile
     :config
     (setq auto-compile-display-buffer             nil
-	  auto-compile-mode-line-counter            t
-	  auto-compile-source-recreate-deletes-dest t
-	  auto-compile-toggle-deletes-nonlib-dest   t
-	  auto-compile-update-autoloads             t
-	  warning-suppress-log-types        '((comp)))
+  		auto-compile-mode-line-counter            t
+  		auto-compile-source-recreate-deletes-dest t
+  		auto-compile-toggle-deletes-nonlib-dest   t
+  		auto-compile-update-autoloads             t
+  		warning-suppress-log-types        '((comp))
+    )
   )
 #+end_src
 
@@ -635,12 +642,10 @@ options for =which-key-posframe-poshandler=:
   ) 
 #+end_src
 * Basic UI
-
 We setup UI for basic emacs widgets at this place. Again, not all UI's are set here.
 Some package specific UI configs are set under where the package is configured.
 
 ** Fonts
-
 Defining the various fonts that Emacs will use.
 Note that monospace fonts are not always fixed-pitch [[https://stackoverflow.com/questions/70797173/monospace-font-characters-are-not-fixed-width][Monospace vs fixed-width]].
 #+begin_src elisp
@@ -789,11 +794,13 @@ But currently we only use olivetti mode.
 #+end_src
 
 ** Solaire mode
+[[https://github.com/hlissner/emacs-solaire-mode][Solaire-mode]] makes certain buffers grossly incandescent. Useful to distinguish the main  buffers from others.
 #+begin_src elisp
   (use-package solaire-mode
     :hook (minibuffer-setup . solaire-mode)
           (help-mode . solaire-mode)
-          (Helpful-mode . solaire-mode)
+          (helpful-mode . solaire-mode)
+          (org-export-stack-mode . solaire-mode)
     )
 #+end_src
 ** Whitespace mode
@@ -2064,16 +2071,6 @@ AucTex needs some tweaks to be built.
 #+end_src
 
 * Org
-** Kbd
-*** Evil-org
-#+begin_src elisp
-  (use-package evil-org
-  :disabled
-  :after org
-  :hook (org-mode . evil-org-mode)
-  )
-#+end_src
-
 ** UI
 *** Fonts
 
@@ -2270,7 +2267,17 @@ Disabled cause org-modern already does the job.
   )
 #+end_src
 
-** LaTeX
+** GTD
+#+begin_src elisp
+  (use-package org-gtd
+  :defer t
+  :after org
+  :init
+    (setq org-gtd-update-ack "3.0.0")
+  )
+#+end_src
+
+** Preview
 *** Org 9.7
 #+begin_src elisp
   (use-package org
@@ -2380,44 +2387,155 @@ Code under :config is taken from https://emacs-china.org/t/org-mode-latex-mode/2
   )
 #+end_src
 
-** GTD
-#+begin_src elisp
-  (use-package org-gtd
-  :after org
-  :init
-    (setq org-gtd-update-ack "3.0.0")
-  )
-#+end_src
-
-** Export
-*** Basic
-#+begin_src elisp
-
-#+end_src
-*** Pandoc
-#+begin_src elisp
-;; (use-package org-pandoc)
-#+end_src
-
-*** ox-gfm
-#+begin_src elisp
-  (use-package ox-gfm
-  :after org
-  )
-#+end_src
-
-*** ox-hugo
-#+begin_src elisp
-  (use-package ox-hugo
-    :config
-    )
-#+end_src
 *** grip-mode
 #+begin_src elisp
   (use-package grip-mode
   :after org
   )
 #+end_src
+
+** Export
+*** Basic
+#+begin_src elisp
+  (use-package ox
+    :config
+    (setq org-export-with-toc t
+  		org-export-with-tags 'not-in-toc
+  		org-export-with-drawers nil
+  		org-export-with-priority t
+  		org-export-with-footnotes t
+  		org-export-with-smart-quotes t
+  		org-export-with-section-numbers t
+  		org-export-with-sub-superscripts '{})
+    (setq org-export-use-babel t
+  		org-export-headline-levels 9
+  		org-export-coding-system 'utf-8
+  		org-export-with-broken-links 'mark)
+    )
+#+end_src
+*** HTML
+
+#+begin_src elisp
+  (use-package ox-html
+    :after ox
+    :config
+    (setq org-html-doctype "html5"
+  		org-html-html5-fancy t
+  		org-html-checkbox-type 'unicode
+  		org-html-validation-link nil))
+#+end_src
+
+#+begin_src elisp
+  (use-package htmlize
+    :config
+    (setq htmlize-pre-style t
+  		htmlize-output-type 'inline-css))
+#+end_src
+*** PDF
+There're 3 common ways to export org into PDF.
+- ox-html, then export to pdf via browser.
+- ox-latex
+- ox-pandoc
+#+begin_src elisp
+
+#+end_src
+*** LaTeX
+#+begin_src elisp
+  (use-package ox-latex
+  :after ox
+    )
+#+end_src
+
+*** Slides
+Use [[revealjs.com][reveal.js]] to generate beautiful presentations.
+This requires reveal.js installed on your machine.
+
+#+begin_src bash
+git clone https://github.com/hakimel/reveal.js.git
+cd reveal.js && npm install
+#+end_src
+
+#+begin_src elisp
+  (use-package ox-reveal
+    :after ox
+    :config
+    (setq org-reveal-hlevel 1
+  		org-reveal-theme "moon"
+  		org-reveal-mathjax t
+  		org-reveal-ignore-speaker-notes t
+  		org-reveal-title-slide "<h1><font size=\"8\">%t</font></h1><h2><font size=\"6\">%s</font></h2><p><font size=\"5\">%a</font><br/><font size=\"5\">%d</font></p>"
+  		org-reveal-plugins '(markdown zoom notes search)
+  		org-reveal-klipsify-src 'on))
+#+end_src
+*** Markdown
+Use [[https://github.com/larstvei/ox-gfm][ox-gfm]] to generate github-style markdown file.
+#+begin_src elisp
+  (use-package ox-gfm
+  :after ox
+  )
+#+end_src
+*** MS-Office
+Use ox-pandoc to generate MS-Office files like word and ppt.
+#+begin_src elisp
+  (use-package ox-pandoc
+    :after ox
+    :config
+    (setq org-pandoc-format-extensions 
+  	      '(markdown_github+pipe_tables+raw_html)
+  		org-pandoc-command "/usr/local/bin/pandoc")
+    )
+#+end_src
+
+** Blog
+*** Static HTML
+#+begin_src elisp
+  (use-package ox-publish)
+#+end_src
+*** Hugo
+General steps to publish a blog using hugo in emacs includes:
+- create a org mode heading
+- write your blog
+- use ox-hugo to export to a markdown file 
+    (Because hugo doesn't support org very well)
+- use easy-hugo to preview
+- publish
+
+[[https://github.com/kaushalmodi/ox-hugo][ox-hugo]] is an Org exporter backend that exports Org to Hugo-compatible Markdown and also generates the front-matter (in TOML or YAML format).
+#+begin_src elisp
+  (use-package ox-hugo
+    :after ox
+    :init (setq org-hugo-base-dir "~/Blog")
+    :config
+    (defun org-hugo-new-subtree-post-capture-template ()
+      "Returns `org-capture' template string for new Hugo post.
+       See `org-capture-templates' for more information."
+      (let* ((title (read-from-minibuffer "Post Title: ")) 
+  		   (fname (org-hugo-slug title)))
+  	  (mapconcat #'identity
+          `(,(concat "* TODO " title) ":PROPERTIES:"
+            ,(concat ":EXPORT_FILE_NAME: " fname) ":END:" "%?\n")
+            ;Place the cursor here finally
+          "\n"
+        )
+      )
+    )
+
+    (add-to-list 'org-capture-templates
+  	'("h"
+        "Hugo post"
+        entry
+  	  (file+olp "capture.org" "Notes")
+  	  (function org-hugo-new-subtree-post-capture-template)))    )
+
+#+end_src
+
+Easy-hugo 
+
+#+begin_src elisp
+  (use-package easy-hugo
+    )
+#+end_src
+
 * Emacs OS
 ** Elfeed
 #+begin_src elisp

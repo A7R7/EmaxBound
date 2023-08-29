@@ -46,11 +46,12 @@
 (use-package auto-compile
   :config
   (setq auto-compile-display-buffer             nil
-	auto-compile-mode-line-counter            t
-	auto-compile-source-recreate-deletes-dest t
-	auto-compile-toggle-deletes-nonlib-dest   t
-	auto-compile-update-autoloads             t
-	warning-suppress-log-types        '((comp)))
+  	      auto-compile-mode-line-counter            t
+  	      auto-compile-source-recreate-deletes-dest t
+  	      auto-compile-toggle-deletes-nonlib-dest   t
+  	      auto-compile-update-autoloads             t
+  	      warning-suppress-log-types        '((comp))
+  )
 )
 
 (use-package epkg
@@ -407,7 +408,8 @@
 (use-package solaire-mode
   :hook (minibuffer-setup . solaire-mode)
         (help-mode . solaire-mode)
-        (Helpful-mode . solaire-mode)
+        (helpful-mode . solaire-mode)
+        (org-export-stack-mode . solaire-mode)
   )
 
 (config/leader :infix "t"
@@ -1384,12 +1386,6 @@
 (use-package laas
   :hook (LaTeX-mode . laas-mode))
 
-(use-package evil-org
-:disabled
-:after org
-:hook (org-mode . evil-org-mode)
-)
-
 (use-package org
 :custom-face
   (org-latex-and-related ((t (:foreground "LightSteelBlue4" :weight bold))))
@@ -1521,6 +1517,13 @@
   (setq org-roam-v2-ack t)
 )
 
+(use-package org-gtd
+:defer t
+:after org
+:init
+  (setq org-gtd-update-ack "3.0.0")
+)
+
 (use-package org
 :init
   (setq org-element-cache-persistent nil)
@@ -1621,27 +1624,97 @@
     (advice-add 'org-create-formula-image :around #'org-renumber-environment)
 )
 
-(use-package org-gtd
-:after org
-:init
-  (setq org-gtd-update-ack "3.0.0")
-)
-
-
-
-;; (use-package org-pandoc)
-
-(use-package ox-gfm
-:after org
-)
-
-(use-package ox-hugo
-  :config
-  )
-
 (use-package grip-mode
 :after org
 )
+
+(use-package ox
+  :config
+  (setq org-export-with-toc t
+  	      org-export-with-tags 'not-in-toc
+  	      org-export-with-drawers nil
+  	      org-export-with-priority t
+  	      org-export-with-footnotes t
+  	      org-export-with-smart-quotes t
+  	      org-export-with-section-numbers t
+  	      org-export-with-sub-superscripts '{})
+  (setq org-export-use-babel t
+  	      org-export-headline-levels 9
+  	      org-export-coding-system 'utf-8
+  	      org-export-with-broken-links 'mark)
+  )
+
+(use-package ox-html
+  :after ox
+  :config
+  (setq org-html-doctype "html5"
+  	      org-html-html5-fancy t
+  	      org-html-checkbox-type 'unicode
+  	      org-html-validation-link nil))
+
+(use-package htmlize
+  :config
+  (setq htmlize-pre-style t
+  	      htmlize-output-type 'inline-css))
+
+
+
+(use-package ox-latex
+:after ox
+  )
+
+(use-package ox-reveal
+  :after ox
+  :config
+  (setq org-reveal-hlevel 1
+  	      org-reveal-theme "moon"
+  	      org-reveal-mathjax t
+  	      org-reveal-ignore-speaker-notes t
+  	      org-reveal-title-slide "<h1><font size=\"8\">%t</font></h1><h2><font size=\"6\">%s</font></h2><p><font size=\"5\">%a</font><br/><font size=\"5\">%d</font></p>"
+  	      org-reveal-plugins '(markdown zoom notes search)
+  	      org-reveal-klipsify-src 'on))
+
+(use-package ox-gfm
+:after ox
+)
+
+(use-package ox-pandoc
+  :after ox
+  :config
+  (setq org-pandoc-format-extensions 
+  	    '(markdown_github+pipe_tables+raw_html)
+  	      org-pandoc-command "/usr/local/bin/pandoc")
+  )
+
+(use-package ox-publish)
+
+(use-package ox-hugo
+  :after ox
+  :init (setq org-hugo-base-dir "~/Blog")
+  :config
+  (defun org-hugo-new-subtree-post-capture-template ()
+    "Returns `org-capture' template string for new Hugo post.
+     See `org-capture-templates' for more information."
+    (let* ((title (read-from-minibuffer "Post Title: ")) 
+  		 (fname (org-hugo-slug title)))
+  	(mapconcat #'identity
+        `(,(concat "* TODO " title) ":PROPERTIES:"
+          ,(concat ":EXPORT_FILE_NAME: " fname) ":END:" "%?\n")
+          ;Place the cursor here finally
+        "\n"
+      )
+    )
+  )
+
+  (add-to-list 'org-capture-templates
+      '("h"
+      "Hugo post"
+      entry
+  	(file+olp "capture.org" "Notes")
+  	(function org-hugo-new-subtree-post-capture-template)))    )
+
+(use-package easy-hugo
+  )
 
 (use-package elfeed
 :config
