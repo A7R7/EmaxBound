@@ -40,3 +40,6 @@ codespell-fix:
 	  etc/codespell/ignore-files | tr "\\n" ",")
 
 endif
+
+tangle:
+	emacs --batch --eval "(require 'org)" --eval '(org-babel-tangle-file "config.org")'

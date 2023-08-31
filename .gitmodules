@@ -301,6 +301,9 @@
 [submodule "org-super-agenda"]
 	path = lib/org-super-agenda
 	url = https://github.com/alphapapa/org-super-agenda
+[submodule "org-super-links"]
+	path = lib/org-super-links
+	url = git@github.com:toshism/org-super-links.git
 [submodule "org-superstar"]
 	path = lib/org-superstar
 	url = https://github.com/integral-dw/org-superstar-mode

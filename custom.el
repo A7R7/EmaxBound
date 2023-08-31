@@ -7,30 +7,32 @@
  '(custom-enabled-themes '(doom-ayu-mirage))
  '(display-line-numbers-width 4)
  '(elfeed-feeds
-   '("https://manateelazycat.github.io/feed.xml"
-	 ("http://nullprogram.com/feed/" blog emacs)
-	 "http://www.50ply.com/atom.xml"
-	 ("http://nedroid.com/feed/" webcomic)))
+	 '("https://manateelazycat.github.io/feed.xml"
+		 ("http://nullprogram.com/feed/" blog emacs)
+		 "http://www.50ply.com/atom.xml"
+		 ("http://nedroid.com/feed/" webcomic)))
  '(highlight-indent-guides-delay 0.01)
  '(highlight-indent-guides-responsive 'top)
  '(mixed-pitch-fixed-pitch-faces
-   '(diff-added diff-context diff-file-header diff-function diff-header diff-hunk-header diff-removed font-latex-math-face font-latex-sedate-face font-latex-warning-face font-latex-sectioning-5-face font-lock-builtin-face font-lock-comment-delimiter-face font-lock-constant-face font-lock-doc-face font-lock-function-name-face font-lock-keyword-face font-lock-negation-char-face font-lock-preprocessor-face font-lock-regexp-grouping-backslash font-lock-regexp-grouping-construct font-lock-string-face font-lock-type-face font-lock-variable-name-face line-number line-number-current-line line-number-major-tick line-number-minor-tick markdown-code-face markdown-gfm-checkbox-face markdown-inline-code-face markdown-language-info-face markdown-language-keyword-face markdown-math-face message-header-name message-header-to message-header-cc message-header-newsgroups message-header-xheader message-header-subject message-header-other mu4e-header-key-face mu4e-header-value-face mu4e-link-face mu4e-contact-face mu4e-compose-separator-face mu4e-compose-header-face org-block org-document-info-keyword org-code org-indent org-latex-and-related org-checkbox org-formula org-meta-line org-special-keyword org-table org-verbatim widget-field))
+	 '(diff-added diff-context diff-file-header diff-function diff-header diff-hunk-header diff-removed font-latex-math-face font-latex-sedate-face font-latex-warning-face font-latex-sectioning-5-face font-lock-builtin-face font-lock-comment-delimiter-face font-lock-constant-face font-lock-doc-face font-lock-function-name-face font-lock-keyword-face font-lock-negation-char-face font-lock-preprocessor-face font-lock-regexp-grouping-backslash font-lock-regexp-grouping-construct font-lock-string-face font-lock-type-face font-lock-variable-name-face line-number line-number-current-line line-number-major-tick line-number-minor-tick markdown-code-face markdown-gfm-checkbox-face markdown-inline-code-face markdown-language-info-face markdown-language-keyword-face markdown-math-face message-header-name message-header-to message-header-cc message-header-newsgroups message-header-xheader message-header-subject message-header-other mu4e-header-key-face mu4e-header-value-face mu4e-link-face mu4e-contact-face mu4e-compose-separator-face mu4e-compose-header-face org-block org-document-info-keyword org-code org-indent org-latex-and-related org-checkbox org-formula org-meta-line org-special-keyword org-table org-verbatim widget-field))
  '(mixed-pitch-set-height nil)
  '(org-pretty-entities t)
  '(org-return-follows-link t)
- '(tab-width 4)
+ '(tab-width 2)
  '(which-key-posframe-border-width 3))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :extend nil :stipple nil :background "#1f2430" :foreground "#c9cfda" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight regular :height 181 :width normal :foundry "GOOG" :family "RobotoMono Nerd Font"))))
+ '(default ((t (:inherit nil :extend nil :stipple nil :background "#1f2430" :foreground "#cad0e5" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight regular :height 181 :width normal :foundry "GOOG" :family "RobotoMono Nerd Font"))))
+ '(bold ((t (:foreground "#dae0f5" :weight bold))))
  '(dashboard-items-face ((t nil)))
  '(dashboard-no-items-face ((t (:inherit dashboard-items-face))))
  '(diff-hl-insert ((t (:extend nil :background "#5E734A" :foreground "#a6cc70"))))
  '(diff-hl-margin-change ((t (:extend nil :inherit diff-hl-change))))
  '(font-lock-doc-face ((t (:foreground "LightSteelBlue4" :inherit font-lock-comment-face))))
+ '(help-key-binding ((t (:box (:line-width (-1 . -1) :color "LightSteelBlue4") :foreground "LightBlue" :inherit fixed-pitch))))
  '(highlight-indent-guides-character-face ((t (:foreground "LightSteelBlue4"))))
  '(highlight-indent-guides-top-character-face ((t (:foreground "LightSteelBlue4"))))
  '(line-number ((t (:weight normal :slant normal :foreground "LightSteelBlue4" :background "#171B24" :inherit default))))

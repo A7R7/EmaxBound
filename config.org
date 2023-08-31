@@ -64,7 +64,7 @@ Check [[https://emacsmirror.net/manual/borg/Bootstrapping-using-a-seed.html][Boo
 - [[https://github.com/lijigang/100-questions-about-orgmode][lijigang's 100-questions-about-orgmode]] (2023) for org mode of course.
 - [[https://github.com/doomemacs/doomemacs][Doom Emacs]] (2023) Some best practices.
 - [[https://github.com/dakra/dmacs][Dakra's Dmacs]] (2023) Another Emacs Literate configuration with borg
-- [[https://github.com/DogLooksGood/meomacs][DogLooksGood/Meomacs]] (2023) Meow modal editing, emacs native friendly
+- [[https://github.com/DogLooksGood/meomacs][DogLooksGood's Meomacs]] (2023) Meow modal editing, emacs native friendly
 
 *NOTE*: the year number after link equals to
 - min (last time the config get's updated, last time I refered to the config)
@@ -905,6 +905,12 @@ Dashboard is an extensible startup screen showing you recent files, bookmarks, a
     )
   :config
     (dashboard-setup-startup-hook)
+  :bind (:map dashboard-mode-map
+    ("i" . 'dashboard-previous-line)
+    ("k" . 'dashboard-next-line)
+    ("l" . 'dashboard-return)
+    ("j" . 'dashboard-remove-item-under)
+    )
   )
 #+end_src
 
@@ -1383,22 +1389,18 @@ It is very useful for figuring out how things work in Emacs.
 #+end_src
 
 ** Vertico
-
+*** Vertico
 [[https://github.com/minad/vertico#extensions][Vertico]] provides a performant and minimalistic vertical completion UI based on the default completion system.
 
 #+begin_src elisp
   (use-package vertico
     :init
-    (setq completion-styles '(orderless))
-    (setq orderless-component-separator #'orderless-escapable-split-on-space)
-    (setq orderless-matching-styles
-	'(orderless-initialism orderless-prefixes orderless-regexp))
     ;; Different scroll margin
-    ;(setq vertico-scroll-margin 1)
+    (setq vertico-scroll-margin 1)
     ;; Show more candidates
-    ;(setq vertico-count 20)
+    (setq vertico-count 20)
     ;; Grow and shrink the Vertico minibuffer
-    ;(setq vertico-resize nil)
+    (setq vertico-resize nil)
     ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
     (setq vertico-cycle t)
     ;; use Vertico as an in-buffer completion UI
@@ -1412,7 +1414,21 @@ tweaks to build vertico
 	load-path = .
 	load-path = extensions
 #+end_src
-**** Vertico-directory
+*** Orderless
+[[https://github.com/oantolin/orderless][Orderless]] provides a completion style that divides the pattern into space-separated components, and matches candidates that match all of the components in any order.
+Each component can match in any one of several ways: literally, as a regexp, as an initialism, in the flex style, or as multiple word prefixes. By default, regexp and literal matches are enabled.
+
+#+begin_src elisp
+  (use-package orderless
+    :init
+    (setq completion-styles '(orderless))
+    (setq orderless-component-separator 
+  		#'orderless-escapable-split-on-space)
+    (setq orderless-matching-styles
+  		'(orderless-initialism orderless-prefixes orderless-regexp))
+    )
+#+end_src
+*** Vertico-directory
 
 #+begin_src elisp
 (use-package vertico-directory
@@ -1425,7 +1441,7 @@ tweaks to build vertico
   ;; Tidy shadowed file names
   :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
 #+end_src
-**** Vertico-multiform
+*** Vertico-multiform
 
 Vertico-multiform configures Vertico modes per command or completion category.
 
@@ -1436,7 +1452,7 @@ Vertico-multiform configures Vertico modes per command or completion category.
   )
 #+end_src
 
-**** Vertico-posframe
+*** Vertico-posframe
 
 [[https://github.com/tumashu/vertico-posframe][Vertico-posframe]] is an vertico extension, which lets vertico use posframe to show its candidate menu.
 
@@ -1499,7 +1515,7 @@ Vertico-multiform configures Vertico modes per command or completion category.
   )
 #+end_src
 
-**** Savehist
+*** Savehist
 
 #+begin_src elisp
   ;; Persist history over Emacs restarts. Vertico sorts by history position.
@@ -1546,9 +1562,9 @@ Vertico-multiform configures Vertico modes per command or completion category.
   :bind (;; C-c bindings in `mode-specific-map'
 	 ("C-c M-x" . consult-mode-command)
 	 ("C-c h" . consult-history)
-	 ("C-c k" . consult-kmacro)
+	 ;("C-c k" . consult-kmacro)
 	 ("C-c m" . consult-man)
-	 ("C-c i" . consult-info)
+	 ;("C-c i" . consult-info)
 	 ([remap Info-search] . consult-info)
 	 ;; C-x bindings in `ctl-x-map'
 	 ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
@@ -2256,14 +2272,80 @@ Disabled cause org-modern already does the job.
 
 [[https://github.com/tbanel/orgaggregate][Orgtbl-aggregate]] can creat a new table by computing sums, averages, and so on, out of material from the first table.
 
-** Roam
-
+** Notes
+*** Org-capture
+#+begin_src elisp
+  (use-package org-capture
+  :after org
+  :bind (("C-c c" . org-capture))
+  :init
+    (setq org-directory "~/Org")
+  :config
+    (setq org-capture-templates (append org-capture-templates '(
+      ("j" "Journal"
+        entry (file+datetree "~/Org/journal.org")
+        "* %U - %^{heading}\n  %?")
+      ("i" "Inbox"
+        entry (file "~/Dropbox/org/inbox.org")
+        "* %U - %^{heading} %^g\n %?\n")
+      ("n" "Notes"
+        entry (file "~/Dropbox/org/notes/inbox.org")
+        "* %^{heading} %t %^g\n  %?\n")
+    )))
+  )
+#+end_src
+*** Org-super-links
+#+begin_src elisp
+  (use-package org-super-links
+  :after org
+  :bind (("C-c s s" . org-super-links-link)
+         ("C-c s l" . org-super-links-store-link)
+         ("C-c s C-l" . org-super-links-insert-link))
+  )
+#+end_src
+*** Org-roam
 #+begin_src elisp
   (use-package org-roam
   :after org
   :init
     (setq org-roam-directory (file-truename "~/roam"))
     (setq org-roam-v2-ack t)
+    (setq org-roam-capture-templates '(
+            ("d" "default" plain "%?"
+              :target (file+head 
+                "%<%Y%m%d%H>-${slug}.org"
+                "#+title: ${title}\n#+filetags: \n")
+              :unnarrowed t)
+            ("b" "book notes" plain "%?"
+              :target (file+head 
+                "book/book%<%Y%m%d%H>-${slug}.org"
+                "#+title: ${title}\n#+filetags: :bookreading: \n\n")
+              :unnarrowed t)
+            ("c" "company" plain "%?"
+              :target (file+head 
+                "company/company%<%Y%m%d%H>-${slug}.org"
+                "#+title: ${title}\n#filetags: :compnay: \n\n")
+              :unnarrowed t)
+            ("i" "industry" plain "%?"
+              :target (file+head 
+                "industry/industry%<%Y%m%d%H>-${slug}.org"
+                "#+title:${slug}\n#+filetags: :industry: \n\n")
+              :unnarrowed t)
+            ("m" "marketing" plain "%?"
+              :target (file+head 
+                "marketing/marketing%<%Y%m%d%H%M%S>-${slug}.org"
+                "#+title: ${title}\n#+filetags: :marketing: \n\n")
+              :unnarrowed t)
+            ("p" "project" plain "%?"
+              :target (file+head 
+                "project/project%<%Y%m%d%H>-${slug}.org"
+                "#+title: ${title}\n#+filetags: :project: \n\n - tag ::")
+              :unnarrowed t)
+            ("r" "reference" plain "%?"
+              :target (file+head 
+                "<%Y%m%d%H>-${slug}.org"
+                "#+title: {$title}\n%filetags: reference \n\n -tag ::")
+              :unarrowed t)))    
   )
 #+end_src
 
@@ -2281,6 +2363,7 @@ Disabled cause org-modern already does the job.
 *** Org 9.7
 #+begin_src elisp
   (use-package org
+  :after emacs
   :init
     (setq org-element-cache-persistent nil)
     (setq org-element-use-cache nil)
@@ -2299,6 +2382,7 @@ Disabled cause org-modern already does the job.
 Code under :config is taken from https://emacs-china.org/t/org-mode-latex-mode/22490
 #+begin_src elisp
   (use-package org-fragtog
+  :defer t
   :config
       ;; Vertically align LaTeX preview in org mode
       (defun my-org-latex-preview-advice (beg end &rest _args)
@@ -2417,6 +2501,7 @@ Code under :config is taken from https://emacs-china.org/t/org-mode-latex-mode/2
 
 #+begin_src elisp
   (use-package ox-html
+    :defer t
     :after ox
     :config
     (setq org-html-doctype "html5"
@@ -2442,8 +2527,9 @@ There're 3 common ways to export org into PDF.
 *** LaTeX
 #+begin_src elisp
   (use-package ox-latex
+  :defer t
   :after ox
-    )
+  )
 #+end_src
 
 *** Slides
@@ -2457,8 +2543,9 @@ cd reveal.js && npm install
 
 #+begin_src elisp
   (use-package ox-reveal
-    :after ox
-    :config
+  :defer t
+  :after ox
+  :config
     (setq org-reveal-hlevel 1
   		org-reveal-theme "moon"
   		org-reveal-mathjax t
@@ -2471,6 +2558,7 @@ cd reveal.js && npm install
 Use [[https://github.com/larstvei/ox-gfm][ox-gfm]] to generate github-style markdown file.
 #+begin_src elisp
   (use-package ox-gfm
+  :defer t
   :after ox
   )
 #+end_src
@@ -2478,8 +2566,9 @@ Use [[https://github.com/larstvei/ox-gfm][ox-gfm]] to generate github-style mark
 Use ox-pandoc to generate MS-Office files like word and ppt.
 #+begin_src elisp
   (use-package ox-pandoc
-    :after ox
-    :config
+  :defer t
+  :after ox
+  :config
     (setq org-pandoc-format-extensions 
   	      '(markdown_github+pipe_tables+raw_html)
   		org-pandoc-command "/usr/local/bin/pandoc")
@@ -2525,7 +2614,8 @@ General steps to publish a blog using hugo in emacs includes:
         "Hugo post"
         entry
   	  (file+olp "capture.org" "Notes")
-  	  (function org-hugo-new-subtree-post-capture-template)))    )
+  	  (function org-hugo-new-subtree-post-capture-template)))    
+  )
 
 #+end_src
 
