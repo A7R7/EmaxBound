@@ -46,6 +46,9 @@
 [submodule "borg"]
 	path = lib/borg
 	url = https://github.com/emacscollective/borg
+[submodule "cask"]
+	path = lib/cask
+	url = git@github.com:emacsattic/cask.git
 [submodule "cdlatex"]
 	path = lib/cdlatex
 	url = https://github.com/cdominik/cdlatex
@@ -160,12 +163,6 @@
 [submodule "grip-mode"]
 	path = lib/grip-mode
 	url = https://github.com/seagle0128/grip-mode
-[submodule "helm"]
-	path = lib/helm
-	url = https://github.com/emacs-helm/helm
-[submodule "helm-org"]
-	path = lib/helm-org
-	url = https://github.com/emacs-helm/helm-org
 [submodule "helpful"]
 	path = lib/helpful
 	url = https://github.com/Wilfred/helpful
@@ -190,6 +187,12 @@
 [submodule "imenu-list"]
 	path = lib/imenu-list
 	url = https://github.com/bmag/imenu-list
+[submodule "info+"]
+	path = lib/info+
+	url = git@github.com:emacsmirror/info-plus.git
+[submodule "info-colors"]
+	path = lib/info-colors
+	url = https://github.com/ubolonton/info-colors
 [submodule "js2-mode"]
 	path = lib/js2-mode
 	url = https://github.com/mooz/js2-mode
@@ -202,6 +205,9 @@
 [submodule "key-echo"]
 	path = lib/key-echo
 	url = https://github.com/manateelazycat/key-echo.git
+[submodule "laas"]
+	path = lib/laas
+	url = https://github.com/tecosaur/LaTeX-auto-activating-snippets
 [submodule "leaf"]
 	path = lib/leaf
 	url = https://github.com/conao3/leaf.el

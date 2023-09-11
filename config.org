@@ -1,6 +1,6 @@
 :DOC-CONFIG:
-#+PROPERTY: header-args:elisp :tangle init.el :language elisp
-#+PROPERTY: header-args:emacs-lisp :tangle init.el :language elisp
+#+PROPERTY: header-args:elisp :tangle init.el :language elisp :comments link
+#+PROPERTY: header-args:emacs-lisp :tangle init.el :language elisp :comments link
 #+PROPERTY: header-args:conf :tangle .borgconfig :language conf
 #+PROPERTY: header-args:mkdirp yes :comments no
 #+STARTUP: fold
@@ -400,7 +400,7 @@ I do not use evil mode anymore because of Meow Edit.
               (keypad . "🅚")))
     (setq meow-keypad-self-insert-undefined nil)
     (setq meow-selection-command-fallback '(
-          (meow-change . meow-change-char)
+          (meow-change . meow-mark-word)
           (meow-kill . meow-delete)
           (meow-cancel-selection . keyboard-quit)
           (meow-pop-selection . meow-pop-grab)
@@ -412,6 +412,8 @@ I do not use evil mode anymore because of Meow Edit.
       (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
 
       (meow-motion-overwrite-define-key
+       '("i" . meow-prev)
+       '("k" . meow-next)
        '("<escape>" . ignore))
 
       (meow-leader-define-key
@@ -420,6 +422,7 @@ I do not use evil mode anymore because of Meow Edit.
        '("j" . meow-insert)
        '("k" . meow-open-below)
        '("l" . meow-append) 
+       '("m" . meow-change-char)
       
        ;; Use SPC (0-9) for digit arguments.
        '("1" . meow-digit-argument) '("2" . meow-digit-argument)
@@ -450,7 +453,7 @@ I do not use evil mode anymore because of Meow Edit.
        '("j" . meow-left) '("J" . meow-left-expand)
        '("k" . meow-next) '("K" . meow-next-expand)
        '("l" . meow-right) '("L" . meow-right-expand)
-       '("m" . meow-mark-word) '("M" . meow-mark-symbol)
+       '("m" . meow-change) '("M" . meow-mark-symbol)
        '("n" . meow-search)
        '("o" . meow-next-word) '("O" . meow-next-symbol)
        '("p" . meow-pop-selection)
@@ -484,10 +487,10 @@ I do not use evil mode anymore because of Meow Edit.
 
     (general-evil-setup t)
     (general-create-definer config/leader
-      :states '(normal insert visual emacs)
-      ;:keymaps 'meow-keypad-state-keymap
-      :keymaps 'override
-      ;:prefix "SPC" ;; set leader
+      ;:states '(normal insert visual emacs)
+      :keymaps 'meow-normal-state-map
+      ;:keymaps 'override
+      :prefix "SPC" ;; set leader
       :global-prefix "M-SPC" ;; access leader in insert mode
     )
 
@@ -665,8 +668,9 @@ Note that monospace fonts are not always fixed-pitch [[https://stackoverflow.com
     :font "RobotoMono Nerd Font"
     :height 180
   )
-  (set-face-attribute 'fixed-pitch-serif t
-    :family "Monospace Serif"
+  (set-face-attribute 'fixed-pitch-serif nil
+    ;:family "Monospace Serif"
+    :font "RobotoMono Nerd Font"
     :height 180
   )
 #+end_src
@@ -701,14 +705,16 @@ You can use the bindings CTRL plus =/- for zooming in/out.  You can also use CTR
 *** Pitch
 There're 2 modes that controls pitch, mixed-pitch-mode and fixed-pitch-mode.
 #+begin_src elisp
-  (use-package fixed-pitch)
+  (use-package fixed-pitch
+  :defer t
+  )
 #+end_src
 
 #+begin_src elisp
   (use-package mixed-pitch-mode
   :defer t
-  :config
   :hook (Custom-mode . mixed-pitch-mode)
+  :config
     (setq  mixed-pitch-set-height t)
   )
 #+end_src
@@ -906,8 +912,8 @@ Dashboard is an extensible startup screen showing you recent files, bookmarks, a
   :config
     (dashboard-setup-startup-hook)
   :bind (:map dashboard-mode-map
-    ("i" . 'dashboard-previous-line)
-    ("k" . 'dashboard-next-line)
+    ;("i" . 'dashboard-previous-line)
+    ;("k" . 'dashboard-next-line)
     ("l" . 'dashboard-return)
     ("j" . 'dashboard-remove-item-under)
     )
@@ -922,6 +928,7 @@ Dashboard is an extensible startup screen showing you recent files, bookmarks, a
       (dired-mode . centaur-tabs-local-mode)
       (dirvish-directory-view-mode . centaur-tabs-local-mode)
       (dashboard-mode . centaur-tabs-local-mode)
+      (calendar-mode . centaur-tabs-local-mode)
     :init
       (setq centaur-tabs-set-icons t
 	    centaur-tabs-set-modified-marker t
@@ -1283,7 +1290,7 @@ Dropin replacement for dired.
 #+begin_src elisp
   (use-package dirvish
   :init
-    (dirvish-override-dired-mode)
+    ;(dirvish-override-dired-mode)
   :hook
     (dired-mode . solaire-mode)
   :custom
@@ -1358,6 +1365,7 @@ Tweaks to build dirvish. Load dirvish and its extensions.
 #+end_src
 
 ** Helpful
+
 [[https://github.com/Wilfred/helpful][Helpful]] adds a lot of very helpful information to Emacs' =describe-= command buffers.
 For example, if you use =describe-function=, you will not only get the documentation about the function,
 you will also see the source code of the function and where it gets used in other places in the Emacs configuration.
@@ -1370,9 +1378,25 @@ It is very useful for figuring out how things work in Emacs.
      ([remap describe-command]  . helpful-command)
      ([remap describe-variable] . helpful-variable)
      ([remap describe-function] . helpful-callable)
+     ("C-h F" . describe-face)
+     ("C-h K" . describe-keymap)
   )
 #+end_src
 
+** Info+
+#+begin_src elisp
+  (use-package info+
+  :config
+  )
+#+end_src
+#+begin_src elisp
+  (use-package info-colors
+  :config
+    (add-hook 'Info-selection-hook 'info-colors-fontify-node)
+    (add-hook 'Info-mode-hook 'olivetti-mode)
+    (add-hook 'Info-mode-hook 'mixed-pitch-mode)
+  )
+#+end_src
 ** Marginalia
 [[https://github.com/minad/marginalia][Marginalia]] enriches existing commands with completion annotations
 #+begin_src elisp
@@ -1889,12 +1913,12 @@ parentheses, brackets, and braces according to their depth.
   (use-package highlight-indent-guides
   :hook (prog-mode . highlight-indent-guides-mode)
   :config
-    (setq highlight-indent-guides-method 'character
+    (setq highlight-indent-guides-method 'bitmap
           highlight-indent-guides-character 9474 
           highlight-indent-guides-auto-enabled nil
     )
     (set-face-attribute 'highlight-indent-guides-character-face nil
-      :foreground "LightSteelBlue4")
+      :foreground "#3b445f")
     (set-face-attribute 'highlight-indent-guides-top-character-face nil
       :foreground "#ffcc66")
 
@@ -2101,9 +2125,9 @@ Change the font size of different org-levels.
   :hook (org-mode . mixed-pitch-mode)
   :config
     (set-face-attribute 'org-level-1 nil
-	:family "Sarasa Gothic SC" :height 1.8 )
+	:family "Sarasa Gothic SC" :height 1.4 )
     (set-face-attribute 'org-level-2 nil
-	:family "Sarasa Gothic SC" :height 1.6 )
+	:family "Sarasa Gothic SC" :height 1.4 )
     (set-face-attribute 'org-level-3 nil
 	:family "Sarasa Gothic SC" :height 1.4 )
     (set-face-attribute 'org-level-4 nil
@@ -2281,19 +2305,19 @@ Disabled cause org-modern already does the job.
   :init
     (setq org-directory "~/Org")
   :config
+    ;; if file path is not absolute
+    ;; it is treated as relative path to org-directory
     (setq org-capture-templates (append org-capture-templates '(
-      ("j" "Journal"
-        entry (file+datetree "~/Org/journal.org")
-        "* %U - %^{heading}\n  %?")
-      ("i" "Inbox"
-        entry (file "~/Dropbox/org/inbox.org")
-        "* %U - %^{heading} %^g\n %?\n")
-      ("n" "Notes"
-        entry (file "~/Dropbox/org/notes/inbox.org")
-        "* %^{heading} %t %^g\n  %?\n")
+      ("j" "Journal" entry 
+        (file+datetree "journal.org")
+        "* %U - %?\n")
+      ("i" "Inbox" entry 
+        (file "inbox.org")
+        "* %U - %? %^g\n")
     )))
   )
 #+end_src
+
 *** Org-super-links
 #+begin_src elisp
   (use-package org-super-links
@@ -2303,6 +2327,7 @@ Disabled cause org-modern already does the job.
          ("C-c s C-l" . org-super-links-insert-link))
   )
 #+end_src
+
 *** Org-roam
 #+begin_src elisp
   (use-package org-roam
@@ -2311,53 +2336,152 @@ Disabled cause org-modern already does the job.
     (setq org-roam-directory (file-truename "~/roam"))
     (setq org-roam-v2-ack t)
     (setq org-roam-capture-templates '(
-            ("d" "default" plain "%?"
-              :target (file+head 
-                "%<%Y%m%d%H>-${slug}.org"
-                "#+title: ${title}\n#+filetags: \n")
-              :unnarrowed t)
-            ("b" "book notes" plain "%?"
-              :target (file+head 
-                "book/book%<%Y%m%d%H>-${slug}.org"
-                "#+title: ${title}\n#+filetags: :bookreading: \n\n")
-              :unnarrowed t)
-            ("c" "company" plain "%?"
-              :target (file+head 
-                "company/company%<%Y%m%d%H>-${slug}.org"
-                "#+title: ${title}\n#filetags: :compnay: \n\n")
-              :unnarrowed t)
-            ("i" "industry" plain "%?"
-              :target (file+head 
-                "industry/industry%<%Y%m%d%H>-${slug}.org"
-                "#+title:${slug}\n#+filetags: :industry: \n\n")
-              :unnarrowed t)
-            ("m" "marketing" plain "%?"
-              :target (file+head 
-                "marketing/marketing%<%Y%m%d%H%M%S>-${slug}.org"
-                "#+title: ${title}\n#+filetags: :marketing: \n\n")
-              :unnarrowed t)
-            ("p" "project" plain "%?"
-              :target (file+head 
-                "project/project%<%Y%m%d%H>-${slug}.org"
-                "#+title: ${title}\n#+filetags: :project: \n\n - tag ::")
-              :unnarrowed t)
-            ("r" "reference" plain "%?"
-              :target (file+head 
-                "<%Y%m%d%H>-${slug}.org"
-                "#+title: {$title}\n%filetags: reference \n\n -tag ::")
-              :unarrowed t)))    
+       ("d" "default" plain "%?"
+         :target (file+head 
+           "%<%Y%m%d%H>-${slug}.org"
+           "#+title: ${title}\n#+filetags: \n")
+         :unnarrowed t)
+       ("b" "book notes" plain "%?"
+         :target (file+head 
+           "book/book%<%Y%m%d%H>-${slug}.org"
+           "#+title: ${title}\n#+filetags: :bookreading: \n\n")
+         :unnarrowed t)
+       ("c" "company" plain "%?"
+         :target (file+head 
+           "company/company%<%Y%m%d%H>-${slug}.org"
+           "#+title: ${title}\n#filetags: :compnay: \n\n")
+         :unnarrowed t)
+       ("i" "industry" plain "%?"
+         :target (file+head 
+           "industry/industry%<%Y%m%d%H>-${slug}.org"
+           "#+title:${slug}\n#+filetags: :industry: \n\n")
+         :unnarrowed t)
+       ("m" "marketing" plain "%?"
+         :target (file+head 
+           "marketing/marketing%<%Y%m%d%H%M%S>-${slug}.org"
+           "#+title: ${title}\n#+filetags: :marketing: \n\n")
+         :unnarrowed t)
+       ("p" "project" plain "%?"
+         :target (file+head 
+           "project/project%<%Y%m%d%H>-${slug}.org"
+           "#+title: ${title}\n#+filetags: :project: \n\n - tag ::")
+         :unnarrowed t)
+       ("r" "reference" plain "%?"
+         :target (file+head 
+           "<%Y%m%d%H>-${slug}.org"
+           "#+title: {$title}\n%filetags: reference \n\n -tag ::")
+         :unarrowed t)))    
   )
 #+end_src
 
-** GTD
+** Task-MNG
+*** TODOs
+#+begin_src elisp
+  (use-package org
+  :config
+  (setq org-todo-keywords '(
+       (sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+       (sequence "WAIT(w@/!)" "HOLD(h@/!)" "|" "CNCL(c@/!)")
+       (sequence "SOMEDAY")
+  ))
+  (setq org-todo-state-tags-triggers
+     '(("CNCL" ("CNCL" . t))
+       ("WAIT" ("WAIT" . t))
+       ("HOLD" ("WAIT") ("HOLD" . t))
+       (done ("WAIT") ("HOLD"))
+       ("TODO" ("WAIT") ("CNCL") ("HOLD"))
+       ("NEXT" ("WAIT") ("CNCL") ("HOLD"))
+       ("DONE" ("WAIT") ("CNCL") ("HOLD"))))
+  )
+
+  ;;selecting keys from the fast todo selection key menu
+  (setq org-use-fast-todo-selection t
+        org-enforce-todo-dependencies t
+        org-log-done 'time
+  )
+#+end_src
+*** Org-agenda
+#+begin_src elisp
+  (use-package org-agenda
+  :after org
+  :hook
+    (org-agenda-mode . solaire-mode)
+    (org-agenda-mode . olivetti-mode)
+  :bind
+    ("<f12>" . org-agenda)
+  :config
+    (setq org-agenda-span 'day)
+    (setq org-agenda-files '("~/Org"))
+  )
+#+end_src
+*** Org-super-agenda
+#+begin_src elisp
+  (use-package org-super-agenda
+  :after org-agenda
+  :config
+    (org-super-agenda-mode)
+    (setq org-super-agenda-groups '(
+      (:name "Today"
+       :time-grid t
+       :scheduled today)
+      (:name "Due today"
+  		 :deadline today)
+      (:name "Important"
+  	   :priority "A")
+      (:name "Overdue"
+       :deadline past)
+      (:name "Due soon"
+       :deadline future)
+      (:name "Waiting"
+       :todo "WAIT")
+      (:name "Someday"
+       :todo "SOMEDAY")
+    ))
+  )
+#+end_src
+*** Calendar
+
+#+begin_src elisp
+  (use-package calendar
+  :hook
+    (calendar-mode . olivetti-mode)
+    (calendar-mode . solaire-mode)
+  :config 
+    (setq calendar-date-style 'iso)
+  )
+#+end_src
+
+*** GTD
 #+begin_src elisp
   (use-package org-gtd
-  :defer t
   :after org
   :init
     (setq org-gtd-update-ack "3.0.0")
-  )
+  :config
+  ;; where org-gtd will put its files.
+  (setq org-gtd-directory "~/gtd/")
+  ;; package: https://github.com/Malabarba/org-agenda-property
+  ;; this is so you can see who an item was delegated to in the agenda
+  (setq org-agenda-property-list '("DELEGATED_TO"))
+  ;; I think this makes the agenda easier to read
+  (setq org-agenda-property-position 'next-line)
+  ;; package: https://www.nongnu.org/org-edna-el/
+  ;; org-edna is used to make sure that when a project task gets DONE,
+  ;; the next TODO is automatically changed to NEXT.
+  (setq org-edna-use-inheritance t)
+  (org-edna-load)
+  :bind
+  (("C-c d c" . org-gtd-capture) ;; add item to inbox
+   ("C-c d a" . org-agenda-list) ;; see what's on your plate today
+   ("C-c d p" . org-gtd-process-inbox) ;; process entire inbox
+   ("C-c d n" . org-gtd-show-all-next) ;; see all NEXT items
+   ;; see projects that don't have a NEXT item
+   ("C-c d s" . org-gtd-show-stuck-projects)
+   ;; the keybinding to hit when you're done editing an item in the
+   ;; processing phase
+   ("C-c d f" . org-gtd-clarify-finalize)))
 #+end_src
+
 
 ** Preview
 *** Org 9.7
@@ -2626,7 +2750,54 @@ Easy-hugo
     )
 #+end_src
 
+** Org-transclusion
 * Emacs OS
+** PDF-Tools
+PDF-tools is a replacement for DocView for PDF files. 
+The rendering is performed by poppler.
+Run =M-x pdf-tools-install= to install libraries needed.
+#+begin_src elisp
+  (use-package pdf-tools
+  ;; manually update
+  ;; after each update we have to call:
+  ;; Install pdf-tools but don't ask or raise error (otherwise daemon mode will wait for input)
+  ;; (pdf-tools-install t t t)
+  :magic ("%PDF" . pdf-view-mode)
+  :mode (("\\.pdf\\'" . pdf-view-mode))
+  :hook ((pdf-view-mode . pdf-view-init))
+  :bind (:map pdf-view-mode-map
+         ("C-s" . isearch-forward)
+         ("M-w" . pdf-view-kill-ring-save)
+         ("M-p" . print-pdf))
+  :config
+  (defun pdf-view-init ()
+    "Initialize pdf-tools view like enabline TOC functions or use dark theme at night."
+
+    ;; Use dark theme when opening PDFs at night time
+    (let ((hour (string-to-number (format-time-string "%H"))))
+      (when (or (< hour 5) (< 20 hour))
+        (pdf-view-midnight-minor-mode)))
+
+    ;; Enable pdf-tools minor mode to have features like TOC extraction by pressing `o'.
+    (pdf-tools-enable-minor-modes)
+
+    ;; Disable while-line-or-region to free keybindings.
+    (whole-line-or-region-local-mode -1))
+
+  ;; Use `gtklp' or `hp-print' to print as it has better cups support
+  (setq print-pdf-command "hp-print")
+  (defun print-pdf (&optional pdf)
+    "Print PDF using external program defined in `print-pdf-command'."
+    (interactive "P")
+    (start-process-shell-command
+     print-pdf-command nil (concat print-pdf-command " " (shell-quote-argument (or pdf (buffer-file-name))))))
+
+  ;; more fine-grained zooming; +/- 10% instead of default 25%
+  (setq pdf-view-resize-factor 1.1)
+  ;; Always use midnight-mode and almost same color as default font.
+  ;; Just slightly brighter background to see the page boarders
+  (setq pdf-view-midnight-colors '("#c6c6c6" . "#363636")))
+#+end_src
 ** Elfeed
 #+begin_src elisp
   (use-package elfeed
