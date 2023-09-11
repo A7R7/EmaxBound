@@ -25,7 +25,7 @@
 
 * Screenshots
 #+HTML:<img alt="Dashboard" src="assets/dashboard.png" width="80%">
-#+HTML:<img alt="Org Mode" src="assets/org_mode.png" width="80%">
+#+HTML:<img alt="Org Mode" src="assets/org-mode.png" width="80%">
 * Introduction
 ** How to deploy this config
 This config file is still in its early stages of development, *Everything is unstable!*
