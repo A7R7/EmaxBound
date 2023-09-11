@@ -20,7 +20,7 @@
  '(org-agenda-files nil)
  '(org-pretty-entities t)
  '(org-return-follows-link t)
- '(org-tags-column 10)
+ '(org-tags-column 0)
  '(tab-width 2)
  '(which-key-posframe-border-width 3))
 (custom-set-faces
