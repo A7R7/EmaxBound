@@ -262,6 +262,7 @@
 [submodule "org"]
 	path = lib/org
 	url = https://git.tecosaur.net/tec/org-mode.git
+  ignore = dirty
 [submodule "org-agenda-property"]
 	path = lib/org-agenda-property
 	url = https://github.com/Malabarba/org-agenda-property
@@ -343,6 +344,7 @@
 [submodule "pdf-tools"]
 	path = lib/pdf-tools
 	url = https://github.com/vedang/pdf-tools
+  ignore = dirty
 [submodule "peg"]
 	path = lib/peg
 	url = git@github.com:emacsmirror/peg.git
