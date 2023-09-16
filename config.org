@@ -4,28 +4,25 @@
 #+PROPERTY: header-args:conf :tangle .borgconfig :language conf
 #+PROPERTY: header-args:mkdirp yes :comments no
 #+STARTUP: fold
-#+OPTIONS: toc:2
 #+AUTO_TANGLE: t
-#+HUGO_BASE_DIR: ~/Blog
-#+HUGO_SECTION: posts
-#+HUGO_PUBLISHDATE: 2023-08-29
-#+HUGO_CUSTOM_FRONT_MATTER: :hide - header - footer
-#+TOC: headlines 2
+#+HUGO_BUNDLE: emaxbound-configuration
+#+EXPORT_FILE_NAME: index.en
+#+HUGO_PUBLISHDATE: 2023-07-24
+#+HUGO_FRONT_MATTER_KEY_REPLACE: author>authors
+#+HUGO_CUSTOM_FRONT_MATTER: :featuredImage Emacsbound.png
 #+FILETAGS: :Emacs:Org-mode:
 :END:
-
 #+TITLE: EmaxBound Configuration
 #+AUTHOR: A7R7
-
-#+HTML:<img alt="EmaxBound" src="assets/EmacsBound.svg" width="100%">
+#+DESCRIPTION: My GNU Emacs's literate config
+#+HTML:<!--more-->
   -----
 #+HTML:<a href="https://www.gnu.org/software/emacs/"><img alt="GNU Emacs" src="https://img.shields.io/badge/emacs-29.1-8A2BF2?logo=gnuemacs&logoColor=white"/></a>
 #+HTML:<a href="https://github.com/emacscollective/borg"><img alt="Package Manager" src="https://img.shields.io/badge/package_manager-borg-green"/></a>
 #+HTML:<a href="https://en.wikipedia.org/wiki/Linux"><img alt="Linux" src="https://img.shields.io/badge/linux-FCC624?logo=linux&logoColor=black"/></a>
 
 * Screenshots
-#+HTML:<img alt="Dashboard" src="assets/dashboard.png" width="80%">
-#+HTML:<img alt="Org Mode" src="assets/org-mode.png" width="80%">
+[[file:assets/dashboard.png]]
 * Introduction
 ** How to deploy this config
 This config file is still in its early stages of development, *Everything is unstable!*
@@ -42,17 +39,17 @@ make bootstrap       # bootstrap collective or new drones
 
 Last, run ~emacs --init-directory=<path-of-the-repo>~ (replace the path).
 
-** How I built this config from seed
+** How I built this config from the seed
 
 The whole config structure is built upon [[https://github.com/emacscollective/emacs.g][emacscollective/emacs.g]].
 It is a starter-kit using borg as the package manager, which utilizes git submodules to maintain all its packages.
-Check [[https://emacsmirror.net/manual/borg/Bootstrapping-using-a-seed.html][Bootstrapping-using-a-seed]] from its [[https://emacsmirror.net/manual/borg/][manual]] to see how to build the config structure.
+Check [[https://emacsmirror.net/manual/borg/Bootstrapping-using-a-seed.html][Bootstrapping-using-a-seed]] from Borg's manual to see how to build the config structure.
 
-- Firstly, I generated the structure from the seed.
+- First, I generated the structure from the seed.
 - Then, I copied and pasted all the original code from init.el and early-init.el to this org file.
 - Last, most further config does not go beyond the following 3 steps:
   + Run [[elisp: borg-assimilate][M-x borg-assimilate]] and input the name of the package to install this package.
-  + Write config codes into this org file, then run [[elisp:org-babel-tangle][M-x org-babel-tangle]] so that emacs writes the codes into the corresponding file. (Tangle is done automatically on save)
+  + Write config codes into this org file, then run [[elisp:org-babel-tangle][M-x org-babel-tangle]] so that emacs writes the codes into the corresponding file. (the org-auto-tangle package that I installed enables auto tangling on saving org file)
   + For some packages, specify its load path or build method in ~.borgconfig~ for them to be load or built as expected. This is auto tangled as well.
 
 ** References
@@ -61,7 +58,6 @@ Check [[https://emacsmirror.net/manual/borg/Bootstrapping-using-a-seed.html][Boo
 - [[https://gitlab.com/dwt1/configuring-emacs][DistroTube's Configuring Emacs]] (2023) easy to follow.
 - [[https://github.com/seagle0128/.emacs.d][seagle0128's Centaur Emacs]] (2023) be morden.
 - [[https://github.com/daviwil/emacs-from-scratch][Daviwell's Emacs from scratch]] (2021) intuitive.
-- [[https://github.com/lijigang/100-questions-about-orgmode][lijigang's 100-questions-about-orgmode]] (2023) for org mode of course.
 - [[https://github.com/doomemacs/doomemacs][Doom Emacs]] (2023) Some best practices.
 - [[https://github.com/dakra/dmacs][Dakra's Dmacs]] (2023) Another Emacs Literate configuration with borg
 - [[https://github.com/DogLooksGood/meomacs][DogLooksGood's Meomacs]] (2023) Meow modal editing, emacs native friendly
@@ -69,13 +65,15 @@ Check [[https://emacsmirror.net/manual/borg/Bootstrapping-using-a-seed.html][Boo
 *NOTE*: the year number after link equals to
 - min (last time the config get's updated, last time I refered to the config)
 
-* Earliest birds
+* Early Init
 
-*NOTE*: codes under this heading are tangled to early-init.el
+*NOTE*: codes under this heading are tangled to early-init.el.
 
-Disable byte-compile for early-init.el, according to the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html][emacs manual]].
+Disable byte-compile for early-init.el. 
+According to the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html][emacs manual]], byte-compiling the init does not startup very much, and often leads to problems when you forget to recompile the file. 
+Also, from my experience, it may lead to bugs that do not happen when not using byte-compile. 
 #+begin_src elisp :tangle early-init.el
-;;; early-init.el --- earliest birds  -*- lexical-binding: t; no-byte-compile: t -*-
+;;; early-init.el -*- lexical-binding: t; no-byte-compile: t -*-
 #+end_src
 
 Disable tool-bar, menu-bar and scroll-bar before they're loaded.
@@ -108,7 +106,7 @@ Borg seed generated configs.
 ;;; early-init.el ends here
 #+end_src
 
-* Early birds
+* Init
 
 *NOTE*: Starting from here, elisp codes are tangled to init.el !
 
@@ -380,24 +378,19 @@ I do not use evil mode anymore because of Meow Edit.
       "Move to the end of selection, switch to INSERT state."
       (interactive)
       (if meow--temp-normal
-  	(progn
-  	  (message "Quit temporary normal mode")
-  	  (meow--switch-state 'motion))
+  	    (progn
+  	      (message "Quit temporary normal mode")
+  	      (meow--switch-state 'motion))
         (if (not (region-active-p))
-  	  (when (and (not (use-region-p))
+  	      (when (and (not (use-region-p))
   		     (< (point) (point-max)))
-  	    (forward-char 1))
-  	(meow--direction-forward)
-  	(meow--cancel-selection))
-        (meow--switch-state 'insert)))
+  	        (forward-char 1))
+  	        (meow--direction-forward)
+  	        (meow--cancel-selection))
+        (meow--switch-state 'insert))
+    )
     (advice-add 'meow-append :override #'my-meow-append)
     
-    (setq meow-replace-state-name-list
-            '((normal . "🅝")
-              (beacon . "🅑")
-              (insert . "🅘")
-              (motion . "🅜")
-              (keypad . "🅚")))
     (setq meow-keypad-self-insert-undefined nil)
     (setq meow-selection-command-fallback '(
           (meow-change . meow-mark-word)
@@ -418,12 +411,7 @@ I do not use evil mode anymore because of Meow Edit.
 
       (meow-leader-define-key
        ;; SPC j/k will run the original command in MOTION state.
-       '("i" . meow-open-above)
-       '("j" . meow-insert)
-       '("k" . meow-open-below)
-       '("l" . meow-append) 
        '("m" . meow-change-char)
-      
        ;; Use SPC (0-9) for digit arguments.
        '("1" . meow-digit-argument) '("2" . meow-digit-argument)
        '("3" . meow-digit-argument) '("4" . meow-digit-argument)
@@ -446,7 +434,7 @@ I do not use evil mode anymore because of Meow Edit.
        '("c" . meow-save) '("C" . meow-sync-grab)
        '("D" . meow-open-below)
        '("E" . meow-open-above)
-       '("F" . meow-append)
+       '("f" . meow-next-word) '("F" . meow-next-symbol)
        '("g" . meow-find) '("G" . meow-grab)
        '("h" . meow-line) '("H" . meow-goto-line)
        '("i" . meow-prev) '("I" . meow-prev-expand)
@@ -455,22 +443,26 @@ I do not use evil mode anymore because of Meow Edit.
        '("l" . meow-right) '("L" . meow-right-expand)
        '("m" . meow-change) '("M" . meow-mark-symbol)
        '("n" . meow-search)
-       '("o" . meow-next-word) '("O" . meow-next-symbol)
+       '("o" . meow-append) '("O" . meow-open-below)
        '("p" . meow-pop-selection)
        '("q" . meow-quit)
-       '("S" . meow-insert)
+       '("s" . meow-back-word) '("S" . meow-back-symbol)
        '("t" . meow-till)
-       '("u" . meow-back-word) '("U" . meow-back-symbol)
+       '("u" . meow-insert) '("U" . meow-open-above)
        '("v" . meow-replace) '("V" . meow-yank-pop)
        '("x" . meow-kill)
        '("y" . meow-join)
        '("z" . meow-undo) '("Z" . meow-undo-in-selection)
-       '("'" . repeat) '("<escape>" . meow-cancel-selection)))
+       '("'" . repeat) '("<escape>" . meow-cancel-selection)
+  		 '("(" . fingertip-wrap-round) '(")" . fingertip-unwrap)
+       '("{" . fingertip-wrap-curly) 
+       '("\"" . fingertip-double-quote)
+      )
+    )
     (meow-setup)
     (meow-global-mode)
-    )
+  )
 #+end_src
-
 ** General
 [[https://github.com/noctuid/general.el][General]] provides a more convenient method for binding keys in emacs
 (for both evil and non-evil users).
@@ -1386,6 +1378,7 @@ It is very useful for figuring out how things work in Emacs.
 ** Info+
 #+begin_src elisp
   (use-package info+
+  :defer t
   :config
   )
 #+end_src
@@ -1706,6 +1699,7 @@ Vertico-multiform configures Vertico modes per command or completion category.
 
 #+begin_src elisp
   (use-package blink-search
+  :defer t
   :config
     (setq blink-search-enable-posframe t)
   )
@@ -1715,6 +1709,7 @@ Vertico-multiform configures Vertico modes per command or completion category.
 [[https://github.com/manateelazycat/color-rg][Color-rg]] is a search and refactoring tool based on ripgrep.
 #+begin_src elisp
   (use-package color-rg
+  :defer t
   :config
     (general-def isearch-mode-map
       "M-s M-s" 'isearch-toggle-color-rg
@@ -2283,7 +2278,7 @@ This package provides visual alignment for Org Mode, Markdown and table.el table
 
 [[https://github.com/yilkalargaw/org-auto-tangle][Org-auto-tangle]] Automatically and Asynchronously tangles org files on save.
 Adding the option =#+auto_tangle: t= in an org file to auto-tangle.
-Or setting the =org-auto-tangle-default= variable to t to configure auto-tangle as the default behavior for all org buffers. In this case, it can be disabled for some buffers by adding =#+auto_tangle:nil=.
+Or setting =org-auto-tangle-default= to t to configure auto-tangle as the default behavior for all org buffers. In this case, it can be disabled for some buffers by adding =#+auto_tangle: nil=.
 #+begin_src elisp
   (use-package org-auto-tangle
   :hook (org-mode . org-auto-tangle-mode)
@@ -2296,6 +2291,38 @@ Disabled cause org-modern already does the job.
 
 [[https://github.com/tbanel/orgaggregate][Orgtbl-aggregate]] can creat a new table by computing sums, averages, and so on, out of material from the first table.
 
+** Images
+*** Org-download
+#+begin_src elisp
+  (use-package org-download
+    :defer t
+    :after org
+  )
+#+end_src
+*** PlantUML
+
+#+begin_src elisp
+  (use-package plantuml-mode
+    :defer t
+    :mode ("\\.plantuml\\'" . plantuml-mode)
+    :init
+    ;; enable plantuml babel support
+    (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
+    (org-babel-do-load-languages 'org-babel-load-languages
+                                 (append org-babel-load-languages
+                                         '((plantuml . t))))
+    :config
+    (setq org-plantuml-exec-mode 'plantuml)
+    (setq org-plantuml-executable-path "plantuml")
+    (setq plantuml-executable-path "plantuml")
+    (setq plantuml-default-exec-mode 'executable)
+    ;; set default babel header arguments
+    (setq org-babel-default-header-args:plantuml
+          '((:exports . "results")
+            (:results . "file")
+            ))
+  )
+#+end_src
 ** Notes
 *** Org-capture
 #+begin_src elisp
@@ -2374,7 +2401,7 @@ Disabled cause org-modern already does the job.
   )
 #+end_src
 
-** Task-MNG
+** Agenda
 *** TODOs
 #+begin_src elisp
   (use-package org
@@ -2401,7 +2428,7 @@ Disabled cause org-modern already does the job.
   )
 #+end_src
 *** Org-agenda
-#+begin_src elisp
+#+begin_src elisp :tangle no
   (use-package org-agenda
   :after org
   :hook
@@ -2412,6 +2439,40 @@ Disabled cause org-modern already does the job.
   :config
     (setq org-agenda-span 'day)
     (setq org-agenda-files '("~/Org"))
+    (let ((org-agenda-custom-commands '(
+      ("u" "Super view" (
+        (agenda "" ( 
+          (org-agenda-span 1)
+          (org-super-agenda-groups '(
+            (:name "Today"
+             :tag ("bday" "ann" "hols" "cal" "today")
+             :time-grid t
+             :todo ("WIP")
+             :deadline today)
+            (:name "Perso"
+             :tag "perso")
+            (:name "Overdue"
+             :deadline past)
+            (:name "Reschedule"
+             :scheduled past)
+            (:name "Due Soon"
+             :deadline future)
+            )))
+        )
+        (tags (concat "w" (format-time-string "%V"))  
+          ( (org-agenda-overriding-header  
+              (concat "ToDos Week " (format-time-string "%V")))
+            (org-super-agenda-groups '(
+               (:discard (:deadline t))
+               (:name "Perso" :tag "perso")
+               (:name "Loka"  :tag "loka")
+               (:name "Ping"  :tag "ping")
+            ))
+          )
+        )
+	   )))))
+    (org-agenda nil "u"))
+
   )
 #+end_src
 *** Org-super-agenda
@@ -2481,7 +2542,6 @@ Disabled cause org-modern already does the job.
    ;; processing phase
    ("C-c d f" . org-gtd-clarify-finalize)))
 #+end_src
-
 
 ** Preview
 *** Org 9.7
@@ -2636,6 +2696,7 @@ Code under :config is taken from https://emacs-china.org/t/org-mode-latex-mode/2
 
 #+begin_src elisp
   (use-package htmlize
+    :defer t
     :config
     (setq htmlize-pre-style t
   		htmlize-output-type 'inline-css))
@@ -2695,14 +2756,15 @@ Use ox-pandoc to generate MS-Office files like word and ppt.
   :config
     (setq org-pandoc-format-extensions 
   	      '(markdown_github+pipe_tables+raw_html)
-  		org-pandoc-command "/usr/local/bin/pandoc")
     )
+  )
 #+end_src
 
-** Blog
 *** Static HTML
 #+begin_src elisp
-  (use-package ox-publish)
+  (use-package ox-publish
+  :defer t
+  )
 #+end_src
 *** Hugo
 General steps to publish a blog using hugo in emacs includes:
@@ -2717,7 +2779,10 @@ General steps to publish a blog using hugo in emacs includes:
 #+begin_src elisp
   (use-package ox-hugo
     :after ox
-    :init (setq org-hugo-base-dir "~/Blog")
+    :commands org-hugo
+    :init (setq org-hugo-base-dir "~/Blog"
+                org-hugo-front-matter-format "yaml"
+          )
     :config
     (defun org-hugo-new-subtree-post-capture-template ()
       "Returns `org-capture' template string for new Hugo post.
@@ -2867,7 +2932,7 @@ tweaks to build eaf
   )
 #+end_src
 
-* Tequila worms
+* End
 #+begin_src elisp
 (progn ;     startup
   (message "Loading %s...done (%fs)" user-init-file

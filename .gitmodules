@@ -262,7 +262,7 @@
 [submodule "org"]
 	path = lib/org
 	url = https://git.tecosaur.net/tec/org-mode.git
-  ignore = dirty
+	ignore = dirty
 [submodule "org-agenda-property"]
 	path = lib/org-agenda-property
 	url = https://github.com/Malabarba/org-agenda-property
@@ -299,9 +299,6 @@
 [submodule "org-preview-html"]
 	path = lib/org-preview-html
 	url = https://github.com/jakebox/org-preview-html
-[submodule "org-ql"]
-	path = lib/org-ql
-	url = https://github.com/alphapapa/org-ql
 [submodule "org-roam"]
 	path = lib/org-roam
 	url = https://github.com/org-roam/org-roam
@@ -344,7 +341,7 @@
 [submodule "pdf-tools"]
 	path = lib/pdf-tools
 	url = https://github.com/vedang/pdf-tools
-  ignore = dirty
+	ignore = dirty
 [submodule "peg"]
 	path = lib/peg
 	url = git@github.com:emacsmirror/peg.git
@@ -357,6 +354,9 @@
 [submodule "pfuture"]
 	path = lib/pfuture
 	url = https://github.com/Alexander-Miller/pfuture
+[submodule "plantuml-mode"]
+	path = lib/plantuml-mode
+	url = https://github.com/skuro/plantuml-mode
 [submodule "popper"]
 	path = lib/popper
 	url = https://github.com/karthink/popper
@@ -492,3 +492,5 @@
 [submodule "zoxide"]
 	path = lib/zoxide
 	url = https://gitlab.com/Vonfry/zoxide.el
+[submodule "./lib/ox-pandoc"]
+	url = https://github.com/emacsorphanage/ox-pandoc

@@ -1,8 +1,8 @@
-;; [[file:config.org::*Early birds][Early birds:1]]
+;; [[file:config.org::*Init][Init:1]]
 ;;; init.el --- user-init-file
-;; Early birds:1 ends here
+;; Init:1 ends here
 
-;; [[file:config.org::*Early birds][Early birds:2]]
+;; [[file:config.org::*Init][Init:2]]
 ;;; -*- lexical-binding: t; no-byte-compile: t -*-
 (progn ;     startup
   (defvar before-user-init-time (current-time)
@@ -29,7 +29,7 @@
   (setq-default mode-line-format nil)
   (setq confirm-kill-emacs 'y-or-n-p)
 )
-;; Early birds:2 ends here
+;; Init:2 ends here
 
 ;; [[file:config.org::*Borg][Borg:1]]
 (eval-and-compile ; `borg'
@@ -119,24 +119,19 @@
     "Move to the end of selection, switch to INSERT state."
     (interactive)
     (if meow--temp-normal
-      (progn
-  	(message "Quit temporary normal mode")
-  	(meow--switch-state 'motion))
+  	  (progn
+  	    (message "Quit temporary normal mode")
+  	    (meow--switch-state 'motion))
       (if (not (region-active-p))
-  	(when (and (not (use-region-p))
+  	    (when (and (not (use-region-p))
   		   (< (point) (point-max)))
-  	  (forward-char 1))
-      (meow--direction-forward)
-      (meow--cancel-selection))
-      (meow--switch-state 'insert)))
+  	      (forward-char 1))
+  	      (meow--direction-forward)
+  	      (meow--cancel-selection))
+      (meow--switch-state 'insert))
+  )
   (advice-add 'meow-append :override #'my-meow-append)
 
-  (setq meow-replace-state-name-list
-          '((normal . "🅝")
-            (beacon . "🅑")
-            (insert . "🅘")
-            (motion . "🅜")
-            (keypad . "🅚")))
   (setq meow-keypad-self-insert-undefined nil)
   (setq meow-selection-command-fallback '(
         (meow-change . meow-mark-word)
@@ -157,12 +152,7 @@
 
     (meow-leader-define-key
      ;; SPC j/k will run the original command in MOTION state.
-     '("i" . meow-open-above)
-     '("j" . meow-insert)
-     '("k" . meow-open-below)
-     '("l" . meow-append) 
      '("m" . meow-change-char)
-
      ;; Use SPC (0-9) for digit arguments.
      '("1" . meow-digit-argument) '("2" . meow-digit-argument)
      '("3" . meow-digit-argument) '("4" . meow-digit-argument)
@@ -185,7 +175,7 @@
      '("c" . meow-save) '("C" . meow-sync-grab)
      '("D" . meow-open-below)
      '("E" . meow-open-above)
-     '("F" . meow-append)
+     '("f" . meow-next-word) '("F" . meow-next-symbol)
      '("g" . meow-find) '("G" . meow-grab)
      '("h" . meow-line) '("H" . meow-goto-line)
      '("i" . meow-prev) '("I" . meow-prev-expand)
@@ -194,20 +184,25 @@
      '("l" . meow-right) '("L" . meow-right-expand)
      '("m" . meow-change) '("M" . meow-mark-symbol)
      '("n" . meow-search)
-     '("o" . meow-next-word) '("O" . meow-next-symbol)
+     '("o" . meow-append) '("O" . meow-open-below)
      '("p" . meow-pop-selection)
      '("q" . meow-quit)
-     '("S" . meow-insert)
+     '("s" . meow-back-word) '("S" . meow-back-symbol)
      '("t" . meow-till)
-     '("u" . meow-back-word) '("U" . meow-back-symbol)
+     '("u" . meow-insert) '("U" . meow-open-above)
      '("v" . meow-replace) '("V" . meow-yank-pop)
      '("x" . meow-kill)
      '("y" . meow-join)
      '("z" . meow-undo) '("Z" . meow-undo-in-selection)
-     '("'" . repeat) '("<escape>" . meow-cancel-selection)))
+     '("'" . repeat) '("<escape>" . meow-cancel-selection)
+  	       '("(" . fingertip-wrap-round) '(")" . fingertip-unwrap)
+     '("{" . fingertip-wrap-curly) 
+     '("\"" . fingertip-double-quote)
+    )
+  )
   (meow-setup)
   (meow-global-mode)
-  )
+)
 ;; Meow:1 ends here
 
 ;; [[file:config.org::*General][General:1]]
@@ -969,6 +964,7 @@
 
 ;; [[file:config.org::*Info+][Info+:1]]
 (use-package info+
+:defer t
 :config
 )
 ;; Info+:1 ends here
@@ -1258,6 +1254,7 @@
 
 ;; [[file:config.org::*Blink search][Blink search:1]]
 (use-package blink-search
+:defer t
 :config
   (setq blink-search-enable-posframe t)
 )
@@ -1265,6 +1262,7 @@
 
 ;; [[file:config.org::*Color-rg][Color-rg:1]]
 (use-package color-rg
+:defer t
 :config
   (general-def isearch-mode-map
     "M-s M-s" 'isearch-toggle-color-rg
@@ -1743,6 +1741,36 @@
 )
 ;; Code block:2 ends here
 
+;; [[file:config.org::*Org-download][Org-download:1]]
+(use-package org-download
+  :defer t
+  :after org
+)
+;; Org-download:1 ends here
+
+;; [[file:config.org::*PlantUML][PlantUML:1]]
+(use-package plantuml-mode
+  :defer t
+  :mode ("\\.plantuml\\'" . plantuml-mode)
+  :init
+  ;; enable plantuml babel support
+  (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
+  (org-babel-do-load-languages 'org-babel-load-languages
+                               (append org-babel-load-languages
+                                       '((plantuml . t))))
+  :config
+  (setq org-plantuml-exec-mode 'plantuml)
+  (setq org-plantuml-executable-path "plantuml")
+  (setq plantuml-executable-path "plantuml")
+  (setq plantuml-default-exec-mode 'executable)
+  ;; set default babel header arguments
+  (setq org-babel-default-header-args:plantuml
+        '((:exports . "results")
+          (:results . "file")
+          ))
+)
+;; PlantUML:1 ends here
+
 ;; [[file:config.org::*Org-capture][Org-capture:1]]
 (use-package org-capture
 :after org
@@ -1841,20 +1869,6 @@
       org-log-done 'time
 )
 ;; TODOs:1 ends here
-
-;; [[file:config.org::*Org-agenda][Org-agenda:1]]
-(use-package org-agenda
-:after org
-:hook
-  (org-agenda-mode . solaire-mode)
-  (org-agenda-mode . olivetti-mode)
-:bind
-  ("<f12>" . org-agenda)
-:config
-  (setq org-agenda-span 'day)
-  (setq org-agenda-files '("~/Org"))
-)
-;; Org-agenda:1 ends here
 
 ;; [[file:config.org::*Org-super-agenda][Org-super-agenda:1]]
 (use-package org-super-agenda
@@ -2064,6 +2078,7 @@
 
 ;; [[file:config.org::*HTML][HTML:2]]
 (use-package htmlize
+  :defer t
   :config
   (setq htmlize-pre-style t
   	      htmlize-output-type 'inline-css))
@@ -2108,18 +2123,23 @@
 :config
   (setq org-pandoc-format-extensions 
   	    '(markdown_github+pipe_tables+raw_html)
-  	      org-pandoc-command "/usr/local/bin/pandoc")
   )
+)
 ;; MS-Office:1 ends here
 
 ;; [[file:config.org::*Static HTML][Static HTML:1]]
-(use-package ox-publish)
+(use-package ox-publish
+:defer t
+)
 ;; Static HTML:1 ends here
 
 ;; [[file:config.org::*Hugo][Hugo:1]]
 (use-package ox-hugo
   :after ox
-  :init (setq org-hugo-base-dir "~/Blog")
+  :commands org-hugo
+  :init (setq org-hugo-base-dir "~/Blog"
+              org-hugo-front-matter-format "yaml"
+        )
   :config
   (defun org-hugo-new-subtree-post-capture-template ()
     "Returns `org-capture' template string for new Hugo post.
@@ -2241,7 +2261,7 @@
 )
 ;; 2048:1 ends here
 
-;; [[file:config.org::*Tequila worms][Tequila worms:1]]
+;; [[file:config.org::*End][End:1]]
 (progn ;     startup
   (message "Loading %s...done (%fs)" user-init-file
 	   (float-time (time-subtract (current-time)
@@ -2264,4 +2284,4 @@
 ;; indent-tabs-mode: nil
 ;; End:
 ;;; init.el ends here
-;; Tequila worms:1 ends here
+;; End:1 ends here
