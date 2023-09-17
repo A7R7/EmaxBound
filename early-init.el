@@ -1,5 +1,5 @@
 ;; [[file:config.org::*Early Init][Early Init:1]]
-;;; early-init.el -*- lexical-binding: t; no-byte-compile: t -*-
+;;; -*- lexical-binding: t; no-byte-compile: t -*-
 ;; Early Init:1 ends here
 
 ;; [[file:config.org::*Early Init][Early Init:2]]
@@ -23,9 +23,4 @@
 
 (with-eval-after-load 'package
   (add-to-list 'package-archives (cons "melpa" "https://melpa.org/packages/") t))
-;; Local Variables:
-;; no-byte-compile: t
-;; indent-tabs-mode: nil
-;; End:
-;;; early-init.el ends here
 ;; Early Init:3 ends here

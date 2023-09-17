@@ -22,6 +22,7 @@
  '(org-return-follows-link t)
  '(org-tags-column 0)
  '(tab-width 2)
+ '(use-package-minimum-reported-time 0.001)
  '(which-key-posframe-border-width 3))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.

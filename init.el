@@ -1,9 +1,8 @@
 ;; [[file:config.org::*Init][Init:1]]
-;;; init.el --- user-init-file
+;;; -*- lexical-binding: t; no-byte-compile: t -*-
 ;; Init:1 ends here
 
 ;; [[file:config.org::*Init][Init:2]]
-;;; -*- lexical-binding: t; no-byte-compile: t -*-
 (progn ;     startup
   (defvar before-user-init-time (current-time)
     "Value of `current-time' when Emacs begins loading `user-init-file'.")
@@ -99,11 +98,11 @@
 (use-package org)
 ;; Org:1 ends here
 
-;; [[file:config.org::*End of early birds][End of early birds:1]]
+;; [[file:config.org::*End of core units][End of core units:1]]
 (progn ;     startup
-  (message "Loading early birds...done (%fs)"
+  (message "Loading core units...done (%fs)"
 	   (float-time (time-subtract (current-time) before-user-init-time))))
-;; End of early birds:1 ends here
+;; End of core units:1 ends here
 
 ;; [[file:config.org::*Shrink path][Shrink path:1]]
 (use-package shrink-path :demand t)
@@ -1803,6 +1802,7 @@
 ;; [[file:config.org::*Org-roam][Org-roam:1]]
 (use-package org-roam
 :after org
+:defer t
 :init
   (setq org-roam-directory (file-truename "~/roam"))
   (setq org-roam-v2-ack t)
@@ -2049,20 +2049,23 @@
 
 ;; [[file:config.org::*Basic][Basic:1]]
 (use-package ox
-  :config
-  (setq org-export-with-toc t
+:after org
+:config
+  (setq 
+    org-export-with-toc t
   	      org-export-with-tags 'not-in-toc
   	      org-export-with-drawers nil
   	      org-export-with-priority t
   	      org-export-with-footnotes t
   	      org-export-with-smart-quotes t
   	      org-export-with-section-numbers t
-  	      org-export-with-sub-superscripts '{})
-  (setq org-export-use-babel t
+  	      org-export-with-sub-superscripts '{}
+    org-export-use-babel t
   	      org-export-headline-levels 9
   	      org-export-coding-system 'utf-8
-  	      org-export-with-broken-links 'mark)
+  	      org-export-with-broken-links 'mark
   )
+)
 ;; Basic:1 ends here
 
 ;; [[file:config.org::*HTML][HTML:1]]
@@ -2135,12 +2138,13 @@
 
 ;; [[file:config.org::*Hugo][Hugo:1]]
 (use-package ox-hugo
-  :after ox
-  :commands org-hugo
-  :init (setq org-hugo-base-dir "~/Blog"
-              org-hugo-front-matter-format "yaml"
-        )
-  :config
+:commands (org-hugo-export-as-md org-hugo-export-to-md)
+:init 
+  (setq org-hugo-base-dir "~/Blog"
+        org-hugo-front-matter-format "yaml"
+  )
+:config
+
   (defun org-hugo-new-subtree-post-capture-template ()
     "Returns `org-capture' template string for new Hugo post.
      See `org-capture-templates' for more information."
@@ -2214,6 +2218,7 @@
 
 ;; [[file:config.org::*Elfeed][Elfeed:1]]
 (use-package elfeed
+:defer t
 :config
   (setq elfeed-feeds '(
       ("http://nullprogram.com/feed/" blog emacs)
