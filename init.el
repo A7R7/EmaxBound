@@ -26,6 +26,8 @@
   (setq gc-cons-percentage 0.6)
   ;; Prevent flashing of unstyled modeline at startup
   (setq-default mode-line-format nil)
+  ;; This improves performance for some fonts
+  (setq inhibit-compacting-font-cache t)
   (setq confirm-kill-emacs 'y-or-n-p)
 )
 ;; Init:2 ends here

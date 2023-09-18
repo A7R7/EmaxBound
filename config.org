@@ -91,7 +91,7 @@ Credits goes to the authors of those emacs configs that I referenced during the 
 - [[https://github.com/DogLooksGood/meomacs][DogLooksGood's Meomacs]] (2023) Meow modal editing, emacs native friendly
 
 *NOTE*: the year number after link equals to
-$min (last time the config get's updated, last time I refered to the config)$
+min (last time the config get's updated, last time I refered to the config)
 
 * Early Init
 *NOTE*: elisp codes under this headline are tangled to early-init.el.
@@ -163,6 +163,8 @@ Calculating time used loading emacs excutable, as well as setting some variables
     (setq gc-cons-percentage 0.6)
     ;; Prevent flashing of unstyled modeline at startup
     (setq-default mode-line-format nil)
+    ;; This improves performance for some fonts
+    (setq inhibit-compacting-font-cache t)
     (setq confirm-kill-emacs 'y-or-n-p)
   )
 #+end_src
