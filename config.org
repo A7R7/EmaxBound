@@ -128,7 +128,7 @@ Below codes belongs to the original Borg seed.
 #+end_src
 
 * Init
-
+** Begin of init
 *NOTE*: Starting from here, elisp codes are tangled to init.el
 
 After loading early-init.el, emacs begin to load init.el.
@@ -149,7 +149,11 @@ Calculating time used loading emacs excutable, as well as setting some variables
     (setq user-init-file (or load-file-name buffer-file-name))
     (setq user-emacs-directory (file-name-directory user-init-file))
     (message "Loading %s..." user-init-file)
-
+  )
+#+end_src
+Set some defaults of emacs
+#+begin_src elisp
+  (progn
     (setq inhibit-startup-buffer-menu t)
     (setq inhibit-startup-screen t)
     (setq inhibit-startup-echo-area-message "locutus")
@@ -168,28 +172,28 @@ Calculating time used loading emacs excutable, as well as setting some variables
     (setq confirm-kill-emacs 'y-or-n-p)
   )
 #+end_src
+** Use-package
+Use-package is built-in since emacs-29. Uncomment the comment if running below29.
+#+begin_src elisp
+  (use-package use-package
+  :init
+    (setq use-package-verbose t)
+  )
+#+end_src
 
-* Core units
 ** Borg
  [[https://github.com/emacscollective/borg][Borg]] assimilate Emacs packages as Git submodules. Core of the core units.
    =borg-initialize= should be called in init.el for borg to initialize assimilated drones using =borg-activate=.
     To skip the activation of the drone named DRONE, temporarily disable it by setting the value of the Git variable submodule.DRONE.disabled to true in ~/.config/emacs/.gitmodules.
 
 #+begin_src elisp
-(eval-and-compile ; `borg'
-  (add-to-list 'load-path (expand-file-name "lib/borg" user-emacs-directory))
-  (require 'borg)
-  (borg-initialize)
-)
-#+end_src
-
-** Use-package
-Use-package is built-in since emacs-29. Uncomment the comment if running below29.
-#+begin_src elisp
-(setq use-package-verbose t)
-  ;(eval-and-compile ; `use-package'
-  ;  (require  'use-package)
-  ;  (setq use-package-verbose t))
+  (use-package borg
+  :init
+    (add-to-list 'load-path 
+      (expand-file-name "lib/borg" user-emacs-directory))
+  :config
+    (borg-initialize)
+  )
 #+end_src
 
 ** Dash

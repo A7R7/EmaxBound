@@ -1,8 +1,8 @@
-;; [[file:config.org::*Init][Init:1]]
+;; [[file:config.org::*Begin of init][Begin of init:1]]
 ;;; -*- lexical-binding: t; no-byte-compile: t -*-
-;; Init:1 ends here
+;; Begin of init:1 ends here
 
-;; [[file:config.org::*Init][Init:2]]
+;; [[file:config.org::*Begin of init][Begin of init:2]]
 (progn ;     startup
   (defvar before-user-init-time (current-time)
     "Value of `current-time' when Emacs begins loading `user-init-file'.")
@@ -12,7 +12,11 @@
   (setq user-init-file (or load-file-name buffer-file-name))
   (setq user-emacs-directory (file-name-directory user-init-file))
   (message "Loading %s..." user-init-file)
+)
+;; Begin of init:2 ends here
 
+;; [[file:config.org::*Begin of init][Begin of init:3]]
+(progn
   (setq inhibit-startup-buffer-menu t)
   (setq inhibit-startup-screen t)
   (setq inhibit-startup-echo-area-message "locutus")
@@ -30,22 +34,24 @@
   (setq inhibit-compacting-font-cache t)
   (setq confirm-kill-emacs 'y-or-n-p)
 )
-;; Init:2 ends here
+;; Begin of init:3 ends here
+
+;; [[file:config.org::*Use-package][Use-package:1]]
+(use-package use-package
+:init
+  (setq use-package-verbose t)
+)
+;; Use-package:1 ends here
 
 ;; [[file:config.org::*Borg][Borg:1]]
-(eval-and-compile ; `borg'
-  (add-to-list 'load-path (expand-file-name "lib/borg" user-emacs-directory))
-  (require 'borg)
+(use-package borg
+:init
+  (add-to-list 'load-path 
+    (expand-file-name "lib/borg" user-emacs-directory))
+:config
   (borg-initialize)
 )
 ;; Borg:1 ends here
-
-;; [[file:config.org::*Use-package][Use-package:1]]
-(setq use-package-verbose t)
-  ;(eval-and-compile ; `use-package'
-  ;  (require  'use-package)
-  ;  (setq use-package-verbose t))
-;; Use-package:1 ends here
 
 ;; [[file:config.org::*Dash][Dash:1]]
 (use-package dash

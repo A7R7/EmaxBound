@@ -441,9 +441,6 @@
 [submodule "ts"]
 	path = lib/ts
 	url = https://github.com/alphapapa/ts.el
-[submodule "use-package"]
-	path = lib/use-package
-	url = git@github.com:jwiegley/use-package.git
 [submodule "valign"]
 	path = lib/valign
 	url = https://github.com/casouri/valign
