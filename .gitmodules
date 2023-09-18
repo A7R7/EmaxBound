@@ -1,6 +1,8 @@
 [include]
 	path = .gitremotes
 	path = .borgconfig
+[submodule "./lib/ox-pandoc"]
+	url = https://github.com/emacsorphanage/ox-pandoc
 [submodule "2048-game"]
 	path = lib/2048-game
 	url = git@github.com:emacsmirror/2048-game.git
@@ -259,10 +261,6 @@
 [submodule "orderless"]
 	path = lib/orderless
 	url = https://github.com/oantolin/orderless
-[submodule "org"]
-	path = lib/org
-	url = https://git.tecosaur.net/tec/org-mode.git
-	ignore = dirty
 [submodule "org-agenda-property"]
 	path = lib/org-agenda-property
 	url = https://github.com/Malabarba/org-agenda-property
@@ -489,5 +487,6 @@
 [submodule "zoxide"]
 	path = lib/zoxide
 	url = https://gitlab.com/Vonfry/zoxide.el
-[submodule "./lib/ox-pandoc"]
-	url = https://github.com/emacsorphanage/ox-pandoc
+[submodule "org"]
+	path = lib/org
+	url = https://git.tecosaur.net/tec/org-mode.git
