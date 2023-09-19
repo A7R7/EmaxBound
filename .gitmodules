@@ -243,9 +243,6 @@
 [submodule "mixed-pitch"]
 	path = lib/mixed-pitch
 	url = https://gitlab.com/jabranham/mixed-pitch
-[submodule "mu4e"]
-	path = lib/mu4e
-	url = https://github.com/djcb/mu
 [submodule "nano-theme"]
 	path = lib/nano-theme
 	url = https://github.com/rougier/nano-theme
