@@ -138,7 +138,7 @@ Smooth window on startup
 
 Config use-package before loading use-package
 #+begin_src elisp
-  (setq use-package-enable-imenu-support t)
+  ;(setq use-package-enable-imenu-support t)
   (setq use-package-verbose t)
 #+end_src
 
@@ -197,14 +197,6 @@ Set some defaults of emacs
     (setq confirm-kill-emacs 'y-or-n-p)
   )
 #+end_src
-** Use-package
-Use-package is built-in since emacs-29. Uncomment the comment if running below29.
-#+begin_src elisp
-  (use-package use-package
-  :init
-  )
-#+end_src
-
 ** Borg
  [[https://github.com/emacscollective/borg][Borg]] assimilate Emacs packages as Git submodules. Core of the core units.
    =borg-initialize= should be called in init.el for borg to initialize assimilated drones using =borg-activate=.
@@ -2298,11 +2290,6 @@ This package provides visual alignment for Org Mode, Markdown and table.el table
   )
 #+end_src
 
-*** Fancy-priorities
-#+begin_src elisp
-  (use-package org-fancy-priorities)
-#+end_src
-
 *** Org-appear
 [[https://github.com/awth13/org-appearAutomatically][Org-appear]] disaply emphasis markers and links when the cursor is on them.
 #+begin_src elisp
@@ -2390,6 +2377,16 @@ Disabled cause org-modern already does the job.
   :config
     ;; if file path is not absolute
     ;; it is treated as relative path to org-directory
+    (defun org-hugo-new-subtree-post-capture-template ()
+      "Returns `org-capture' template string for new Hugo post.
+       See `org-capture-templates' for more information."
+      (let* ((title (read-from-minibuffer "Post Title: ")) 
+  		   (fname (org-hugo-slug title)))
+  	  (mapconcat #'identity
+          `(,(concat "* TODO " title) ":PROPERTIES:"
+            ,(concat ":EXPORT_FILE_NAME: " fname) ":END:" "%?\n")
+            ;Place the cursor here finally
+          "\n")))
     (setq org-capture-templates (append org-capture-templates '(
       ("j" "Journal" entry 
         (file+datetree "journal.org")
@@ -2397,6 +2394,9 @@ Disabled cause org-modern already does the job.
       ("i" "Inbox" entry 
         (file "inbox.org")
         "* %U - %? %^g\n")
+  	 '("h" "Hugo post" entry
+  	    (file+olp "capture.org" "Notes")
+  	    (function org-hugo-new-subtree-post-capture-template))
     )))
   )
 #+end_src
@@ -2720,10 +2720,11 @@ Code under :config is taken from https://emacs-china.org/t/org-mode-latex-mode/2
 #+end_src
 
 ** Export
-*** Basic
+*** Ox
 #+begin_src elisp
   (use-package ox
   :after org
+  :defer t
   :config
     (setq 
       org-export-with-toc t
@@ -2838,33 +2839,12 @@ General steps to publish a blog using hugo in emacs includes:
 [[https://github.com/kaushalmodi/ox-hugo][ox-hugo]] is an Org exporter backend that exports Org to Hugo-compatible Markdown and also generates the front-matter (in TOML or YAML format).
 #+begin_src elisp
   (use-package ox-hugo
+  :after ox
   :commands (org-hugo-export-as-md org-hugo-export-to-md)
   :init 
     (setq org-hugo-base-dir "~/Blog"
           org-hugo-front-matter-format "yaml"
     )
-  :config
-
-    (defun org-hugo-new-subtree-post-capture-template ()
-      "Returns `org-capture' template string for new Hugo post.
-       See `org-capture-templates' for more information."
-      (let* ((title (read-from-minibuffer "Post Title: ")) 
-  		   (fname (org-hugo-slug title)))
-  	  (mapconcat #'identity
-          `(,(concat "* TODO " title) ":PROPERTIES:"
-            ,(concat ":EXPORT_FILE_NAME: " fname) ":END:" "%?\n")
-            ;Place the cursor here finally
-          "\n"
-        )
-      )
-    )
-
-    (add-to-list 'org-capture-templates
-  	'("h"
-        "Hugo post"
-        entry
-  	  (file+olp "capture.org" "Notes")
-  	  (function org-hugo-new-subtree-post-capture-template)))    
   )
 
 #+end_src
@@ -2873,7 +2853,8 @@ Easy-hugo
 
 #+begin_src elisp
   (use-package easy-hugo
-    )
+  :defer t
+  )
 #+end_src
 
 ** Org-transclusion

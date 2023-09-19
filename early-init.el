@@ -26,7 +26,7 @@
 ;; Early Init:5 ends here
 
 ;; [[file:config.org::*Early Init][Early Init:6]]
-(setq use-package-enable-imenu-support t)
+;(setq use-package-enable-imenu-support t)
 (setq use-package-verbose t)
 ;; Early Init:6 ends here
 

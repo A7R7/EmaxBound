@@ -28,12 +28,6 @@
 )
 ;; Begin of init:3 ends here
 
-;; [[file:config.org::*Use-package][Use-package:1]]
-(use-package use-package
-:init
-)
-;; Use-package:1 ends here
-
 ;; [[file:config.org::*Borg][Borg:1]]
 (use-package borg
 :init
@@ -1708,10 +1702,6 @@
 )
 ;; Highlight TODO:1 ends here
 
-;; [[file:config.org::*Fancy-priorities][Fancy-priorities:1]]
-(use-package org-fancy-priorities)
-;; Fancy-priorities:1 ends here
-
 ;; [[file:config.org::*Org-appear][Org-appear:1]]
 (use-package org-appear
   :hook (org-mode . org-appear-mode)
@@ -1782,6 +1772,16 @@
 :config
   ;; if file path is not absolute
   ;; it is treated as relative path to org-directory
+  (defun org-hugo-new-subtree-post-capture-template ()
+    "Returns `org-capture' template string for new Hugo post.
+     See `org-capture-templates' for more information."
+    (let* ((title (read-from-minibuffer "Post Title: ")) 
+  		 (fname (org-hugo-slug title)))
+  	(mapconcat #'identity
+        `(,(concat "* TODO " title) ":PROPERTIES:"
+          ,(concat ":EXPORT_FILE_NAME: " fname) ":END:" "%?\n")
+          ;Place the cursor here finally
+        "\n")))
   (setq org-capture-templates (append org-capture-templates '(
     ("j" "Journal" entry 
       (file+datetree "journal.org")
@@ -1789,6 +1789,9 @@
     ("i" "Inbox" entry 
       (file "inbox.org")
       "* %U - %? %^g\n")
+       '("h" "Hugo post" entry
+  	  (file+olp "capture.org" "Notes")
+  	  (function org-hugo-new-subtree-post-capture-template))
   )))
 )
 ;; Org-capture:1 ends here
@@ -2050,9 +2053,10 @@
 )
 ;; grip-mode:1 ends here
 
-;; [[file:config.org::*Basic][Basic:1]]
+;; [[file:config.org::*Ox][Ox:1]]
 (use-package ox
 :after org
+:defer t
 :config
   (setq 
     org-export-with-toc t
@@ -2069,7 +2073,7 @@
   	      org-export-with-broken-links 'mark
   )
 )
-;; Basic:1 ends here
+;; Ox:1 ends here
 
 ;; [[file:config.org::*HTML][HTML:1]]
 (use-package ox-html
@@ -2141,39 +2145,19 @@
 
 ;; [[file:config.org::*Hugo][Hugo:1]]
 (use-package ox-hugo
+:after ox
 :commands (org-hugo-export-as-md org-hugo-export-to-md)
 :init 
   (setq org-hugo-base-dir "~/Blog"
         org-hugo-front-matter-format "yaml"
   )
-:config
-
-  (defun org-hugo-new-subtree-post-capture-template ()
-    "Returns `org-capture' template string for new Hugo post.
-     See `org-capture-templates' for more information."
-    (let* ((title (read-from-minibuffer "Post Title: ")) 
-  		 (fname (org-hugo-slug title)))
-  	(mapconcat #'identity
-        `(,(concat "* TODO " title) ":PROPERTIES:"
-          ,(concat ":EXPORT_FILE_NAME: " fname) ":END:" "%?\n")
-          ;Place the cursor here finally
-        "\n"
-      )
-    )
-  )
-
-  (add-to-list 'org-capture-templates
-      '("h"
-      "Hugo post"
-      entry
-  	(file+olp "capture.org" "Notes")
-  	(function org-hugo-new-subtree-post-capture-template)))    
 )
 ;; Hugo:1 ends here
 
 ;; [[file:config.org::*Hugo][Hugo:2]]
 (use-package easy-hugo
-  )
+:defer t
+)
 ;; Hugo:2 ends here
 
 ;; [[file:config.org::*PDF-Tools][PDF-Tools:1]]

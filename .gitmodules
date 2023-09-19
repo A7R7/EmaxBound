@@ -279,9 +279,6 @@
 [submodule "org-edna"]
 	path = lib/org-edna
 	url = git@github.com:emacsmirror/org-edna.git
-[submodule "org-fancy-priorities"]
-	path = lib/org-fancy-priorities
-	url = https://github.com/harrybournis/org-fancy-priorities
 [submodule "org-fragtog"]
 	path = lib/org-fragtog
 	url = https://github.com/io12/org-fragtog
