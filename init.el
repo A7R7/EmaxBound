@@ -22,14 +22,6 @@
   (setq inhibit-startup-echo-area-message "locutus")
   (setq initial-buffer-choice t)
   (setq initial-scratch-message "")
-  ;; smooth window on startup
-  (setq frame-inhibit-implied-resize t)
-  ;; Defer garbage collection further back in the startup process
-  (setq gc-cons-threshold most-positive-fixnum)
-  ;; copied from lazycat
-  (setq gc-cons-percentage 0.6)
-  ;; Prevent flashing of unstyled modeline at startup
-  (setq-default mode-line-format nil)
   ;; This improves performance for some fonts
   (setq inhibit-compacting-font-cache t)
   (setq confirm-kill-emacs 'y-or-n-p)
@@ -39,7 +31,6 @@
 ;; [[file:config.org::*Use-package][Use-package:1]]
 (use-package use-package
 :init
-  (setq use-package-verbose t)
 )
 ;; Use-package:1 ends here
 
@@ -450,13 +441,17 @@
   (dashboard-mode . variable-pitch-mode)
   (olivetti-mode . visual-line-mode)
 :init
-  (setq-default fill-column 74)
+  (setq-default fill-column 78)
 :config
   ;If nil (the default), use the value of fill-column + 2.
   (setq olivetti-body-width nil
 	       olivetti-style 'fancy)
   (set-face-attribute 'olivetti-fringe nil :background "#171B24")
-
+  (defun config/window-center (width)
+    (interactive)
+    (setq fill-column width)
+    (olivetti-mode)
+  )
   (config/leader
     "tc"  '(olivetti-mode     :wk "󰉠 Center")
   )

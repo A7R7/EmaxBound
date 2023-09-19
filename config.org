@@ -94,37 +94,70 @@ Credits goes to the authors of those emacs configs that I referenced during the 
 min (last time the config get's updated, last time I refered to the config)
 
 * Early Init
+  :PROPERTIES:
+  :header-args:elisp: :tangle early-init.el :language elisp :comments link
+  :END:
+
 *NOTE*: elisp codes under this headline are tangled to early-init.el.
 
 Emacs load early-init.el before init.el.
-Disable byte-compile for early-init.el. According to the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html][emacs manual]], byte-compiling the init does not startup very much, and often leads to problems when you forget to recompile the file. Also, from my experience, it may lead to bugs that do not happen when not using byte-compile. 
-#+begin_src elisp :tangle early-init.el
-;;; -*- lexical-binding: t; no-byte-compile: t -*-
+
+Enable lexical-binding. Disable byte-compile for early-init.el. 
+
+According to the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html][emacs manual]], byte-compiling the init does not startup very much, and often leads to problems when you forget to recompile the file. Also, from my experience, it may lead to bugs that do not happen when not using byte-compile. 
+#+begin_src elisp
+  ;;; -*- lexical-binding: t; no-byte-compile: t -*-
+#+end_src
+
+Defer garbage collection in the startup process.
+#+begin_src elisp
+  (setq gc-cons-threshold most-positive-fixnum)
+  ;; copied from lazycat
+  (setq gc-cons-percentage 0.6)
+#+end_src
+
+Prevent unwanted runtime compilation for native-comp.
+#+begin_src elisp
+  (setq native-comp-deferred-compilation nil ;; obsolete since 29.1
+        native-comp-jit-compilation nil)
 #+end_src
 
 Disable tool-bar, menu-bar and scroll-bar before they're loaded.
 #+begin_src elisp :tangle early-init.el
-(tool-bar-mode -1)
-(menu-bar-mode -1)
-(scroll-bar-mode -1)
+  (push '(menu-bar-lines . 0) default-frame-alist)
+  (push '(tool-bar-lines . 0) default-frame-alist)
+  (push '(vertical-scroll-bars) default-frame-alist)
+  ;; Prevent flashing of unstyled modeline at startup
+  (setq-default mode-line-format nil)
+#+end_src
+
+Smooth window on startup
+#+begin_src elisp 
+  (setq frame-inhibit-implied-resize t)
+#+end_src
+
+Config use-package before loading use-package
+#+begin_src elisp
+  (setq use-package-enable-imenu-support t)
+  (setq use-package-verbose t)
 #+end_src
 
 Below codes belongs to the original Borg seed.
 #+begin_src elisp :tangle early-init.el
-(setq load-prefer-newer t)
-
-(let ((dir (file-name-directory (or load-file-name buffer-file-name))))
-  (add-to-list 'load-path (expand-file-name "lib/compat" dir))
-  (add-to-list 'load-path (expand-file-name "lib/packed" dir))
-  (add-to-list 'load-path (expand-file-name "lib/auto-compile" dir)))
-(require 'auto-compile)
-(auto-compile-on-load-mode)
-(auto-compile-on-save-mode)
-
-(setq package-enable-at-startup nil)
-
-(with-eval-after-load 'package
-  (add-to-list 'package-archives (cons "melpa" "https://melpa.org/packages/") t))
+  (setq load-prefer-newer t)
+  
+  (let ((dir (file-name-directory (or load-file-name buffer-file-name))))
+    (add-to-list 'load-path (expand-file-name "lib/compat" dir))
+    (add-to-list 'load-path (expand-file-name "lib/packed" dir))
+    (add-to-list 'load-path (expand-file-name "lib/auto-compile" dir)))
+  (require 'auto-compile)
+  (auto-compile-on-load-mode)
+  (auto-compile-on-save-mode)
+  
+  (setq package-enable-at-startup nil)
+  
+  (with-eval-after-load 'package
+    (add-to-list 'package-archives (cons "melpa" "https://melpa.org/packages/") t))
 #+end_src
 
 * Init
@@ -159,14 +192,6 @@ Set some defaults of emacs
     (setq inhibit-startup-echo-area-message "locutus")
     (setq initial-buffer-choice t)
     (setq initial-scratch-message "")
-    ;; smooth window on startup
-    (setq frame-inhibit-implied-resize t)
-    ;; Defer garbage collection further back in the startup process
-    (setq gc-cons-threshold most-positive-fixnum)
-    ;; copied from lazycat
-    (setq gc-cons-percentage 0.6)
-    ;; Prevent flashing of unstyled modeline at startup
-    (setq-default mode-line-format nil)
     ;; This improves performance for some fonts
     (setq inhibit-compacting-font-cache t)
     (setq confirm-kill-emacs 'y-or-n-p)
@@ -177,7 +202,6 @@ Use-package is built-in since emacs-29. Uncomment the comment if running below29
 #+begin_src elisp
   (use-package use-package
   :init
-    (setq use-package-verbose t)
   )
 #+end_src
 
@@ -791,13 +815,17 @@ But currently we only use olivetti mode.
     (dashboard-mode . variable-pitch-mode)
     (olivetti-mode . visual-line-mode)
   :init
-    (setq-default fill-column 74)
+    (setq-default fill-column 78)
   :config
     ;If nil (the default), use the value of fill-column + 2.
     (setq olivetti-body-width nil
 	         olivetti-style 'fancy)
     (set-face-attribute 'olivetti-fringe nil :background "#171B24")
-
+    (defun config/window-center (width)
+      (interactive)
+      (setq fill-column width)
+      (olivetti-mode)
+    )
     (config/leader
       "tc"  '(olivetti-mode     :wk "󰉠 Center")
     )
