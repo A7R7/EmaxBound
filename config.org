@@ -136,10 +136,16 @@ Smooth window on startup
   (setq frame-inhibit-implied-resize t)
 #+end_src
 
-Config use-package before loading use-package
+Config use-package before loading use-package.
+When start emacs with =--debug-init=, the =init-file-debug= condition is meet, and use-package will print out more info.
 #+begin_src elisp
-  ;(setq use-package-enable-imenu-support t)
-  (setq use-package-verbose t)
+  (if init-file-debug
+    (setq use-package-verbose t
+          use-package-expand-minimally nil
+          use-package-compute-statistics t
+          debug-on-error t)
+    (setq use-package-verbose nil
+          use-package-expand-minimally t))
 #+end_src
 
 Below codes belongs to the original Borg seed.
@@ -1789,6 +1795,7 @@ tweaks to build lsp-bridge
 
 ** Treesit
 You can find the addresses of language parsers at [[https://tree-sitter.github.io/tree-sitter/][treesitter's official doc]].
+To enable treesit support for a language, you need to run =M-x treesit-install-language-grammar= and select the language. This will clone the language's tree-sitter repo and build it (requires system =cc=).
 #+begin_src elisp 
   (use-package treesit
   :commands (treesit-install-language-grammar  
@@ -2131,7 +2138,8 @@ https://github.com/zerolfx/copilot.el
 #+begin_src elisp
 (use-package auctex)
 #+end_src
-AucTex needs some tweaks to be built.
+AucTex needs some tweaks to be built. 
+To build auctex, =autoconf= should be avaliable on your system.
 #+begin_src conf :tangle .borgconfig
 [submodule "auctex"]
 	load-path = .
@@ -2153,7 +2161,9 @@ AucTex needs some tweaks to be built.
   :hook (LaTeX-mode . laas-mode))
 #+end_src
 
+** Nix
 * Org
+
 ** UI
 *** Fonts
 

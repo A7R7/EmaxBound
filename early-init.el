@@ -26,8 +26,13 @@
 ;; Early Init:5 ends here
 
 ;; [[file:config.org::*Early Init][Early Init:6]]
-;(setq use-package-enable-imenu-support t)
-(setq use-package-verbose t)
+(if init-file-debug
+  (setq use-package-verbose t
+        use-package-expand-minimally nil
+        use-package-compute-statistics t
+        debug-on-error t)
+  (setq use-package-verbose nil
+        use-package-expand-minimally t))
 ;; Early Init:6 ends here
 
 ;; [[file:config.org::*Early Init][Early Init:7]]
