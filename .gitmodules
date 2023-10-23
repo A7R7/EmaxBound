@@ -249,6 +249,12 @@
 [submodule "nerd-icons"]
 	path = lib/nerd-icons
 	url = https://github.com/rainstormstudio/nerd-icons.el
+[submodule "nix-mode"]
+	path = lib/nix-mode
+	url = https://github.com/NixOS/nix-mode
+[submodule "no-littering"]
+	path = lib/no-littering
+	url = https://github.com/emacscollective/no-littering
 [submodule "notibox"]
 	path = lib/notibox
 	url = https://github.com/MitchMarq42/notibox.el.git
@@ -258,6 +264,9 @@
 [submodule "orderless"]
 	path = lib/orderless
 	url = https://github.com/oantolin/orderless
+[submodule "org"]
+	path = lib/org
+	url = https://git.tecosaur.net/tec/org-mode.git
 [submodule "org-agenda-property"]
 	path = lib/org-agenda-property
 	url = https://github.com/Malabarba/org-agenda-property
@@ -481,6 +490,3 @@
 [submodule "zoxide"]
 	path = lib/zoxide
 	url = https://gitlab.com/Vonfry/zoxide.el
-[submodule "org"]
-	path = lib/org
-	url = https://git.tecosaur.net/tec/org-mode.git

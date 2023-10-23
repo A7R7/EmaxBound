@@ -2162,6 +2162,11 @@ To build auctex, =autoconf= should be avaliable on your system.
 #+end_src
 
 ** Nix
+#+begin_src elisp
+  (use-package nix-mode
+  :mode "\\.nix\\'"
+  )
+#+end_src
 * Org
 
 ** UI
