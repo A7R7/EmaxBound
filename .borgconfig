@@ -3,15 +3,15 @@
 	no-makeinfo = dash-template.texi
 
 [submodule "org"]
-	load-path = lisp
-	build-step = make autoloads
-	build-step = borg-update-autoloads
-	build-step = borg-compile
-	build-step = borg-maketexi
-	build-step = borg-makeinfo
+  load-path = lisp
+  build-step = make autoloads
+  build-step = borg-update-autoloads
+  build-step = borg-compile
+  build-step = borg-maketexi
+  build-step = borg-makeinfo
 
 [submodule "emacsql"]
-      no-byte-compile = emacsql-pg.el
+no-byte-compile = emacsql-pg.el
 
 [submodule "sqlite3"]
 	build-step = make
@@ -35,9 +35,7 @@
 	load-path = extensions
 
 [submodule "lsp-bridge"]
-  load-path = .
-  load-path = acm
-  load-path = core
+  build-step = borg-update-autoloads
 
 [submodule "auctex"]
 	load-path = .

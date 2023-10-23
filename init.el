@@ -7,8 +7,8 @@
   (defvar before-user-init-time (current-time)
     "Value of `current-time' when Emacs begins loading `user-init-file'.")
   (message "Loading Emacs...done (%fs)"
-  	   (float-time (time-subtract before-user-init-time
-  				      before-init-time)))
+	     (float-time (time-subtract before-user-init-time
+					before-init-time)))
   (setq user-init-file (or load-file-name buffer-file-name))
   (setq user-emacs-directory (file-name-directory user-init-file))
   (message "Loading %s..." user-init-file)
@@ -51,11 +51,11 @@
 (use-package auto-compile
   :config
   (setq auto-compile-display-buffer             nil
-  	      auto-compile-mode-line-counter            t
-  	      auto-compile-source-recreate-deletes-dest t
-  	      auto-compile-toggle-deletes-nonlib-dest   t
-  	      auto-compile-update-autoloads             t
-  	      warning-suppress-log-types        '((comp))
+		auto-compile-mode-line-counter            t
+		auto-compile-source-recreate-deletes-dest t
+		auto-compile-toggle-deletes-nonlib-dest   t
+		auto-compile-update-autoloads             t
+		warning-suppress-log-types        '((comp))
   )
 )
 ;; Auto-Compile:1 ends here
@@ -111,19 +111,19 @@
     "Move to the end of selection, switch to INSERT state."
     (interactive)
     (if meow--temp-normal
-  	  (progn
-  	    (message "Quit temporary normal mode")
-  	    (meow--switch-state 'motion))
+	    (progn
+	      (message "Quit temporary normal mode")
+	      (meow--switch-state 'motion))
       (if (not (region-active-p))
-  	    (when (and (not (use-region-p))
-  		   (< (point) (point-max)))
-  	      (forward-char 1))
-  	      (meow--direction-forward)
-  	      (meow--cancel-selection))
+	      (when (and (not (use-region-p))
+		     (< (point) (point-max)))
+	        (forward-char 1))
+	        (meow--direction-forward)
+	        (meow--cancel-selection))
       (meow--switch-state 'insert))
   )
   (advice-add 'meow-append :override #'my-meow-append)
-
+  
   (setq meow-keypad-self-insert-undefined nil)
   (setq meow-selection-command-fallback '(
         (meow-change . meow-mark-word)
@@ -187,7 +187,7 @@
      '("y" . meow-join)
      '("z" . meow-undo) '("Z" . meow-undo-in-selection)
      '("'" . repeat) '("<escape>" . meow-cancel-selection)
-  	       '("(" . fingertip-wrap-round) '(")" . fingertip-unwrap)
+		 '("(" . fingertip-wrap-round) '(")" . fingertip-unwrap)
      '("{" . fingertip-wrap-curly) 
      '("\"" . fingertip-double-quote)
     )
@@ -439,7 +439,7 @@
 :config
   ;If nil (the default), use the value of fill-column + 2.
   (setq olivetti-body-width nil
-	       olivetti-style 'fancy)
+         olivetti-style 'fancy)
   (set-face-attribute 'olivetti-fringe nil :background "#171B24")
   (defun config/window-center (width)
     (interactive)
@@ -533,21 +533,21 @@
 (use-package dashboard
 :init
   (setq initial-buffer-choice 'dashboard-open
-      dashboard-image-banner-max-width 1000
-      dashboard-set-heading-icons t
-      dashboard-center-content t ;; set to 't' for centered content
-      dashboard-set-file-icons t
-      initial-buffer-choice
-  	  (lambda () (get-buffer-create "*dashboard*"))
-      dashboard-startup-banner ;; use custom image as banner
-  	  (concat user-emacs-directory "assets/EmacsBound.xpm")
-      dashboard-items '(
-  	  (recents . 5)
-  	  (agenda . 5 )
-  	  (bookmarks . 3)
-  	  (projects . 3)
-  	  (registers . 3)
-      )
+	dashboard-image-banner-max-width 1000
+	dashboard-set-heading-icons t
+	dashboard-center-content t ;; set to 't' for centered content
+	dashboard-set-file-icons t
+	initial-buffer-choice
+	    (lambda () (get-buffer-create "*dashboard*"))
+	dashboard-startup-banner ;; use custom image as banner
+	    (concat user-emacs-directory "assets/EmacsBound.xpm")
+	dashboard-items '(
+	    (recents . 5)
+	    (agenda . 5 )
+	    (bookmarks . 3)
+	    (projects . 3)
+	    (registers . 3)
+	)
   )
 :config
   (dashboard-setup-startup-hook)
@@ -570,11 +570,11 @@
     (calendar-mode . centaur-tabs-local-mode)
   :init
     (setq centaur-tabs-set-icons t
-	  centaur-tabs-set-modified-marker t
-	  centaur-tabs-modified-marker "M"
-	  centaur-tabs-cycle-scope 'tabs
-	  centaur-tabs-set-bar 'over
-	  centaur-tabs-enable-ido-completion nil
+    centaur-tabs-set-modified-marker t
+    centaur-tabs-modified-marker "M"
+    centaur-tabs-cycle-scope 'tabs
+    centaur-tabs-set-bar 'over
+    centaur-tabs-enable-ido-completion nil
     )
     (centaur-tabs-mode t)
   :config
@@ -751,9 +751,9 @@
   :hook (magit-mode . solaire-mode) (magit-mode . olivetti-mode)
   :config
   (magit-add-section-hook 'magit-status-sections-hook
-  			'magit-insert-modules
-  			'magit-insert-stashes
-  			'append))
+			  'magit-insert-modules
+			  'magit-insert-stashes
+			  'append))
 ;; Magit:1 ends here
 
 ;; [[file:config.org::*Treemacs][Treemacs:1]]
@@ -885,52 +885,52 @@
 :custom
   (dirvish-quick-access-entries ;`setq' won't work for custom
     '(("h" "~/"                          "Home")
-      ("d" "~/Downloads/"                "Downloads")
-      ("m" "/mnt/"                       "Drives")
-      ("t" "~/.local/share/Trash/files/" "TrashCan"))
+	("d" "~/Downloads/"                "Downloads")
+	("m" "/mnt/"                       "Drives")
+	("t" "~/.local/share/Trash/files/" "TrashCan"))
   )
 :config
   (dirvish-define-preview exa (file)
   "Use `exa' to generate directory preview."
   :require ("exa") ; tell Dirvish to check if we have the executable
   (when (file-directory-p file) ; we only interest in directories here
-      `(shell . ("exa" "-al" "--color=always" "--icons"
-  	      "--group-directories-first" ,file))))
+	`(shell . ("exa" "-al" "--color=always" "--icons"
+		"--group-directories-first" ,file))))
 
   (add-to-list 'dirvish-preview-dispatchers 'exa)
   ;; (dirvish-peek-mode) ; Preview files in minibuffer
   ;; (dirvish-side-follow-mode) ; similar to `treemacs-follow-mode'
   (setq dirvish-path-separators (list "  " "  " "  "))
   (setq dirvish-mode-line-format
-  	  '(:left (sort symlink) :right (omit yank index)))
+	    '(:left (sort symlink) :right (omit yank index)))
   (setq dirvish-attributes
-  	  '(all-the-icons file-time file-size collapse subtree-state vc-state git-msg))
+	    '(all-the-icons file-time file-size collapse subtree-state vc-state git-msg))
   (setq delete-by-moving-to-trash t)
   (setq dired-listing-switches
-  	  "-l --almost-all --human-readable --group-directories-first --no-group")
+	    "-l --almost-all --human-readable --group-directories-first --no-group")
   (nmap dirvish-mode-map
-      "?"      '(dirvish-dispatch          :wk "Dispatch")
-      "TAB"    '(dirvish-subtree-toggle    :wk "Subtre-toggle")
-      "q"      '(dirvish-quit              :wk "Quit")
-      "h"      '(dired-up-directory        :wk "Up-dir")
-      "l"      '(dired-find-file           :wk "Open/Toggle")
-      "a"      '(dirvish-quick-access      :wk "Access")
-      "f"      '(dirvish-file-info-menu    :wk "File Info Menu")
-      "y"      '(dirvish-yank-menu         :wk "Yank Menu")
-      "N"      '(dirvish-narrow            :wk "Narrow")
-      ;         `dired-view-file'
-      "v"      '(dirvish-vc-menu           :wk "View-file")
-      ;         `dired-sort-toggle-or-edit'
-      "s"      '(dirvish-quicksort         :wk "Quick-sort")
+	"?"      '(dirvish-dispatch          :wk "Dispatch")
+	"TAB"    '(dirvish-subtree-toggle    :wk "Subtre-toggle")
+	"q"      '(dirvish-quit              :wk "Quit")
+	"h"      '(dired-up-directory        :wk "Up-dir")
+	"l"      '(dired-find-file           :wk "Open/Toggle")
+	"a"      '(dirvish-quick-access      :wk "Access")
+	"f"      '(dirvish-file-info-menu    :wk "File Info Menu")
+	"y"      '(dirvish-yank-menu         :wk "Yank Menu")
+	"N"      '(dirvish-narrow            :wk "Narrow")
+	;         `dired-view-file'
+	"v"      '(dirvish-vc-menu           :wk "View-file")
+	;         `dired-sort-toggle-or-edit'
+	"s"      '(dirvish-quicksort         :wk "Quick-sort")
 
-      "M-f"    '(dirvish-history-go-forward  :wk "History-forward")
-      "M-b"    '(dirvish-history-go-backward :wk "History-back")
-      "M-l"    '(dirvish-ls-switches-menu    :wk "ls Switch Menu")
-      "M-m"    '(dirvish-mark-menu           :wk "Mark Menu")
-      "M-t"    '(dirvish-layout-toggle       :wk "Layout-toggle")
-      "M-s"    '(dirvish-setup-menu          :wk "Setup-Menu")
-      "M-e"    '(dirvish-emerge-menu         :wk "Emerge-Menu")
-      "M-j"    '(dirvish-fd-jump             :wk "fd-jump")
+	"M-f"    '(dirvish-history-go-forward  :wk "History-forward")
+	"M-b"    '(dirvish-history-go-backward :wk "History-back")
+	"M-l"    '(dirvish-ls-switches-menu    :wk "ls Switch Menu")
+	"M-m"    '(dirvish-mark-menu           :wk "Mark Menu")
+	"M-t"    '(dirvish-layout-toggle       :wk "Layout-toggle")
+	"M-s"    '(dirvish-setup-menu          :wk "Setup-Menu")
+	"M-e"    '(dirvish-emerge-menu         :wk "Emerge-Menu")
+	"M-j"    '(dirvish-fd-jump             :wk "fd-jump")
   )
 )
 ;; Dirvish:1 ends here
@@ -1009,9 +1009,9 @@
   :init
   (setq completion-styles '(orderless))
   (setq orderless-component-separator 
-  	      #'orderless-escapable-split-on-space)
+		#'orderless-escapable-split-on-space)
   (setq orderless-matching-styles
-  	      '(orderless-initialism orderless-prefixes orderless-regexp))
+		'(orderless-initialism orderless-prefixes orderless-regexp))
   )
 ;; Orderless:1 ends here
 
@@ -1096,36 +1096,36 @@
 ;; [[file:config.org::*Savehist][Savehist:1]]
 ;; Persist history over Emacs restarts. Vertico sorts by history position.
   (use-package savehist
-      :init
-      (savehist-mode))
+:init
+(savehist-mode))
 ;; Savehist:1 ends here
 
 ;; [[file:config.org::*Savehist][Savehist:2]]
 ;; A few more useful configurations...
   (use-package emacs
-      :init
-      ;; Add prompt indicator to `completing-read-multiple'.
-      ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
-      (defun crm-indicator (args)
-      (cons (format "[CRM%s] %s"
-		      (replace-regexp-in-string
-		      "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
-		      crm-separator)
-		      (car args))
-	      (cdr args)))
-      (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+:init
+;; Add prompt indicator to `completing-read-multiple'.
+;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
+(defun crm-indicator (args)
+(cons (format "[CRM%s] %s"
+		(replace-regexp-in-string
+		"\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+		crm-separator)
+		(car args))
+	(cdr args)))
+(advice-add #'completing-read-multiple :filter-args #'crm-indicator)
 
-      ;; Do not allow the cursor in the minibuffer prompt
-      (setq minibuffer-prompt-properties
-	  '(read-only t cursor-intangible t face minibuffer-prompt))
-      (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+;; Do not allow the cursor in the minibuffer prompt
+(setq minibuffer-prompt-properties
+    '(read-only t cursor-intangible t face minibuffer-prompt))
+(add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
 
-      ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
-      ;; Vertico commands are hidden in normal buffers.
-      ;; (setq read-extended-command-predicate
-      ;;       #'command-completion-default-include-p)
-      ;; Enable recursive minibuffers
-      (setq enable-recursive-minibuffers t))
+;; Emacs 28: Hide commands in M-x which do not work in the current mode.
+;; Vertico commands are hidden in normal buffers.
+;; (setq read-extended-command-predicate
+;;       #'command-completion-default-include-p)
+;; Enable recursive minibuffers
+(setq enable-recursive-minibuffers t))
 ;; Savehist:2 ends here
 
 ;; [[file:config.org::*Consult][Consult:1]]
@@ -1353,17 +1353,17 @@
         ))
 
 (add-hook 'markdown-mode-hook #'(lambda () 
-  				(treesit-parser-create 'markdown)))
+				  (treesit-parser-create 'markdown)))
 
 (add-hook 'web-mode-hook #'(lambda ()
-  			   (let ((file-name (buffer-file-name)))
-  			     (when file-name
-  			       (treesit-parser-create
-  				(pcase (file-name-extension file-name)
-  				  ("vue" 'vue)
-  				  ("html" 'html)
-  				  ("php" 'php))))
-  			     )))
+			     (let ((file-name (buffer-file-name)))
+			       (when file-name
+				 (treesit-parser-create
+				  (pcase (file-name-extension file-name)
+				    ("vue" 'vue)
+				    ("html" 'html)
+				    ("php" 'php))))
+			       )))
 
 (add-hook 'emacs-lisp-mode-hook #'(lambda () (treesit-parser-create 'elisp)))
 (add-hook 'ielm-mode-hook #'(lambda () (treesit-parser-create 'elisp)))
@@ -1457,72 +1457,72 @@
 (use-package fingertip
 :config
   (dolist (hook (list
-	      'c-mode-common-hook 'c-mode-hook 'c++-mode-hook
-	      'c-ts-mode-hook 'c++-ts-mode-hook
-	      'cmake-ts-mode-hook
-	      'java-mode-hook
-	      'haskell-mode-hook
-	      'emacs-lisp-mode-hook 
+	'c-mode-common-hook 'c-mode-hook 'c++-mode-hook
+	'c-ts-mode-hook 'c++-ts-mode-hook
+	'cmake-ts-mode-hook
+	'java-mode-hook
+	'haskell-mode-hook
+	'emacs-lisp-mode-hook 
            'lisp-interaction-mode-hook 'lisp-mode-hook
-	      'maxima-mode-hook
-	      'ielm-mode-hook
-	      'bash-ts-mode-hook 'sh-mode-hook
-	      'makefile-gmake-mode-hook
-	      'php-mode-hook
-	      'python-mode-hook 'python-ts-mode-hook
-	      'js-mode-hook
-	      'go-mode-hook
-	      'qml-mode-hook
-	      'jade-mode-hook
-	      'css-mode-hook 'css-ts-mode-hook
-	      'ruby-mode-hook
-	      'coffee-mode-hook
-	      'rust-mode-hook 'rust-ts-mode-hook
-	      'qmake-mode-hook
-	      'lua-mode-hook
-	      'swift-mode-hook
-	      'web-mode-hook
-	      'markdown-mode-hook
-	      'llvm-mode-hook
-	      'conf-conf-mode-hook 'conf-ts-mode-hook
-	      'nim-mode-hook
-	      'typescript-mode-hook 'typescript-ts-mode-hook
-	      'js-ts-mode-hook 'json-ts-mode-hook
-	      ))
+	'maxima-mode-hook
+	'ielm-mode-hook
+	'bash-ts-mode-hook 'sh-mode-hook
+	'makefile-gmake-mode-hook
+	'php-mode-hook
+	'python-mode-hook 'python-ts-mode-hook
+	'js-mode-hook
+	'go-mode-hook
+	'qml-mode-hook
+	'jade-mode-hook
+	'css-mode-hook 'css-ts-mode-hook
+	'ruby-mode-hook
+	'coffee-mode-hook
+	'rust-mode-hook 'rust-ts-mode-hook
+	'qmake-mode-hook
+	'lua-mode-hook
+	'swift-mode-hook
+	'web-mode-hook
+	'markdown-mode-hook
+	'llvm-mode-hook
+	'conf-conf-mode-hook 'conf-ts-mode-hook
+	'nim-mode-hook
+	'typescript-mode-hook 'typescript-ts-mode-hook
+	'js-ts-mode-hook 'json-ts-mode-hook
+	))
   (add-hook hook #'(lambda () (fingertip-mode 1))))
   (general-def
     :keymaps 'fingertip-mode-map
-      "(" 'fingertip-open-round
-      "[" 'fingertip-open-bracket
-      "{" 'fingertip-open-curly
-      ")" 'fingertip-close-round
-      "]" 'fingertip-close-bracket
-      "}" 'fingertip-close-curly
-      "=" 'fingertip-equal
+"(" 'fingertip-open-round
+"[" 'fingertip-open-bracket
+"{" 'fingertip-open-curly
+")" 'fingertip-close-round
+"]" 'fingertip-close-bracket
+"}" 'fingertip-close-curly
+"=" 'fingertip-equal
 
-      "%" 'fingertip-match-paren
-      "\"" 'fingertip-double-quote
-      "'" 'fingertip-single-quote
+"%" 'fingertip-match-paren
+"\"" 'fingertip-double-quote
+"'" 'fingertip-single-quote
 
-      "SPC" 'fingertip-space
-      "RET" 'fingertip-newline
+"SPC" 'fingertip-space
+"RET" 'fingertip-newline
 
-      "M-o" 'fingertip-backward-delete
-      "C-d" 'fingertip-forward-delete
-      "C-k" 'fingertip-kill
+"M-o" 'fingertip-backward-delete
+"C-d" 'fingertip-forward-delete
+"C-k" 'fingertip-kill
 
-      "M-\"" 'fingertip-wrap-double-quote
-      "M-'" 'fingertip-wrap-single-quote
-      "M-[" 'fingertip-wrap-bracket
-      "M-{" 'fingertip-wrap-curly
-      "M-(" 'fingertip-wrap-round
-      "M-)" 'fingertip-unwrap
+"M-\"" 'fingertip-wrap-double-quote
+"M-'" 'fingertip-wrap-single-quote
+"M-[" 'fingertip-wrap-bracket
+"M-{" 'fingertip-wrap-curly
+"M-(" 'fingertip-wrap-round
+"M-)" 'fingertip-unwrap
 
-      "M-p" 'fingertip-jump-right
-      "M-n" 'fingertip-jump-left
-      "M-:" 'fingertip-jump-out-pair-and-newline
+"M-p" 'fingertip-jump-right
+"M-n" 'fingertip-jump-left
+"M-:" 'fingertip-jump-out-pair-and-newline
 
-      "C-j" 'fingertip-jump-up
+"C-j" 'fingertip-jump-up
   )
 )
 ;; Fingertip:1 ends here
@@ -1591,6 +1591,12 @@
   :hook (LaTeX-mode . laas-mode))
 ;; LAAS:1 ends here
 
+;; [[file:config.org::*Nix][Nix:1]]
+(use-package nix-mode
+:mode "\\.nix\\'"
+)
+;; Nix:1 ends here
+
 ;; [[file:config.org::*Fonts][Fonts:1]]
 (use-package org
 :custom-face
@@ -1601,21 +1607,21 @@
 :hook (org-mode . mixed-pitch-mode)
 :config
   (set-face-attribute 'org-level-1 nil
-      :family "Sarasa Gothic SC" :height 1.4 )
+:family "Sarasa Gothic SC" :height 1.4 )
   (set-face-attribute 'org-level-2 nil
-      :family "Sarasa Gothic SC" :height 1.4 )
+:family "Sarasa Gothic SC" :height 1.4 )
   (set-face-attribute 'org-level-3 nil
-      :family "Sarasa Gothic SC" :height 1.4 )
+:family "Sarasa Gothic SC" :height 1.4 )
   (set-face-attribute 'org-level-4 nil
-      :family "Sarasa Gothic SC" :height 1.3 )
+:family "Sarasa Gothic SC" :height 1.3 )
   (set-face-attribute 'org-level-5 nil
-      :family "Sarasa Gothic SC" :height 1.2 )
+:family "Sarasa Gothic SC" :height 1.2 )
   (set-face-attribute 'org-level-6 nil
-      :family "Sarasa Gothic SC" :height 1.1 )
+:family "Sarasa Gothic SC" :height 1.1 )
   (set-face-attribute 'org-document-title nil
-      :family "Sarasa Gothic SC" :height 2.5 :bold t)
+:family "Sarasa Gothic SC" :height 2.5 :bold t)
   (set-face-attribute 'org-document-info nil
-      :family "Sarasa Gothic SC" :height 1.8 :bold t)
+:family "Sarasa Gothic SC" :height 1.8 :bold t)
   (set-face-attribute 'org-document-info-keyword nil
     :foreground "LightSteelBlue4" :inherit 'org-document-info)
   (set-face-attribute 'org-block t
@@ -1629,23 +1635,23 @@
 :config
    (setq org-modern-keyword
      (quote (("author" . "⛾")
-	     ("title" . "❖")
-	     ("subtitle" . "◈")
-	     ("html" . "󰅱 ")
-	     (t . t))))
+       ("title" . "❖")
+       ("subtitle" . "◈")
+       ("html" . "󰅱 ")
+       (t . t))))
    (setq org-modern-star
-	;'("◉" "○" "◈" "◇" "✳")
-	'("⚀" "⚁" "⚂" "⚃" "⚄" "⚅")
-	;'("☰" "☱" "☲" "☳" "☴" "☵" "☶" "☷")
+  ;'("◉" "○" "◈" "◇" "✳")
+  '("⚀" "⚁" "⚂" "⚃" "⚄" "⚅")
+  ;'("☰" "☱" "☲" "☳" "☴" "☵" "☶" "☷")
    )
    (setq org-modern-list ;; for '+' '-' '*' respectively
-       '((43 . "⯌") (45 . "⮚") (42 . "⊛"))
+ '((43 . "⯌") (45 . "⮚") (42 . "⊛"))
    )
    (setq org-modern-block-fringe nil)
    (setq org-modern-todo nil)
    (setq org-modern-block-name '("⇲ " . "⇱ "))
    (set-face-attribute 'org-modern-block-name nil
-      :inherit 'variable-pitch)
+:inherit 'variable-pitch)
    (setq org-modern-table nil)
 )
 ;; Bullets:1 ends here
@@ -1673,8 +1679,8 @@
   (org-visual-indent-pipe-face ((t (:background "slate gray" :foreground "slate gray" :height 0.1))))
 :config
   (setq org-bars-color-options '(
-	:desaturate-level-faces 100
-	:darken-level-faces 10
+  :desaturate-level-faces 100
+  :darken-level-faces 10
   ))
   (setq org-bars-extra-pixels-height 25)
   (setq org-bars-stars '(:empty "" :invisible "" :visible ""))
@@ -1776,8 +1782,8 @@
     "Returns `org-capture' template string for new Hugo post.
      See `org-capture-templates' for more information."
     (let* ((title (read-from-minibuffer "Post Title: ")) 
-  		 (fname (org-hugo-slug title)))
-  	(mapconcat #'identity
+		   (fname (org-hugo-slug title)))
+	  (mapconcat #'identity
         `(,(concat "* TODO " title) ":PROPERTIES:"
           ,(concat ":EXPORT_FILE_NAME: " fname) ":END:" "%?\n")
           ;Place the cursor here finally
@@ -1789,9 +1795,9 @@
     ("i" "Inbox" entry 
       (file "inbox.org")
       "* %U - %? %^g\n")
-       '("h" "Hugo post" entry
-  	  (file+olp "capture.org" "Notes")
-  	  (function org-hugo-new-subtree-post-capture-template))
+	 '("h" "Hugo post" entry
+	    (file+olp "capture.org" "Notes")
+	    (function org-hugo-new-subtree-post-capture-template))
   )))
 )
 ;; Org-capture:1 ends here
@@ -1886,9 +1892,9 @@
      :time-grid t
      :scheduled today)
     (:name "Due today"
-  	       :deadline today)
+		 :deadline today)
     (:name "Important"
-  	 :priority "A")
+	   :priority "A")
     (:name "Overdue"
      :deadline past)
     (:name "Due soon"
@@ -1963,11 +1969,11 @@
     ;; Vertically align LaTeX preview in org mode
     (defun my-org-latex-preview-advice (beg end &rest _args)
     (let* ((ov (car (overlays-at (/ (+ beg end) 2) t)))
-	    (img (cdr (overlay-get ov 'display)))
-	    (new-img (plist-put img :ascent 95)))
-	(overlay-put ov 'display (cons 'image new-img))))
+      (img (cdr (overlay-get ov 'display)))
+      (new-img (plist-put img :ascent 95)))
+  (overlay-put ov 'display (cons 'image new-img))))
     (advice-add 'org--make-preview-overlay
-		:after #'my-org-latex-preview-advice)
+	  :after #'my-org-latex-preview-advice)
 
     ;; from: https://kitchingroup.cheme.cmu.edu/blog/2016/11/06/
     ;; Justifying-LaTeX-preview-fragments-in-org-mode/
@@ -1976,72 +1982,72 @@
 
     (defun eli/org-justify-fragment-overlay (beg end image imagetype)
     (let* ((position (plist-get org-format-latex-options :justify))
-	    (img (create-image image 'svg t))
-	    (ov (car (overlays-at (/ (+ beg end) 2) t)))
-	    (width (car (image-display-size (overlay-get ov 'display))))
-	    offset)
-	(cond
-	((and (eq 'center position)
-	    (= beg (line-beginning-position)))
-	(setq offset (floor (- (/ fill-column 2)
-				(/ width 2))))
-	(if (< offset 0)
-	    (setq offset 0))
-	(overlay-put ov 'before-string (make-string offset ? )))
-	((and (eq 'right position)
-	    (= beg (line-beginning-position)))
-	(setq offset (floor (- fill-column
-				width)))
-	(if (< offset 0)
-	    (setq offset 0))
-	(overlay-put ov 'before-string (make-string offset ? ))))))
+      (img (create-image image 'svg t))
+      (ov (car (overlays-at (/ (+ beg end) 2) t)))
+      (width (car (image-display-size (overlay-get ov 'display))))
+      offset)
+  (cond
+  ((and (eq 'center position)
+      (= beg (line-beginning-position)))
+  (setq offset (floor (- (/ fill-column 2)
+			  (/ width 2))))
+  (if (< offset 0)
+      (setq offset 0))
+  (overlay-put ov 'before-string (make-string offset ? )))
+  ((and (eq 'right position)
+      (= beg (line-beginning-position)))
+  (setq offset (floor (- fill-column
+			  width)))
+  (if (< offset 0)
+      (setq offset 0))
+  (overlay-put ov 'before-string (make-string offset ? ))))))
     (advice-add 'org--make-preview-overlay
-		:after 'eli/org-justify-fragment-overlay)
+	  :after 'eli/org-justify-fragment-overlay)
 
     ;; from: https://kitchingroup.cheme.cmu.edu/blog/2016/11/07/
     ;; Better-equation-numbering-in-LaTeX-fragments-in-org-mode/
     (defun org-renumber-environment (orig-func &rest args)
     (let ((results '())
-	    (counter -1)
-	    (numberp))
-	(setq results (cl-loop for (begin .  env) in
-	    (org-element-map (org-element-parse-buffer)
-		'latex-environment
-		(lambda (env)
-		(cons
-		    (org-element-property :begin env)
-		    (org-element-property :value env))))
-	    collect
-	    (cond
-		((and (string-match "\\\\begin{equation}" env)
-		    (not (string-match "\\\\tag{" env)))
-		(cl-incf counter)
-		(cons begin counter))
-		((and (string-match "\\\\begin{align}" env)
-		    (string-match "\\\\notag" env))
-		(cl-incf counter)
-		(cons begin counter))
-		((string-match "\\\\begin{align}" env)
-		(prog2
-		    (cl-incf counter)
-		    (cons begin counter)
-		(with-temp-buffer
-		    (insert env)
-		    (goto-char (point-min))
-		    ;; \\ is used for a new line. Each one leads
-		    ;; to a number
-		    (cl-incf counter (count-matches "\\\\$"))
-		    ;; unless there are nonumbers.
-		    (goto-char (point-min))
-		    (cl-decf counter
-			    (count-matches "\\nonumber")))))
-		(t
-		(cons begin nil)))))
-	(when (setq numberp (cdr (assoc (point) results)))
-	(setf (car args)
-		(concat
-		(format "\\setcounter{equation}{%s}\n" numberp)
-		(car args)))))
+      (counter -1)
+      (numberp))
+  (setq results (cl-loop for (begin .  env) in
+      (org-element-map (org-element-parse-buffer)
+	  'latex-environment
+	  (lambda (env)
+	  (cons
+	      (org-element-property :begin env)
+	      (org-element-property :value env))))
+      collect
+      (cond
+	  ((and (string-match "\\\\begin{equation}" env)
+	      (not (string-match "\\\\tag{" env)))
+	  (cl-incf counter)
+	  (cons begin counter))
+	  ((and (string-match "\\\\begin{align}" env)
+	      (string-match "\\\\notag" env))
+	  (cl-incf counter)
+	  (cons begin counter))
+	  ((string-match "\\\\begin{align}" env)
+	  (prog2
+	      (cl-incf counter)
+	      (cons begin counter)
+	  (with-temp-buffer
+	      (insert env)
+	      (goto-char (point-min))
+	      ;; \\ is used for a new line. Each one leads
+	      ;; to a number
+	      (cl-incf counter (count-matches "\\\\$"))
+	      ;; unless there are nonumbers.
+	      (goto-char (point-min))
+	      (cl-decf counter
+		      (count-matches "\\nonumber")))))
+	  (t
+	  (cons begin nil)))))
+  (when (setq numberp (cdr (assoc (point) results)))
+  (setf (car args)
+	  (concat
+	  (format "\\setcounter{equation}{%s}\n" numberp)
+	  (car args)))))
     (apply orig-func args))
     (advice-add 'org-create-formula-image :around #'org-renumber-environment)
 )
@@ -2060,17 +2066,17 @@
 :config
   (setq 
     org-export-with-toc t
-  	      org-export-with-tags 'not-in-toc
-  	      org-export-with-drawers nil
-  	      org-export-with-priority t
-  	      org-export-with-footnotes t
-  	      org-export-with-smart-quotes t
-  	      org-export-with-section-numbers t
-  	      org-export-with-sub-superscripts '{}
+		org-export-with-tags 'not-in-toc
+		org-export-with-drawers nil
+		org-export-with-priority t
+		org-export-with-footnotes t
+		org-export-with-smart-quotes t
+		org-export-with-section-numbers t
+		org-export-with-sub-superscripts '{}
     org-export-use-babel t
-  	      org-export-headline-levels 9
-  	      org-export-coding-system 'utf-8
-  	      org-export-with-broken-links 'mark
+		org-export-headline-levels 9
+		org-export-coding-system 'utf-8
+		org-export-with-broken-links 'mark
   )
 )
 ;; Ox:1 ends here
@@ -2081,9 +2087,9 @@
   :after ox
   :config
   (setq org-html-doctype "html5"
-  	      org-html-html5-fancy t
-  	      org-html-checkbox-type 'unicode
-  	      org-html-validation-link nil))
+		org-html-html5-fancy t
+		org-html-checkbox-type 'unicode
+		org-html-validation-link nil))
 ;; HTML:1 ends here
 
 ;; [[file:config.org::*HTML][HTML:2]]
@@ -2091,7 +2097,7 @@
   :defer t
   :config
   (setq htmlize-pre-style t
-  	      htmlize-output-type 'inline-css))
+		htmlize-output-type 'inline-css))
 ;; HTML:2 ends here
 
 ;; [[file:config.org::*PDF][PDF:1]]
@@ -2111,12 +2117,12 @@
 :after ox
 :config
   (setq org-reveal-hlevel 1
-  	      org-reveal-theme "moon"
-  	      org-reveal-mathjax t
-  	      org-reveal-ignore-speaker-notes t
-  	      org-reveal-title-slide "<h1><font size=\"8\">%t</font></h1><h2><font size=\"6\">%s</font></h2><p><font size=\"5\">%a</font><br/><font size=\"5\">%d</font></p>"
-  	      org-reveal-plugins '(markdown zoom notes search)
-  	      org-reveal-klipsify-src 'on))
+		org-reveal-theme "moon"
+		org-reveal-mathjax t
+		org-reveal-ignore-speaker-notes t
+		org-reveal-title-slide "<h1><font size=\"8\">%t</font></h1><h2><font size=\"6\">%s</font></h2><p><font size=\"5\">%a</font><br/><font size=\"5\">%d</font></p>"
+		org-reveal-plugins '(markdown zoom notes search)
+		org-reveal-klipsify-src 'on))
 ;; Slides:2 ends here
 
 ;; [[file:config.org::*Markdown][Markdown:1]]
@@ -2132,7 +2138,7 @@
 :after ox
 :config
   (setq org-pandoc-format-extensions 
-  	    '(markdown_github+pipe_tables+raw_html)
+	      '(markdown_github+pipe_tables+raw_html)
   )
 )
 ;; MS-Office:1 ends here
@@ -2208,9 +2214,9 @@
 :defer t
 :config
   (setq elfeed-feeds '(
-      ("http://nullprogram.com/feed/" blog emacs)
-      "http://www.50ply.com/atom.xml"  ; no autotagging
-      ("http://nedroid.com/feed/" webcomic)
+("http://nullprogram.com/feed/" blog emacs)
+"http://www.50ply.com/atom.xml"  ; no autotagging
+("http://nedroid.com/feed/" webcomic)
     )
   )
 )
