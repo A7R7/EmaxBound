@@ -3,21 +3,18 @@
 	no-makeinfo = dash-template.texi
 
 [submodule "org"]
-  load-path = lisp
-  build-step = make autoloads
-  build-step = borg-update-autoloads
-  build-step = borg-compile
-  build-step = borg-maketexi
-  build-step = borg-makeinfo
+	load-path = lisp
+	build-step = make autoloads
+	build-step = borg-update-autoloads
+	build-step = borg-compile
+	build-step = borg-maketexi
+	build-step = borg-makeinfo
 
 [submodule "emacsql"]
-no-byte-compile = emacsql-pg.el
+      no-byte-compile = emacsql-pg.el
 
 [submodule "sqlite3"]
 	build-step = make
-
-[submodule "evil"]
-  info-path = doc/build/texinfo
 
 [submodule "magit"]
 	no-byte-compile = lisp/magit-libgit.el

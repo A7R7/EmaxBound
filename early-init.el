@@ -26,16 +26,22 @@
 ;; Early Init:5 ends here
 
 ;; [[file:config.org::*Early Init][Early Init:6]]
-(if init-file-debug
+;; (if init-file-debug
   (setq use-package-verbose t
         use-package-expand-minimally nil
         use-package-compute-statistics t
-        debug-on-error t)
-  (setq use-package-verbose nil
-        use-package-expand-minimally t))
+        ;;debug-on-error t
+  )
+  ;; (setq use-package-verbose nil
+  ;;       use-package-expand-minimally t))
 ;; Early Init:6 ends here
 
 ;; [[file:config.org::*Early Init][Early Init:7]]
+(set-frame-parameter nil 'alpha-background 96)
+(add-to-list 'default-frame-alist '(alpha-background . 96))
+;; Early Init:7 ends here
+
+;; [[file:config.org::*Early Init][Early Init:8]]
 (setq load-prefer-newer t)
 
 (let ((dir (file-name-directory (or load-file-name buffer-file-name))))
@@ -50,4 +56,4 @@
 
 (with-eval-after-load 'package
   (add-to-list 'package-archives (cons "melpa" "https://melpa.org/packages/") t))
-;; Early Init:7 ends here
+;; Early Init:8 ends here
