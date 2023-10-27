@@ -126,24 +126,6 @@
 [submodule "etexshow"]
 	path = lib/etexshow
 	url = https://github.com/pgundlach/etexshow
-[submodule "evil"]
-	path = lib/evil
-	url = https://github.com/emacs-evil/evil
-[submodule "evil-collection"]
-	path = lib/evil-collection
-	url = https://github.com/emacs-evil/evil-collection
-[submodule "evil-nerd-commenter"]
-	path = lib/evil-nerd-commenter
-	url = https://github.com/redguardtoo/evil-nerd-commenter
-[submodule "evil-org"]
-	path = lib/evil-org
-	url = https://github.com/Somelauw/evil-org-mode
-[submodule "evil-surround"]
-	path = lib/evil-surround
-	url = https://github.com/emacs-evil/evil-surround
-[submodule "evil-tutor"]
-	path = lib/evil-tutor
-	url = https://github.com/syl20bnr/evil-tutor
 [submodule "f"]
 	path = lib/f
 	url = https://github.com/rejeep/f.el
@@ -162,6 +144,9 @@
 [submodule "git-modes"]
 	path = lib/git-modes
 	url = https://github.com/magit/git-modes
+[submodule "goggles"]
+	path = lib/goggles
+	url = https://github.com/minad/goggles
 [submodule "grip-mode"]
 	path = lib/grip-mode
 	url = https://github.com/seagle0128/grip-mode
@@ -370,6 +355,9 @@
 [submodule "projectile"]
 	path = lib/projectile
 	url = https://github.com/bbatsov/projectile
+[submodule "pulsing-cursor"]
+	path = lib/pulsing-cursor
+	url = git@github.com:jasonjckn/pulsing-cursor.git
 [submodule "queue"]
 	path = lib/queue
 	url = git@github.com:emacsmirror/queue.git
@@ -382,6 +370,9 @@
 [submodule "request"]
 	path = lib/request
 	url = https://github.com/tkf/emacs-request
+[submodule "rime"]
+	path = lib/rime
+	url = https://github.com/DogLooksGood/emacs-rime
 [submodule "ripgrep"]
 	path = lib/ripgrep
 	url = https://github.com/nlamirault/ripgrep.el
@@ -406,6 +397,9 @@
 [submodule "solaire-mode"]
 	path = lib/solaire-mode
 	url = https://github.com/hlissner/emacs-solaire-mode
+[submodule "sort-tab"]
+	path = lib/sort-tab
+	url = https://github.com/manateelazycat/sort-tab
 [submodule "spacious-padding"]
 	path = lib/spacious-padding
 	url = https://github.com/emacsmirror/spacious-padding
