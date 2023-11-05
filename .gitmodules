@@ -24,21 +24,27 @@
 [submodule "all-the-icons"]
 	path = lib/all-the-icons
 	url = https://github.com/domtronn/all-the-icons.el
+[submodule "all-the-icons-completion"]
+	path = lib/all-the-icons-completion
+	url = https://github.com/iyefrat/all-the-icons-completion
 [submodule "annalist"]
 	path = lib/annalist
 	url = https://github.com/noctuid/annalist.el
 [submodule "async"]
 	path = lib/async
 	url = https://github.com/jwiegley/emacs-async
-[submodule "auctex"]
-	path = lib/auctex
-	url = git@github.com:emacsmirror/auctex.git
 [submodule "auto-compile"]
 	path = lib/auto-compile
 	url = https://github.com/emacscollective/auto-compile
+[submodule "auto-save"]
+	path = lib/auto-save
+	url = git@github.com:manateelazycat/auto-save.git
 [submodule "avy"]
 	path = lib/avy
 	url = https://github.com/abo-abo/avy
+[submodule "awesome-tray"]
+	path = lib/awesome-tray
+	url = git@github.com:manateelazycat/awesome-tray.git
 [submodule "beacon"]
 	path = lib/beacon
 	url = https://github.com/Malabarba/beacon
@@ -96,6 +102,12 @@
 [submodule "doom-themes"]
 	path = lib/doom-themes
 	url = https://github.com/doomemacs/themes
+[submodule "doremi"]
+	path = lib/doremi
+	url = git@github.com:emacsmirror/doremi.git
+[submodule "doremi-cmd"]
+	path = lib/doremi-cmd
+	url = git@github.com:emacsmirror/doremi-cmd.git
 [submodule "eaf"]
 	path = lib/eaf
 	url = https://github.com/emacs-eaf/emacs-application-framework
@@ -126,6 +138,18 @@
 [submodule "etexshow"]
 	path = lib/etexshow
 	url = https://github.com/pgundlach/etexshow
+[submodule "evil"]
+	path = lib/evil
+	url = https://github.com/emacs-evil/evil
+[submodule "evil-collection"]
+	path = lib/evil-collection
+	url = https://github.com/emacs-evil/evil-collection
+[submodule "evil-nerd-commenter"]
+	path = lib/evil-nerd-commenter
+	url = https://github.com/redguardtoo/evil-nerd-commenter
+[submodule "evil-surround"]
+	path = lib/evil-surround
+	url = https://github.com/emacs-evil/evil-surround
 [submodule "f"]
 	path = lib/f
 	url = https://github.com/rejeep/f.el
@@ -228,6 +252,9 @@
 [submodule "mixed-pitch"]
 	path = lib/mixed-pitch
 	url = https://gitlab.com/jabranham/mixed-pitch
+[submodule "nano-modeline"]
+	path = lib/nano-modeline
+	url = https://github.com/rougier/nano-modeline
 [submodule "nano-theme"]
 	path = lib/nano-theme
 	url = https://github.com/rougier/nano-theme
@@ -237,6 +264,9 @@
 [submodule "nix-mode"]
 	path = lib/nix-mode
 	url = https://github.com/NixOS/nix-mode
+[submodule "nix-ts-mode"]
+	path = lib/nix-ts-mode
+	url = https://github.com/remi-gelinas/nix-ts-mode
 [submodule "no-littering"]
 	path = lib/no-littering
 	url = https://github.com/emacscollective/no-littering
@@ -412,6 +442,12 @@
 [submodule "tablist"]
 	path = lib/tablist
 	url = https://github.com/emacsorphanage/tablist
+[submodule "tempel"]
+	path = lib/tempel
+	url = https://github.com/minad/tempel
+[submodule "tempel-collection"]
+	path = lib/tempel-collection
+	url = https://github.com/Crandel/tempel-collection
 [submodule "tomelr"]
 	path = lib/tomelr
 	url = https://github.com/kaushalmodi/tomelr
@@ -448,6 +484,9 @@
 [submodule "visual-fill-column"]
 	path = lib/visual-fill-column
 	url = git@github.com:emacsmirror/visual-fill-column.git
+[submodule "voyager"]
+	path = lib/voyager
+	url = git@github.com:manateelazycat/voyager.git
 [submodule "vscode-icon"]
 	path = lib/vscode-icon
 	url = https://github.com/jojojames/vscode-icon-emacs
@@ -475,6 +514,9 @@
 [submodule "xenops"]
 	path = lib/xenops
 	url = https://github.com/dandavison/xenops
+[submodule "yaml-mode"]
+	path = lib/yaml-mode
+	url = https://github.com/yoshiki/yaml-mode
 [submodule "yascroll"]
 	path = lib/yascroll
 	url = https://github.com/emacsorphanage/yascroll

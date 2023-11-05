@@ -16,6 +16,10 @@
 [submodule "sqlite3"]
 	build-step = make
 
+[submodule "vertico"]
+	load-path = .
+	load-path = extensions
+
 [submodule "magit"]
 	no-byte-compile = lisp/magit-libgit.el
 
@@ -24,10 +28,6 @@
   load-path = src/extra
 
 [submodule "dirvish"]
-	load-path = .
-	load-path = extensions
-
-[submodule "vertico"]
 	load-path = .
 	load-path = extensions
 
