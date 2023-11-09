@@ -65,7 +65,7 @@ Check [[https://emacsmirror.net/manual/borg/Bootstrapping-using-a-seed.html][Boo
 
 ** Why it's called EmaxBound
 
-The name "EmaxBound" is inspired by "Starbound", a game I used to play and I love it. 
+The name "EmaxBound" is inspired by "Starbound", a game I used to play and I love it.
 Why it is "EmaxBound" but not "EmacsBound" ?
 - "Emax" has the same number of characters of "Star"
 - So that the logo I drawed (mimicing the style of starbound) looks balanced
@@ -73,22 +73,21 @@ Why it is "EmaxBound" but not "EmacsBound" ?
 
 ** Why not other popular emacs distros
 
-- Doom emacs, spacemacs and other emacs "distros", are pretty good. They did a good job in "working out of the box". However, their complexities is blocking me from gaining a further understanding of emacs and elisp. 
+- Doom emacs, spacemacs and other emacs "distros", are pretty good. They did a good job in "working out of the box". However, their complexities is blocking me from gaining a further understanding of emacs and elisp.
 - Meanwhile, it's much harder to do customizations on those complex systems, especially when you do not know what it already have. However, self-configured emacs does not have this problem.
 - Those distros get updates from time to time. What if one update breaks your workflow?
 
 ** Why a literate config
 
 Using literate configuration in org-mode has many benefits.
-- You know what you code does, because there're descriptions of different styles around the code. Code comments cannot achieve 100% of this.
-- Easy jumping to the target code among those foldable outlines. 
-- Hot reload code blocks: after editing a src block, ~C-c C-c~ to load the new code block. 
-- The org file can be used as readme in github/gitlab, which shows all your codes.
-- The org file can be published as blogs. For example, I use ox-hugo to generate markdown files, and later hugo renders it to html files. This is where this blog comes from.
+- You know what you code does, because there're descriptions in various styles around the code. Code comments cannot achieve 100% of this.
+- Easy jumping to the target code block among those foldable outlines.
+- Hot reload code blocks: after editing a src block, ~C-c C-c~ to apply changes on the fly.
+- The org file can be used as readme in github/gitlab, which shows all your codes. It can be published as blogs. For example, I use ox-hugo to generate markdown files, and later hugo renders it to html files. This is where this blog comes from.
 
 ** References
 
-Credits goes to the authors of those emacs configs that I referenced during the build-up of my emacs config file. 
+Credits goes to the authors of those emacs configs that I referenced during the build-up of my emacs config file.
 
 - [[https://github.com/lccambiaghi/vanilla-emacs][Luca's vanilla-emacs]] (2023) detailed org config file.
 - [[https://gitlab.com/dwt1/configuring-emacs][DistroTube's Configuring Emacs]] (2023) easy to follow.
@@ -102,17 +101,17 @@ Credits goes to the authors of those emacs configs that I referenced during the 
 min (last time the config get's updated, last time I refered to the config)
 
 * Early Init
-  :PROPERTIES:
-  :header-args:elisp: :tangle early-init.el :language elisp :comments link
-  :END:
+:PROPERTIES:
+:header-args:elisp: :tangle early-init.el :language elisp :comments link
+:END:
 
 *NOTE*: elisp codes under this headline are tangled to early-init.el.
 
 Emacs load early-init.el before init.el.
 
-Enable lexical-binding. Disable byte-compile for early-init.el. 
+Enable lexical-binding. Disable byte-compile for early-init.el.
 
-According to the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html][emacs manual]], byte-compiling the init does not startup very much, and often leads to problems when you forget to recompile the file. Also, from my experience, it may lead to bugs that do not happen when not using byte-compile. 
+According to the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html][emacs manual]], byte-compiling the init does not startup very much, and often leads to problems when you forget to recompile the file. Also, from my experience, it may lead to bugs that do not happen when not using byte-compile.
 #+begin_src elisp
   ;;; -*- lexical-binding: t; no-byte-compile: t -*-
 #+end_src
@@ -140,7 +139,7 @@ Disable tool-bar, menu-bar and scroll-bar before they're loaded.
 #+end_src
 
 Smooth window on startup
-#+begin_src elisp 
+#+begin_src elisp
   (setq frame-inhibit-implied-resize t)
 #+end_src
 
@@ -166,7 +165,7 @@ Make emacs startup with background Transparency.
 Below codes belongs to the original Borg seed.
 #+begin_src elisp :tangle early-init.el
   (setq load-prefer-newer t)
-  
+
   (let ((dir (file-name-directory (or load-file-name buffer-file-name))))
     (add-to-list 'load-path (expand-file-name "lib/compat" dir))
     (add-to-list 'load-path (expand-file-name "lib/packed" dir))
@@ -174,9 +173,9 @@ Below codes belongs to the original Borg seed.
   (require 'auto-compile)
   (auto-compile-on-load-mode)
   (auto-compile-on-save-mode)
-  
+
   (setq package-enable-at-startup nil)
-  
+
   (with-eval-after-load 'package
     (add-to-list 'package-archives (cons "melpa" "https://melpa.org/packages/") t))
 #+end_src
@@ -197,7 +196,7 @@ Calculating time used loading emacs excutable, as well as setting some variables
 	(progn ;     startup
 				(defvar before-user-init-time (current-time)
 					"Value of `current-time' when Emacs begins loading `user-init-file'.")
-			;; (switch-to-buffer "*Messages*")		
+			;; (switch-to-buffer "*Messages*")
 	(message "Loading Emacs...done (%fs)"
 						 (float-time (time-subtract before-user-init-time
 											before-init-time)))
@@ -235,12 +234,11 @@ Set some defaults of emacs
 #+begin_src elisp
 	(use-package borg
 	:init
-		(add-to-list 'load-path 
+		(add-to-list 'load-path
 			(expand-file-name "lib/borg" user-emacs-directory))
 	:config
 		(borg-initialize)
-	(switch-to-buffer "*Messages*")		
-
+	  (switch-to-buffer "*Messages*")
 	)
 #+end_src
 
@@ -314,24 +312,6 @@ Server allows Emacs to operate as a server for other processes. Built in.
 		:config (or (server-running-p) (server-mode)))
 #+end_src
 
-** Org
- [[https://git.tecosaur.net/tec/org-mode][Org-9.7]] did some overhaul to org-latex-preview in org mode. Load External org before the built in org is loaded.
-#+begin_src elisp
-	(use-package org)
-#+end_src
-
-All the .el files are placed in the ./lisp/ folder.
-According to the installation manual of org, we need to make autoloads before compile.
-#+begin_src conf
-  [submodule "org"]
-	  load-path = lisp
-	  build-step = make autoloads
-	  build-step = borg-update-autoloads
-	  build-step = borg-compile
-	  build-step = borg-maketexi
-	  build-step = borg-makeinfo
-#+end_src
-
 ** End of core units
 Calculate loading time of core units.
 #+begin_src elisp
@@ -367,6 +347,7 @@ tweaks to buiild emacsql
 [submodule "sqlite3"]
 	build-step = make
 #+end_src
+
 * Input
 
 We setup keybinding framworks and basic keybindings at this place. Note that not all keybindings are set here. Some package specific keybinding configs are set under where the package is configured.
@@ -377,7 +358,7 @@ I do not use evil mode anymore because of Meow Edit.
 *** Evil mode
 [[https://github.com/emacs-evil/evil][Evil mode]] that turns you into an evil.
 
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (use-package evil
     :disabled
     :init
@@ -405,7 +386,7 @@ I do not use evil mode anymore because of Meow Edit.
 *** Evil collection
 [[https://github.com/emacs-evil/evil-collection][Evil-collection]] automatically configures various Emacs modes with Vi-like keybindings.
 
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (use-package evil-collection
     ;; :demand t
     :disabled
@@ -424,7 +405,7 @@ I do not use evil mode anymore because of Meow Edit.
 #+end_src
 
 *** Evil Surround
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (use-package evil-surround
   :after evil
   :disabled
@@ -433,7 +414,7 @@ I do not use evil mode anymore because of Meow Edit.
 #+end_src
 *** Evil Nerd commenter
 [[https://github.com/redguardtoo/evil-nerd-commenter][Evi Nerd Commenter]] helps you comment code efficiently!
-#+begin_src elisp :tangle no
+#+begin_src elisp
   (use-package evil-nerd-commenter
   :after evil
   :disabled
@@ -445,114 +426,126 @@ I do not use evil mode anymore because of Meow Edit.
 #+begin_src elisp
 	(use-package meow
 	:custom-face
-							(meow-cheatsheet-command ((t (:height 180 :inherit fixed-pitch))))
+	  (meow-cheatsheet-command ((t (:height 180 :inherit fixed-pitch))))
 	:config
-							;; Replicate the behavior of vi's
-							(defun my-meow-append ()
-									"Move to the end of selection, switch to INSERT state."
-									(interactive)
-									(if meow--temp-normal
-														(progn
-															(message "Quit temporary normal mode")
-															(meow--switch-state 'motion))
-										(if (not (region-active-p))
-															(when (and (not (use-region-p))
-																				 (< (point) (point-max)))
-																(forward-char 1))
-											(meow--direction-forward)
-											(meow--cancel-selection))
-										(meow--switch-state 'insert))
-										)
-							(advice-add 'meow-append :override #'my-meow-append)
+	 ;cate the behavior of vi's
+	  (defun my-meow-append ()
+	    "Move to the end of selection, switch to INSERT state."
+	    (interactive)
+	    (if meow--temp-normal
+	           (progn
+	             (message "Quit temporary normal mode")
+	             (meow--switch-state 'motion))
+	    (if (not (region-active-p))
+	             (when (and (not (use-region-p))
+	                        (< (point) (point-max)))
+	               (forward-char 1))
+	     (meow--direction-forward)
+	     (meow--cancel-selection))
+	     (meow--switch-state 'insert)))
 
-							(setq meow-keypad-self-insert-undefined nil)
-							(setq meow-selection-command-fallback '(
+	   (advice-add 'meow-append :override #'my-meow-append)
 
-						(meow-grab . meow-right-expand)					
-						(meow-change . meow-change-char) 
-									(meow-kill . meow-delete)
-									(meow-cancel-selection . keyboard-quit)
-									(meow-pop-selection . meow-pop-grab)
-									(meow-beacon-change . meow-beacon-change-char)
-									(meow-replace . meow-yank)
-									(meow-reverse . negative-argument)
-							))
+	  (defun my-meow-open-below ()
+	    "Open a newline below and switch to INSERT state."
+	    (interactive)
+	    (if meow--temp-normal
+	        (progn
+	          (message "Quit temporary normal mode")
+	          (meow--switch-state 'motion))
+	      (meow--switch-state 'insert)
+	      ;(goto-char (line-end-position))
+				(move-end-of-line 1)
+	      (meow--execute-kbd-macro "RET")))
+	   (advice-add 'meow-open-below :override #'my-meow-open-below)
 
-							(defun meow-setup ()
-									(interactive)
-									(setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
+	 (setq meow-keypad-self-insert-undefined nil)
+	 (setq meow-selection-command-fallback '(
+	    (meow-grab . meow-right-expand)
+	    (meow-change . meow-change-char)
+	    (meow-kill . meow-delete)
+	    (meow-cancel-selection . keyboard-quit)
+	    (meow-pop-selection . meow-pop-grab)
+	    (meow-beacon-change . meow-beacon-change-char)
+	    (meow-replace . meow-yank)
+	    (meow-reverse . negative-argument)
+	  ))
 
-									(meow-motion-overwrite-define-key
-									 '("k" . meow-next)
-									 '("l" . meow-prev)
-									 '("<escape>" . ignore)
-									)
+	  (defun meow-setup ()
+	    (interactive)
+	    (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
 
-									(meow-leader-define-key
-									 ;; Use SPC (0-9) for digit arguments.
-									 '("1" . meow-digit-argument) '("2" . meow-digit-argument)
-									 '("3" . meow-digit-argument) '("4" . meow-digit-argument)
-									 '("5" . meow-digit-argument) '("6" . meow-digit-argument)
-									 '("7" . meow-digit-argument) '("8" . meow-digit-argument)
-									 '("9" . meow-digit-argument) '("0" . meow-digit-argument)
-									 '("/" . meow-keypad-describe-key) '("?" . meow-cheatsheet)
-												)
+	    (meow-motion-overwrite-define-key
+	     '("l" . meow-next)
+	     '("k" . meow-prev)
+	     '("<escape>" . ignore)
+	    )
 
-									(meow-normal-define-key
-									 '("<escape>" . meow-cancel-selection)
-									 '("1" . meow-expand-1) '("2" . meow-expand-2)
-									 '("3" . meow-expand-3) '("4" . meow-expand-4)
-									 '("5" . meow-expand-5) '("6" . meow-expand-6)
-									 '("7" . meow-expand-7) '("8" . meow-expand-8)
-									 '("9" . meow-expand-9) '("0" . meow-expand-0)
+	    (meow-leader-define-key
+	     ;; Use SPC (0-9) for digit arguments.
+	     '("1" . meow-digit-argument) '("2" . meow-digit-argument)
+	     '("3" . meow-digit-argument) '("4" . meow-digit-argument)
+	     '("5" . meow-digit-argument) '("6" . meow-digit-argument)
+	     '("7" . meow-digit-argument) '("8" . meow-digit-argument)
+	     '("9" . meow-digit-argument) '("0" . meow-digit-argument)
+	     '("/" . meow-keypad-describe-key) '("?" . meow-cheatsheet)
+	    )
 
-									 '("q" . meow-quit) '("Q" . meow-quit)
-									 ;'("w" . meow-window) '("W" . meow-window)
-									 ;'("e" . meow-) '("E" . meow-e)
-									 ;'("r" . meow-) '("R" . meow-e)
-									 ;'("t" . meow-) '("T" . meow-e)
+	    (meow-normal-define-key
+	     '("<escape>" . meow-cancel-selection)
+	     '("1" . meow-expand-1) '("2" . meow-expand-2)
+	     '("3" . meow-expand-3) '("4" . meow-expand-4)
+	     '("5" . meow-expand-5) '("6" . meow-expand-6)
+	     '("7" . meow-expand-7) '("8" . meow-expand-8)
+	     '("9" . meow-expand-9) '("0" . meow-expand-0)
 
-									 ;'("a" . meow) '("A" . meow-inner-of-thing)
-									 ;'("s" . meow) '("S" . meow-bounds-of-thing)
-									 ;'("d" . meow) '("D" . meow-end-of-thing)
-									 ;'("f" . meow) '("F" . meow-beginning-of-thing)
-									 '("g" . meow-right-expand) '("G" . meow-grab)
+	     '("q" . meow-quit) '("Q" . meow-quit)
+	     ;'("w" . meow-window) '("W" . meow-window)
+	     ;'("e" . meow-) '("E" . meow-e)
+	     ;'("r" . meow-) '("R" . meow-e)
+	     '("t" . meow-till) '("T" . meow-till-expand)
 
-									 '("z" . meow-undo) '("Z" . meow-undo-in-selection)
-									 '("x" . meow-kill) '("X" . meow-clipboard-kill)
-									 '("c" . meow-save) '("C" . meow-clipboard-save)
-									 '("v" . meow-replace) '("V" . meow-yank-pop)
-									 '("C-v" . meow-clipboard-yank)
-									 '("b" . meow-block) '("B" . meow-to-block)
+	     '("a" . begin-of-line) '("a" . meow-beginning-of-thing)
+	     '("s" . meow) '("s" . meow-bounds-of-thing)
+	     '("d" . meow) '("d" . meow-inner-of-thing)
+	     '("f" . end-of-line) '("f" . meow-end-of-thing)
+	     '("g" . meow-right-expand) '("G" . meow-grab)
 
-									 '("y" . meow-join)
-									 '("u" . meow-change) '("U" . meow-reverse)
-									 '("i" . meow-insert) '("I" . meow-open-below)
-									 '("o" . meow-append) '("O" . meow-open-above)
-									 '("p" . meow-pop-selection)
-									 '("[" . meow-beginning-of-thing) '("]" . meow-end-of-thing)
+	     '("z" . meow-undo) '("Z" . meow-undo-in-selection)
+	     '("x" . meow-kill) '("X" . meow-clipboard-kill)
+	     '("c" . meow-save)
+	     '("C-c" . meow-clipboard-save)
+	     '("v" . meow-replace) '("V" . meow-yank-pop)
+	     '("C-v" . meow-clipboard-yank)
+	     '("b". meow-block) '("B" . meow-to-block)
 
-									 '("h" . meow-line)  '("H" . meow-goto-line)
-									 '("j" . meow-left)  '("J" . meow-left-expand)
-									 '("k" . meow-next)  '("K" . meow-next-expand)
-									 '("l" . meow-prev)  '("L" . meow-prev-expand)
-									 '(";" . meow-right) '(":" . meow-right-expand)
+	     '("y" . meow-join)
+	     '("u" . meow-change) '("U" . meow-reverse)
+	     '("i" . meow-insert) '("I" . meow-open-above)
+	     '("o" . meow-append) '("O" . meow-open-below)
+	     '("p" . meow-pop-selection)
+	     '("[" . meow-beginning-of-thing) '("]" . meow-end-of-thing)
 
-									 '("n" . meow-search)      '("N" . meow-pop-search)
-									 '("m" . meow-mark-word)   '("M" . meow-mark-symbol)
-									 '("," . meow-back-word)   '("<" . meow-back-symbol) 
-									 '("." . meow-next-word)   '(">" . meow-next-symbol)
-									 '("/" . meow-reverse)
+	     '("h" . meow-line)  '("H" . meow-goto-line)
+	     '("j" . meow-left)  '("J" . meow-left-expand)
+	     '("k" . meow-prev)  '("K" . meow-prev-expand)
+	     '("l" . meow-next)  '("L" . meow-next-expand)
+	     '(";" . meow-right) '(":" . meow-right-expand)
 
-						 '("'" . fingertip-wrap-single-quote)
-									 '("\"" . fingertip-wrap-double-quote)
-									 '("(" . fingertip-wrap-round)
-									 '("[" . fingertip-wrap-bracket) 
-									 '("{" . fingertip-wrap-curly)
-									) 
-							)
-							(meow-setup)
-							(meow-global-mode)
+	     '("n" . meow-search)      '("N" . meow-pop-search)
+	     '("m" . meow-mark-word)   '("M" . meow-mark-symbol)
+	     '("," . meow-back-word)   '("<" . meow-back-symbol)
+	     '("." . meow-next-word)   '(">" . meow-next-symbol)
+	     '("/" . meow-reverse)
+
+	     '("'" . fingertip-wrap-single-quote)
+	     '("\"" . fingertip-wrap-double-quote)
+	     '("(" . fingertip-wrap-round)
+	     '("[" . fingertip-wrap-bracket)
+	     '("{" . fingertip-wrap-curly)
+	  ))
+	  (meow-setup)
+	  (meow-global-mode)
 	)
 #+end_src
 
@@ -562,43 +555,48 @@ I do not use evil mode anymore because of Meow Edit.
 
 *Note*: byte compile init.el will lead to function created by general-create-definer failed to work.
 #+begin_src elisp
-	;; Make ESC quit prompts
-	(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+  ;; Make ESC quit prompts
+  ;; (global-set-key ([kbd] "<escape>") 'keyboard-escape-quit)
 
-	(use-package general
-	:config  
-				(general-define-key
-				:keymaps '(meow-normal-state-keymap meow-motion-state-keymap)
-						"C-j"       '(windmove-left               :wk " Win H ")
-						"C-k"       '(windmove-down               :wk " Win J ")
-						"C-l"       '(windmove-up                 :wk " Win K ")
-						"C-;"       '(windmove-right              :wk " Win L ")
-						"C-,"       '(sort-tab-select-prev-tab    :wk " Tab L ")
-						"C-."       '(sort-tab-select-next-tab    :wk " Tab R ")
-				)
+  (use-package general
+  :config
+    (general-def
+    :keymaps '(global-map override)
+      "C-v"       '(meow-clipboard-yank         :wk "paste")
+      ;"C-/"       '(yank                        :wk "comment-dwim")
+    )
+    (general-def
+    :keymaps '(meow-normal-state-keymap meow-motion-state-keymap)
+      "M-j"       '(windmove-left               :wk " Win H ")
+      "M-k"       '(windmove-down               :wk " Win J ")
+      "M-l"       '(windmove-up                 :wk " Win K ")
+      "M-;"       '(windmove-right              :wk " Win L ")
+      "M-,"       '(sort-tab-select-prev-tab    :wk " Tab L ")
+      "M-."       '(sort-tab-select-next-tab    :wk " Tab R ")
+    )
 
-				(general-define-key
-				:keymaps '(vertico-map)
-			"C-k"       '(vertico-next                  :wk "")
-						"C-l"       '(vertico-previous              :wk "")
-			"C-j"       '(vertico-directory-delete-word :wk "")
-						"C-;"       '(vertico-directory-enter       :wk "")
-						"C-,"       '(vertico-previous-group        :wk "")
-						"C-."       '(vertico-next-group            :wk "")
-						"RET"       'vertico-directory-enter
-						"DEL"       'vertico-directory-delete-char
-						"M-DEL"     'vertico-directory-delete-word
-				)
-				;; (general-create-definer config/leader
-				;; ;:states '(normal insert visual emacs)
-				;; :keymaps 'meow-normal-state-map
-				;; ;:keymaps 'override
-				;; :prefix "SPC" ;; set leader
-				;; :global-prefix "M-SPC" ;; access leader in insert mode
-				;; )
-	)
+    (general-def
+    :keymaps '(vertico-map)
+      "C-k"       '(vertico-next                  :wk "")
+      "C-l"       '(vertico-previous              :wk "")
+      "C-j"       '(vertico-directory-delete-word :wk "")
+      "C-;"       '(vertico-directory-enter       :wk "")
+      "C-,"       '(vertico-previous-group        :wk "")
+      "C-."       '(vertico-next-group            :wk "")
+      "RET"       'vertico-directory-enter
+      "DEL"       'vertico-directory-delete-char
+      "M-DEL"     'vertico-directory-delete-word
+    )
+    ;; (general-create-definer config/leader
+    ;; ;:states '(normal insert visual emacs)
+    ;; :keymaps 'meow-normal-state-map
+    ;; ;:keymaps 'override
+    ;; :prefix "SPC" ;; set leader
+    ;; :global-prefix "M-SPC" ;; access leader in insert mode
+    ;; )
+  )
  #+end_src
- 
+
  #+begin_src elisp :tangle no
 	 ;; buffers
 	 (config/leader :infix "b"
@@ -732,7 +730,7 @@ options for =which-key-posframe-poshandler=:
   :disabled
   :config
     (setq transient-posframe-min-height 1)
-    (setq transient-posframe-mode t) 
+    (setq transient-posframe-mode t)
   )
 #+end_src
 ** Key-echo
@@ -762,102 +760,55 @@ options for =which-key-posframe-poshandler=:
 				rime-predicate-prog-in-code-p))
 	)
 #+end_src
+
 * Basic UI
 We setup UI for basic emacs widgets at this place. Again, not all UI's are set here.
 Some package specific UI configs are set under where the package is configured.
 ** Fonts
-Defining the various fonts that Emacs will use.
-Note that monospace fonts are not always fixed-pitch [[https://stackoverflow.com/questions/70797173/monospace-font-characters-are-not-fixed-width][Monospace vs fixed-width]].
-#+begin_src elisp
-	(set-face-attribute 'default nil
-		;:font "JetBrainsMono Nerd Font"
-		:font "RobotoMono Nerd Font Propo"
-		;:font "Sarasa Term SC Nerd"
-		;:font "Sarasa Gothic SC"
-		:height 150
-	)
-	(set-face-attribute 'variable-pitch nil
-		:font "Sarasa Gothic SC"
-		:height 160
-	)
-	(set-face-attribute 'fixed-pitch nil
-		;:font "Sarasa Fixed SC"
-		:font "RobotoMono Nerd Font Propo"
-		:height 150
-	)
-	(set-face-attribute 'fixed-pitch-serif nil
-		;:family "Monospace Serif"
-		:font "RobotoMono Nerd Font Propo"
-		:height 150
-	)
-#+end_src
+Fonts in emacs is really a complex system. If you don't treat it with care, you'll definitedly encounter some bugs.
 
-Makes commented text and keywords italics. Working in emacsclient but not emacs.
-#+begin_src elisp
-	(set-face-attribute 'font-lock-comment-face nil
-		:foreground "LightSteelBlue4" :slant 'italic)
-	(set-face-attribute 'font-lock-keyword-face nil :slant 'italic)
-#+end_src
+One essential thing about font is pitch. In general, pitch control's whether a font is fixed-widthed or non-fixed-widthed. Currently there're 2 helpful modes that controls font pitch: =mixed-pitch-mode= and =fixed-pitch-mode=.
 
-links
+I recommend stick to only one of these modes and does all the font settings based on the mode. For me I choses fixed-pitch-mode. This mode makes certain major mode have fixed-pitch fonts, and left all the other fonts to the default font (which can be set to some non-fixed-pitch fonts)
+
+*** Fixed-pitch-mode
+[[https://github.com/cstby/fixed-pitch-mode][Fixed-pitch-mode]] make certain buffers to have fixed-pitch fonts.
 #+begin_src elisp
-	(set-face-attribute 'link nil
-		:foreground "#ffcc66" :underline t :bold nil)
+  (use-package fixed-pitch
+  :config
+    ;; This cause some bugs
+    ;; (add-to-list 'default-frame-alist '(font . "Sarasa Gothic SC-16" ))
+    (set-face-attribute 'default nil
+      :font "Sarasa Gothic SC"
+      :height 150)
+    (set-face-attribute 'fixed-pitch nil
+    ;:font "Sarasa Fixed SC"
+      :font "RobotoMono Nerd Font Mono"
+      :height 1.0)
+    ;(set-fontset-font t 'symbol "Noto Sans Symbols 2")
+    (set-face-attribute 'link nil
+  	  :foreground "#ffcc66" :underline t :bold nil)
+    (fixed-pitch-mode)
+  )
+#+end_src
+*** COMMENT Mixed-pitch-mode
+#+begin_src elisp
+  (use-package mixed-pitch-mode
+  :defer t
+  :config
+    (setq  mixed-pitch-set-height t)
+  )
 #+end_src
 
 *** Zooming In/Out
 
 You can use the bindings CTRL plus =/- for zooming in/out.  You can also use CTRL plus the mouse wheel for zooming in/out.
-
 #+begin_src elisp
-	(use-package org
-	:custom-face
-		(org-latex-and-related ((t (:foreground "LightSteelBlue4" :weight bold))))
-		(org-meta-line ((t (:foreground "LightSteelBlue4"))))
-		(org-special-keyword ((t (:foreground "LightSteelBlue4"))))
-		(org-tag ((t (:foreground "LightSteelBlue4" :weight normal))))
-	:hook (org-mode . mixed-pitch-mode)
-	:config
-		(set-face-attribute 'org-level-1 nil
-				:family "Sarasa Gothic SC" :height 1.4 )
-		(set-face-attribute 'org-level-2 nil
-				:family "Sarasa Gothic SC" :height 1.4 )
-		(set-face-attribute 'org-level-3 nil
-				:family "Sarasa Gothic SC" :height 1.4 )
-		(set-face-attribute 'org-level-4 nil
-				:family "Sarasa Gothic SC" :height 1.3 )
-		(set-face-attribute 'org-level-5 nil
-				:family "Sarasa Gothic SC" :height 1.2 )
-		(set-face-attribute 'org-level-6 nil
-				:family "Sarasa Gothic SC" :height 1.1 )
-		(set-face-attribute 'org-document-title nil
-				:family "Sarasa Gothic SC" :height 2.5 :bold t)
-		(set-face-attribute 'org-document-info nil
-				:family "Sarasa Gothic SC" :height 1.8 :bold t)
-		(set-face-attribute 'org-document-info-keyword nil
-			:foreground "LightSteelBlue4" :inherit 'org-document-info)
-		(set-face-attribute 'org-block t
-			:extend t :inherit 'fixed-pitch)
-	)
+(global-set-key (kbd "C-=") 'text-scale-increase)
+(global-set-key (kbd "C--") 'text-scale-decrease)
+(global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
+(global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
 #+end_src
-
-*** Pitch
-There're 2 modes that controls pitch, mixed-pitch-mode and fixed-pitch-mode.
-#+begin_src elisp
-	(use-package fixed-pitch
-	:defer t
-	)
-#+end_src
-
-#+begin_src elisp
-	(use-package mixed-pitch-mode
-	:defer t
-	:hook (Custom-mode . mixed-pitch-mode)
-	:config
-		(setq  mixed-pitch-set-height t)
-	)
-#+end_src
-
 ** Icons
 *** All-the-icons
 
@@ -873,6 +824,15 @@ There're 2 modes that controls pitch, mixed-pitch-mode and fixed-pitch-mode.
 
 *NOTE*: In order for the icons to work it is very important that you install the Resource Fonts included in this package. Run [[elisp:all-the-icons-install-fonts][M-x all-the-icons-install-fonts]] to install necessary icons.
 
+*** All-the-icons-completion
+All-the-icons-completion makes icons appear in the minibuffer. Cool.
+#+begin_src elisp
+  (use-package all-the-icons-completion
+    :after (marginalia all-the-icons)
+    :hook (marginalia-mode . all-the-icons-completion-marginalia-setup)
+    :init
+    (all-the-icons-completion-mode))
+#+end_src
 *** Nerd-icons
 [[https://github.com/rainstormstudio/nerd-icons.el][Nerd-icons]] is a library for easily using Nerd Font icons inside Emacs, an alternative to all-the-icons.
 Run [[elisp:nerd-icons-install-fonts][M-x nerd-icons-install-fonts]] to install =Symbols Nerd Fonts Mono= for you.
@@ -888,8 +848,8 @@ Run [[elisp:nerd-icons-install-fonts][M-x nerd-icons-install-fonts]] to install 
 
 ** Widgets
 *** Posframe
-[[https://github.com/tumashu/posframe][Posframe]] can pop up a frame at point, this *posframe* is a child-frame connected to its root window's buffer, in which some texts are showed. It's more pretty and tidy than showing everything in the minibuffer.  
-Posframe can be used by many useful and important package, such as vertico, consult, emacs-rime, lsp-bridge. 
+[[https://github.com/tumashu/posframe][Posframe]] can pop up a frame at point, this *posframe* is a child-frame connected to its root window's buffer, in which some texts are showed. It's more pretty and tidy than showing everything in the minibuffer.
+Posframe can be used by many useful and important package, such as vertico, consult, emacs-rime, lsp-bridge.
 
 Note that a 'frame' is a window on the desktop, a 'window' is a subwindow of emacs.
 #+begin_src elisp
@@ -898,7 +858,7 @@ Note that a 'frame' is a window on the desktop, a 'window' is a subwindow of ema
 		(defun posframe-poshandler-frame-upper-center! (info)
 		"Posframe's position handler.
 
-		 This poshandler function let center of posframe align to 
+		 This poshandler function let center of posframe align to
 		 vertically upper 1/6, horizontally center
 		 of frame."
 		(cons (/ (max 0 (- (plist-get info :parent-frame-width)
@@ -908,7 +868,7 @@ Note that a 'frame' is a window on the desktop, a 'window' is a subwindow of ema
 		(defun posframe-poshandler-window-upper-center! (info)
 		 "Posframe's position handler.
 
-			 This poshandler function let center of posframe align to 
+			 This poshandler function let center of posframe align to
 			 vertically upper 1/6, horizontally center
 			 of window."
 		(let* ((window-left    (plist-get info :parent-window-left))
@@ -936,12 +896,12 @@ Note that a 'frame' is a window on the desktop, a 'window' is a subwindow of ema
 #+end_src
 
 *** Holo-layer
-[[https://github.com/manateelazycat/holo-layer][Holo-layer]] is developed based on PyQt, aiming to significantly enhance the visual experience of Emacs. 
+[[https://github.com/manateelazycat/holo-layer][Holo-layer]] is developed based on PyQt, aiming to significantly enhance the visual experience of Emacs.
 #+begin_src elisp
   (use-package holo-layer
   :defer t
   :if (memq window-system '(pgtk mac ns))
-  :config 
+  :config
   	(setq holo-layer-enable-cursor-animation 1
           holo-layer-enable-window-border 1
   				holo-layer-sort-tab-ui 1
@@ -959,14 +919,14 @@ Note that a 'frame' is a window on the desktop, a 'window' is a subwindow of ema
 [[https://github.com/hlissner/emacs-solaire-mode][Solaire-mode]] makes certain buffers grossly incandescent. Useful to distinguish the main  buffers from others.
 #+begin_src elisp
   (use-package solaire-mode
-  :defer t	
+  :defer t
   :init (solaire-global-mode)
   )
 #+end_src
 
 ** Spacing
 *** Margin
-We have 3 modes that can help centering text in a window. 
+We have 3 modes that can help centering text in a window.
 But currently we only use olivetti mode.
 
 **** Olivetti
@@ -977,29 +937,29 @@ But currently we only use olivetti mode.
     Note that for pages with variable-pitch fonts,
     =olivetti-body-width= should be set smaller for it to look good.
 #+begin_src elisp
-	(use-package olivetti
-	:hook (org-mode . olivetti-mode)
-				(Custom-mode . olivetti-mode)
-				(help-mode . olivetti-mode)
-				;(dashboard-mode . olivetti-mode)
-				(dashboard-mode . variable-pitch-mode)
-				(olivetti-mode . visual-line-mode)
-	:init
-				(setq-default fill-column 78)
-	:config
-				;If nil (the default), use the value of fill-column + 2.
-				(setq olivetti-body-width nil
-								 olivetti-style 'fancy)
-				(set-face-attribute 'olivetti-fringe nil :background "#171B24")
-				(defun config/window-center (width)
-						(interactive)
-						(setq fill-column width)
-						(olivetti-mode)
-				)
-				;; (config/leader
-				;; 	"tc"  '(olivetti-mode     :wk "󰉠 Center")
-				;; )
-	)
+  (use-package olivetti
+  :hook (org-mode . olivetti-mode)
+        (Custom-mode . olivetti-mode)
+        (help-mode . olivetti-mode)
+        ;(dashboard-mode . olivetti-mode)
+        (dashboard-mode . variable-pitch-mode)
+        (olivetti-mode . visual-line-mode)
+  :init
+        (setq-default fill-column 90)
+  :config
+        ;If nil (the default), use the value of fill-column + 2.
+        (setq olivetti-body-width nil
+                 olivetti-style 'fancy)
+        ;; (set-face-attribute 'olivetti-fringe nil :background "#171B24")
+        (defun config/window-center (width)
+            (interactive)
+            (setq fill-column width)
+            (olivetti-mode)
+        )
+        ;; (config/leader
+        ;;  "tc"  '(olivetti-mode     :wk "󰉠 Center")
+        ;; )
+  )
 #+end_src
 
 **** Visual-fill-column
@@ -1058,7 +1018,7 @@ Set background Transparency, according to [[https://www.emacswiki.org/emacs/Tran
 		(defun +pixel-scroll-interpolate-up (&optional lines)
 				(interactive)
 				(if lines
-						(pixel-scroll-precision-interpolate (* lines  
+						(pixel-scroll-precision-interpolate (* lines
 						(pixel-line-height))))
 				(pixel-scroll-interpolate-up))
 
@@ -1076,7 +1036,7 @@ Set background Transparency, according to [[https://www.emacswiki.org/emacs/Tran
 	:config
 		(setq diff-hl-draw-borders nil)
 		(global-diff-hl-mode)
-		;(diff-hl-margin-mode) 
+		;(diff-hl-margin-mode)
 		(add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
 	)
 #+end_src
@@ -1087,19 +1047,17 @@ Beacon makes the cursor shine when scrolling window or jumping. Somewhat buggy.
 #+begin_src elisp
 	(use-package beacon
 	:defer t
-	:config  
+	:config
 				(beacon-mode)
 	)
 #+end_src
 
-#+RESULTS:
-: #s(hash-table size 65 test eql rehash-size 1.5 rehash-threshold 0.8125 data (:use-package (25915 64083 165201 834000) :init (25915 64083 165196 884000) :config (25915 64083 165192 717000) :config-secs (0 0 226 641000) :init-secs (0 0 254 292000) :use-package-secs (0 0 265 233000)))
-
 *** Pulse-Cursor
 Makes the cursor to blink with fade out animation.
 #+begin_src elisp
-	(use-package pulsing-cursor
-			:config (pulsing-cursor-mode +1))
+  (use-package pulsing-cursor
+  		:config (pulsing-cursor-mode)
+  )
 #+end_src
 *** Goggles
 Goggles highlights the modified region using pulse. Currently the commands undo, yank, kill and delete are supported.
@@ -1117,8 +1075,20 @@ Goggles highlights the modified region using pulse. Currently the commands undo,
 		(global-hl-line-mode)
 	)
 #+end_src
+
 * Facilities
+** Auto-save
+#+begin_src elisp
+  (use-package auto-save
+  :after lsp-bridge
+  :config
+    (auto-save-enable)
+    (setq auto-save-silent t)   ; quietly save
+    (setq auto-save-delete-trailing-whitespace t)
+  )
+#+end_src
 ** Long tail
+*** DIff mode
 #+begin_src elisp
 	(use-package diff-mode
 		:defer t
@@ -1128,7 +1098,7 @@ Goggles highlights the modified region using pulse. Currently the commands undo,
 			(set-face-attribute 'diff-refine-removed nil :extend t)
 			(set-face-attribute 'diff-refine-added   nil :extend t)))
 #+end_src
-
+*** Dired
 #+begin_src elisp
 	(use-package dired
 		:defer t
@@ -1142,7 +1112,7 @@ a MinorMode which shows you, in the echo area, the argument list of the function
 		:when (version< "25" emacs-version)
 		:config (global-eldoc-mode))
 #+end_src
-*** Help 
+*** Help
 #+begin_src elisp
 	(use-package help
 		:defer t
@@ -1270,37 +1240,38 @@ Dashboard is an extensible startup screen showing you recent files, bookmarks, a
 
 Emacs currently cannot display correpng or svg with alpha channels, when emacs's background is transparent. The solution is to use xpm format image.
 #+begin_src elisp
-	(use-package dashboard
-	:init
-		(setq initial-buffer-choice 'dashboard-open
-				dashboard-image-banner-max-width 1100
-				dashboard-set-heading-icons t
-				dashboard-center-content t ;; set to 't' for centered content
-				dashboard-set-file-icons t
-				initial-buffer-choice
-				(lambda () (get-buffer-create "*dashboard*"))
-				dashboard-startup-banner ;; use custom image as banner
-				(concat user-emacs-directory "assets/EmaxBound.webp")
-				dashboard-items '(
-				(recents . 5)
-				(agenda . 5 )
-				(bookmarks . 3)
-				(projects . 3)
-				(registers . 3)
-				)
-		)
-	:config
-		(dashboard-setup-startup-hook)
+  (use-package dashboard
+  :init
+  	(setq initial-buffer-choice 'dashboard-open
+  			dashboard-image-banner-max-width 1100
+  			dashboard-set-heading-icons t
+  			dashboard-center-content t ;; set to 't' for centered content
+  			dashboard-set-file-icons t
+  			initial-buffer-choice
+  			(lambda () (get-buffer-create "*dashboard*"))
+  			dashboard-startup-banner ;; use custom image as banner
+  			(concat user-emacs-directory "assets/EmaxBound.webp")
+  			dashboard-items '(
+  			(recents . 5)
+  			(agenda . 5 )
+  			(bookmarks . 3)
+  			(projects . 3)
+  			(registers . 3)
+  			)
+  	)
+  :config
+  	(dashboard-setup-startup-hook)
   	(setq-default header-line-format mode-line-format)
   	(setq-default mode-line-format nil)
+  	(set-face-attribute 'dashboard-items-face nil)
 
-	:bind (:map dashboard-mode-map
-		("l" . 'dashboard-previous-line)
-		("k" . 'dashboard-next-line)
-		(";" . 'dashboard-next-section)
-		("j" . 'dashboard-previous-section)
-		)
-	)
+  :bind (:map dashboard-mode-map
+  	("k" . 'dashboard-previous-line)
+  	("l" . 'dashboard-next-line)
+  	(";" . 'dashboard-next-section)
+  	("j" . 'dashboard-previous-section)
+  	)
+  )
 #+end_src
 
 ** Modeline
@@ -1320,7 +1291,7 @@ Emacs currently cannot display correpng or svg with alpha channels, when emacs's
   	;; let modeline show on the header, not bottom
   	(defun move-up-modeline ()
   		(interactive)
-  		(progn 
+  		(progn
   			(setq-default header-line-format mode-line-format)
   			(setq-default mode-line-format nil)
   		))
@@ -1349,7 +1320,7 @@ Emacs currently cannot display correpng or svg with alpha channels, when emacs's
 		(add-hook 'xwidget-webkit-mode-hook  #'nano-modeline-xwidget-mode)
 		(add-hook 'messages-buffer-mode-hook #'nano-modeline-message-mode)
 		(add-hook 'org-capture-mode-hook     #'nano-modeline-org-capture-mode)
-		(add-hook 'org-agenda-mode-hook      #'nano-modeline-org-agenda-mode)  
+		(add-hook 'org-agenda-mode-hook      #'nano-modeline-org-agenda-mode)
 	)
 #+end_src
 *** Diminish
@@ -1358,6 +1329,16 @@ This package implements hiding or abbreviation of the modeline displays (lighter
 	(use-package diminish)
 #+end_src
 
+*** Awesome-tray
+#+begin_src elisp
+  (use-package awesome-tray
+  :defer t
+  :init
+    ;(awesome-tray-mode)
+  :config
+    (setq awesome-tray-hide-mode-line nil)
+  )
+#+end_src
 ** Minibuffer
 *** Vertico
 [[https://github.com/minad/vertico#extensions][Vertico]] provides a performant and minimalistic vertical completion UI based on the default completion system.
@@ -1392,7 +1373,7 @@ Each component can match in any one of several ways: literally, as a regexp, as 
 	(use-package orderless
 		:init
 		(setq completion-styles '(orderless))
-		(setq orderless-component-separator 
+		(setq orderless-component-separator
 						#'orderless-escapable-split-on-space)
 		(setq orderless-matching-styles
 						'(orderless-initialism orderless-prefixes orderless-regexp))
@@ -1481,19 +1462,19 @@ See [[* Posframe][Posframe]] for function defintion.
 
 								(consult-imenu
 									(vertico-count . 40)
-									(vertico-posframe-poshandler . 
+									(vertico-posframe-poshandler .
 										 posframe-poshandler-window-top-right-corner)
 									(vertico-posframe-width . 80))
 
 								(consult-outline
 									(vertico-count . 30)
-									(vertico-posframe-poshandler . 
+									(vertico-posframe-poshandler .
 										 posframe-poshandler-window-top-right-corner)
 									(vertico-posframe-width . 40))
 
 								(consult-line
 						(vertico-count . 30)
-									(vertico-posframe-poshandler . 
+									(vertico-posframe-poshandler .
 										 posframe-poshandler-frame-top-right-corner)
 									(vertico-posframe-width . 60))
 
@@ -1614,8 +1595,8 @@ See [[* Posframe][Posframe]] for function defintion.
 
 	:init
 
-				;; Optionally configure the register formatting. 
-		;; This improves the register preview for 
+				;; Optionally configure the register formatting.
+		;; This improves the register preview for
 		;; `consult-register', `consult-register-load',
 		;; `consult-register-store' and the Emacs built-ins.
 				(setq register-preview-delay 0.5
@@ -1631,7 +1612,7 @@ See [[* Posframe][Posframe]] for function defintion.
 
 	:config
 
-				;; Optionally configure preview. 
+				;; Optionally configure preview.
 		;; The default value is 'any, such that any key triggers the preview.
 				;; (setq consult-preview-key 'any)
 				;; (setq consult-preview-key "M-.")
@@ -1640,7 +1621,7 @@ See [[* Posframe][Posframe]] for function defintion.
 		;; For some commands and buffer sources it is useful to configure the
 				;; :preview-key on a per-command basis using the `consult-customize' macro.
 				(consult-customize
-				 consult-theme 
+				 consult-theme
 			 :preview-key '(:debounce 0.2 any)
 				 consult-ripgrep consult-git-grep consult-grep
 				 consult-bookmark consult-recent-file consult-xref
@@ -1674,13 +1655,6 @@ See [[* Posframe][Posframe]] for function defintion.
 	)
 #+end_src
 
-*** Awesome-tray
-#+begin_src elisp
-  (use-package awesome-tray
-  :init
-    (awesome-tray-mode)
-  )
-#+end_src
 ** Tabs
 **** COMMENT Tab-line-mode
 Code stolen from [[https://emacs-china.org/t/27-1-tab-line-mode/20514][Emacs China]]
@@ -1690,15 +1664,15 @@ Code stolen from [[https://emacs-china.org/t/27-1-tab-line-mode/20514][Emacs Chi
     "* Included buffers in tabbar."
     :type '(repeat (string :tag "Buffer Name"))
     :group 'EmacsPortable)
-  
+
   (defcustom config/excluded-buffers '("*Messages*" "*Completions*" "*ESS*")
     "* Excluded buffers in tabbar."
     :type '(repeat (string :tag "Buffer Name"))
     :group 'EmacsPortable)
 
   (setq config/excluded-buffers '(
-    "*Messages*" "*Completions*" "*ESS*" 
-    "*Compile-Log*" "*Ibuffer*" "*SPEEDBAR*" 
+    "*Messages*" "*Completions*" "*ESS*"
+    "*Compile-Log*" "*Ibuffer*" "*SPEEDBAR*"
     "*etags tmp*" "*reg group-leader*" "*Pymacs*" "*grep*")
   )
   (setq config/included-buffers '("*scratch*" "*shell*"))
@@ -1726,7 +1700,7 @@ Code stolen from [[https://emacs-china.org/t/27-1-tab-line-mode/20514][Emacs Chi
           :init
           (setq tab-line-tabs-function 'ep-tabbar-buffer-list)
           :config
-          (global-tab-line-mode 1)  
+          (global-tab-line-mode 1)
           )
 #+end_src
 **** Tab-bar-mode
@@ -1743,7 +1717,7 @@ Code stolen from [[https://emacs-china.org/t/27-1-tab-line-mode/20514][Emacs Chi
 		(calendar-mode . centaur-tabs-local-mode)
 	:init
 	:config
-		(setq 
+		(setq
 			centaur-tabs-set-icons t
 			centaur-tabs-set-modified-marker t
 			centaur-tabs-modified-marker "M"
@@ -1762,7 +1736,7 @@ Code stolen from [[https://emacs-china.org/t/27-1-tab-line-mode/20514][Emacs Chi
 						magit-log-mode
 						magit-file-mode
 						magit-blob-mode
-						magit-blame-mode))) 
+						magit-blame-mode)))
 							 "Emacs")
 				((derived-mode-p '(prog-mode org-mode) "Editing"))
 				((derived-mode-p 'dired-mode) "Dired")
@@ -1786,7 +1760,7 @@ Code stolen from [[https://emacs-china.org/t/27-1-tab-line-mode/20514][Emacs Chi
 
 	)
 #+end_src
-**** Sort-tab 
+**** Sort-tab
 
 #+begin_src elisp
 	(use-package sort-tab
@@ -2081,6 +2055,7 @@ It is very useful for figuring out how things work in Emacs.
 #+begin_src elisp
   (use-package voyager)
 #+end_src
+
 * Coding
 ** LSP-bridge
 [[https://github.com/manateelazycat/lsp-bridge][lsp-bridge]] builds a high-speed cache between Emacs and the LSP server.
@@ -2103,9 +2078,9 @@ tweaks to build lsp-bridge
 ** Treesit
 You can find the addresses of language parsers at [[https://tree-sitter.github.io/tree-sitter/][treesitter's official doc]].
 To enable treesit support for a language, you need to run =M-x treesit-install-language-grammar= and select the language. This will clone the language's tree-sitter repo and build it (requires system =cc=).
-#+begin_src elisp 
+#+begin_src elisp
   (use-package treesit
-  :commands (treesit-install-language-grammar  
+  :commands (treesit-install-language-grammar
   					 config/treesit-install-all-languages)
   :init
   	(setq treesit-language-source-alist
@@ -2126,16 +2101,16 @@ To enable treesit support for a language, you need to run =M-x treesit-install-l
   			(json . ("https://github.com/tree-sitter/tree-sitter-json"))
   			(lua . ("https://github.com/Azganoth/tree-sitter-lua"))
   			(make . ("https://github.com/alemuller/tree-sitter-make"))
-  			(markdown . ("https://github.com/MDeiml/tree-sitter-markdown" nil   
+  			(markdown . ("https://github.com/MDeiml/tree-sitter-markdown" nil
   				"tree-sitter-markdown/src"))
   			(nix . ("https://github.com/nix-community/tree-sitter-nix.git"))
   			(ocaml . ("https://github.com/tree-sitter/tree-sitter-ocaml" nil "ocaml/src"))
   			(org . ("https://github.com/milisims/tree-sitter-org"))
   			(python . ("https://github.com/tree-sitter/tree-sitter-python"))
   			(php . ("https://github.com/tree-sitter/tree-sitter-php"))
-  			(typescript . ("https://github.com/tree-sitter/tree-sitter-typescript" nil 
+  			(typescript . ("https://github.com/tree-sitter/tree-sitter-typescript" nil
   					"typescript/src"))
-  			(tsx . ("https://github.com/tree-sitter/tree-sitter-typescript" nil 
+  			(tsx . ("https://github.com/tree-sitter/tree-sitter-typescript" nil
   					"tsx/src"))
   			(ruby . ("https://github.com/tree-sitter/tree-sitter-ruby"))
   			(rust . ("https://github.com/tree-sitter/tree-sitter-rust"))
@@ -2169,7 +2144,7 @@ To enable treesit support for a language, you need to run =M-x treesit-install-l
   				(rust-mode       . rust-ts-mode)
   				))
 
-  (add-hook 'markdown-mode-hook #'(lambda () 
+  (add-hook 'markdown-mode-hook #'(lambda ()
   					(treesit-parser-create 'markdown)))
 
   (add-hook 'web-mode-hook #'(lambda ()
@@ -2219,13 +2194,13 @@ Disabled because I use lazycat's method instead.
 #+begin_src elisp
 	(use-package auctex)
 #+end_src
-AucTex needs some tweaks to be built. 
+AucTex needs some tweaks to be built.
 To build auctex, =autoconf= should be avaliable on your system.
 #+begin_src conf :tangle .borgconfig
 [submodule "auctex"]
 	load-path = .
 	build-step = ./autogen.sh
-	build-step = ./configure
+	build-step = ./configure --with-lispdir=~/.emacs.d/lib/auctex
 	build-step = make
 	build-step = make doc
 	build-step = borg-maketexi
@@ -2233,13 +2208,17 @@ To build auctex, =autoconf= should be avaliable on your system.
 	build-step = borg-update-autoloads
 #+end_src
 **** CDTeX
+#+begin_src elisp
 
-**** LAAS
+#+end_src
+**** COMMENT LAAS
+
 [[https://github.com/tecosaur/LaTeX-auto-activating-snippets][LASS (LaTeX Auto Activating Snippets)]] is a chunky set of LaTeX snippets for the auto-activating-snippets engine.
 
 #+begin_src elisp
-	(use-package laas
-		:hook (LaTeX-mode . laas-mode))
+  (use-package laas
+  :after ass
+  :hook (LaTeX-mode . laas-mode))
 #+end_src
 
 *** Nix
@@ -2254,7 +2233,7 @@ To build auctex, =autoconf= should be avaliable on your system.
   :mode "\\.nix\\'"
   )
 #+end_src
-*** YAML 
+*** YAML
 #+begin_src elisp
   (use-package yaml-mode
   :mode "\\.yaml\\'"
@@ -2263,41 +2242,41 @@ To build auctex, =autoconf= should be avaliable on your system.
 ** UI
 *** Line Number
 #+begin_src elisp
-	(use-package emacs
-	:custom-face
-				(line-number ((t (
-						:weight normal :slant normal :foreground "LightSteelBlue4"     
-						:inherit default))))
-				(line-number-current-line ((t (
-						:inherit (hl-line default) :slant normal :foreground "#ffcc66"))))
-	:hook (prog-mode . config/toggle-line-number-absolute)
-	:config
-				(defun config/toggle-line-number-nil ()
-						(interactive)
-						(setq display-line-numbers nil)
-				)
-				(defun config/toggle-line-number-absolute ()
-						(interactive)
-						(setq display-line-numbers t)
-				)
-				(defun config/toggle-line-number-relative ()
-						(interactive)
-						(setq display-line-numbers 'relative)
-				)
-				(defun config/toggle-line-number-visual ()
-						(interactive)
-						(setq display-line-numbers 'visual)
-				)
-				;; (config/leader :infix "tl"
-				;; 	""    '(nil                                :wk "  Line Number ")
-				;; 	"DEL" '(which-key-undo                     :wk "󰕍 Undo key   ")
-				;; 	"n"   '(config/toggle-line-number-nil      :wk "󰅖 Nil        ")
-				;; 	"a"   '(config/toggle-line-number-absolute :wk "󰱇 Absolute   ")
-				;; 	"r"   '(config/toggle-line-number-relative :wk "󰰠 Relative   ")
-				;; 	"v"   '(config/toggle-line-number-visual   :wk " Visual     ")
-				;; 	"h"   '(hl-line-mode                       :wk "󰸱 Hl-line")
-				;; )
-	)
+  (use-package emacs
+  :custom-face
+  			;; (line-number ((t (
+  			;; 		:weight normal :slant normal :foreground "LightSteelBlue4"
+  			;; 		:inherit default))))
+  			(line-number-current-line ((t (
+  					:inherit (hl-line default) :slant normal :foreground "#ffcc66"))))
+  :hook (prog-mode . config/toggle-line-number-absolute)
+  :config
+  			(defun config/toggle-line-number-nil ()
+  					(interactive)
+  					(setq display-line-numbers nil)
+  			)
+  			(defun config/toggle-line-number-absolute ()
+  					(interactive)
+  					(setq display-line-numbers t)
+  			)
+  			(defun config/toggle-line-number-relative ()
+  					(interactive)
+  					(setq display-line-numbers 'relative)
+  			)
+  			(defun config/toggle-line-number-visual ()
+  					(interactive)
+  					(setq display-line-numbers 'visual)
+  			)
+  			;; (config/leader :infix "tl"
+  			;; 	""    '(nil                                :wk "  Line Number ")
+  			;; 	"DEL" '(which-key-undo                     :wk "󰕍 Undo key   ")
+  			;; 	"n"   '(config/toggle-line-number-nil      :wk "󰅖 Nil        ")
+  			;; 	"a"   '(config/toggle-line-number-absolute :wk "󰱇 Absolute   ")
+  			;; 	"r"   '(config/toggle-line-number-relative :wk "󰰠 Relative   ")
+  			;; 	"v"   '(config/toggle-line-number-visual   :wk " Visual     ")
+  			;; 	"h"   '(hl-line-mode                       :wk "󰸱 Hl-line")
+  			;; )
+  )
 #+end_src
 
 *** Rainbow-mode
@@ -2321,7 +2300,7 @@ parentheses, brackets, and braces according to their depth.
 	:hook (prog-mode . highlight-indent-guides-mode)
 	:config
 		(setq highlight-indent-guides-method 'bitmap
-					highlight-indent-guides-character 9474 
+					highlight-indent-guides-character 9474
 					highlight-indent-guides-auto-enabled nil
 		)
 		(set-face-attribute 'highlight-indent-guides-character-face nil
@@ -2340,6 +2319,10 @@ and tries to be smart about it.
 		(smartparens-global-mode)
 	)
 #+end_src
+** COMMENT Ts-fold
+#+begin_src elisp
+  (use-package ts-fold)
+#+end_src
 ** Fingertip
 
 fingertip.el is a plugin that provides grammatical edit base on treesit
@@ -2352,7 +2335,7 @@ fingertip.el is a plugin that provides grammatical edit base on treesit
 					'cmake-ts-mode-hook
 					'java-mode-hook
 					'haskell-mode-hook
-					'emacs-lisp-mode-hook 
+					'emacs-lisp-mode-hook
 						 'lisp-interaction-mode-hook 'lisp-mode-hook
 					'maxima-mode-hook
 					'ielm-mode-hook
@@ -2437,7 +2420,7 @@ than `electric-indent-mode'.
 	)
 #+end_src
 
-** AAS
+** COMMENT AAS
 [[https://github.com/ymarco/auto-activating-snippets][AAS (Auto Activating Snippets)]] implements an engine for auto-expanding snippets. It is done by tracking your inputted chars along a tree until you complete a registered key sequence.
 #+begin_src elisp
 	(use-package aas
@@ -2473,10 +2456,77 @@ than `electric-indent-mode'.
 			"supp" nil))
 #+end_src
 
+** Tempel
+#+begin_src elisp
+  (use-package tempel
+    ;; Require trigger prefix before template name when completing.
+    ;; :custom
+    ;; (tempel-trigger-prefix "<")
+
+    :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
+           ("M-*" . tempel-insert))
+
+    :init
+
+    ;; Setup completion at point
+    (defun tempel-setup-capf ()
+      ;; Add the Tempel Capf to `completion-at-point-functions'.
+      ;; `tempel-expand' only triggers on exact matches. Alternatively use
+      ;; `tempel-complete' if you want to see all matches, but then you
+      ;; should also configure `tempel-trigger-prefix', such that Tempel
+      ;; does not trigger too often when you don't expect it. NOTE: We add
+      ;; `tempel-expand' *before* the main programming mode Capf, such
+      ;; that it will be tried first.
+      (setq-local completion-at-point-functions
+                  (cons #'tempel-expand
+                        completion-at-point-functions)))
+
+    (add-hook 'conf-mode-hook 'tempel-setup-capf)
+    (add-hook 'prog-mode-hook 'tempel-setup-capf)
+    (add-hook 'text-mode-hook 'tempel-setup-capf)
+
+    ;; Optionally make the Tempel templates available to Abbrev,
+    ;; either locally or globally. `expand-abbrev' is bound to C-x '.
+    ;; (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
+    ;; (global-tempel-abbrev-mode)
+  )
+
+  ;; Optional: Add tempel-collection.
+  ;; The package is young and doesn't have comprehensive coverage.
+  (use-package tempel-collection)
+#+end_src
 ** Copilot
 https://github.com/zerolfx/copilot.el
 
 * Org
+** Init
+[[https://git.tecosaur.net/tec/org-mode][Org-9.7]] did some overhaul to org-latex-preview in org mode. Load External org before the built in org is loaded.
+#+begin_src elisp
+  (use-package org
+  :after emacs
+  :init
+    (setq org-element-cache-persistent nil)
+    (setq org-element-use-cache nil)
+    (setq org-latex-preview-numbered t)
+  :config
+    (add-hook 'org-mode-hook #'olivetti-mode)
+    (add-hook 'org-mode-hook #'org-visual-indent-mode)
+    (add-hook 'org-mode-hook #'turn-on-org-cdlatex)
+  )
+#+end_src
+
+All the .el files are placed in the ./lisp/ folder.
+According to the installation manual of org, we need to make autoloads before compile.
+#+begin_src conf
+  [submodule "org"]
+	  load-path = lisp
+	  build-step = make autoloads
+	  build-step = borg-update-autoloads
+	  build-step = borg-compile
+	  build-step = borg-maketexi
+	  build-step = borg-makeinfo
+#+end_src
+
 ** UI
 *** Fonts
 
@@ -2484,31 +2534,23 @@ Change the font size of different org-levels.
 #+begin_src elisp
   (use-package org
   :custom-face
-    (org-latex-and-related ((t (:foreground "LightSteelBlue4" :weight bold))))
-    (org-meta-line ((t (:foreground "LightSteelBlue4"))))
-    (org-special-keyword ((t (:foreground "LightSteelBlue4"))))
-    (org-tag ((t (:foreground "LightSteelBlue4" :weight normal))))
+    ;; (org-latex-and-related ((t (:foreground "LightSteelBlue4" :weight bold))))
+    ;; (org-meta-line ((t (:foreground "LightSteelBlue4"))))
+    ;; (org-special-keyword ((t (:foreground "LightSteelBlue4"))))
+    ;; (org-tag ((t (:foreground "LightSteelBlue4" :weight normal))))
   ;:hook (org-mode . mixed-pitch-mode)
   :config
-    (set-face-attribute 'org-level-1 nil
-	:family "Sarasa Gothic SC" :height 1.4 )
-    (set-face-attribute 'org-level-2 nil
-	:family "Sarasa Gothic SC" :height 1.4 )
-    (set-face-attribute 'org-level-3 nil
-	:family "Sarasa Gothic SC" :height 1.4 )
-    (set-face-attribute 'org-level-4 nil
-	:family "Sarasa Gothic SC" :height 1.3 )
-    (set-face-attribute 'org-level-5 nil
-	:family "Sarasa Gothic SC" :height 1.2 )
-    (set-face-attribute 'org-level-6 nil
-	:family "Sarasa Gothic SC" :height 1.1 )
-    (set-face-attribute 'org-document-title nil
-	:family "Sarasa Gothic SC" :height 2.5 :bold t)
-    (set-face-attribute 'org-document-info nil
-	:family "Sarasa Gothic SC" :height 1.8 :bold t)
-    (set-face-attribute 'org-document-info-keyword nil
-      :foreground "LightSteelBlue4" :inherit 'org-document-info)
-    (set-face-attribute 'org-block t
+    (set-face-attribute 'org-level-1 nil :height 1.6 )
+    (set-face-attribute 'org-level-2 nil :height 1.4 )
+    (set-face-attribute 'org-level-3 nil :height 1.4 )
+    (set-face-attribute 'org-level-4 nil :height 1.3 )
+    (set-face-attribute 'org-level-5 nil :height 1.2 )
+    (set-face-attribute 'org-level-6 nil :height 1.1 )
+    (set-face-attribute 'org-document-title nil :height 2.5 :bold t)
+    (set-face-attribute 'org-document-info nil :height 1.8 :bold t)
+    ;; (set-face-attribute 'org-document-info-keyword nil
+    ;;   :foreground "LightSteelBlue4" :inherit 'org-document-info)
+    (set-face-attribute 'org-block nil
       :extend t :inherit 'fixed-pitch)
   )
 #+end_src
@@ -2518,30 +2560,32 @@ Change the font size of different org-levels.
 [[https://github.com/minad/org-modern][Org-modern]] implements a modern style for Org buffers using font locking and text properties. The package styles =headlines=, =keywords=, =tables= and =source blocks=.
 
 #+begin_src elisp
-	(use-package org-modern
-	:hook (org-mode . org-modern-mode)
-	:config
-		 (setq org-modern-keyword
-			 (quote (("author" . "⛾")
-				 ("title" . "❖")
-				 ("subtitle" . "◈")
-				 ("html" . "󰅱 ")
-				 (t . t))))
-		 (setq org-modern-star
-		;'("◉" "○" "◈" "◇" "✳")
-		'("⚀" "⚁" "⚂" "⚃" "⚄" "⚅")
-		;'("☰" "☱" "☲" "☳" "☴" "☵" "☶" "☷")
-		 )
-		 (setq org-modern-list ;; for '+' '-' '*' respectively
-				 '((43 . "⯌") (45 . "⮚") (42 . "⊛"))
-		 )
-		 (setq org-modern-block-fringe nil)
-		 (setq org-modern-todo nil)
-		 (setq org-modern-block-name '("⇲ " . "⇱ "))
-		 (set-face-attribute 'org-modern-block-name nil
-				:inherit 'variable-pitch)
-		 (setq org-modern-table nil)
-	)
+  (use-package org-modern
+  ;;:hook (org-mode . org-modern-mode)
+  :config
+    (setq org-modern-keyword
+      (quote (("author" . "⛾")
+        ("title" . "❖")
+        ("subtitle" . "◈")
+        ("html" . "󰅱 ")
+        (t . t))))
+    (setq org-modern-star
+     '("⚀" "⚁" "⚂" "⚃" "⚄" "⚅")
+    )
+    (set-face-attribute 'org-modern-symbol nil :family "Noto Sans Symbols 2")
+  ; '("☰" "☱" "☲" "☳" "☴" "☵" "☶" "☷")
+  ; '("◉" "○" "◈" "◇" "✳")
+    (setq org-modern-list ;; for '+' '-' '*' respectively
+        '((43 . "⯌") (45 . "⮚") (42 . "⊛"))
+    )
+    (setq org-modern-block-fringe nil)
+    (setq org-modern-todo nil)
+    (setq org-modern-block-name '("⇲ " . "⇱ "))
+    (set-face-attribute 'org-modern-block-name nil
+       :inherit 'variable-pitch)
+    (setq org-modern-table nil)
+    (global-org-modern-mode)
+  )
 #+end_src
 
 [[https://github.com/integral-dw/org-superstar-mode][Org-superstar]] replaces the asterisk before every org-level with ascii symbols.
@@ -2587,11 +2631,11 @@ Have drawbacks when using mixed-pitch-mode.
 #+begin_src elisp
 	(use-package org-visual-outline
 	:custom-face
-	 (org-visual-indent-blank-pipe-face ((t 
-				 (:background "#1f2430" :foreground "#1f2430" 
+	 (org-visual-indent-blank-pipe-face ((t
+				 (:background "#1f2430" :foreground "#1f2430"
 			:height 0.1 :width extra-expanded))))
-	 (org-visual-indent-pipe-face ((t 
-				 (:background "#454d6d" :foreground "#454d6d" 
+	 (org-visual-indent-pipe-face ((t
+				 (:background "#454d6d" :foreground "#454d6d"
 			:height 0.1 :width extra-expanded))))
 	:hook (org-mode . org-visual-indent-mode)
 	)
@@ -2644,7 +2688,6 @@ This package provides visual alignment for Org Mode, Markdown and table.el table
 					org-confirm-babel-evaluate nil
 					org-confirm-elisp-link-function nil
 					org-link-elisp-confirm-function nil
-					electric-indent-mode nil
 				)
 		(general-define-key :keymap 'org-src-mode-map
 			 "C-c C-c" 'eval-buffer)
@@ -2712,7 +2755,7 @@ Disabled cause org-modern already does the job.
 		(defun org-hugo-new-subtree-post-capture-template ()
 			"Returns `org-capture' template string for new Hugo post.
 			 See `org-capture-templates' for more information."
-			(let* ((title (read-from-minibuffer "Post Title: ")) 
+			(let* ((title (read-from-minibuffer "Post Title: "))
 				 (fname (org-hugo-slug title)))
 			(mapconcat #'identity
 					`(,(concat "* TODO " title) ":PROPERTIES:"
@@ -2720,10 +2763,10 @@ Disabled cause org-modern already does the job.
 						;Place the cursor here finally
 					"\n")))
 		(setq org-capture-templates (append org-capture-templates '(
-			("j" "Journal" entry 
+			("j" "Journal" entry
 				(file+datetree "journal.org")
 				"* %U - %?\n")
-			("i" "Inbox" entry 
+			("i" "Inbox" entry
 				(file "inbox.org")
 				"* %U - %? %^g\n")
 				 '("h" "Hugo post" entry
@@ -2753,40 +2796,40 @@ Disabled cause org-modern already does the job.
 		(setq org-roam-v2-ack t)
 		(setq org-roam-capture-templates '(
 			 ("d" "default" plain "%?"
-				 :target (file+head 
+				 :target (file+head
 					 "%<%Y%m%d%H>-${slug}.org"
 					 "#+title: ${title}\n#+filetags: \n")
 				 :unnarrowed t)
 			 ("b" "book notes" plain "%?"
-				 :target (file+head 
+				 :target (file+head
 					 "book/book%<%Y%m%d%H>-${slug}.org"
 					 "#+title: ${title}\n#+filetags: :bookreading: \n\n")
 				 :unnarrowed t)
 			 ("c" "company" plain "%?"
-				 :target (file+head 
+				 :target (file+head
 					 "company/company%<%Y%m%d%H>-${slug}.org"
 					 "#+title: ${title}\n#filetags: :compnay: \n\n")
 				 :unnarrowed t)
 			 ("i" "industry" plain "%?"
-				 :target (file+head 
+				 :target (file+head
 					 "industry/industry%<%Y%m%d%H>-${slug}.org"
 					 "#+title:${slug}\n#+filetags: :industry: \n\n")
 				 :unnarrowed t)
 			 ("m" "marketing" plain "%?"
-				 :target (file+head 
+				 :target (file+head
 					 "marketing/marketing%<%Y%m%d%H%M%S>-${slug}.org"
 					 "#+title: ${title}\n#+filetags: :marketing: \n\n")
 				 :unnarrowed t)
 			 ("p" "project" plain "%?"
-				 :target (file+head 
+				 :target (file+head
 					 "project/project%<%Y%m%d%H>-${slug}.org"
 					 "#+title: ${title}\n#+filetags: :project: \n\n - tag ::")
 				 :unnarrowed t)
 			 ("r" "reference" plain "%?"
-				 :target (file+head 
+				 :target (file+head
 					 "<%Y%m%d%H>-${slug}.org"
 					 "#+title: {$title}\n%filetags: reference \n\n -tag ::")
-				 :unarrowed t)))    
+				 :unarrowed t)))
 	)
 #+end_src
 
@@ -2830,7 +2873,7 @@ Disabled cause org-modern already does the job.
     (setq org-agenda-files '("~/Org"))
     (let ((org-agenda-custom-commands '(
       ("u" "Super view" (
-        (agenda "" ( 
+        (agenda "" (
           (org-agenda-span 1)
           (org-super-agenda-groups '(
             (:name "Today"
@@ -2848,8 +2891,8 @@ Disabled cause org-modern already does the job.
              :deadline future)
             )))
         )
-        (tags (concat "w" (format-time-string "%V"))  
-          ( (org-agenda-overriding-header  
+        (tags (concat "w" (format-time-string "%V"))
+          ( (org-agenda-overriding-header
               (concat "ToDos Week " (format-time-string "%V")))
             (org-super-agenda-groups '(
                (:discard (:deadline t))
@@ -2896,7 +2939,7 @@ Disabled cause org-modern already does the job.
 	:hook
 		(calendar-mode . olivetti-mode)
 		(calendar-mode . solaire-mode)
-	:config 
+	:config
 		(setq calendar-date-style 'iso)
 	)
 #+end_src
@@ -2932,23 +2975,7 @@ Disabled cause org-modern already does the job.
 	 ("C-c d f" . org-gtd-clarify-finalize)))
 #+end_src
 
-** Preview
-*** Org 9.7
-#+begin_src elisp
-	(use-package org
-	:after emacs
-	:init
-		(setq org-element-cache-persistent nil)
-		(setq org-element-use-cache nil)
-		(setq org-latex-preview-numbered t)
-		(plist-put org-latex-preview-options :zoom 1.25)
-		(let ((pos (assoc 'dvisvgm org-latex-preview-process-alist)))
-			(plist-put (cdr pos) :image-converter '("dvisvgm --page=1- --optimize --clipjoin --relative --no-fonts --bbox=preview -o %B-%%9p.svg %f")))
-	:config
-		(add-hook 'org-mode-hook #'turn-on-org-cdlatex)
-	)
-#+end_src
-
+** LaTeX
 *** Org-fragtog
 [[https://github.com/io12/org-fragtog][Org-fragtog]] automatically toggle Org mode LaTeX fragment previews as the cursor enters and exits them
 
@@ -3058,7 +3085,7 @@ Code under :config is taken from https://emacs-china.org/t/org-mode-latex-mode/2
 	:after org
 	:defer t
 	:config
-		(setq 
+		(setq
 			org-export-with-toc t
 						org-export-with-tags 'not-in-toc
 						org-export-with-drawers nil
@@ -3147,7 +3174,7 @@ Use ox-pandoc to generate MS-Office files like word and ppt.
 	:defer t
 	:after ox
 	:config
-		(setq org-pandoc-format-extensions 
+		(setq org-pandoc-format-extensions
 					'(markdown_github+pipe_tables+raw_html)
 		)
 	)
@@ -3163,7 +3190,7 @@ Use ox-pandoc to generate MS-Office files like word and ppt.
 General steps to publish a blog using hugo in emacs includes:
 - create a org mode heading
 - write your blog
-- use ox-hugo to export to a markdown file 
+- use ox-hugo to export to a markdown file
     (Because hugo doesn't support org very well)
 - use easy-hugo to preview
 - publish
@@ -3173,14 +3200,14 @@ General steps to publish a blog using hugo in emacs includes:
 	(use-package ox-hugo
 	:after ox
 	:commands (org-hugo-export-as-md org-hugo-export-to-md)
-	:init 
+	:init
 		(setq org-hugo-base-dir "~/Blog"
 					org-hugo-front-matter-format "yaml"
 		)
 	)
 #+end_src
 
-Easy-hugo 
+Easy-hugo
 
 #+begin_src elisp
 	(use-package easy-hugo
@@ -3191,7 +3218,7 @@ Easy-hugo
 ** Org-transclusion
 * Emacs OS
 ** PDF-Tools
-PDF-tools is a replacement for DocView for PDF files. 
+PDF-tools is a replacement for DocView for PDF files.
 The rendering is performed by poppler.
 Run =M-x pdf-tools-install= to install libraries needed.
 #+begin_src elisp
@@ -3331,3 +3358,4 @@ tweaks to build eaf
   ;;; init.el ends here
 #+end_src
 
+*

@@ -2,14 +2,6 @@
 	no-byte-compile = dash-functional.el
 	no-makeinfo = dash-template.texi
 
-[submodule "org"]
-	load-path = lisp
-	build-step = make autoloads
-	build-step = borg-update-autoloads
-	build-step = borg-compile
-	build-step = borg-maketexi
-	build-step = borg-makeinfo
-
 [submodule "emacsql"]
       no-byte-compile = emacsql-pg.el
 
@@ -37,12 +29,20 @@
 [submodule "auctex"]
 	load-path = .
 	build-step = ./autogen.sh
-	build-step = ./configure
+	build-step = ./configure --with-lispdir=~/.emacs.d/lib/auctex
 	build-step = make
 	build-step = make doc
 	build-step = borg-maketexi
 	build-step = borg-makeinfo
 	build-step = borg-update-autoloads
+
+[submodule "org"]
+	load-path = lisp
+	build-step = make autoloads
+	build-step = borg-update-autoloads
+	build-step = borg-compile
+	build-step = borg-maketexi
+	build-step = borg-makeinfo
 
 [submodule "mu4e"]
   build-step = ./autogen.sh

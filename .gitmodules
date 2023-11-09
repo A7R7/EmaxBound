@@ -33,6 +33,9 @@
 [submodule "async"]
 	path = lib/async
 	url = https://github.com/jwiegley/emacs-async
+[submodule "auctex"]
+	path = lib/auctex
+	url = git@github.com:emacsmirror/auctex.git
 [submodule "auto-compile"]
 	path = lib/auto-compile
 	url = https://github.com/emacscollective/auto-compile
@@ -280,8 +283,8 @@
 	path = lib/orderless
 	url = https://github.com/oantolin/orderless
 [submodule "org"]
-  path = lib/org
-  url = https://git.tecosaur.net/tec/org-mode.git
+	path = lib/org
+	url = https://git.tecosaur.net/tec/org-mode.git
 [submodule "org-agenda-property"]
 	path = lib/org-agenda-property
 	url = https://github.com/Malabarba/org-agenda-property
@@ -472,6 +475,9 @@
 [submodule "ts"]
 	path = lib/ts
 	url = https://github.com/alphapapa/ts.el
+[submodule "ts-fold"]
+	path = lib/ts-fold
+	url = git@github.com:emacs-tree-sitter/ts-fold.git
 [submodule "valign"]
 	path = lib/valign
 	url = https://github.com/casouri/valign

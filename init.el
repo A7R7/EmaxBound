@@ -4,46 +4,47 @@
 
 ;; [[file:config.org::*Begin of init][Begin of init:2]]
 (progn ;     startup
-	    (defvar before-user-init-time (current-time)
-		    "Value of `current-time' when Emacs begins loading `user-init-file'.")
-    ;; (switch-to-buffer "*Messages*")		
+			(defvar before-user-init-time (current-time)
+				"Value of `current-time' when Emacs begins loading `user-init-file'.")
+		;; (switch-to-buffer "*Messages*")
 (message "Loading Emacs...done (%fs)"
-			     (float-time (time-subtract before-user-init-time
-								    before-init-time)))
-	    (setq user-init-file (or load-file-name buffer-file-name))
-	    (setq user-emacs-directory (file-name-directory user-init-file))
-	    (message "Loading %s..." user-init-file)
-    )
+					 (float-time (time-subtract before-user-init-time
+										before-init-time)))
+			(setq user-init-file (or load-file-name buffer-file-name))
+			(setq user-emacs-directory (file-name-directory user-init-file))
+			(message "Loading %s..." user-init-file)
+		)
 ;; Begin of init:2 ends here
 
 ;; [[file:config.org::*Begin of init][Begin of init:3]]
 (progn
-      (setq inhibit-startup-buffer-menu t)
-      (setq inhibit-startup-screen t)
-      (setq inhibit-startup-echo-area-message "locutus")
-      (setq initial-buffer-choice t)
-      ;; (setq initial-scratch-message "")
-      ;; This improves performance for some fonts
-      (setq inhibit-compacting-font-cache t)
-      ;; emacs.stackexchange.com/questions/70232/how-to-disable-emacs-bidi
-      (setq-default bidi-paragraph-direction 'left-to-right)
-      (setq bidi-inhibit-bpa t
-    long-line-threshold 1000
-    large-hscroll-threshold 1000
-    syntax-wholeline-max 1000)
-      (setq confirm-kill-emacs 'y-or-n-p)
+						(setq inhibit-startup-buffer-menu t)
+						(setq inhibit-startup-screen t)
+						(setq inhibit-startup-echo-area-message "locutus")
+						(setq initial-buffer-choice t)
+						;; (setq initial-scratch-message "")
+						;; This improves performance for some fonts
+						(setq inhibit-compacting-font-cache t)
+						;; emacs.stackexchange/how-to-disable-emacs-bidi
+						(setq-default bidi-paragraph-direction 'left-to-right)
+						(setq bidi-inhibit-bpa t
+									long-line-threshold 1000
+									large-hscroll-threshold 1000
+									syntax-wholeline-max 1000)
+						(setq global-auto-revert-mode 1)
+						(setq use-dialog-box nil)
+						(setq confirm-kill-emacs 'y-or-n-p)
 )
 ;; Begin of init:3 ends here
 
 ;; [[file:config.org::*Borg][Borg:1]]
 (use-package borg
 :init
-	(add-to-list 'load-path 
+	(add-to-list 'load-path
 		(expand-file-name "lib/borg" user-emacs-directory))
 :config
 	(borg-initialize)
-(switch-to-buffer "*Messages*")		
-
+  (switch-to-buffer "*Messages*")
 )
 ;; Borg:1 ends here
 
@@ -96,10 +97,6 @@
 	:config (or (server-running-p) (server-mode)))
 ;; Server:1 ends here
 
-;; [[file:config.org::*Org][Org:1]]
-(use-package org)
-;; Org:1 ends here
-
 ;; [[file:config.org::*End of core units][End of core units:1]]
 (progn ;     startup
 	(message "Loading core units...done (%fs)"
@@ -113,137 +110,162 @@
 ;; [[file:config.org::*Meow][Meow:1]]
 (use-package meow
 :custom-face
-	(meow-cheatsheet-command ((t (:height 180 :inherit fixed-pitch))))
+  (meow-cheatsheet-command ((t (:height 180 :inherit fixed-pitch))))
 :config
-	;; Replicate the behavior of vi's
-	(defun my-meow-append ()
-		"Move to the end of selection, switch to INSERT state."
-		(interactive)
-		(if meow--temp-normal
-							(progn
-								(message "Quit temporary normal mode")
-								(meow--switch-state 'motion))
-			(if (not (region-active-p))
-								(when (and (not (use-region-p))
-													 (< (point) (point-max)))
-									(forward-char 1))
-				(meow--direction-forward)
-				(meow--cancel-selection))
-			(meow--switch-state 'insert))
-			)
-	(advice-add 'meow-append :override #'my-meow-append)
+ ;cate the behavior of vi's
+  (defun my-meow-append ()
+    "Move to the end of selection, switch to INSERT state."
+    (interactive)
+    (if meow--temp-normal
+	   (progn
+	     (message "Quit temporary normal mode")
+	     (meow--switch-state 'motion))
+    (if (not (region-active-p))
+	     (when (and (not (use-region-p))
+	                (< (point) (point-max)))
+	       (forward-char 1))
+     (meow--direction-forward)
+     (meow--cancel-selection))
+     (meow--switch-state 'insert)))
 
-	(setq meow-keypad-self-insert-undefined nil)
-	(setq meow-selection-command-fallback '(
-		(meow-mark-symbol . meow-mark-word)
-					(meow-kill . meow-delete)
-					(meow-cancel-selection . keyboard-quit)
-					(meow-pop-selection . meow-pop-grab)
-					(meow-beacon-change . meow-beacon-change-char)
-					(meow-replace . meow-yank)
-					(meow-reverse . negative-argument)
-			))
+   (advice-add 'meow-append :override #'my-meow-append)
 
-	(defun meow-setup ()
-		(interactive)
-		(setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
+  (defun my-meow-open-below ()
+    "Open a newline below and switch to INSERT state."
+    (interactive)
+    (if meow--temp-normal
+	(progn
+	  (message "Quit temporary normal mode")
+	  (meow--switch-state 'motion))
+      (meow--switch-state 'insert)
+      ;(goto-char (line-end-position))
+			(move-end-of-line 1)
+      (meow--execute-kbd-macro "RET")))
+   (advice-add 'meow-open-below :override #'my-meow-open-below)
 
-		(meow-motion-overwrite-define-key
-		 '("k" . meow-next)
-		 '("l" . meow-prev)
-		 '("<escape>" . ignore)
-		)
+ (setq meow-keypad-self-insert-undefined nil)
+ (setq meow-selection-command-fallback '(
+    (meow-grab . meow-right-expand)
+    (meow-change . meow-change-char)
+    (meow-kill . meow-delete)
+    (meow-cancel-selection . keyboard-quit)
+    (meow-pop-selection . meow-pop-grab)
+    (meow-beacon-change . meow-beacon-change-char)
+    (meow-replace . meow-yank)
+    (meow-reverse . negative-argument)
+  ))
 
-		(meow-leader-define-key
-		 ;; Use SPC (0-9) for digit arguments.
-		 '("1" . meow-digit-argument) '("2" . meow-digit-argument)
-		 '("3" . meow-digit-argument) '("4" . meow-digit-argument)
-		 '("5" . meow-digit-argument) '("6" . meow-digit-argument)
-		 '("7" . meow-digit-argument) '("8" . meow-digit-argument)
-		 '("9" . meow-digit-argument) '("0" . meow-digit-argument)
-		 '("/" . meow-keypad-describe-key) '("?" . meow-cheatsheet)
-					)
+  (defun meow-setup ()
+    (interactive)
+    (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
 
-		(meow-normal-define-key
-		 '("1" . meow-expand-1) '("2" . meow-expand-2)
-		 '("3" . meow-expand-3) '("4" . meow-expand-4)
-		 '("5" . meow-expand-5) '("6" . meow-expand-6)
-		 '("7" . meow-expand-7) '("8" . meow-expand-8)
-		 '("9" . meow-expand-9) '("0" . meow-expand-0)
+    (meow-motion-overwrite-define-key
+     '("l" . meow-next)
+     '("k" . meow-prev)
+     '("<escape>" . ignore)
+    )
 
-		 '("q" . meow-quit) '("Q" . meow-quit)
-		 ;'("w" . meow-window) '("W" . meow-window)
-		 ;'("e" . meow-) '("E" . meow-e)
-		 ;'("r" . meow-) '("R" . meow-e)
-		 ;'("t" . meow-) '("T" . meow-e)
+    (meow-leader-define-key
+     ;; Use SPC (0-9) for digit arguments.
+     '("1" . meow-digit-argument) '("2" . meow-digit-argument)
+     '("3" . meow-digit-argument) '("4" . meow-digit-argument)
+     '("5" . meow-digit-argument) '("6" . meow-digit-argument)
+     '("7" . meow-digit-argument) '("8" . meow-digit-argument)
+     '("9" . meow-digit-argument) '("0" . meow-digit-argument)
+     '("/" . meow-keypad-describe-key) '("?" . meow-cheatsheet)
+    )
 
-		 ;'("a" . meow) '("A" . meow-inner-of-thing)
-		 ;'("s" . meow) '("S" . meow-bounds-of-thing)
-		 ;'("d" . meow) '("D" . meow-end-of-thing)
-		 ;'("f" . meow) '("F" . meow-beginning-of-thing)
-		 '("g" . meow-grab) '("G" . meow-swap-grab)
+    (meow-normal-define-key
+     '("<escape>" . meow-cancel-selection)
+     '("1" . meow-expand-1) '("2" . meow-expand-2)
+     '("3" . meow-expand-3) '("4" . meow-expand-4)
+     '("5" . meow-expand-5) '("6" . meow-expand-6)
+     '("7" . meow-expand-7) '("8" . meow-expand-8)
+     '("9" . meow-expand-9) '("0" . meow-expand-0)
 
-		 '("z" . meow-undo) '("Z" . meow-undo-in-selection)
-		 '("x" . meow-kill) '("X" . meow-clipboard-kill)
-		 '("c" . meow-save) '("C" . meow-clipboard-save)
-		 '("v" . meow-replace) '("V" . meow-yank-pop)
-		 '("C-v" . meow-clipboard-yank)
-		 '("b" . meow-block) '("B" . meow-to-block)
+     '("q" . meow-quit) '("Q" . meow-quit)
+     ;'("w" . meow-window) '("W" . meow-window)
+     ;'("e" . meow-) '("E" . meow-e)
+     ;'("r" . meow-) '("R" . meow-e)
+     '("t" . meow-till) '("T" . meow-till-expand)
 
-		 '("y" . meow-join)
-		 ;'("u" . meow-reverse) '("U" . meow-reverse)
-		 '("i" . meow-insert) '("I" . meow-open-above)
-		 '("o" . meow-append) '("O" . meow-open-below)
-		 '("p" . meow-pop-selection)
-		 '("[" . meow-beginning-of-thing) '("]" . meow-end-of-thing)
+     '("a" . begin-of-line) '("a" . meow-beginning-of-thing)
+     '("s" . meow) '("s" . meow-bounds-of-thing)
+     '("d" . meow) '("d" . meow-inner-of-thing)
+     '("f" . end-of-line) '("f" . meow-end-of-thing)
+     '("g" . meow-right-expand) '("G" . meow-grab)
 
-		 '("h" . meow-line)  '("H" . meow-goto-line)
-		 '("j" . meow-left)  '("J" . meow-left-expand)
-		 '("k" . meow-next)  '("K" . meow-next-expand)
-		 '("l" . meow-prev)  '("L" . meow-prev-expand)
-		 '(";" . meow-right) '(":" . meow-right-expand)
+     '("z" . meow-undo) '("Z" . meow-undo-in-selection)
+     '("x" . meow-kill) '("X" . meow-clipboard-kill)
+     '("c" . meow-save)
+     '("C-c" . meow-clipboard-save)
+     '("v" . meow-replace) '("V" . meow-yank-pop)
+     '("C-v" . meow-clipboard-yank)
+     '("b". meow-block) '("B" . meow-to-block)
 
-		 '("n" . meow-search)      '("N" . meow-pop-search)
-		 '("m" . meow-mark-word)   '("M" . meow-mark-symbol)
-		 '("," . meow-back-word)   '("<" . meow-back-symbol) 
-		 '("." . meow-next-word)   '(">" . meow-next-symbol)
-		 '("/" . meow-reverse)
+     '("y" . meow-join)
+     '("u" . meow-change) '("U" . meow-reverse)
+     '("i" . meow-insert) '("I" . meow-open-above)
+     '("o" . meow-append) '("O" . meow-open-below)
+     '("p" . meow-pop-selection)
+     '("[" . meow-beginning-of-thing) '("]" . meow-end-of-thing)
+
+     '("h" . meow-line)  '("H" . meow-goto-line)
+     '("j" . meow-left)  '("J" . meow-left-expand)
+     '("k" . meow-prev)  '("K" . meow-prev-expand)
+     '("l" . meow-next)  '("L" . meow-next-expand)
+     '(";" . meow-right) '(":" . meow-right-expand)
+
+     '("n" . meow-search)      '("N" . meow-pop-search)
+     '("m" . meow-mark-word)   '("M" . meow-mark-symbol)
+     '("," . meow-back-word)   '("<" . meow-back-symbol)
+     '("." . meow-next-word)   '(">" . meow-next-symbol)
+     '("/" . meow-reverse)
 
      '("'" . fingertip-wrap-single-quote)
-		 '("\"" . fingertip-wrap-double-quote)
-		 '("(" . fingertip-wrap-round)
-		 '("[" . fingertip-wrap-bracket) 
-		 '("{" . fingertip-wrap-curly)
-		) 
-	)
-	(meow-setup)
-	(meow-global-mode)
+     '("\"" . fingertip-wrap-double-quote)
+     '("(" . fingertip-wrap-round)
+     '("[" . fingertip-wrap-bracket)
+     '("{" . fingertip-wrap-curly)
+  ))
+  (meow-setup)
+  (meow-global-mode)
 )
 ;; Meow:1 ends here
 
 ;; [[file:config.org::*General][General:1]]
 ;; Make ESC quit prompts
-(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+;; (global-set-key ([kbd] "<escape>") 'keyboard-escape-quit)
 
 (use-package general
-:config  
-  (general-define-key
+:config
+  (general-def
+  :keymaps '(global-map override)
+    "C-v"       '(meow-clipboard-yank         :wk "paste")
+    ;"C-/"       '(yank                        :wk "comment-dwim")
+  )
+  (general-def
   :keymaps '(meow-normal-state-keymap meow-motion-state-keymap)
-  	"C-j"       '(windmove-left               :wk " Win H ")
-  	"C-k"       '(windmove-down               :wk " Win J ")
-  	"C-l"       '(windmove-up                 :wk " Win K ")
-  	"C-;"       '(windmove-right              :wk " Win L ")
-  	"C-,"       '(centaur-tabs-backward       :wk " Tab L ")
-  	"C-."       '(centaur-tabs-forward        :wk " Tab R ")
+    "M-j"       '(windmove-left               :wk " Win H ")
+    "M-k"       '(windmove-down               :wk " Win J ")
+    "M-l"       '(windmove-up                 :wk " Win K ")
+    "M-;"       '(windmove-right              :wk " Win L ")
+    "M-,"       '(sort-tab-select-prev-tab    :wk " Tab L ")
+    "M-."       '(sort-tab-select-next-tab    :wk " Tab R ")
   )
 
-      (general-define-key
-      :keymaps '(vertico-map)
-  	"C-k"       '(vertico-next                :wk "")
-  	      "C-l"       '(vertico-previous            :wk "")
-  	      "C-j"       '(vertico-next-group          :wk "")
-  	      "C-;"       '(vertico-previous-group      :wk "")
-      )
+  (general-def
+  :keymaps '(vertico-map)
+    "C-k"       '(vertico-next                  :wk "")
+    "C-l"       '(vertico-previous              :wk "")
+    "C-j"       '(vertico-directory-delete-word :wk "")
+    "C-;"       '(vertico-directory-enter       :wk "")
+    "C-,"       '(vertico-previous-group        :wk "")
+    "C-."       '(vertico-next-group            :wk "")
+    "RET"       'vertico-directory-enter
+    "DEL"       'vertico-directory-delete-char
+    "M-DEL"     'vertico-directory-delete-word
+  )
   ;; (general-create-definer config/leader
   ;; ;:states '(normal insert visual emacs)
   ;; :keymaps 'meow-normal-state-map
@@ -307,101 +329,45 @@
 ;; [[file:config.org::*Rime][Rime:1]]
 (use-package rime
 :custom
-  (rime-emacs-module-header-root "~/.nix-profile/include")
-  (rime-librime-root "~/.nix-profile")
-  (rime-share-data-dir "~/.config/fcitx/rime")
+	(rime-emacs-module-header-root "~/.nix-profile/include")
+	(rime-librime-root "~/.nix-profile")
+	(rime-share-data-dir "~/.config/fcitx/rime")
 :config
-  (setq default-input-method "rime"
-        rime-show-candidate 'posframe)
-  (setq rime-disable-predicates
-    '(meow-normal-mode-p
-      meow-motion-mode-p
-      rime-predicate-after-alphabet-char-p
-      rime-predicate-prog-in-code-p))
+	(setq default-input-method "rime"
+				rime-show-candidate 'posframe)
+	(setq rime-disable-predicates
+		'(meow-normal-mode-p
+			meow-motion-mode-p
+			rime-predicate-after-alphabet-char-p
+			rime-predicate-prog-in-code-p))
 )
 ;; Rime:1 ends here
 
-;; [[file:config.org::*Fonts][Fonts:1]]
-(set-face-attribute 'default nil
-	;:font "JetBrainsMono Nerd Font"
-	:font "RobotoMono Nerd Font Propo"
-	;:font "Sarasa Term SC Nerd"
-	;:font "Sarasa Gothic SC"
-	:height 180
+;; [[file:config.org::*Fixed-pitch-mode][Fixed-pitch-mode:1]]
+(use-package fixed-pitch
+:config
+  ;; This cause some bugs
+  ;; (add-to-list 'default-frame-alist '(font . "Sarasa Gothic SC-16" ))
+  (set-face-attribute 'default nil
+    :font "Sarasa Gothic SC"
+    :height 150)
+  (set-face-attribute 'fixed-pitch nil
+  ;:font "Sarasa Fixed SC"
+    :font "RobotoMono Nerd Font Mono"
+    :height 1.0)
+  ;(set-fontset-font t 'symbol "Noto Sans Symbols 2")
+  (set-face-attribute 'link nil
+  	:foreground "#ffcc66" :underline t :bold nil)
+  (fixed-pitch-mode)
 )
-(set-face-attribute 'variable-pitch nil
-	:font "Sarasa Gothic SC"
-	:height 180
-)
-(set-face-attribute 'fixed-pitch nil
-	;:font "Sarasa Fixed SC"
-	:font "RobotoMono Nerd Font"
-	:height 180
-)
-(set-face-attribute 'fixed-pitch-serif nil
-	;:family "Monospace Serif"
-	:font "RobotoMono Nerd Font"
-	:height 180
-)
-;; Fonts:1 ends here
-
-;; [[file:config.org::*Fonts][Fonts:2]]
-(set-face-attribute 'font-lock-comment-face nil
-	:foreground "LightSteelBlue4" :slant 'italic)
-(set-face-attribute 'font-lock-keyword-face nil :slant 'italic)
-;; Fonts:2 ends here
-
-;; [[file:config.org::*Fonts][Fonts:3]]
-(set-face-attribute 'link nil
-	:foreground "#ffcc66" :underline t :bold nil)
-;; Fonts:3 ends here
+;; Fixed-pitch-mode:1 ends here
 
 ;; [[file:config.org::*Zooming In/Out][Zooming In/Out:1]]
-(use-package org
-:custom-face
-	(org-latex-and-related ((t (:foreground "LightSteelBlue4" :weight bold))))
-	(org-meta-line ((t (:foreground "LightSteelBlue4"))))
-	(org-special-keyword ((t (:foreground "LightSteelBlue4"))))
-	(org-tag ((t (:foreground "LightSteelBlue4" :weight normal))))
-:hook (org-mode . mixed-pitch-mode)
-:config
-	(set-face-attribute 'org-level-1 nil
-			:family "Sarasa Gothic SC" :height 1.4 )
-	(set-face-attribute 'org-level-2 nil
-			:family "Sarasa Gothic SC" :height 1.4 )
-	(set-face-attribute 'org-level-3 nil
-			:family "Sarasa Gothic SC" :height 1.4 )
-	(set-face-attribute 'org-level-4 nil
-			:family "Sarasa Gothic SC" :height 1.3 )
-	(set-face-attribute 'org-level-5 nil
-			:family "Sarasa Gothic SC" :height 1.2 )
-	(set-face-attribute 'org-level-6 nil
-			:family "Sarasa Gothic SC" :height 1.1 )
-	(set-face-attribute 'org-document-title nil
-			:family "Sarasa Gothic SC" :height 2.5 :bold t)
-	(set-face-attribute 'org-document-info nil
-			:family "Sarasa Gothic SC" :height 1.8 :bold t)
-	(set-face-attribute 'org-document-info-keyword nil
-		:foreground "LightSteelBlue4" :inherit 'org-document-info)
-	(set-face-attribute 'org-block t
-		:extend t :inherit 'fixed-pitch)
-)
+(global-set-key (kbd "C-=") 'text-scale-increase)
+(global-set-key (kbd "C--") 'text-scale-decrease)
+(global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
+(global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
 ;; Zooming In/Out:1 ends here
-
-;; [[file:config.org::*Pitch][Pitch:1]]
-(use-package fixed-pitch
-:defer t
-)
-;; Pitch:1 ends here
-
-;; [[file:config.org::*Pitch][Pitch:2]]
-(use-package mixed-pitch-mode
-:defer t
-:hook (Custom-mode . mixed-pitch-mode)
-:config
-	(setq  mixed-pitch-set-height t)
-)
-;; Pitch:2 ends here
 
 ;; [[file:config.org::*All-the-icons][All-the-icons:1]]
 (use-package all-the-icons
@@ -410,6 +376,14 @@
 ;(use-package all-the-icons-dired
 ;  :hook (dired-mode . (lambda () (all-the-icons-dired-mode t))))
 ;; All-the-icons:1 ends here
+
+;; [[file:config.org::*All-the-icons-completion][All-the-icons-completion:1]]
+(use-package all-the-icons-completion
+  :after (marginalia all-the-icons)
+  :hook (marginalia-mode . all-the-icons-completion-marginalia-setup)
+  :init
+  (all-the-icons-completion-mode))
+;; All-the-icons-completion:1 ends here
 
 ;; [[file:config.org::*Nerd-icons][Nerd-icons:1]]
 (use-package nerd-icons
@@ -421,40 +395,715 @@
 )
 ;; Nerd-icons:1 ends here
 
+;; [[file:config.org::*Posframe][Posframe:1]]
+(use-package posframe
+:config
+	(defun posframe-poshandler-frame-upper-center! (info)
+	"Posframe's position handler.
+
+	 This poshandler function let center of posframe align to
+	 vertically upper 1/6, horizontally center
+	 of frame."
+	(cons (/ (max 0 (- (plist-get info :parent-frame-width)
+							 (plist-get info :posframe-width))) 2)
+				(/ (plist-get info :parent-frame-height) 6)))
+
+	(defun posframe-poshandler-window-upper-center! (info)
+	 "Posframe's position handler.
+
+		 This poshandler function let center of posframe align to
+		 vertically upper 1/6, horizontally center
+		 of window."
+	(let* ((window-left    (plist-get info :parent-window-left))
+				 (window-top     (plist-get info :parent-window-top))
+				 (window-width   (plist-get info :parent-window-width))
+				 (window-height  (plist-get info :parent-window-height))
+				 (posframe-width (plist-get info :posframe-width)))
+		(cons (max 0 (+ window-left (/ (- window-width posframe-width) 2)))
+					(+ window-top (/ window-height 6))))
+	)
+)
+;; Posframe:1 ends here
+
+;; [[file:config.org::*Mini-frame][Mini-frame:1]]
+(use-package mini-frame
+:config
+	(setq mini-frame-detach-on-hide nil)
+	;(setq mini-frame-standalone 't)
+	;(setq mini-frame-resize-min-height 10)
+	(setq mini-frame-ignore-commands
+		(append mini-frame-ignore-commands
+		 '(evil-window-split evil-window-vsplit evil-ex)))
+)
+;; Mini-frame:1 ends here
+
+;; [[file:config.org::*Holo-layer][Holo-layer:1]]
+(use-package holo-layer
+:defer t
+:if (memq window-system '(pgtk mac ns))
+:config
+      (setq holo-layer-enable-cursor-animation 1
+        holo-layer-enable-window-border 1
+  			      holo-layer-sort-tab-ui 1
+  			      ;;holo-layer-cursor-animation-type "arrow easing"
+  			      )
+      (holo-layer-enable)
+)
+;; Holo-layer:1 ends here
+
+;; [[file:config.org::*Solaire mode][Solaire mode:1]]
+(use-package solaire-mode
+:defer t
+:init (solaire-global-mode)
+)
+;; Solaire mode:1 ends here
+
+;; [[file:config.org::*Olivetti][Olivetti:1]]
+(use-package olivetti
+:hook (org-mode . olivetti-mode)
+      (Custom-mode . olivetti-mode)
+      (help-mode . olivetti-mode)
+      ;(dashboard-mode . olivetti-mode)
+      (dashboard-mode . variable-pitch-mode)
+      (olivetti-mode . visual-line-mode)
+:init
+      (setq-default fill-column 90)
+:config
+      ;If nil (the default), use the value of fill-column + 2.
+      (setq olivetti-body-width nil
+               olivetti-style 'fancy)
+      ;; (set-face-attribute 'olivetti-fringe nil :background "#171B24")
+      (defun config/window-center (width)
+          (interactive)
+          (setq fill-column width)
+          (olivetti-mode)
+      )
+      ;; (config/leader
+      ;;  "tc"  '(olivetti-mode     :wk "󰉠 Center")
+      ;; )
+)
+;; Olivetti:1 ends here
+
+;; [[file:config.org::*Vertical Spacing][Vertical Spacing:1]]
+(use-package topspace
+:init (global-topspace-mode)
+)
+;; Vertical Spacing:1 ends here
+
+;; [[file:config.org::*Whitespace mode][Whitespace mode:1]]
+;; (config/leader :infix "t"
+;;   "SPC"  '(whitespace-mode  :wk "󰡭 Show Space")
+;; )
+;; Whitespace mode:1 ends here
+
+;; [[file:config.org::*Transparency][Transparency:1]]
+(set-frame-parameter nil 'alpha-background 96)
+(add-to-list 'default-frame-alist '(alpha-background . 96))
+
+(defun config/transparency (value)
+			"Sets the transparency of the frame window. 0=transparent/100=opaque"
+			(interactive "nTransparency Value 0 - 100 opaque:")
+			(set-frame-parameter nil 'alpha-background value))
+;; Transparency:1 ends here
+
+;; [[file:config.org::*Scroll][Scroll:1]]
+(use-package emacs
+:config
+	(setq scroll-conservatively 97)
+	(setq scroll-preserve-screen-position 1)
+	(setq mouse-wheel-progressive-speed nil)
+	;; The following piece of code is stolen from
+	;; https://emacs-china.org/t/topic/25114/5
+	(pixel-scroll-precision-mode 1)
+	(setq pixel-scroll-precision-interpolate-page t)
+	(defun +pixel-scroll-interpolate-down (&optional lines)
+			(interactive)
+			(if lines
+					(pixel-scroll-precision-interpolate (* -1 lines (pixel-line-height)))
+			(pixel-scroll-interpolate-down)))
+
+	(defun +pixel-scroll-interpolate-up (&optional lines)
+			(interactive)
+			(if lines
+					(pixel-scroll-precision-interpolate (* lines
+					(pixel-line-height))))
+			(pixel-scroll-interpolate-up))
+
+	(defalias 'scroll-up-command '+pixel-scroll-interpolate-down)
+	(defalias 'scroll-down-command '+pixel-scroll-interpolate-up)
+)
+;; Scroll:1 ends here
+
+;; [[file:config.org::*Diff][Diff:1]]
+(use-package diff-hl
+:custom-face
+	(diff-hl-change ((t (:background "#2c5f72" :foreground "#77a8d9"))))
+	(diff-hl-delete ((t (:background "#844953" :foreground "#f27983"))))
+	(diff-hl-insert ((t (:background "#5E734A" :foreground "#a6cc70"))))
+:config
+	(setq diff-hl-draw-borders nil)
+	(global-diff-hl-mode)
+	;(diff-hl-margin-mode)
+	(add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
+)
+;; Diff:1 ends here
+
+;; [[file:config.org::*Beacon][Beacon:1]]
+(use-package beacon
+:defer t
+:config
+			(beacon-mode)
+)
+;; Beacon:1 ends here
+
+;; [[file:config.org::*Pulse-Cursor][Pulse-Cursor:1]]
+(use-package pulsing-cursor
+  	      :config (pulsing-cursor-mode)
+)
+;; Pulse-Cursor:1 ends here
+
+;; [[file:config.org::*Goggles][Goggles:1]]
+(use-package goggles
+:hook ((prog-mode text-mode org-mode) . goggles-mode)
+:config
+	(setq-default goggles-pulse t)) ;; set to nil to disable pulsing
+;; Goggles:1 ends here
+
+;; [[file:config.org::*Hl-line][Hl-line:1]]
+(use-package hl-line
+:init
+	(global-hl-line-mode)
+)
+;; Hl-line:1 ends here
+
+;; [[file:config.org::*Auto-save][Auto-save:1]]
+(use-package auto-save
+:after lsp-bridge
+:config
+  (auto-save-enable)
+  (setq auto-save-silent t)   ; quietly save
+  (setq auto-save-delete-trailing-whitespace t)
+)
+;; Auto-save:1 ends here
+
+;; [[file:config.org::*DIff mode][DIff mode:1]]
+(use-package diff-mode
+	:defer t
+	:config
+	(when (>= emacs-major-version 27)
+		(set-face-attribute 'diff-refine-changed nil :extend t)
+		(set-face-attribute 'diff-refine-removed nil :extend t)
+		(set-face-attribute 'diff-refine-added   nil :extend t)))
+;; DIff mode:1 ends here
+
+;; [[file:config.org::*Dired][Dired:1]]
+(use-package dired
+	:defer t
+	:config (setq dired-listing-switches "-alh"))
+;; Dired:1 ends here
+
+;; [[file:config.org::*ELdoc][ELdoc:1]]
+(use-package eldoc
+	:when (version< "25" emacs-version)
+	:config (global-eldoc-mode))
+;; ELdoc:1 ends here
+
+;; [[file:config.org::*Help][Help:1]]
+(use-package help
+	:defer t
+	:config (temp-buffer-resize-mode))
+;; Help:1 ends here
+
+;; [[file:config.org::*Isearch][Isearch:1]]
+(progn ;    `isearch'
+	(setq isearch-allow-scroll t))
+;; Isearch:1 ends here
+
+;; [[file:config.org::*Lisp-mode][Lisp-mode:1]]
+(use-package lisp-mode
+	:config
+	(add-hook 'emacs-lisp-mode-hook 'outline-minor-mode)
+	(add-hook 'emacs-lisp-mode-hook 'reveal-mode)
+	(defun indent-spaces-mode ()
+		(setq indent-tabs-mode nil))
+	(add-hook 'lisp-interaction-mode-hook 'indent-spaces-mode))
+;; Lisp-mode:1 ends here
+
+;; [[file:config.org::*Man][Man:1]]
+(use-package man
+	:defer t
+	:config (setq Man-width 80))
+;; Man:1 ends here
+
+;; [[file:config.org::*Paren][Paren:1]]
+(use-package paren
+	:config (show-paren-mode))
+;; Paren:1 ends here
+
+;; [[file:config.org::*Prog-mode][Prog-mode:1]]
+(use-package prog-mode
+	:config (global-prettify-symbols-mode)
+	(defun indicate-buffer-boundaries-left ()
+		(setq indicate-buffer-boundaries 'left))
+	(add-hook 'prog-mode-hook 'indicate-buffer-boundaries-left))
+;; Prog-mode:1 ends here
+
+;; [[file:config.org::*Recentf][Recentf:1]]
+(use-package recentf
+	:demand t
+	:config (add-to-list 'recentf-exclude "^/\\(?:ssh\\|su\\|sudo\\)?x?:"))
+;; Recentf:1 ends here
+
+;; [[file:config.org::*Savehist][Savehist:1]]
+;; Persist history over Emacs restarts. Vertico sorts by history position.
+	(use-package savehist
+			:init
+			(savehist-mode))
+;; Savehist:1 ends here
+
+;; [[file:config.org::*Saveplace][Saveplace:1]]
+;; A few more useful configurations...
+	(use-package emacs
+			:init
+			;; Add prompt indicator to `completing-read-multiple'.
+			;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
+			(defun crm-indicator (args)
+			(cons (format "[CRM%s] %s"
+					(replace-regexp-in-string
+					"\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+					crm-separator)
+					(car args))
+				(cdr args)))
+			(advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+
+			;; Do not allow the cursor in the minibuffer prompt
+			(setq minibuffer-prompt-properties
+		'(read-only t cursor-intangible t face minibuffer-prompt))
+			(add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
+			;; Emacs 28: Hide commands in M-x which do not work in the current mode.
+			;; Vertico commands are hidden in normal buffers.
+			;; (setq read-extended-command-predicate
+			;;       #'command-completion-default-include-p)
+			;; Enable recursive minibuffers
+			(setq enable-recursive-minibuffers t))
+;; Saveplace:1 ends here
+
+;; [[file:config.org::*Simple][Simple:1]]
+(use-package simple
+	:config (column-number-mode))
+;; Simple:1 ends here
+
+;; [[file:config.org::*Smerge][Smerge:1]]
+(use-package smerge-mode
+	:defer t
+	:config
+	(when (>= emacs-major-version 27)
+		(set-face-attribute 'smerge-refined-removed nil :extend t)
+		(set-face-attribute 'smerge-refined-added   nil :extend t)))
+;; Smerge:1 ends here
+
+;; [[file:config.org::*Text][Text:1]]
+(progn ;    `text-mode'
+	(add-hook 'text-mode-hook 'indicate-buffer-boundaries-left))
+;; Text:1 ends here
+
+;; [[file:config.org::*Tramp][Tramp:1]]
+(use-package tramp
+	:defer t
+	:config
+	(add-to-list 'tramp-default-proxies-alist '(nil "\\`root\\'" "/ssh:%h:"))
+	(add-to-list 'tramp-default-proxies-alist '("localhost" nil nil))
+	(add-to-list 'tramp-default-proxies-alist
+				 (list (regexp-quote (system-name)) nil nil))
+	(setq vc-ignore-dir-regexp
+	(format "\\(%s\\)\\|\\(%s\\)"
+		vc-ignore-dir-regexp
+		tramp-file-name-regexp)))
+;; Tramp:1 ends here
+
+;; [[file:config.org::*Tramp-sh][Tramp-sh:1]]
+(use-package tramp-sh
+	:defer t
+	:config (cl-pushnew 'tramp-own-remote-path tramp-remote-path))
+;; Tramp-sh:1 ends here
+
 ;; [[file:config.org::*Dashboard][Dashboard:1]]
 (use-package dashboard
 :init
-	(setq initial-buffer-choice 'dashboard-open
-			dashboard-image-banner-max-width 1000
-			dashboard-set-heading-icons t
-			dashboard-center-content t ;; set to 't' for centered content
-			dashboard-set-file-icons t
-			initial-buffer-choice
-			(lambda () (get-buffer-create "*dashboard*"))
-			dashboard-startup-banner ;; use custom image as banner
-			(concat user-emacs-directory "assets/EmacsBound.xpm")
-			dashboard-items '(
-			(recents . 5)
-			(agenda . 5 )
-			(bookmarks . 3)
-			(projects . 3)
-			(registers . 3)
-			)
-	)
+      (setq initial-buffer-choice 'dashboard-open
+  		      dashboard-image-banner-max-width 1100
+  		      dashboard-set-heading-icons t
+  		      dashboard-center-content t ;; set to 't' for centered content
+  		      dashboard-set-file-icons t
+  		      initial-buffer-choice
+  		      (lambda () (get-buffer-create "*dashboard*"))
+  		      dashboard-startup-banner ;; use custom image as banner
+  		      (concat user-emacs-directory "assets/EmaxBound.webp")
+  		      dashboard-items '(
+  		      (recents . 5)
+  		      (agenda . 5 )
+  		      (bookmarks . 3)
+  		      (projects . 3)
+  		      (registers . 3)
+  		      )
+      )
 :config
-	;(dashboard-setup-startup-hook)
+      (dashboard-setup-startup-hook)
+      (setq-default header-line-format mode-line-format)
+      (setq-default mode-line-format nil)
+      (set-face-attribute 'dashboard-items-face nil)
+
 :bind (:map dashboard-mode-map
-	("l" . 'dashboard-previous-line)
-	("k" . 'dashboard-next-line)
-	(";" . 'dashboard-next-section)
-	("j" . 'dashboard-previous-section)
-	)
+      ("k" . 'dashboard-previous-line)
+      ("l" . 'dashboard-next-line)
+      (";" . 'dashboard-next-section)
+      ("j" . 'dashboard-previous-section)
+      )
 )
 ;; Dashboard:1 ends here
 
+;; [[file:config.org::*Doom-modeline][Doom-modeline:1]]
+(use-package doom-modeline
+:init
+  		      (setq
+  				      doom-modeline-height 37
+  				      doom-modeline-enable-word-count t)
+  		      (doom-modeline-mode 1)
+:config
+  		      (set-face-attribute 'doom-modeline t
+  				      :inherit 'variable-pitch)
+      ;; let modeline show on the header, not bottom
+      (defun move-up-modeline ()
+  	      (interactive)
+  	      (progn
+  		      (setq-default header-line-format mode-line-format)
+  		      (setq-default mode-line-format nil)
+  	      ))
+      (move-up-modeline)
+)
+;; Doom-modeline:1 ends here
+
+;; [[file:config.org::*Nano-modline][Nano-modline:1]]
+(use-package nano-modeline
+:defer t
+:config
+	(add-hook 'prog-mode-hook            #'nano-modeline-prog-mode)
+	(add-hook 'text-mode-hook            #'nano-modeline-text-mode)
+	(add-hook 'org-mode-hook             #'nano-modeline-org-mode)
+	(add-hook 'pdf-view-mode-hook        #'nano-modeline-pdf-mode)
+	(add-hook 'mu4e-headers-mode-hook    #'nano-modeline-mu4e-headers-mode)
+	(add-hook 'mu4e-view-mode-hook       #'nano-modeline-mu4e-message-mode)
+	(add-hook 'elfeed-show-mode-hook     #'nano-modeline-elfeed-entry-mode)
+	(add-hook 'elfeed-search-mode-hook   #'nano-modeline-elfeed-search-mode)
+	(add-hook 'term-mode-hook            #'nano-modeline-term-mode)
+	(add-hook 'xwidget-webkit-mode-hook  #'nano-modeline-xwidget-mode)
+	(add-hook 'messages-buffer-mode-hook #'nano-modeline-message-mode)
+	(add-hook 'org-capture-mode-hook     #'nano-modeline-org-capture-mode)
+	(add-hook 'org-agenda-mode-hook      #'nano-modeline-org-agenda-mode)
+)
+;; Nano-modline:1 ends here
+
+;; [[file:config.org::*Diminish][Diminish:1]]
+(use-package diminish)
+;; Diminish:1 ends here
+
+;; [[file:config.org::*Awesome-tray][Awesome-tray:1]]
+(use-package awesome-tray
+:defer t
+:init
+  ;(awesome-tray-mode)
+:config
+  (setq awesome-tray-hide-mode-line nil)
+)
+;; Awesome-tray:1 ends here
+
+;; [[file:config.org::*Vertico][Vertico:1]]
+(use-package vertico
+	:init
+	;; Different scroll margin
+	(setq vertico-scroll-margin 1)
+	;; Show more candidates
+	(setq vertico-count 20)
+	;; Grow and shrink the Vertico minibuffer
+	(setq vertico-resize nil)
+	;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
+	(setq vertico-cycle t)
+	;; use Vertico as an in-buffer completion UI
+	(setq completion-in-region-function 'consult-completion-in-region)
+	(vertico-mode 1)
+)
+;; Vertico:1 ends here
+
+;; [[file:config.org::*Orderless][Orderless:1]]
+(use-package orderless
+	:init
+	(setq completion-styles '(orderless))
+	(setq orderless-component-separator
+					#'orderless-escapable-split-on-space)
+	(setq orderless-matching-styles
+					'(orderless-initialism orderless-prefixes orderless-regexp))
+	)
+;; Orderless:1 ends here
+
+;; [[file:config.org::*Vertico-directory][Vertico-directory:1]]
+(use-package vertico-directory
+		:after vertico
+		;; More convenient directory navigation commands
+		:bind (:map vertico-map
+)
+		;; Tidy shadowed file names
+		:hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
+;; Vertico-directory:1 ends here
+
+;; [[file:config.org::*Vertico-multiform][Vertico-multiform:1]]
+(use-package vertico-multiform
+	:after vertico
+	:config (vertico-multiform-mode)
+)
+;; Vertico-multiform:1 ends here
+
+;; [[file:config.org::*Vertico-posframe][Vertico-posframe:1]]
+(use-package vertico-posframe
+;:disabled
+:after vertico-multiform
+:init
+			(setq vertico-posframe-poshandler
+							'posframe-poshandler-frame-top-center)
+			(setq vertico-count 15
+							vertico-posframe-border-width 3
+							vertico-posframe-width 140
+							vertico-resize nil)
+			(setq vertico-posframe-parameters
+						 '((left-fringe . 20)
+							 (right-fringe . 20)))
+			(setq vertico-multiform-commands '(
+
+							(execute-extended-command ; M-x
+								(vertico-posframe-poshandler .
+									 posframe-poshandler-frame-top-center)
+								(vertico-posframe-width . 120))
+
+							(meow-visit
+								(vertico-posframe-poshandler .
+									 posframe-poshandler-window-top-right-corner)
+								(vertico-posframe-width . 50))
+
+							(meow-yank-pop; M-x
+								(vertico-posframe-poshandler .
+									 posframe-poshandler-point-window-center)
+								(vertico-posframe-width . 50))
+
+							(find-file
+								(vertico-count . 25)
+								(vertico-posframe-width . 70)
+								(vertico-posframe-poshandler .
+									 posframe-poshandler-window-upper-center!))
+
+							(consult-buffer
+								(vertico-count . 25)
+								(vertico-posframe-width . 100)
+								(vertico-posframe-poshandler .
+									 posframe-poshandler-window-upper-center!))
+
+							(switch-to-buffer
+								(vertico-count . 25)
+								(vertico-posframe-width . 100)
+								(vertico-posframe-poshandler .
+									 posframe-poshandler-window-upper-center!))
+
+							(org-insert-link; C-c C-l
+								(vertico-posframe-poshandler .
+									 posframe-poshandler-point-top-left-corner)
+								(vertico-posframe-width . 70))
+
+							(consult-imenu
+								(vertico-count . 40)
+								(vertico-posframe-poshandler .
+									 posframe-poshandler-window-top-right-corner)
+								(vertico-posframe-width . 80))
+
+							(consult-outline
+								(vertico-count . 30)
+								(vertico-posframe-poshandler .
+									 posframe-poshandler-window-top-right-corner)
+								(vertico-posframe-width . 40))
+
+							(consult-line
+					(vertico-count . 30)
+								(vertico-posframe-poshandler .
+									 posframe-poshandler-frame-top-right-corner)
+								(vertico-posframe-width . 60))
+
+							(t
+								(vertico-posframe-poshandler .
+									 posframe-poshandler-frame-top-center)
+								(vertico-posframe-width . 120))
+			))
+
+:config
+			(vertico-multiform-mode 1)
+			(vertico-posframe-mode 1)
+)
+;; Vertico-posframe:1 ends here
+
+;; [[file:config.org::*Savehist][Savehist:1]]
+;; Persist history over Emacs restarts. Vertico sorts by history position.
+	(use-package savehist
+			:init
+			(savehist-mode))
+;; Savehist:1 ends here
+
+;; [[file:config.org::*Savehist][Savehist:2]]
+;; A few more useful configurations...
+	(use-package emacs
+			:init
+			;; Add prompt indicator to `completing-read-multiple'.
+			;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
+			(defun crm-indicator (args)
+			(cons (format "[CRM%s] %s"
+					(replace-regexp-in-string
+					"\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+					crm-separator)
+					(car args))
+				(cdr args)))
+			(advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+
+			;; Do not allow the cursor in the minibuffer prompt
+			(setq minibuffer-prompt-properties
+		'(read-only t cursor-intangible t face minibuffer-prompt))
+			(add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
+			;; Emacs 28: Hide commands in M-x which do not work in the current mode.
+			;; Vertico commands are hidden in normal buffers.
+			;; (setq read-extended-command-predicate
+			;;       #'command-completion-default-include-p)
+			;; Enable recursive minibuffers
+			(setq enable-recursive-minibuffers t))
+;; Savehist:2 ends here
+
+;; [[file:config.org::*Consult][Consult:1]]
+(use-package consult
+			;; Replace bindings. Lazily loaded due by `use-package'.
+:bind (;; C-c bindings in `mode-specific-map'
+			 ("C-c M-x" . consult-mode-command)
+			 ("C-c h" . consult-history)
+			 ;("C-c k" . consult-kmacro)
+			 ("C-c m" . consult-man)
+			 ;("C-c i" . consult-info)
+			 ([remap Info-search] . consult-info)
+			 ;; C-x bindings in `ctl-x-map'
+			 ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+			 ([remap list-buffers] . consult-buffer)   ;; orig. switch-to-buffer
+			 ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+			 ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
+			 ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
+			 ("C-x p b" . consult-project-buffer) ;; orig. project-switch-to-buffer
+			 ;; Custom M-# bindings for fast register access
+			 ("M-#" . consult-register-load)
+			 ("M-'" . consult-register-store)  ;; orig. abbrev-prefix-mark (unrelated)
+			 ("C-M-#" . consult-register)
+			 ;; Other custom bindings
+			 ("M-y" . consult-yank-pop)           ;; orig. yank-pop
+			 ;; M-g bindings in `goto-map'
+			 ("M-g e" . consult-compile-error)
+			 ("M-g f" . consult-flymake)          ;; Alternative: consult-flycheck
+			 ("M-g g" . consult-goto-line)        ;; orig. goto-line
+			 ("M-g M-g" . consult-goto-line)      ;; orig. goto-line
+			 ("M-g o" . consult-outline)          ;; Alternative: consult-org-heading
+			 ("M-g m" . consult-mark)
+			 ("M-g k" . consult-global-mark)
+			 ("M-g i" . consult-imenu)
+			 ("M-g I" . consult-imenu-multi)
+			 ;; M-s bindings in `search-map'
+			 ("M-s d" . consult-find)
+			 ("M-s D" . consult-locate)
+			 ("M-s g" . consult-grep)
+			 ("M-s G" . consult-git-grep)
+			 ("M-s r" . consult-ripgrep)
+			 ("M-s l" . consult-line)
+			 ("M-s L" . consult-line-multi)
+			 ("M-s k" . consult-keep-lines)
+			 ("M-s u" . consult-focus-lines)
+			 ;; Isearch integration
+			 ("M-s e" . consult-isearch-history)
+			 :map isearch-mode-map
+			 ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
+			 ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
+			 ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
+			 ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
+			 ;; Minibuffer history
+			 :map minibuffer-local-map
+			 ("M-s" . consult-history)                 ;; orig. next-matching-history-element
+			 ("M-r" . consult-history))                ;; orig. previous-matching-history-element
+
+			;; Enable automatic preview at point in the *Completions* buffer. This is
+			;; relevant when you use the default completion UI.
+			:hook (completion-list-mode . consult-preview-at-point-mode)
+
+:init
+
+			;; Optionally configure the register formatting.
+	;; This improves the register preview for
+	;; `consult-register', `consult-register-load',
+	;; `consult-register-store' and the Emacs built-ins.
+			(setq register-preview-delay 0.5
+			register-preview-function #'consult-register-format)
+
+			;; Optionally tweak the register preview window.
+			;; This adds thin lines, sorting and hides the mode line of the window.
+			(advice-add #'register-preview :override #'consult-register-window)
+
+			;; Use Consult to select xref locations with preview
+			(setq xref-show-xrefs-function #'consult-xref
+			xref-show-definitions-function #'consult-xref)
+
+:config
+
+			;; Optionally configure preview.
+	;; The default value is 'any, such that any key triggers the preview.
+			;; (setq consult-preview-key 'any)
+			;; (setq consult-preview-key "M-.")
+			;; (setq consult-preview-key '("S-<down>" "S-<up>"))
+
+	;; For some commands and buffer sources it is useful to configure the
+			;; :preview-key on a per-command basis using the `consult-customize' macro.
+			(consult-customize
+			 consult-theme
+		 :preview-key '(:debounce 0.2 any)
+			 consult-ripgrep consult-git-grep consult-grep
+			 consult-bookmark consult-recent-file consult-xref
+			 consult--source-bookmark consult--source-file-register
+			 consult--source-recent-file consult--source-project-recent-file
+			 ;;  :preview-key "M-."
+			 :preview-key '(:debounce 0.4 any)
+	)
+
+			;; Optionally configure the narrowing key.
+			(setq consult-narrow-key "<") ;; "C-+"
+	(setq consult-buffer-filter "\\*")
+			;; Optionally make narrowing help available in the minibuffer.
+			;; You may want to use `embark-prefix-help-command' or which-key instead.
+			;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
+)
+;; Consult:1 ends here
+
+;; [[file:config.org::*Marginalia][Marginalia:1]]
+(use-package marginalia
+:general
+	(:keymaps 'minibuffer-local-map
+	 "M-A" 'marginalia-cycle)
+:custom
+	(marginalia-max-relative-age 0)
+	(marginalia-align 'right)
+:init
+	(marginalia-mode)
+)
+;; Marginalia:1 ends here
+
 ;; [[file:config.org::*Centaur-tabs][Centaur-tabs:1]]
 (use-package centaur-tabs
-;; :disabled
+:disabled
 :hook
 	(emacs-startup . centaur-tabs-mode)
 	(dired-mode . centaur-tabs-local-mode)
@@ -463,7 +1112,7 @@
 	(calendar-mode . centaur-tabs-local-mode)
 :init
 :config
-	(setq 
+	(setq
 		centaur-tabs-set-icons t
 		centaur-tabs-set-modified-marker t
 		centaur-tabs-modified-marker "M"
@@ -482,7 +1131,7 @@
 					magit-log-mode
 					magit-file-mode
 					magit-blob-mode
-					magit-blame-mode))) 
+					magit-blame-mode)))
 						 "Emacs")
 			((derived-mode-p '(prog-mode org-mode) "Editing"))
 			((derived-mode-p 'dired-mode) "Dired")
@@ -507,280 +1156,11 @@
 )
 ;; Centaur-tabs:1 ends here
 
-;; [[file:config.org::*Modeline][Modeline:1]]
-(use-package doom-modeline
-:init
-	(setq
-		doom-modeline-height 37
-		doom-modeline-enable-word-count t)
-	(doom-modeline-mode 1)
-:config
-	(set-face-attribute 'doom-modeline t
-		:inherit 'variable-pitch
-	)
+;; [[file:config.org::*Sort-tab][Sort-tab:1]]
+(use-package sort-tab
+:init (sort-tab-mode)
 )
-;; Modeline:1 ends here
-
-;; [[file:config.org::*Diminish][Diminish:1]]
-(use-package diminish)
-;; Diminish:1 ends here
-
-;; [[file:config.org::*Mini-frame][Mini-frame:1]]
-(use-package mini-frame
-:config
-	(setq mini-frame-detach-on-hide nil)
-	;(setq mini-frame-standalone 't)
-	;(setq mini-frame-resize-min-height 10)
-	(setq mini-frame-ignore-commands
-		(append mini-frame-ignore-commands
-		 '(evil-window-split evil-window-vsplit evil-ex)))
-)
-;; Mini-frame:1 ends here
-
-;; [[file:config.org::*Holo-layer][Holo-layer:1]]
-(use-package holo-layer
-      :config 
-  (setq holo-layer-enable-cursor-animation 1
-  			)
-      ;(holo-layer-enable)
-)
-;; Holo-layer:1 ends here
-
-;; [[file:config.org::*Olivetti][Olivetti:1]]
-(use-package olivetti
-:hook (org-mode . olivetti-mode)
-      (Custom-mode . olivetti-mode)
-      (help-mode . olivetti-mode)
-      (dashboard-mode . olivetti-mode)
-      (dashboard-mode . variable-pitch-mode)
-      (olivetti-mode . visual-line-mode)
-:init
-      (setq-default fill-column 78)
-:config
-      ;If nil (the default), use the value of fill-column + 2.
-      (setq olivetti-body-width nil
-  			       olivetti-style 'fancy)
-      (set-face-attribute 'olivetti-fringe nil :background "#171B24")
-      (defun config/window-center (width)
-  	      (interactive)
-  	      (setq fill-column width)
-  	      (olivetti-mode)
-      )
-      ;; (config/leader
-      ;; 	"tc"  '(olivetti-mode     :wk "󰉠 Center")
-      ;; )
-)
-;; Olivetti:1 ends here
-
-;; [[file:config.org::*Vertical Spacing][Vertical Spacing:1]]
-(use-package topspace
-:init (global-topspace-mode)
-)
-;; Vertical Spacing:1 ends here
-
-;; [[file:config.org::*Solaire mode][Solaire mode:1]]
-(use-package solaire-mode
-	:hook (minibuffer-setup . solaire-mode)
-				(help-mode . solaire-mode)
-				(helpful-mode . solaire-mode)
-				(org-export-stack-mode . solaire-mode)
-	)
-;; Solaire mode:1 ends here
-
-;; [[file:config.org::*Whitespace mode][Whitespace mode:1]]
-;; (config/leader :infix "t"
-;;   "SPC"  '(whitespace-mode  :wk "󰡭 Show Space")
-;; )
-;; Whitespace mode:1 ends here
-
-;; [[file:config.org::*Transparency][Transparency:1]]
-(set-frame-parameter nil 'alpha-background 96)
-(add-to-list 'default-frame-alist '(alpha-background . 96))
-
-(defun config/transparency (value)
-      "Sets the transparency of the frame window. 0=transparent/100=opaque"
-      (interactive "nTransparency Value 0 - 100 opaque:")
-      (set-frame-parameter nil 'alpha-background value))
-;; Transparency:1 ends here
-
-;; [[file:config.org::*Scroll][Scroll:1]]
-(use-package emacs
-:config
-	(setq scroll-conservatively 97)
-	(setq scroll-preserve-screen-position 1)
-	(setq mouse-wheel-progressive-speed nil)
-	;; The following piece of code is stolen from
-	;; https://emacs-china.org/t/topic/25114/5
-	(pixel-scroll-precision-mode 1)
-	(setq pixel-scroll-precision-interpolate-page t)
-	(defun +pixel-scroll-interpolate-down (&optional lines)
-			(interactive)
-			(if lines
-					(pixel-scroll-precision-interpolate (* -1 lines (pixel-line-height)))
-			(pixel-scroll-interpolate-down)))
-
-	(defun +pixel-scroll-interpolate-up (&optional lines)
-			(interactive)
-			(if lines
-					(pixel-scroll-precision-interpolate (* lines  
-					(pixel-line-height))))
-			(pixel-scroll-interpolate-up))
-
-	(defalias 'scroll-up-command '+pixel-scroll-interpolate-down)
-	(defalias 'scroll-down-command '+pixel-scroll-interpolate-up)
-)
-;; Scroll:1 ends here
-
-;; [[file:config.org::*Diff][Diff:1]]
-(use-package diff-hl
-:custom-face
-	(diff-hl-change ((t (:background "#2c5f72" :foreground "#77a8d9"))))
-	(diff-hl-delete ((t (:background "#844953" :foreground "#f27983"))))
-	(diff-hl-insert ((t (:background "#5E734A" :foreground "#a6cc70"))))
-:config
-	(setq diff-hl-draw-borders nil)
-	(global-diff-hl-mode)
-	;(diff-hl-margin-mode) 
-	(add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
-)
-;; Diff:1 ends here
-
-;; [[file:config.org::*Beacon][Beacon:1]]
-(use-package beacon
-:config  
-	(beacon-mode)
-)
-;; Beacon:1 ends here
-
-;; [[file:config.org::*Pulse-Cursor][Pulse-Cursor:1]]
-(use-package pulsing-cursor
-    :config (pulsing-cursor-mode +1))
-;; Pulse-Cursor:1 ends here
-
-;; [[file:config.org::*Goggles][Goggles:1]]
-(use-package goggles
-  :hook ((prog-mode text-mode org-mode) . goggles-mode)
-  :config
-  (setq-default goggles-pulse t)) ;; set to nil to disable pulsing
-;; Goggles:1 ends here
-
-;; [[file:config.org::*Long tail][Long tail:1]]
-(use-package diff-mode
-	:defer t
-	:config
-	(when (>= emacs-major-version 27)
-		(set-face-attribute 'diff-refine-changed nil :extend t)
-		(set-face-attribute 'diff-refine-removed nil :extend t)
-		(set-face-attribute 'diff-refine-added   nil :extend t)))
-;; Long tail:1 ends here
-
-;; [[file:config.org::*Long tail][Long tail:2]]
-(use-package dired
-	:defer t
-	:config (setq dired-listing-switches "-alh"))
-;; Long tail:2 ends here
-
-;; [[file:config.org::*Long tail][Long tail:3]]
-(use-package eldoc
-	:when (version< "25" emacs-version)
-	:config (global-eldoc-mode))
-;; Long tail:3 ends here
-
-;; [[file:config.org::*Long tail][Long tail:4]]
-(use-package help
-	:defer t
-	:config (temp-buffer-resize-mode))
-;; Long tail:4 ends here
-
-;; [[file:config.org::*Long tail][Long tail:5]]
-(progn ;    `isearch'
-	(setq isearch-allow-scroll t))
-;; Long tail:5 ends here
-
-;; [[file:config.org::*Long tail][Long tail:6]]
-(use-package lisp-mode
-	:config
-	(add-hook 'emacs-lisp-mode-hook 'outline-minor-mode)
-	(add-hook 'emacs-lisp-mode-hook 'reveal-mode)
-	(defun indent-spaces-mode ()
-		(setq indent-tabs-mode nil))
-	(add-hook 'lisp-interaction-mode-hook 'indent-spaces-mode))
-;; Long tail:6 ends here
-
-;; [[file:config.org::*Long tail][Long tail:7]]
-(use-package man
-	:defer t
-	:config (setq Man-width 80))
-;; Long tail:7 ends here
-
-;; [[file:config.org::*Long tail][Long tail:8]]
-(use-package paren
-	:config (show-paren-mode))
-;; Long tail:8 ends here
-
-;; [[file:config.org::*Long tail][Long tail:9]]
-(use-package prog-mode
-	:config (global-prettify-symbols-mode)
-	(defun indicate-buffer-boundaries-left ()
-		(setq indicate-buffer-boundaries 'left))
-	(add-hook 'prog-mode-hook 'indicate-buffer-boundaries-left))
-;; Long tail:9 ends here
-
-;; [[file:config.org::*Long tail][Long tail:10]]
-(use-package recentf
-	:demand t
-	:config (add-to-list 'recentf-exclude "^/\\(?:ssh\\|su\\|sudo\\)?x?:"))
-;; Long tail:10 ends here
-
-;; [[file:config.org::*Long tail][Long tail:11]]
-(use-package savehist
-	:config (savehist-mode))
-;; Long tail:11 ends here
-
-;; [[file:config.org::*Long tail][Long tail:12]]
-(use-package saveplace
-	:when (version< "25" emacs-version)
-	:config (save-place-mode))
-;; Long tail:12 ends here
-
-;; [[file:config.org::*Long tail][Long tail:13]]
-(use-package simple
-	:config (column-number-mode))
-;; Long tail:13 ends here
-
-;; [[file:config.org::*Long tail][Long tail:14]]
-(use-package smerge-mode
-	:defer t
-	:config
-	(when (>= emacs-major-version 27)
-		(set-face-attribute 'smerge-refined-removed nil :extend t)
-		(set-face-attribute 'smerge-refined-added   nil :extend t)))
-;; Long tail:14 ends here
-
-;; [[file:config.org::*Long tail][Long tail:15]]
-(progn ;    `text-mode'
-	(add-hook 'text-mode-hook 'indicate-buffer-boundaries-left))
-;; Long tail:15 ends here
-
-;; [[file:config.org::*Long tail][Long tail:16]]
-(use-package tramp
-	:defer t
-	:config
-	(add-to-list 'tramp-default-proxies-alist '(nil "\\`root\\'" "/ssh:%h:"))
-	(add-to-list 'tramp-default-proxies-alist '("localhost" nil nil))
-	(add-to-list 'tramp-default-proxies-alist
-				 (list (regexp-quote (system-name)) nil nil))
-	(setq vc-ignore-dir-regexp
-	(format "\\(%s\\)\\|\\(%s\\)"
-		vc-ignore-dir-regexp
-		tramp-file-name-regexp)))
-;; Long tail:16 ends here
-
-;; [[file:config.org::*Long tail][Long tail:17]]
-(use-package tramp-sh
-	:defer t
-	:config (cl-pushnew 'tramp-own-remote-path tramp-remote-path))
-;; Long tail:17 ends here
+;; Sort-tab:1 ends here
 
 ;; [[file:config.org::*Magit][Magit:1]]
 (use-package magit
@@ -1012,272 +1392,6 @@
 )
 ;; Info+:2 ends here
 
-;; [[file:config.org::*Marginalia][Marginalia:1]]
-(use-package marginalia
-:general
-	(:keymaps 'minibuffer-local-map
-	 "M-A" 'marginalia-cycle)
-:custom
-	(marginalia-max-relative-age 0)
-	(marginalia-align 'right)
-:init
-	(marginalia-mode)
-)
-;; Marginalia:1 ends here
-
-;; [[file:config.org::*Vertico][Vertico:1]]
-(use-package vertico
-	:init
-	;; Different scroll margin
-	(setq vertico-scroll-margin 1)
-	;; Show more candidates
-	(setq vertico-count 20)
-	;; Grow and shrink the Vertico minibuffer
-	(setq vertico-resize nil)
-	;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
-	(setq vertico-cycle t)
-	;; use Vertico as an in-buffer completion UI
-	(setq completion-in-region-function 'consult-completion-in-region)
-	(vertico-mode 1)
-)
-;; Vertico:1 ends here
-
-;; [[file:config.org::*Orderless][Orderless:1]]
-(use-package orderless
-	:init
-	(setq completion-styles '(orderless))
-	(setq orderless-component-separator 
-					#'orderless-escapable-split-on-space)
-	(setq orderless-matching-styles
-					'(orderless-initialism orderless-prefixes orderless-regexp))
-	)
-;; Orderless:1 ends here
-
-;; [[file:config.org::*Vertico-directory][Vertico-directory:1]]
-(use-package vertico-directory
-	:after vertico
-	;; More convenient directory navigation commands
-	:bind (:map vertico-map
-				("RET" . vertico-directory-enter)
-				("DEL" . vertico-directory-delete-char)
-				("M-DEL" . vertico-directory-delete-word))
-	;; Tidy shadowed file names
-	:hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
-;; Vertico-directory:1 ends here
-
-;; [[file:config.org::*Vertico-multiform][Vertico-multiform:1]]
-(use-package vertico-multiform
-	:after vertico
-	:config (vertico-multiform-mode)
-)
-;; Vertico-multiform:1 ends here
-
-;; [[file:config.org::*Vertico-posframe][Vertico-posframe:1]]
-(use-package vertico-posframe
-;:disabled
-:after vertico-multiform
-:init
-	(setq vertico-posframe-poshandler
-				'posframe-poshandler-frame-top-center)
-	(setq vertico-count 15
-				vertico-posframe-border-width 3
-				vertico-posframe-width 140
-				vertico-resize nil)
-	(setq vertico-posframe-parameters
-			 '((left-fringe . 20)
-				 (right-fringe . 20)))
-	(setq vertico-multiform-commands '(
-				(execute-extended-command ; M-x
-					(vertico-posframe-poshandler .
-						 posframe-poshandler-frame-top-center)
-					(vertico-posframe-width . 120)
-				)
-				(meow-visit
-					(vertico-posframe-poshandler .
-						 posframe-poshandler-window-top-right-corner)
-					(vertico-posframe-width . 50)
-				)
-				(meow-yank-pop; M-x
-					(vertico-posframe-poshandler .
-						 posframe-poshandler-point-window-center)
-					(vertico-posframe-width . 50)
-				)
-				(find-file
-					(vertico-count . 25)
-					(vertico-posframe-width . 70)
-					(vertico-posframe-poshandler .
-						 posframe-poshandler-window-center)
-				)
-				(consult-buffer
-					(vertico-count . 25)
-					(vertico-posframe-width . 120)
-					(vertico-posframe-poshandler .
-						 posframe-poshandler-window-center)
-				)
-				(org-insert-link; M-x
-					(vertico-posframe-poshandler .
-						 posframe-poshandler-point-top-left-corner)
-					(vertico-posframe-width . 70)
-				)
-				(consult-line
-					(vertico-posframe-poshandler . 
-						 posframe-poshandler-frame-top-center)
-					(vertico-posframe-fallback-mode . vertico-buffer-mode)
-					(vertico-posframe-width . 70))
-				(t
-					(vertico-posframe-poshandler .
-						 posframe-poshandler-frame-top-center)
-					(vertico-posframe-width . 120)
-				)
-	))
-
-:config
-	(vertico-multiform-mode 1)
-	(vertico-posframe-mode 1)
-)
-;; Vertico-posframe:1 ends here
-
-;; [[file:config.org::*Savehist][Savehist:1]]
-;; Persist history over Emacs restarts. Vertico sorts by history position.
-	(use-package savehist
-			:init
-			(savehist-mode))
-;; Savehist:1 ends here
-
-;; [[file:config.org::*Savehist][Savehist:2]]
-;; A few more useful configurations...
-	(use-package emacs
-			:init
-			;; Add prompt indicator to `completing-read-multiple'.
-			;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
-			(defun crm-indicator (args)
-			(cons (format "[CRM%s] %s"
-					(replace-regexp-in-string
-					"\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
-					crm-separator)
-					(car args))
-				(cdr args)))
-			(advice-add #'completing-read-multiple :filter-args #'crm-indicator)
-
-			;; Do not allow the cursor in the minibuffer prompt
-			(setq minibuffer-prompt-properties
-		'(read-only t cursor-intangible t face minibuffer-prompt))
-			(add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
-
-			;; Emacs 28: Hide commands in M-x which do not work in the current mode.
-			;; Vertico commands are hidden in normal buffers.
-			;; (setq read-extended-command-predicate
-			;;       #'command-completion-default-include-p)
-			;; Enable recursive minibuffers
-			(setq enable-recursive-minibuffers t))
-;; Savehist:2 ends here
-
-;; [[file:config.org::*Consult][Consult:1]]
-(use-package consult
-      ;; Replace bindings. Lazily loaded due by `use-package'.
-:bind (;; C-c bindings in `mode-specific-map'
-       ("C-c M-x" . consult-mode-command)
-       ("C-c h" . consult-history)
-       ;("C-c k" . consult-kmacro)
-       ("C-c m" . consult-man)
-       ;("C-c i" . consult-info)
-       ([remap Info-search] . consult-info)
-       ;; C-x bindings in `ctl-x-map'
-       ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
-       ([remap list-buffers] . consult-buffer)   ;; orig. switch-to-buffer
-       ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
-       ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
-       ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
-       ("C-x p b" . consult-project-buffer) ;; orig. project-switch-to-buffer
-       ;; Custom M-# bindings for fast register access
-       ("M-#" . consult-register-load)
-       ("M-'" . consult-register-store)  ;; orig. abbrev-prefix-mark (unrelated)
-       ("C-M-#" . consult-register)
-       ;; Other custom bindings
-       ("M-y" . consult-yank-pop)           ;; orig. yank-pop
-       ;; M-g bindings in `goto-map'
-       ("M-g e" . consult-compile-error)
-       ("M-g f" . consult-flymake)          ;; Alternative: consult-flycheck
-       ("M-g g" . consult-goto-line)        ;; orig. goto-line
-       ("M-g M-g" . consult-goto-line)      ;; orig. goto-line
-       ("M-g o" . consult-outline)          ;; Alternative: consult-org-heading
-       ("M-g m" . consult-mark)
-       ("M-g k" . consult-global-mark)
-       ("M-g i" . consult-imenu)
-       ("M-g I" . consult-imenu-multi)
-       ;; M-s bindings in `search-map'
-       ("M-s d" . consult-find)
-       ("M-s D" . consult-locate)
-       ("M-s g" . consult-grep)
-       ("M-s G" . consult-git-grep)
-       ("M-s r" . consult-ripgrep)
-       ("M-s l" . consult-line)
-       ("M-s L" . consult-line-multi)
-       ("M-s k" . consult-keep-lines)
-       ("M-s u" . consult-focus-lines)
-       ;; Isearch integration
-       ("M-s e" . consult-isearch-history)
-       :map isearch-mode-map
-       ("M-e" . consult-isearch-history)         ;; orig. isearch-edit-string
-       ("M-s e" . consult-isearch-history)       ;; orig. isearch-edit-string
-       ("M-s l" . consult-line)                  ;; needed by consult-line to detect isearch
-       ("M-s L" . consult-line-multi)            ;; needed by consult-line to detect isearch
-       ;; Minibuffer history
-       :map minibuffer-local-map
-       ("M-s" . consult-history)                 ;; orig. next-matching-history-element
-       ("M-r" . consult-history))                ;; orig. previous-matching-history-element
-
-      ;; Enable automatic preview at point in the *Completions* buffer. This is
-      ;; relevant when you use the default completion UI.
-      :hook (completion-list-mode . consult-preview-at-point-mode)
-
-:init
-
-      ;; Optionally configure the register formatting. 
-  ;; This improves the register preview for 
-  ;; `consult-register', `consult-register-load',
-  ;; `consult-register-store' and the Emacs built-ins.
-      (setq register-preview-delay 0.5
-      register-preview-function #'consult-register-format)
-
-      ;; Optionally tweak the register preview window.
-      ;; This adds thin lines, sorting and hides the mode line of the window.
-      (advice-add #'register-preview :override #'consult-register-window)
-
-      ;; Use Consult to select xref locations with preview
-      (setq xref-show-xrefs-function #'consult-xref
-      xref-show-definitions-function #'consult-xref)
-
-:config
-
-      ;; Optionally configure preview. 
-  ;; The default value is 'any, such that any key triggers the preview.
-      ;; (setq consult-preview-key 'any)
-      ;; (setq consult-preview-key "M-.")
-      ;; (setq consult-preview-key '("S-<down>" "S-<up>"))
-
-  ;; For some commands and buffer sources it is useful to configure the
-      ;; :preview-key on a per-command basis using the `consult-customize' macro.
-      (consult-customize
-       consult-theme 
-     :preview-key '(:debounce 0.2 any)
-       consult-ripgrep consult-git-grep consult-grep
-       consult-bookmark consult-recent-file consult-xref
-       consult--source-bookmark consult--source-file-register
-       consult--source-recent-file consult--source-project-recent-file
-       ;;  :preview-key "M-."
-       :preview-key '(:debounce 0.4 any)
-  )
-
-      ;; Optionally configure the narrowing key.
-      (setq consult-narrow-key "<") ;; "C-+"
-  (setq consult-buffer-filter "\\*")
-      ;; Optionally make narrowing help available in the minibuffer.
-      ;; You may want to use `embark-prefix-help-command' or which-key instead.
-      ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
-)
-;; Consult:1 ends here
-
 ;; [[file:config.org::*Blink search][Blink search:1]]
 (use-package blink-search
 :defer t
@@ -1288,13 +1402,16 @@
 
 ;; [[file:config.org::*Color-rg][Color-rg:1]]
 (use-package color-rg
-:defer t
 :config
 	(general-def isearch-mode-map
 		"M-s M-s" 'isearch-toggle-color-rg
 	)
 )
 ;; Color-rg:1 ends here
+
+;; [[file:config.org::*Voyager][Voyager:1]]
+(use-package voyager)
+;; Voyager:1 ends here
 
 ;; [[file:config.org::*LSP-bridge][LSP-bridge:1]]
 (use-package lsp-bridge
@@ -1309,91 +1426,82 @@
 
 ;; [[file:config.org::*Treesit][Treesit:1]]
 (use-package treesit
-:commands (treesit-install-language-grammar  
-					 config/treesit-install-all-languages)
+:commands (treesit-install-language-grammar
+  				       config/treesit-install-all-languages)
 :init
-	(setq treesit-language-source-alist
-		'((bash . ("https://github.com/tree-sitter/tree-sitter-bash"))
-			(c . ("https://github.com/tree-sitter/tree-sitter-c"))
-			(cpp . ("https://github.com/tree-sitter/tree-sitter-cpp"))
-			(css . ("https://github.com/tree-sitter/tree-sitter-css"))
-			(cmake . ("https://github.com/uyha/tree-sitter-cmake"))
-			(common-lisp . 
-				("https://github.com/theHamsta/tree-sitter-commonlisp"))
-			(csharp     . 
-				("https://github.com/tree-sitter/tree-sitter-c-sharp.git"))
-			(dockerfile . 
-				("https://github.com/camdencheek/tree-sitter-dockerfile"))
-			(elisp . ("https://github.com/Wilfred/tree-sitter-elisp"))
-			(go . ("https://github.com/tree-sitter/tree-sitter-go"))
-			(gomod      . 
-				("https://github.com/camdencheek/tree-sitter-go-mod.git"))
-			(html . ("https://github.com/tree-sitter/tree-sitter-html"))
-			(java       . 
-				("https://github.com/tree-sitter/tree-sitter-java.git"))
-			(javascript .   
-				("https://github.com/tree-sitter/tree-sitter-javascript"))
-			(json . ("https://github.com/tree-sitter/tree-sitter-json"))
-			(lua . ("https://github.com/Azganoth/tree-sitter-lua"))
-			(make . ("https://github.com/alemuller/tree-sitter-make"))
-			(markdown . 
-				("https://github.com/MDeiml/tree-sitter-markdown" nil   
-				"tree-sitter-markdown/src"))
-			(ocaml . 
-					("https://github.com/tree-sitter/tree-sitter-ocaml" nil 
-					"ocaml/src"))
-			(org . ("https://github.com/milisims/tree-sitter-org"))
-			(python . ("https://github.com/tree-sitter/tree-sitter-python"))
-			(php . ("https://github.com/tree-sitter/tree-sitter-php"))
-			(typescript . 
-					("https://github.com/tree-sitter/tree-sitter-typescript" nil 
-					"typescript/src"))
-			(tsx . 
-					("https://github.com/tree-sitter/tree-sitter-typescript" nil 
-					"tsx/src"))
-			(ruby . ("https://github.com/tree-sitter/tree-sitter-ruby"))
-			(rust . ("https://github.com/tree-sitter/tree-sitter-rust"))
-			(sql . ("https://github.com/m-novikov/tree-sitter-sql"))
-			(vue . ("https://github.com/merico-dev/tree-sitter-vue"))
-			(yaml . ("https://github.com/ikatyang/tree-sitter-yaml"))
-			(toml . ("https://github.com/tree-sitter/tree-sitter-toml"))
-			(zig . ("https://github.com/GrayJack/tree-sitter-zig"))))
+      (setq treesit-language-source-alist
+  	      '((bash . ("https://github.com/tree-sitter/tree-sitter-bash"))
+  		      (c . ("https://github.com/tree-sitter/tree-sitter-c"))
+  		      (cpp . ("https://github.com/tree-sitter/tree-sitter-cpp"))
+  		      (css . ("https://github.com/tree-sitter/tree-sitter-css"))
+  		      (cmake . ("https://github.com/uyha/tree-sitter-cmake"))
+  		      (common-lisp . ("https://github.com/theHamsta/tree-sitter-commonlisp"))
+  		      (csharp . ("https://github.com/tree-sitter/tree-sitter-c-sharp.git"))
+  		      (dockerfile . ("https://github.com/camdencheek/tree-sitter-dockerfile"))
+  		      (elisp . ("https://github.com/Wilfred/tree-sitter-elisp"))
+  		      (go . ("https://github.com/tree-sitter/tree-sitter-go"))
+  		      (gomod . ("https://github.com/camdencheek/tree-sitter-go-mod.git"))
+  		      (html . ("https://github.com/tree-sitter/tree-sitter-html"))
+  		      (java . ("https://github.com/tree-sitter/tree-sitter-java.git"))
+  		      (javascript . ("https://github.com/tree-sitter/tree-sitter-javascript"))
+  		      (json . ("https://github.com/tree-sitter/tree-sitter-json"))
+  		      (lua . ("https://github.com/Azganoth/tree-sitter-lua"))
+  		      (make . ("https://github.com/alemuller/tree-sitter-make"))
+  		      (markdown . ("https://github.com/MDeiml/tree-sitter-markdown" nil
+  			      "tree-sitter-markdown/src"))
+  		      (nix . ("https://github.com/nix-community/tree-sitter-nix.git"))
+  		      (ocaml . ("https://github.com/tree-sitter/tree-sitter-ocaml" nil "ocaml/src"))
+  		      (org . ("https://github.com/milisims/tree-sitter-org"))
+  		      (python . ("https://github.com/tree-sitter/tree-sitter-python"))
+  		      (php . ("https://github.com/tree-sitter/tree-sitter-php"))
+  		      (typescript . ("https://github.com/tree-sitter/tree-sitter-typescript" nil
+  				      "typescript/src"))
+  		      (tsx . ("https://github.com/tree-sitter/tree-sitter-typescript" nil
+  				      "tsx/src"))
+  		      (ruby . ("https://github.com/tree-sitter/tree-sitter-ruby"))
+  		      (rust . ("https://github.com/tree-sitter/tree-sitter-rust"))
+  		      (sql . ("https://github.com/m-novikov/tree-sitter-sql"))
+  		      (vue . ("https://github.com/merico-dev/tree-sitter-vue"))
+  		      (yaml . ("https://github.com/ikatyang/tree-sitter-yaml"))
+  		      (toml . ("https://github.com/tree-sitter/tree-sitter-toml"))
+  		      (zig . ("https://github.com/GrayJack/tree-sitter-zig"))))
 :config
 (defun config/treesit-install-all-languages ()
-	"Install all languages specified by `treesit-language-source-alist'."
-	(interactive)
-	(let ((languages (mapcar 'car treesit-language-source-alist)))
-		(dolist (lang languages)
-			(treesit-install-language-grammar lang)
-			(message "`%s' parser was installed." lang)
-			(sit-for 0.75)))))
+      "Install all languages specified by `treesit-language-source-alist'."
+      (interactive)
+      (let ((languages (mapcar 'car treesit-language-source-alist)))
+  	      (dolist (lang languages)
+  		      (treesit-install-language-grammar lang)
+  		      (message "`%s' parser was installed." lang)
+  		      (sit-for 0.75)))))
 ;; stolen from lazycat
 (setq major-mode-remap-alist
-			'((c-mode          . c-ts-mode)
-				(c++-mode        . c++-ts-mode)
-				(cmake-mode      . cmake-ts-mode)
-				(conf-toml-mode  . toml-ts-mode)
-				(css-mode        . css-ts-mode)
-				(js-mode         . js-ts-mode)
-				(js-json-mode    . json-ts-mode)
-				(python-mode     . python-ts-mode)
-				(sh-mode         . bash-ts-mode)
-				(typescript-mode . typescript-ts-mode)
-				(rust-mode       . rust-ts-mode)
-				))
+  		      '((c-mode          . c-ts-mode)
+  			      (c++-mode        . c++-ts-mode)
+  			      (cmake-mode      . cmake-ts-mode)
+  			      (conf-toml-mode  . toml-ts-mode)
+  			      (css-mode        . css-ts-mode)
+  			      (js-mode         . js-ts-mode)
+  			      (js-json-mode    . json-ts-mode)
+  			      (nix-mode        . nix-ts-mode)
+  			      (python-mode     . python-ts-mode)
+  			      (sh-mode         . bash-ts-mode)
+  			      (typescript-mode . typescript-ts-mode)
+  			      (rust-mode       . rust-ts-mode)
+  			      ))
 
-(add-hook 'markdown-mode-hook #'(lambda () 
-					(treesit-parser-create 'markdown)))
+(add-hook 'markdown-mode-hook #'(lambda ()
+  				      (treesit-parser-create 'markdown)))
 
 (add-hook 'web-mode-hook #'(lambda ()
-					 (let ((file-name (buffer-file-name)))
-						 (when file-name
-							 (treesit-parser-create
-					(pcase (file-name-extension file-name)
-						("vue" 'vue)
-						("html" 'html)
-						("php" 'php))))
-						 )))
+  				       (let ((file-name (buffer-file-name)))
+  					       (when file-name
+  						       (treesit-parser-create
+  				      (pcase (file-name-extension file-name)
+  					      ("vue" 'vue)
+  					      ("html" 'html)
+  					      ("php" 'php))))
+  					       )))
 
 (add-hook 'emacs-lisp-mode-hook #'(lambda () (treesit-parser-create 'elisp)))
 (add-hook 'ielm-mode-hook #'(lambda () (treesit-parser-create 'elisp)))
@@ -1412,41 +1520,74 @@
 	(global-treesit-auto-mode))
 ;; Treesit:2 ends here
 
+;; [[file:config.org::*AUCTeX][AUCTeX:1]]
+(use-package ox-latex
+:defer t
+:after ox
+)
+;; AUCTeX:1 ends here
+
+;; [[file:config.org::*AUCTeX][AUCTeX:2]]
+(use-package auctex)
+;; AUCTeX:2 ends here
+
+;; [[file:config.org::*CDTeX][CDTeX:1]]
+
+;; CDTeX:1 ends here
+
+;; [[file:config.org::*Nix][Nix:1]]
+(use-package nix-mode
+:mode "\\.nix\\'"
+)
+;; Nix:1 ends here
+
+;; [[file:config.org::*Nix][Nix:2]]
+(use-package nix-ts-mode
+:mode "\\.nix\\'"
+)
+;; Nix:2 ends here
+
+;; [[file:config.org::*YAML][YAML:1]]
+(use-package yaml-mode
+:mode "\\.yaml\\'"
+)
+;; YAML:1 ends here
+
 ;; [[file:config.org::*Line Number][Line Number:1]]
 (use-package emacs
 :custom-face
-      (line-number ((t (
-  	      :weight normal :slant normal :foreground "LightSteelBlue4"     
-  	      :inherit default))))
-      (line-number-current-line ((t (
-  	      :inherit (hl-line default) :slant normal :foreground "#ffcc66"))))
+  		      ;; (line-number ((t (
+  		      ;; 		:weight normal :slant normal :foreground "LightSteelBlue4"
+  		      ;; 		:inherit default))))
+  		      (line-number-current-line ((t (
+  				      :inherit (hl-line default) :slant normal :foreground "#ffcc66"))))
 :hook (prog-mode . config/toggle-line-number-absolute)
 :config
-      (defun config/toggle-line-number-nil ()
-  	      (interactive)
-  	      (setq display-line-numbers nil)
-      )
-      (defun config/toggle-line-number-absolute ()
-  	      (interactive)
-  	      (setq display-line-numbers t)
-      )
-      (defun config/toggle-line-number-relative ()
-  	      (interactive)
-  	      (setq display-line-numbers 'relative)
-      )
-      (defun config/toggle-line-number-visual ()
-  	      (interactive)
-  	      (setq display-line-numbers 'visual)
-      )
-      ;; (config/leader :infix "tl"
-      ;; 	""    '(nil                                :wk "  Line Number ")
-      ;; 	"DEL" '(which-key-undo                     :wk "󰕍 Undo key   ")
-      ;; 	"n"   '(config/toggle-line-number-nil      :wk "󰅖 Nil        ")
-      ;; 	"a"   '(config/toggle-line-number-absolute :wk "󰱇 Absolute   ")
-      ;; 	"r"   '(config/toggle-line-number-relative :wk "󰰠 Relative   ")
-      ;; 	"v"   '(config/toggle-line-number-visual   :wk " Visual     ")
-      ;; 	"h"   '(hl-line-mode                       :wk "󰸱 Hl-line")
-      ;; )
+  		      (defun config/toggle-line-number-nil ()
+  				      (interactive)
+  				      (setq display-line-numbers nil)
+  		      )
+  		      (defun config/toggle-line-number-absolute ()
+  				      (interactive)
+  				      (setq display-line-numbers t)
+  		      )
+  		      (defun config/toggle-line-number-relative ()
+  				      (interactive)
+  				      (setq display-line-numbers 'relative)
+  		      )
+  		      (defun config/toggle-line-number-visual ()
+  				      (interactive)
+  				      (setq display-line-numbers 'visual)
+  		      )
+  		      ;; (config/leader :infix "tl"
+  		      ;; 	""    '(nil                                :wk "  Line Number ")
+  		      ;; 	"DEL" '(which-key-undo                     :wk "󰕍 Undo key   ")
+  		      ;; 	"n"   '(config/toggle-line-number-nil      :wk "󰅖 Nil        ")
+  		      ;; 	"a"   '(config/toggle-line-number-absolute :wk "󰱇 Absolute   ")
+  		      ;; 	"r"   '(config/toggle-line-number-relative :wk "󰰠 Relative   ")
+  		      ;; 	"v"   '(config/toggle-line-number-visual   :wk " Visual     ")
+  		      ;; 	"h"   '(hl-line-mode                       :wk "󰸱 Hl-line")
+  		      ;; )
 )
 ;; Line Number:1 ends here
 
@@ -1465,7 +1606,7 @@
 :hook (prog-mode . highlight-indent-guides-mode)
 :config
 	(setq highlight-indent-guides-method 'bitmap
-				highlight-indent-guides-character 9474 
+				highlight-indent-guides-character 9474
 				highlight-indent-guides-auto-enabled nil
 	)
 	(set-face-attribute 'highlight-indent-guides-character-face nil
@@ -1492,7 +1633,7 @@
 				'cmake-ts-mode-hook
 				'java-mode-hook
 				'haskell-mode-hook
-				'emacs-lisp-mode-hook 
+				'emacs-lisp-mode-hook
 					 'lisp-interaction-mode-hook 'lisp-mode-hook
 				'maxima-mode-hook
 				'ielm-mode-hook
@@ -1572,118 +1713,109 @@
 )
 ;; YASnippet:1 ends here
 
-;; [[file:config.org::*AAS][AAS:1]]
-(use-package aas
-	:hook (LaTeX-mode . aas-activate-for-major-mode)
-	:hook (org-mode . aas-activate-for-major-mode)
-	:config
-	(aas-set-snippets 'text-mode
-		;; expand unconditionally
-		";o-" "ō"
-		";i-" "ī"
-		";a-" "ā"
-		";u-" "ū"
-		";e-" "ē")
-	(aas-set-snippets 'latex-mode
-		;; set condition!
-		:cond #'texmathp ; expand only while in math
-		"supp" "\\supp"
-		"On" "O(n)"
-		"O1" "O(1)"
-		"Olog" "O(\\log n)"
-		"Olon" "O(n \\log n)"
-		;; Use YAS/Tempel snippets with ease!
-		"amin" '(yas "\\argmin_{$1}") ; YASnippet snippet shorthand form
-		"amax" '(tempel "\\argmax_{" p "}") ; Tempel snippet shorthand form
-		;; bind to functions!
-		";ig" #'insert-register
-		";call-sin"
-		(lambda (angle) ; Get as fancy as you like
-			(interactive "sAngle: ")
-			(insert (format "%s" (sin (string-to-number angle))))))
-	;; disable snippets by redefining them with a nil expansion
-	(aas-set-snippets 'latex-mode
-		"supp" nil))
-;; AAS:1 ends here
+;; [[file:config.org::*Tempel][Tempel:1]]
+(use-package tempel
+  ;; Require trigger prefix before template name when completing.
+  ;; :custom
+  ;; (tempel-trigger-prefix "<")
 
-;; [[file:config.org::*AUCTeX][AUCTeX:1]]
-(use-package ox-latex
-:defer t
-:after ox
+  :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
+         ("M-*" . tempel-insert))
+
+  :init
+
+  ;; Setup completion at point
+  (defun tempel-setup-capf ()
+    ;; Add the Tempel Capf to `completion-at-point-functions'.
+    ;; `tempel-expand' only triggers on exact matches. Alternatively use
+    ;; `tempel-complete' if you want to see all matches, but then you
+    ;; should also configure `tempel-trigger-prefix', such that Tempel
+    ;; does not trigger too often when you don't expect it. NOTE: We add
+    ;; `tempel-expand' *before* the main programming mode Capf, such
+    ;; that it will be tried first.
+    (setq-local completion-at-point-functions
+                (cons #'tempel-expand
+                      completion-at-point-functions)))
+
+  (add-hook 'conf-mode-hook 'tempel-setup-capf)
+  (add-hook 'prog-mode-hook 'tempel-setup-capf)
+  (add-hook 'text-mode-hook 'tempel-setup-capf)
+
+  ;; Optionally make the Tempel templates available to Abbrev,
+  ;; either locally or globally. `expand-abbrev' is bound to C-x '.
+  ;; (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
+  ;; (global-tempel-abbrev-mode)
 )
-;; AUCTeX:1 ends here
 
-;; [[file:config.org::*AUCTeX][AUCTeX:2]]
-(use-package auctex)
-;; AUCTeX:2 ends here
+;; Optional: Add tempel-collection.
+;; The package is young and doesn't have comprehensive coverage.
+(use-package tempel-collection)
+;; Tempel:1 ends here
 
-;; [[file:config.org::*LAAS][LAAS:1]]
-(use-package laas
-	:hook (LaTeX-mode . laas-mode))
-;; LAAS:1 ends here
-
-;; [[file:config.org::*Nix][Nix:1]]
-(use-package nix-mode
-:mode "\\.nix\\'"
+;; [[file:config.org::*Init][Init:1]]
+(use-package org
+:after emacs
+:init
+  (setq org-element-cache-persistent nil)
+  (setq org-element-use-cache nil)
+  (setq org-latex-preview-numbered t)
+:config
+  (add-hook 'org-mode-hook #'olivetti-mode)
+  (add-hook 'org-mode-hook #'org-visual-indent-mode)
+  (add-hook 'org-mode-hook #'turn-on-org-cdlatex)
 )
-;; Nix:1 ends here
+;; Init:1 ends here
 
 ;; [[file:config.org::*Fonts][Fonts:1]]
 (use-package org
 :custom-face
-  (org-latex-and-related ((t (:foreground "LightSteelBlue4" :weight bold))))
-  (org-meta-line ((t (:foreground "LightSteelBlue4"))))
-  (org-special-keyword ((t (:foreground "LightSteelBlue4"))))
-  (org-tag ((t (:foreground "LightSteelBlue4" :weight normal))))
-:hook (org-mode . mixed-pitch-mode)
+  ;; (org-latex-and-related ((t (:foreground "LightSteelBlue4" :weight bold))))
+  ;; (org-meta-line ((t (:foreground "LightSteelBlue4"))))
+  ;; (org-special-keyword ((t (:foreground "LightSteelBlue4"))))
+  ;; (org-tag ((t (:foreground "LightSteelBlue4" :weight normal))))
+;:hook (org-mode . mixed-pitch-mode)
 :config
-  (set-face-attribute 'org-level-1 nil
-      :family "Sarasa Gothic SC" :height 1.4 )
-  (set-face-attribute 'org-level-2 nil
-      :family "Sarasa Gothic SC" :height 1.4 )
-  (set-face-attribute 'org-level-3 nil
-      :family "Sarasa Gothic SC" :height 1.4 )
-  (set-face-attribute 'org-level-4 nil
-      :family "Sarasa Gothic SC" :height 1.3 )
-  (set-face-attribute 'org-level-5 nil
-      :family "Sarasa Gothic SC" :height 1.2 )
-  (set-face-attribute 'org-level-6 nil
-      :family "Sarasa Gothic SC" :height 1.1 )
-  (set-face-attribute 'org-document-title nil
-      :family "Sarasa Gothic SC" :height 2.5 :bold t)
-  (set-face-attribute 'org-document-info nil
-      :family "Sarasa Gothic SC" :height 1.8 :bold t)
-  (set-face-attribute 'org-document-info-keyword nil
-    :foreground "LightSteelBlue4" :inherit 'org-document-info)
-  (set-face-attribute 'org-block t
+  (set-face-attribute 'org-level-1 nil :height 1.6 )
+  (set-face-attribute 'org-level-2 nil :height 1.4 )
+  (set-face-attribute 'org-level-3 nil :height 1.4 )
+  (set-face-attribute 'org-level-4 nil :height 1.3 )
+  (set-face-attribute 'org-level-5 nil :height 1.2 )
+  (set-face-attribute 'org-level-6 nil :height 1.1 )
+  (set-face-attribute 'org-document-title nil :height 2.5 :bold t)
+  (set-face-attribute 'org-document-info nil :height 1.8 :bold t)
+  ;; (set-face-attribute 'org-document-info-keyword nil
+  ;;   :foreground "LightSteelBlue4" :inherit 'org-document-info)
+  (set-face-attribute 'org-block nil
     :extend t :inherit 'fixed-pitch)
 )
 ;; Fonts:1 ends here
 
 ;; [[file:config.org::*Bullets][Bullets:1]]
 (use-package org-modern
-:hook (org-mode . org-modern-mode)
+;;:hook (org-mode . org-modern-mode)
 :config
-	 (setq org-modern-keyword
-		 (quote (("author" . "⛾")
-			 ("title" . "❖")
-			 ("subtitle" . "◈")
-			 ("html" . "󰅱 ")
-			 (t . t))))
-	 (setq org-modern-star
-	;'("◉" "○" "◈" "◇" "✳")
-	'("⚀" "⚁" "⚂" "⚃" "⚄" "⚅")
-	;'("☰" "☱" "☲" "☳" "☴" "☵" "☶" "☷")
-	 )
-	 (setq org-modern-list ;; for '+' '-' '*' respectively
-			 '((43 . "⯌") (45 . "⮚") (42 . "⊛"))
-	 )
-	 (setq org-modern-block-fringe nil)
-	 (setq org-modern-todo nil)
-	 (setq org-modern-block-name '("⇲ " . "⇱ "))
-	 (set-face-attribute 'org-modern-block-name nil
-			:inherit 'variable-pitch)
-	 (setq org-modern-table nil)
+  (setq org-modern-keyword
+    (quote (("author" . "⛾")
+      ("title" . "❖")
+      ("subtitle" . "◈")
+      ("html" . "󰅱 ")
+      (t . t))))
+  (setq org-modern-star
+   '("⚀" "⚁" "⚂" "⚃" "⚄" "⚅")
+  )
+  (set-face-attribute 'org-modern-symbol nil :family "Noto Sans Symbols 2")
+; '("☰" "☱" "☲" "☳" "☴" "☵" "☶" "☷")
+; '("◉" "○" "◈" "◇" "✳")
+  (setq org-modern-list ;; for '+' '-' '*' respectively
+      '((43 . "⯌") (45 . "⮚") (42 . "⊛"))
+  )
+  (setq org-modern-block-fringe nil)
+  (setq org-modern-todo nil)
+  (setq org-modern-block-name '("⇲ " . "⇱ "))
+  (set-face-attribute 'org-modern-block-name nil
+     :inherit 'variable-pitch)
+  (setq org-modern-table nil)
+  (global-org-modern-mode)
 )
 ;; Bullets:1 ends here
 
@@ -1718,12 +1850,12 @@
 ;; [[file:config.org::*Indent lines][Indent lines:2]]
 (use-package org-visual-outline
 :custom-face
- (org-visual-indent-blank-pipe-face ((t 
-       (:background "#1f2430" :foreground "#1f2430" 
-   	:height 0.1 :width extra-expanded))))
- (org-visual-indent-pipe-face ((t 
-       (:background "#454d6d" :foreground "#454d6d" 
-   	:height 0.1 :width extra-expanded))))
+ (org-visual-indent-blank-pipe-face ((t
+			 (:background "#1f2430" :foreground "#1f2430"
+		:height 0.1 :width extra-expanded))))
+ (org-visual-indent-pipe-face ((t
+			 (:background "#454d6d" :foreground "#454d6d"
+		:height 0.1 :width extra-expanded))))
 :hook (org-mode . org-visual-indent-mode)
 )
 ;; Indent lines:2 ends here
@@ -1760,11 +1892,15 @@
 
 ;; [[file:config.org::*Code block][Code block:1]]
 (use-package org
-:init
-	(setq electric-indent-mode nil)
 :config
-	(setq org-src-tab-acts-natively t)
-	(setq org-src-preserve-indentation nil)
+			(setq org-src-tab-acts-natively t
+				org-src-preserve-indentation nil
+				org-confirm-babel-evaluate nil
+				org-confirm-elisp-link-function nil
+				org-link-elisp-confirm-function nil
+			)
+	(general-define-key :keymap 'org-src-mode-map
+		 "C-c C-c" 'eval-buffer)
 )
 ;; Code block:1 ends here
 
@@ -1816,7 +1952,7 @@
 	(defun org-hugo-new-subtree-post-capture-template ()
 		"Returns `org-capture' template string for new Hugo post.
 		 See `org-capture-templates' for more information."
-		(let* ((title (read-from-minibuffer "Post Title: ")) 
+		(let* ((title (read-from-minibuffer "Post Title: "))
 			 (fname (org-hugo-slug title)))
 		(mapconcat #'identity
 				`(,(concat "* TODO " title) ":PROPERTIES:"
@@ -1824,10 +1960,10 @@
 					;Place the cursor here finally
 				"\n")))
 	(setq org-capture-templates (append org-capture-templates '(
-		("j" "Journal" entry 
+		("j" "Journal" entry
 			(file+datetree "journal.org")
 			"* %U - %?\n")
-		("i" "Inbox" entry 
+		("i" "Inbox" entry
 			(file "inbox.org")
 			"* %U - %? %^g\n")
 			 '("h" "Hugo post" entry
@@ -1855,40 +1991,40 @@
 	(setq org-roam-v2-ack t)
 	(setq org-roam-capture-templates '(
 		 ("d" "default" plain "%?"
-			 :target (file+head 
+			 :target (file+head
 				 "%<%Y%m%d%H>-${slug}.org"
 				 "#+title: ${title}\n#+filetags: \n")
 			 :unnarrowed t)
 		 ("b" "book notes" plain "%?"
-			 :target (file+head 
+			 :target (file+head
 				 "book/book%<%Y%m%d%H>-${slug}.org"
 				 "#+title: ${title}\n#+filetags: :bookreading: \n\n")
 			 :unnarrowed t)
 		 ("c" "company" plain "%?"
-			 :target (file+head 
+			 :target (file+head
 				 "company/company%<%Y%m%d%H>-${slug}.org"
 				 "#+title: ${title}\n#filetags: :compnay: \n\n")
 			 :unnarrowed t)
 		 ("i" "industry" plain "%?"
-			 :target (file+head 
+			 :target (file+head
 				 "industry/industry%<%Y%m%d%H>-${slug}.org"
 				 "#+title:${slug}\n#+filetags: :industry: \n\n")
 			 :unnarrowed t)
 		 ("m" "marketing" plain "%?"
-			 :target (file+head 
+			 :target (file+head
 				 "marketing/marketing%<%Y%m%d%H%M%S>-${slug}.org"
 				 "#+title: ${title}\n#+filetags: :marketing: \n\n")
 			 :unnarrowed t)
 		 ("p" "project" plain "%?"
-			 :target (file+head 
+			 :target (file+head
 				 "project/project%<%Y%m%d%H>-${slug}.org"
 				 "#+title: ${title}\n#+filetags: :project: \n\n - tag ::")
 			 :unnarrowed t)
 		 ("r" "reference" plain "%?"
-			 :target (file+head 
+			 :target (file+head
 				 "<%Y%m%d%H>-${slug}.org"
 				 "#+title: {$title}\n%filetags: reference \n\n -tag ::")
-			 :unarrowed t)))    
+			 :unarrowed t)))
 )
 ;; Org-roam:1 ends here
 
@@ -1947,7 +2083,7 @@
 :hook
 	(calendar-mode . olivetti-mode)
 	(calendar-mode . solaire-mode)
-:config 
+:config
 	(setq calendar-date-style 'iso)
 )
 ;; Calendar:1 ends here
@@ -1981,21 +2117,6 @@
  ;; processing phase
  ("C-c d f" . org-gtd-clarify-finalize)))
 ;; GTD:1 ends here
-
-;; [[file:config.org::*Org 9.7][Org 9.7:1]]
-(use-package org
-:after emacs
-:init
-	(setq org-element-cache-persistent nil)
-	(setq org-element-use-cache nil)
-	(setq org-latex-preview-numbered t)
-	(plist-put org-latex-preview-options :zoom 1.25)
-	(let ((pos (assoc 'dvisvgm org-latex-preview-process-alist)))
-		(plist-put (cdr pos) :image-converter '("dvisvgm --page=1- --optimize --clipjoin --relative --no-fonts --bbox=preview -o %B-%%9p.svg %f")))
-:config
-	(add-hook 'org-mode-hook #'turn-on-org-cdlatex)
-)
-;; Org 9.7:1 ends here
 
 ;; [[file:config.org::*Org-fragtog][Org-fragtog:1]]
 (use-package org-fragtog
@@ -2099,7 +2220,7 @@
 :after org
 :defer t
 :config
-	(setq 
+	(setq
 		org-export-with-toc t
 					org-export-with-tags 'not-in-toc
 					org-export-with-drawers nil
@@ -2172,7 +2293,7 @@
 :defer t
 :after ox
 :config
-	(setq org-pandoc-format-extensions 
+	(setq org-pandoc-format-extensions
 				'(markdown_github+pipe_tables+raw_html)
 	)
 )
@@ -2188,7 +2309,7 @@
 (use-package ox-hugo
 :after ox
 :commands (org-hugo-export-as-md org-hugo-export-to-md)
-:init 
+:init
 	(setq org-hugo-base-dir "~/Blog"
 				org-hugo-front-matter-format "yaml"
 	)
@@ -2296,25 +2417,24 @@
 
 ;; [[file:config.org::*End][End:1]]
 (progn ;     startup
-	      (message "Loading %s...done (%fs)" user-init-file
-		       (float-time (time-subtract (current-time)
-							      before-user-init-time)))
-	      (add-hook 'after-init-hook
-			      (lambda ()
-				      (message
-				       "Loading %s...done (%fs) [after-init]" user-init-file
-				       (float-time (time-subtract (current-time)
-						      before-user-init-time))))
-			      t))
+  			      (message "Loading %s...done (%fs)" user-init-file
+  				       (float-time (time-subtract (current-time)
+  									      before-user-init-time)))
+  			      (add-hook 'after-init-hook
+  					      (lambda ()
+  						      (message
+  						       "Loading %s...done (%fs) [after-init]" user-init-file
+  						       (float-time (time-subtract (current-time)
+  								      before-user-init-time))))
+  					      t))
 
-      (progn ;     personalize
-	      (let ((file (expand-file-name (concat (user-real-login-name) ".el")
-				      user-emacs-directory)))
-		      (when (file-exists-p file)
-			      (load file))))
-;;(dashboard-open)
-      ;; Local Variables:
-      ;; indent-tabs-mode: nil
-      ;; End:
-      ;;; init.el ends here
+  		      (progn ;     personalize
+  			      (let ((file (expand-file-name (concat (user-real-login-name) ".el")
+  						      user-emacs-directory)))
+  				      (when (file-exists-p file)
+  					      (load file))))
+;; Local Variables:
+;; indent-tabs-mode: nil
+;; End:
+;;; init.el ends here
 ;; End:1 ends here
