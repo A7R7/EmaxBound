@@ -117,13 +117,13 @@
     "Move to the end of selection, switch to INSERT state."
     (interactive)
     (if meow--temp-normal
-	   (progn
-	     (message "Quit temporary normal mode")
-	     (meow--switch-state 'motion))
+           (progn
+             (message "Quit temporary normal mode")
+             (meow--switch-state 'motion))
     (if (not (region-active-p))
-	     (when (and (not (use-region-p))
-	                (< (point) (point-max)))
-	       (forward-char 1))
+             (when (and (not (use-region-p))
+                        (< (point) (point-max)))
+               (forward-char 1))
      (meow--direction-forward)
      (meow--cancel-selection))
      (meow--switch-state 'insert)))
@@ -134,12 +134,12 @@
     "Open a newline below and switch to INSERT state."
     (interactive)
     (if meow--temp-normal
-	(progn
-	  (message "Quit temporary normal mode")
-	  (meow--switch-state 'motion))
+        (progn
+          (message "Quit temporary normal mode")
+          (meow--switch-state 'motion))
       (meow--switch-state 'insert)
       ;(goto-char (line-end-position))
-			(move-end-of-line 1)
+  		      (move-end-of-line 1)
       (meow--execute-kbd-macro "RET")))
    (advice-add 'meow-open-below :override #'my-meow-open-below)
 
@@ -203,18 +203,19 @@
      '("C-v" . meow-clipboard-yank)
      '("b". meow-block) '("B" . meow-to-block)
 
-     '("y" . meow-join)
+     '("y" . meow-visit)
      '("u" . meow-change) '("U" . meow-reverse)
      '("i" . meow-insert) '("I" . meow-open-above)
      '("o" . meow-append) '("O" . meow-open-below)
      '("p" . meow-pop-selection)
      '("[" . meow-beginning-of-thing) '("]" . meow-end-of-thing)
 
-     '("h" . meow-line)  '("H" . meow-goto-line)
+     '("h" . meow-join)  '("H" . meow-join)
      '("j" . meow-left)  '("J" . meow-left-expand)
      '("k" . meow-prev)  '("K" . meow-prev-expand)
      '("l" . meow-next)  '("L" . meow-next-expand)
      '(";" . meow-right) '(":" . meow-right-expand)
+     '("'" . meow-line) '("\"" . meow-line)
 
      '("n" . meow-search)      '("N" . meow-pop-search)
      '("m" . meow-mark-word)   '("M" . meow-mark-symbol)
@@ -222,7 +223,6 @@
      '("." . meow-next-word)   '(">" . meow-next-symbol)
      '("/" . meow-reverse)
 
-     '("'" . fingertip-wrap-single-quote)
      '("\"" . fingertip-wrap-double-quote)
      '("(" . fingertip-wrap-round)
      '("[" . fingertip-wrap-bracket)
@@ -357,7 +357,11 @@
     :height 1.0)
   ;(set-fontset-font t 'symbol "Noto Sans Symbols 2")
   (set-face-attribute 'link nil
-  	:foreground "#ffcc66" :underline t :bold nil)
+    :foreground "#ffcc66" :underline t :bold nil)
+  ;; buffers that should always use fixed pitch
+  ;; (setq fixed-pitch-whitelist-hooks '(
+  ;;       org-src-mode-hook)
+  ;; )
   (fixed-pitch-mode)
 )
 ;; Fixed-pitch-mode:1 ends here
@@ -455,6 +459,20 @@
 (use-package solaire-mode
 :defer t
 :init (solaire-global-mode)
+:config
+  (setq solaire-mode-remap-alist
+  			      '((hl-line . solaire-hl-line-face)
+  			       (region . solaire-region-face)
+  			       (org-hide . solaire-org-hide-face)
+  			       (org-indent . solaire-org-hide-face)
+  			       (linum . solaire-line-number-face)
+  			       (line-number . solaire-line-number-face)
+  			       (header-line . solaire-header-line-face)
+  			       (mode-line . solaire-mode-line-face)
+  			       (mode-line-active . solaire-mode-line-active-face)
+  			       (mode-line-inactive . solaire-mode-line-inactive-face)
+  			       (highlight-indentation-face . solaire-hl-line-face)
+  			       (fringe . solaire-fringe-face)))
 )
 ;; Solaire mode:1 ends here
 
@@ -1697,6 +1715,13 @@
 	)
 )
 ;; Fingertip:1 ends here
+
+;; [[file:config.org::*Electric-Indent][Electric-Indent:1]]
+(use-package electric
+:config
+  (setq electric-pair-mode t) ;; global-minor mode
+)
+;; Electric-Indent:1 ends here
 
 ;; [[file:config.org::*Aggressive-Indent][Aggressive-Indent:1]]
 (use-package aggressive-indent

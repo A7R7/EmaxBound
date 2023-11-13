@@ -276,6 +276,9 @@
 [submodule "notibox"]
 	path = lib/notibox
 	url = https://github.com/MitchMarq42/notibox.el.git
+[submodule "ob-async"]
+	path = lib/ob-async
+	url = https://github.com/astahlman/ob-async
 [submodule "olivetti"]
 	path = lib/olivetti
 	url = https://github.com/rnkn/olivetti

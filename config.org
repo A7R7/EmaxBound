@@ -207,24 +207,26 @@ Calculating time used loading emacs excutable, as well as setting some variables
 #+end_src
 Set some defaults of emacs
 #+begin_src elisp
-	(progn
-							(setq inhibit-startup-buffer-menu t)
-							(setq inhibit-startup-screen t)
-							(setq inhibit-startup-echo-area-message "locutus")
-							(setq initial-buffer-choice t)
-							;; (setq initial-scratch-message "")
-							;; This improves performance for some fonts
-							(setq inhibit-compacting-font-cache t)
-							;; emacs.stackexchange/how-to-disable-emacs-bidi
-							(setq-default bidi-paragraph-direction 'left-to-right)
-							(setq bidi-inhibit-bpa t
-										long-line-threshold 1000
-										large-hscroll-threshold 1000
-										syntax-wholeline-max 1000)
-							(setq global-auto-revert-mode 1)
-							(setq use-dialog-box nil)
-							(setq confirm-kill-emacs 'y-or-n-p)
-	)
+  (progn
+  	(setq inhibit-startup-buffer-menu t)
+  	(setq inhibit-startup-screen t)
+  	(setq inhibit-startup-echo-area-message "locutus")
+  	(setq initial-buffer-choice t)
+  	;; (setq initial-scratch-message "")
+  	;; This improves performance for some fonts
+  	(setq inhibit-compacting-font-cache t)
+  	;; emacs.stackexchange/how-to-disable-emacs-bidi
+  	(setq-default bidi-paragraph-direction 'left-to-right)
+  	(setq bidi-inhibit-bpa t
+  				long-line-threshold 1000
+  				large-hscroll-threshold 1000
+  				syntax-wholeline-max 1000)
+  	(setq global-auto-revert-mode 1)
+  	(setq use-dialog-box nil)
+  	(setq confirm-kill-emacs 'y-or-n-p)
+  	(put 'downcase-region 'disabled nil)
+  	(put 'upcase-region 'disabled nil)
+  	)
 #+end_src
 ** Borg
  [[https://github.com/emacscollective/borg][Borg]] assimilate Emacs packages as Git submodules. Core of the core units.
@@ -348,7 +350,7 @@ tweaks to buiild emacsql
 	build-step = make
 #+end_src
 
-* Input
+* Keybinds & Input
 
 We setup keybinding framworks and basic keybindings at this place. Note that not all keybindings are set here. Some package specific keybinding configs are set under where the package is configured.
 
@@ -423,291 +425,382 @@ I do not use evil mode anymore because of Meow Edit.
 #+end_src
 ** Meow
 [[https://github.com/meow-edit/meow][Meow]] is yet another modal editing. Meow's freedom allows my setup to be very weird.
-#+begin_src elisp
-	(use-package meow
-	:custom-face
-	  (meow-cheatsheet-command ((t (:height 180 :inherit fixed-pitch))))
-	:config
-	 ;cate the behavior of vi's
-	  (defun my-meow-append ()
-	    "Move to the end of selection, switch to INSERT state."
-	    (interactive)
-	    (if meow--temp-normal
-	           (progn
-	             (message "Quit temporary normal mode")
-	             (meow--switch-state 'motion))
-	    (if (not (region-active-p))
-	             (when (and (not (use-region-p))
-	                        (< (point) (point-max)))
-	               (forward-char 1))
-	     (meow--direction-forward)
-	     (meow--cancel-selection))
-	     (meow--switch-state 'insert)))
+#+begin_src elisp :noweb no-export
+  (use-package meow
+  :custom-face
+    (meow-cheatsheet-command ((t (:height 180 :inherit fixed-pitch))))
+  :config
+   ;cate the behavior of vi's
+    (defun my-meow-append ()
+      "Move to the end of selection, switch to INSERT state."
+      (interactive)
+      (if meow--temp-normal
+             (progn
+               (message "Quit temporary normal mode")
+               (meow--switch-state 'motion))
+      (if (not (region-active-p))
+               (when (and (not (use-region-p))
+                          (< (point) (point-max)))
+                 (forward-char 1))
+       (meow--direction-forward)
+       (meow--cancel-selection))
+       (meow--switch-state 'insert)))
 
-	   (advice-add 'meow-append :override #'my-meow-append)
+     (advice-add 'meow-append :override #'my-meow-append)
 
-	  (defun my-meow-open-below ()
-	    "Open a newline below and switch to INSERT state."
-	    (interactive)
-	    (if meow--temp-normal
-	        (progn
-	          (message "Quit temporary normal mode")
-	          (meow--switch-state 'motion))
-	      (meow--switch-state 'insert)
-	      ;(goto-char (line-end-position))
-				(move-end-of-line 1)
-	      (meow--execute-kbd-macro "RET")))
-	   (advice-add 'meow-open-below :override #'my-meow-open-below)
+    (defun my-meow-open-below ()
+      "Open a newline below and switch to INSERT state."
+      (interactive)
+      (if meow--temp-normal
+          (progn
+            (message "Quit temporary normal mode")
+            (meow--switch-state 'motion))
+        (meow--switch-state 'insert)
+        ;(goto-char (line-end-position))
+  			(move-end-of-line 1)
+        (meow--execute-kbd-macro "RET")))
+     (advice-add 'meow-open-below :override #'my-meow-open-below)
 
-	 (setq meow-keypad-self-insert-undefined nil)
-	 (setq meow-selection-command-fallback '(
-	    (meow-grab . meow-right-expand)
-	    (meow-change . meow-change-char)
-	    (meow-kill . meow-delete)
-	    (meow-cancel-selection . keyboard-quit)
-	    (meow-pop-selection . meow-pop-grab)
-	    (meow-beacon-change . meow-beacon-change-char)
-	    (meow-replace . meow-yank)
-	    (meow-reverse . negative-argument)
-	  ))
+   (setq meow-keypad-self-insert-undefined nil)
+   (setq meow-selection-command-fallback '(
+      (meow-grab . meow-right-expand)
+      (meow-change . meow-change-char)
+      (meow-kill . meow-delete)
+      (meow-cancel-selection . keyboard-quit)
+      (meow-pop-selection . meow-pop-grab)
+      (meow-beacon-change . meow-beacon-change-char)
+      (meow-replace . meow-yank)
+      (meow-reverse . negative-argument)
+    ))
 
-	  (defun meow-setup ()
-	    (interactive)
-	    (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
-
-	    (meow-motion-overwrite-define-key
-	     '("l" . meow-next)
-	     '("k" . meow-prev)
-	     '("<escape>" . ignore)
-	    )
-
-	    (meow-leader-define-key
-	     ;; Use SPC (0-9) for digit arguments.
-	     '("1" . meow-digit-argument) '("2" . meow-digit-argument)
-	     '("3" . meow-digit-argument) '("4" . meow-digit-argument)
-	     '("5" . meow-digit-argument) '("6" . meow-digit-argument)
-	     '("7" . meow-digit-argument) '("8" . meow-digit-argument)
-	     '("9" . meow-digit-argument) '("0" . meow-digit-argument)
-	     '("/" . meow-keypad-describe-key) '("?" . meow-cheatsheet)
-	    )
-
-	    (meow-normal-define-key
-	     '("<escape>" . meow-cancel-selection)
-	     '("1" . meow-expand-1) '("2" . meow-expand-2)
-	     '("3" . meow-expand-3) '("4" . meow-expand-4)
-	     '("5" . meow-expand-5) '("6" . meow-expand-6)
-	     '("7" . meow-expand-7) '("8" . meow-expand-8)
-	     '("9" . meow-expand-9) '("0" . meow-expand-0)
-
-	     '("q" . meow-quit) '("Q" . meow-quit)
-	     ;'("w" . meow-window) '("W" . meow-window)
-	     ;'("e" . meow-) '("E" . meow-e)
-	     ;'("r" . meow-) '("R" . meow-e)
-	     '("t" . meow-till) '("T" . meow-till-expand)
-
-	     '("a" . begin-of-line) '("a" . meow-beginning-of-thing)
-	     '("s" . meow) '("s" . meow-bounds-of-thing)
-	     '("d" . meow) '("d" . meow-inner-of-thing)
-	     '("f" . end-of-line) '("f" . meow-end-of-thing)
-	     '("g" . meow-right-expand) '("G" . meow-grab)
-
-	     '("z" . meow-undo) '("Z" . meow-undo-in-selection)
-	     '("x" . meow-kill) '("X" . meow-clipboard-kill)
-	     '("c" . meow-save)
-	     '("C-c" . meow-clipboard-save)
-	     '("v" . meow-replace) '("V" . meow-yank-pop)
-	     '("C-v" . meow-clipboard-yank)
-	     '("b". meow-block) '("B" . meow-to-block)
-
-	     '("y" . meow-join)
-	     '("u" . meow-change) '("U" . meow-reverse)
-	     '("i" . meow-insert) '("I" . meow-open-above)
-	     '("o" . meow-append) '("O" . meow-open-below)
-	     '("p" . meow-pop-selection)
-	     '("[" . meow-beginning-of-thing) '("]" . meow-end-of-thing)
-
-	     '("h" . meow-line)  '("H" . meow-goto-line)
-	     '("j" . meow-left)  '("J" . meow-left-expand)
-	     '("k" . meow-prev)  '("K" . meow-prev-expand)
-	     '("l" . meow-next)  '("L" . meow-next-expand)
-	     '(";" . meow-right) '(":" . meow-right-expand)
-
-	     '("n" . meow-search)      '("N" . meow-pop-search)
-	     '("m" . meow-mark-word)   '("M" . meow-mark-symbol)
-	     '("," . meow-back-word)   '("<" . meow-back-symbol)
-	     '("." . meow-next-word)   '(">" . meow-next-symbol)
-	     '("/" . meow-reverse)
-
-	     '("'" . fingertip-wrap-single-quote)
-	     '("\"" . fingertip-wrap-double-quote)
-	     '("(" . fingertip-wrap-round)
-	     '("[" . fingertip-wrap-bracket)
-	     '("{" . fingertip-wrap-curly)
-	  ))
-	  (meow-setup)
-	  (meow-global-mode)
-	)
+   (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
+   <<meow-normal>>
+   <<meow-motion>>
+   <<meow-keypad>>
+   (meow-global-mode)
+  )
 #+end_src
+*** Meow-normal
+:PROPERTIES:
+:header-args:elisp: :noweb-ref meow-normal
+:END:
+
+#+begin_src elisp
+  (meow-normal-define-key
+    '("<escape>" . meow-cancel-selection)
+    '("\\" . "C-<escape>") ;; where I define all my custom major mode binding
+    '("SPC" . my/leader-prefix-cmd) ;; defined latter
+    '("1" . meow-expand-1) '("2" . meow-expand-2)
+    '("3" . meow-expand-3) '("4" . meow-expand-4)
+    '("5" . meow-expand-5) '("6" . meow-expand-6)
+    '("7" . meow-expand-7) '("8" . meow-expand-8)
+    '("9" . meow-expand-9) '("0" . meow-expand-0)
+
+    '("q" . meow-quit) '("Q" . meow-quit)
+       ;'("w" . meow-window) '("W" . meow-window)
+       ;'("e" . meow-) '("E" . meow-e)
+       ;'("r" . meow-) '("R" . meow-e)
+    '("t" . meow-till) '("T" . meow-till-expand)
+
+    '("a" . begin-of-line) '("a" . meow-beginning-of-thing)
+    '("s" . meow) '("s" . meow-bounds-of-thing)
+    '("d" . meow) '("d" . meow-inner-of-thing)
+    '("f" . end-of-line) '("f" . meow-end-of-thing)
+    '("g" . meow-right-expand) '("G" . meow-grab)
+
+    '("z" . meow-undo) '("Z" . meow-undo-in-selection)
+    '("x" . meow-kill) '("X" . meow-clipboard-kill)
+    '("c" . meow-save)
+    '("C-c" . meow-clipboard-save)
+    '("v" . meow-replace) '("V" . meow-yank-pop)
+    '("C-v" . meow-clipboard-yank)
+    '("b". meow-block) '("B" . meow-to-block)
+
+    '("y" . meow-visit)
+    '("u" . meow-change) '("U" . meow-reverse)
+    '("i" . meow-insert) '("I" . meow-open-above)
+    '("o" . meow-append) '("O" . meow-open-below)
+    '("p" . meow-pop-selection)
+    '("[" . meow-beginning-of-thing) '("]" . meow-end-of-thing)
+
+    '("h" . meow-join)  '("H" . meow-join)
+    '("j" . meow-left)  '("J" . meow-left-expand)
+    '("k" . meow-prev)  '("K" . meow-prev-expand)
+    '("l" . meow-next)  '("L" . meow-next-expand)
+    '(";" . meow-right) '(":" . meow-right-expand)
+    '("'" . meow-line) '("\"" . meow-line)
+
+    '("C-j" . "C-<escape> C-j")
+    '("C-k" . "C-<escape> C-k")
+    '("C-l" . "C-<escape> C-l")
+    '("C-;" . "C-<escape> C-;")
+
+    '("n" . meow-search)      '("N" . meow-pop-search)
+    '("m" . meow-mark-word)   '("M" . meow-mark-symbol)
+    '("," . meow-back-word)   '("<" . meow-back-symbol)
+    '("." . meow-next-word)   '(">" . meow-next-symbol)
+    '("/" . meow-reverse)
+
+    '("\"" . fingertip-wrap-double-quote)
+    '("(" . fingertip-wrap-round)
+    '("[" . fingertip-wrap-bracket)
+    '("{" . fingertip-wrap-curly)
+    )
+#+end_src
+
+*** Meow-motion
+:PROPERTIES:
+:header-args:elisp: :noweb-ref meow-motion
+:END:
+
+#+begin_src elisp
+  (meow-motion-overwrite-define-key
+   '("l" . meow-next)
+   '("k" . meow-prev)
+   '("SPC" . my/leader-prefix-cmd) ;; defined latter
+   '("<escape>" . ignore)
+  )
+#+end_src
+
+*** Meow-keypad
+:PROPERTIES:
+:header-args:elisp: :noweb-ref meow-keypad
+:END:
+#+begin_src elisp
+  (meow-leader-define-key
+  ;; Use SPC (0-9) for digit arguments.
+   '("1" . meow-digit-argument) '("2" . meow-digit-argument)
+   '("3" . meow-digit-argument) '("4" . meow-digit-argument)
+   '("5" . meow-digit-argument) '("6" . meow-digit-argument)
+   '("7" . meow-digit-argument) '("8" . meow-digit-argument)
+   '("9" . meow-digit-argument) '("0" . meow-digit-argument)
+   '("/" . meow-keypad-describe-key) '("?" . meow-cheatsheet)
+   ;;'("SPC" . config/leader-prefix-cmd)
+  )
+
+#+end_src
+
+#+RESULTS:
 
 ** General
 [[https://github.com/noctuid/general.el][General]] provides a more convenient method for binding keys in emacs
 (for both evil and non-evil users).
 
 *Note*: byte compile init.el will lead to function created by general-create-definer failed to work.
-#+begin_src elisp
+#+begin_src elisp :noweb no-export
   ;; Make ESC quit prompts
   ;; (global-set-key ([kbd] "<escape>") 'keyboard-escape-quit)
 
   (use-package general
   :config
-    (general-def
-    :keymaps '(global-map override)
-      "C-v"       '(meow-clipboard-yank         :wk "paste")
-      ;"C-/"       '(yank                        :wk "comment-dwim")
-    )
-    (general-def
-    :keymaps '(meow-normal-state-keymap meow-motion-state-keymap)
-      "M-j"       '(windmove-left               :wk " Win H ")
-      "M-k"       '(windmove-down               :wk " Win J ")
-      "M-l"       '(windmove-up                 :wk " Win K ")
-      "M-;"       '(windmove-right              :wk " Win L ")
-      "M-,"       '(sort-tab-select-prev-tab    :wk " Tab L ")
-      "M-."       '(sort-tab-select-next-tab    :wk " Tab R ")
-    )
-
-    (general-def
-    :keymaps '(vertico-map)
-      "C-k"       '(vertico-next                  :wk "")
-      "C-l"       '(vertico-previous              :wk "")
-      "C-j"       '(vertico-directory-delete-word :wk "")
-      "C-;"       '(vertico-directory-enter       :wk "")
-      "C-,"       '(vertico-previous-group        :wk "")
-      "C-."       '(vertico-next-group            :wk "")
-      "RET"       'vertico-directory-enter
-      "DEL"       'vertico-directory-delete-char
-      "M-DEL"     'vertico-directory-delete-word
-    )
-    ;; (general-create-definer config/leader
-    ;; ;:states '(normal insert visual emacs)
-    ;; :keymaps 'meow-normal-state-map
-    ;; ;:keymaps 'override
-    ;; :prefix "SPC" ;; set leader
-    ;; :global-prefix "M-SPC" ;; access leader in insert mode
-    ;; )
+    <<global-map>>
+  	<<global-leader>>
+  	<<local-leader>>
   )
- #+end_src
-
- #+begin_src elisp :tangle no
-	 ;; buffers
-	 (config/leader :infix "b"
-		 ""        '(nil                            :wk "  Buffer ")
-		 "DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
-		 "b"       '(switch-to-buffer               :wk " Switch ")
-		 "d"       '(kill-this-buffer               :wk "󰅖 Delete ")
-		 "r"       '(revert-buffer                  :wk "󰑓 Reload ")
-		 "["       '(previous-buffer                :wk " Prev ")
-		 "]"       '(next-buffer                    :wk " Next ")
-		 )
-	 ;; centaur tabs
-	 (config/leader
-		 "{"       '(centaur-tabs-backward-group    :wk " Prev Group")
-		 "}"       '(centaur-tabs-forward-group     :wk " Next Group")
-		 )
-	 ;; builtin-tabs
-	 (config/leader :infix "TAB"
-		 ""        '(nil                            :wk " 󰓩 Tab ")
-		 "DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
-		 "TAB"     '(tab-new                        :wk "󰝜 Tab New ")
-		 "d"       '(tab-close                      :wk "󰭌 Tab Del ")
-		 "["       '(tab-previous                   :wk " Prev ")
-		 "]"       '(tab-next                       :wk " Next ")
-		 )
-	 ;; windows
-	 (config/leader :infix "w"
-		 ""        '(nil                            :wk " 󰓩 Tab ")
-		 "DEL"     '(which-key-undo                 :wk "󰕍 Undo key")
-		 "d"       '(delete-window                  :wk "󰅖 Delete  ")
-		 "v"       '(split-window-vertically        :wk "󰤻 Split   ")
-		 "s"       '(split-window-horizontally      :wk "󰤼 Split   ")
-		 "\\"      '(split-window-vertically        :wk "󰤻 Split   ")
-		 "|"       '(split-window-horizontally      :wk "󰤼 Split   ")
-		 "h"       '(evil-window-left               :wk " Focus H ")
-		 "j"       '(evil-window-down               :wk " Focus J ")
-		 "k"       '(evil-window-up                 :wk " Focus K ")
-		 "l"       '(evil-window-right              :wk " Focus L ")
-		 )
-	 ;; Borg
-	 (config/leader :infix "B"
-		 ""        '(nil                            :wk " 󰏗 Borg      ")
-		 "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
-		 "a"       '(borg-assimilate                :wk "󱧕 Assimilate ")
-		 "A"       '(borg-activate                  :wk " Activate   ")
-		 "b"       '(borg-build                     :wk "󱇝 Build      ")
-		 "c"       '(borg-clone                     :wk " Clone      ")
-		 "r"       '(borg-remove                    :wk "󱧖 Remove     ")
-		 )
-	 ;; toggle
-	 (config/leader :infix "t"
-		 ""        '(nil                            :wk " 󰭩 Toggle    ")
-		 "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
-		 )
-	 ;; quit
-	 (config/leader :infix "q"
-		 ""        '(nil                            :wk " 󰗼 Quit      ")
-		 "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
-		 "q"       '(save-buffers-kill-terminal     :wk "󰗼 Quit Emacs ")
-		 )
-	 ;; Git
-	 (config/leader :infix "g"
-		 ""        '(nil                            :wk " 󰊢 Git       ")
-		 "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
-		 "g"       '(magit                          :wk " Magit      ")
-		 )
-	 ;; dired
-	 (config/leader
-		 "e"       '(dirvish-side                   :wk "󰙅 Dirvish-side ")
-		 ;;"E"       '(dirvish                        :wk " Dirvish      ")
-		 ;;"qe"      '(save-buffers-kill-emacs         :wk "Quit Emacs ")
-		 ;;"e"       '(treemacs                        :wk "󰙅 Treemacs ")
-		 )
-	 (config/leader
-		 "/"       '(evilnc-comment-or-uncomment-lines :wk "󱀢 Comment ")
-	  )
 #+end_src
+*** Global map
+:PROPERTIES:
+:header-args:elisp: :noweb-ref global-map
+:END:
+
+#+begin_src elisp
+  (general-def
+  :keymaps '(global-map override)
+    "C-v"       '(clipboard-yank         :wk "paste")
+    ;"C-/"       '(yank                        :wk "comment-dwim")
+  )
+  (general-def
+  :keymaps '(meow-normal-state-keymap meow-motion-state-keymap)
+    "M-j"       '(windmove-left               :wk " Win H ")
+    "M-k"       '(windmove-down               :wk " Win J ")
+    "M-l"       '(windmove-up                 :wk " Win K ")
+    "M-;"       '(windmove-right              :wk " Win L ")
+    "M-,"       '(sort-tab-select-prev-tab    :wk " Tab L ")
+    "M-."       '(sort-tab-select-next-tab    :wk " Tab R ")
+  )
+
+  (general-def
+  :keymaps '(vertico-map)
+    "C-l"       '(vertico-next                  :wk "")
+    "C-k"       '(vertico-previous              :wk "")
+    "C-j"       '(vertico-directory-delete-word :wk "")
+    "C-;"       '(vertico-directory-enter       :wk "")
+    "C-,"       '(vertico-previous-group        :wk "")
+    "C-."       '(vertico-next-group            :wk "")
+    "RET"       'vertico-directory-enter
+    "DEL"       'vertico-directory-delete-char
+    "M-DEL"     'vertico-directory-delete-word
+  )
+#+end_src
+*** Global leader
+:PROPERTIES:
+:header-args:elisp: :noweb-ref global-leader
+:END:
+
+#+begin_src elisp
+  (general-create-definer my/leader
+    :prefix-command 'my/leader-prefix-cmd
+    :prefix-map 'my/leader-prefix-map
+    )
+#+end_src
+
+#+begin_src elisp
+  ;; windows, buffers and tabs(workspaces)
+  ;; these are copied from emacs source code
+  (defun split-window-left (&optional size window-to-split)
+    (interactive `(,(when current-prefix-arg
+     									(prefix-numeric-value current-prefix-arg))
+     							 ,(selected-window)))
+    (let (new-window)
+     	(when (and size (< size 0) (< (- size) window-min-width))
+     		;; `split-window' would not signal an error here.
+     		(error "Size of new window too small"))
+     	(setq new-window (split-window window-to-split size 'left))
+     	;; Always copy quit-restore parameter in interactive use.
+     	(let ((quit-restore (window-parameter window-to-split 'quit-restore)))
+     		(when quit-restore
+     			(set-window-parameter new-window 'quit-restore quit-restore)))
+     	new-window))
+
+  (defun split-window-above (&optional size window-to-split)
+    (interactive `(,(when current-prefix-arg
+                      (prefix-numeric-value current-prefix-arg))
+                   ,(selected-window)))
+    (let ((old-point (window-point))
+          moved-by-window-height moved new-window bottom)
+      (when (and size (< size 0) (< (- size) window-min-height))
+        ;; `split-window' would not signal an error here.
+        (error "Size of new window too small"))
+      (setq new-window (split-window window-to-split size 'above))
+      (when (and (null split-window-keep-point)
+                 (or (null window-to-split)
+                     (eq window-to-split (selected-window))))
+        (with-current-buffer (window-buffer window-to-split)
+  				(save-excursion
+  					(goto-char (window-start))
+  					(setq moved (vertical-motion (window-height)))
+  					(set-window-start new-window (point))
+  					(when (> (point) (window-point new-window))
+  						(set-window-point new-window (point)))
+  					(when (= moved (window-height))
+  						(setq moved-by-window-height t)
+  						(vertical-motion -1))
+  					(setq bottom (point)))
+  				(and moved-by-window-height
+  						 (<= bottom (point))
+  						 (set-window-point window-to-split (1- bottom)))
+  				(and moved-by-window-height
+  						 (<= (window-start new-window) old-point)
+  						 (set-window-point new-window old-point)
+  						 (select-window new-window))))
+      ;; Always copy quit-restore parameter in interactive use.
+      (let ((quit-restore (window-parameter window-to-split 'quit-restore)))
+        (when quit-restore
+  				(set-window-parameter new-window 'quit-restore quit-restore)))
+      new-window))
+#+end_src
+
+#+begin_src elisp
+  (my/leader :infix "b" ;; buffers
+  	"b"       '(consult-buffer                 :wk "buffer")
+  	"d"       '(     :wk "buffer ")
+  	)
+  (my/leader :infix "w" ;; workspaces
+    ""        '(nil                            :wk "workspaces")
+    "\\"      '(tab-new                        :wk "tab new 󰝜")
+    "|"       '(tab-close                      :wk "tab new 󰝜")
+    "["       '(tab-previous                   :wk "tab ")
+    "]"       '(tab-next                       :wk "tab ")
+
+    ","       '(sort-tab-select-next-tab       :wk "buffer ")
+    "."       '(sort-tab-select-previous-tab   :wk "buffer ")
+    "?"       '(sort-tab-close-current-tab     :wk "buffer 󰅖")
+    "/"       '(consult-buffer                 :wk "buffer")
+    "f"       '(find-file                      :wk "file")
+
+    "j"       '(windmove-left                  :wk "window ")
+    "k"       '(windmove-up                    :wk "window ")
+    "l"       '(windmove-down                  :wk "window ")
+    ";"       '(windmove-right                 :wk "window ")
+    "'"       '(delete-window                  :wk "window 󰅖")
+    "J"       '(split-window-right             :wk "split ")
+    "K"       '(split-window-below             :wk "split ")
+    "L"       '(split-window-above             :wk "split ")
+    ":"       '(split-window-left              :wk "split ")
+    )
+      ;; Borg
+  (my/leader :infix "B"
+    ""        '(nil                            :wk " 󰏗 Borg      ")
+    "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
+    "a"       '(borg-assimilate                :wk "󱧕 Assimilate ")
+    "A"       '(borg-activate                  :wk " Activate   ")
+    "b"       '(borg-build                     :wk "󱇝 Build      ")
+    "c"       '(borg-clone                     :wk " Clone      ")
+    "r"       '(borg-remove                    :wk "󱧖 Remove     ")
+    )
+      ;; toggle
+  (my/leader :infix "t"
+    ""        '(nil                            :wk " 󰭩 Toggle    ")
+    "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
+    )
+      ;; Git
+  (my/leader :infix "g"
+    ""        '(nil                            :wk " 󰊢 Git       ")
+    "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
+    "g"       '(magit                          :wk " Magit      ")
+    )
+      ;; dired
+  (my/leader
+    "e"       '(dirvish-side                   :wk "󰙅 Dirvish-side ")
+    ;;"E"       '(dirvish                        :wk " Dirvish      ")
+    ;;"qe"      '(save-buffers-kill-emacs         :wk "Quit Emacs ")
+    ;;"e"       '(treemacs                        :wk "󰙅 Treemacs ")
+    )
+  (my/leader
+    "/"       '(comment-dwim                   :wk "󱀢 Comment ")
+    )
+#+end_src
+
+#+RESULTS:
+
+*** Local leader
+:PROPERTIES:
+:header-args:elisp: :noweb-ref local-leader
+:END:
+Generally, I define my local leader as follows:
+- Let ~C-<escape>~ be the local leader. The convention is to use ~C-c~, but I make ~C-c~ save to system clipboard ;)
+- I do not directly press ~C-<escape>~. Instead, I map ~\~ to ~C-<escape>~ in meow's normal mode.
+- The keybindings are bind to those major mode maps.
+*** Others
 
 ** Which-key
 [[https://github.com/justbur/emacs-which-key][Which-key]] is a minor mode for Emacs that displays the key bindings following your currently entered incomplete command (a prefix) in a popup.
 
 Magit and meow all use transient maps, therefore we let which-key show transient maps.
 #+begin_src elisp
-	(use-package which-key
-	:after general
-	:init
-		(setq
-			which-key-sort-order #'which-key-key-order-alpha
-			which-key-sort-uppercase-first nil
-			which-key-add-column-padding 1
-			which-key-max-display-columns nil
-			which-key-min-display-lines 6
-			which-key-side-window-location 'bottom
-			which-key-side-window-slot -10
-			which-key-side-window-max-height 0.25
-			which-key-idle-delay 0.8
-			which-key-idle-secondary-delay 0.01
-			which-key-max-description-length 25
-			which-key-allow-imprecise-window-fit t
-			;which-key-separator " → "
-			which-key-separator " "
-			Which-key-show-early-on-C-h t
-			which-key-sort-order 'which-key-prefix-then-key-order
-			which-key-show-transient-maps t
-	 )
-		;(general-define-key
-		;:keymaps 'which-key-mode-map
-		;  "DEL" '(which-key-undo :wk "undo")
-		;)
-		(which-key-mode 1)
-	)
+  (use-package which-key
+  :after general
+  :init
+  	(setq
+  		which-key-sort-order 'which-key-prefix-then-key-order
+  		which-key-sort-uppercase-first t
+  		which-key-add-column-padding 1
+  		which-key-max-display-columns nil
+  		which-key-min-display-lines 6
+  		which-key-idle-delay 0.8 ; the first idle
+  		which-key-idle-secondary-delay 0.01 ; set to 0 will cause some problems
+  		which-key-max-description-length 25	;
+  		which-key-allow-imprecise-window-fit t ; reduce delay
+  		which-key-separator " " ; yeah I don't like the arrow icon
+  		Which-key-show-early-on-C-h t ; this somehow doesn't work
+  		which-key-show-transient-maps t
+   )
+  	;(general-define-key
+  	;:keymaps 'which-key-mode-map
+  	;  "DEL" '(which-key-undo :wk "undo")
+  	;)
+  	(which-key-mode 1)
+  )
 #+end_src
 
 [[https://github.com/yanghaoxie/which-key-posframe][Which-key-posframe]] use posframe to show which-key popup.
@@ -733,7 +826,7 @@ options for =which-key-posframe-poshandler=:
     (setq transient-posframe-mode t)
   )
 #+end_src
-** Key-echo
+** COMMENT Key-echo
 [[https://github.com/manateelazycat/key-echo][Key-Echo]] is an Emacs plugin that uses XRecord technology to listen to system key events.
 #+begin_src elisp
 	(use-package key-echo
@@ -785,9 +878,12 @@ I recommend stick to only one of these modes and does all the font settings base
     ;:font "Sarasa Fixed SC"
       :font "RobotoMono Nerd Font Mono"
       :height 1.0)
-    ;(set-fontset-font t 'symbol "Noto Sans Symbols 2")
+    ; (set-fontset-font t 'symbol "Noto Sans Symbols 2")
     (set-face-attribute 'link nil
-  	  :foreground "#ffcc66" :underline t :bold nil)
+      :foreground "#ffcc66" :underline t :bold nil)
+    ;; This is a temporary fix for solaire mode
+    (set-face-attribute 'solaire-default-face nil
+      :inherit 'fixed-pitch)
     (fixed-pitch-mode)
   )
 #+end_src
@@ -1439,7 +1535,7 @@ See [[* Posframe][Posframe]] for function defintion.
 
 								(find-file
 									(vertico-count . 25)
-									(vertico-posframe-width . 70)
+									(vertico-posframe-width . 80)
 									(vertico-posframe-poshandler .
 										 posframe-poshandler-window-upper-center!))
 
@@ -1489,9 +1585,6 @@ See [[* Posframe][Posframe]] for function defintion.
 				(vertico-posframe-mode 1)
 	)
 #+end_src
-
-#+RESULTS:
-: #s(hash-table size 65 test eql rehash-size 1.5 rehash-threshold 0.8125 data (:use-package (25915 61325 925245 914000) :init (25915 61325 924647 758000) :config (25915 61325 924546 789000) :config-secs (0 0 233 325000) :init-secs (0 0 460 550000) :use-package-secs (0 0 1083 712000)))
 
 *** Savehist
 
@@ -1655,6 +1748,12 @@ See [[* Posframe][Posframe]] for function defintion.
 	)
 #+end_src
 
+*** Embark
+#+begin_src elisp
+  (use-package embark
+  :after consult
+  )
+#+end_src
 ** Tabs
 **** COMMENT Tab-line-mode
 Code stolen from [[https://emacs-china.org/t/27-1-tab-line-mode/20514][Emacs China]]
@@ -2183,6 +2282,9 @@ Disabled because I use lazycat's method instead.
 - highlight-quoted
 - macrostep
 - oversee
+  #+begin_src elisp
+    (setq-default lexical-binding t)
+  #+end_src
 *** LaTeX
 **** AUCTeX
 #+begin_src elisp
@@ -2225,6 +2327,11 @@ To build auctex, =autoconf= should be avaliable on your system.
 #+begin_src elisp
   (use-package nix-mode
   :mode "\\.nix\\'"
+  :config
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+  	 '((nix . t))
+  	 )
   )
 #+end_src
 
@@ -2237,6 +2344,12 @@ To build auctex, =autoconf= should be avaliable on your system.
 #+begin_src elisp
   (use-package yaml-mode
   :mode "\\.yaml\\'"
+  )
+#+end_src
+*** PlantUML
+#+begin_src elisp
+  (use-package plantuml-mode
+  :mode "\\.plantuml\\'"
   )
 #+end_src
 ** UI
@@ -2399,7 +2512,13 @@ fingertip.el is a plugin that provides grammatical edit base on treesit
 		)
 	)
 #+end_src
-
+** Electric-Indent
+#+begin_src elisp
+  (use-package electric
+  :config
+    (setq electric-pair-mode t) ;; global-minor mode
+  )
+#+end_src
 ** Aggressive-Indent
 [[https://github.com/Malabarba/aggressive-indent-mode][Aggressive-indent-mode]] is a minor mode that keeps your code always
 indented.  It reindents after every change, making it more reliable
@@ -2677,21 +2796,92 @@ This package provides visual alignment for Org Mode, Markdown and table.el table
 		)
 	)
 #+end_src
+** Keybinds
+#+begin_src elisp
 
+  (defun my/outline-left ()
+    (interactive)
+    (hide-subtree)
+    (outline-up-heading 1)
+    (hide-subtree)
+    (outline-show-children)
+    (outline-show-entry))
+
+  (defun my/outline-up ()
+    (interactive)
+    (hide-subtree)
+    (outline-backward-same-level 1)
+    (outline-show-children)
+    (outline-show-entry))
+
+  (defun my/outline-down ()
+    (interactive)
+    (hide-subtree)
+    (outline-forward-same-level 1)
+    (outline-show-children)
+    (outline-show-entry))
+
+  (defun my/outline-right ()
+    (interactive)
+    (outline-show-children)
+  	(outline-show-entry)
+  	(if (outline-has-subheading-p)
+  			(progn (outline-next-heading)
+  						 (outline-show-children)
+  						 (outline-show-entry))))
+
+  (use-package org
+    :config
+    (general-def
+      :keymaps '(org-mode-map)
+      "C-<escape>" '(my/org-cmd :wk "Org")
+      )
+    (general-def
+      :prefix-command 'my/org-cmd
+      :prefix-map 'my/org-map
+      "b"   '(my/org-babel-cmd                 :wk "Babel")
+      "c"   '(org-ctrl-c-ctrl-c                :wk "c dwim")
+      "l"   '(org-insert-link                  :wk "link")
+      "'"   '(org-edit-special                 :wk "edit")
+      "C-j" '(my/outline-left                  :wk "back heading")
+      "C-k" '(my/outline-up                    :wk "prev heading")
+      "C-l" '(my/outline-down                  :wk "next heading")
+      "C-;" '(my/outline-right                 :wk "forw heading")
+      )
+    (general-def
+      :prefix-command 'my/org-babel-cmd
+      :prefix-map 'my/org-babel-map
+      "t" '(org-babel-tangle  :wk "tangle")
+      )
+    (general-def
+      :keymaps '(org-src-mode-map)
+      "C-<escape>" '(my/org-src-cmd :wk "Org-src")
+      )
+    (general-def
+      :prefix-command 'my/org-src-cmd
+      :prefix-map 'my/org-src-map
+  		"'"   'org-edit-src-exit
+  		"k"   'org-edit-src-abort
+      )
+    )
+#+end_src
 ** Blocks
 *** Code block
 #+begin_src elisp
-	(use-package org
-	:config
-				(setq org-src-tab-acts-natively t
-					org-src-preserve-indentation nil
-					org-confirm-babel-evaluate nil
-					org-confirm-elisp-link-function nil
-					org-link-elisp-confirm-function nil
-				)
-		(general-define-key :keymap 'org-src-mode-map
-			 "C-c C-c" 'eval-buffer)
-	)
+  (use-package org
+  :init
+    ;; (setq org-babel-load-languages
+  	;; 			'((emacs-lisp . t) (C . t) (nix .t)))
+  :config
+    (setq org-src-tab-acts-natively t
+  				org-src-preserve-indentation nil
+  				org-confirm-babel-evaluate nil
+  				org-confirm-elisp-link-function nil
+  				org-link-elisp-confirm-function nil
+  				)
+  	(general-define-key :keymap 'org-src-mode-map
+  		 "C-c C-c" 'eval-buffer)
+  )
 #+end_src
 
 [[https://github.com/yilkalargaw/org-auto-tangle][Org-auto-tangle]] Automatically and Asynchronously tangles org files on save.
@@ -2703,6 +2893,12 @@ Or setting =org-auto-tangle-default= to t to configure auto-tangle as the defaul
 	)
 #+end_src
 
+[[https://github.com/astahlman/ob-async][Ob-async]] enables asynchronous execution of org-babel src blocks. Simply add the keyword ~:async~ to the header-args of any org-babel src block and invoke ~ob-async-org-babel-execute-src-block~.
+#+begin_src elisp
+  (use-package ob-async
+  :after org
+  	)
+#+end_src
 *** Table-block
 [[https://github.com/casouri/valign][Valign]] provides visual alignment for Org Mode, Markdown and table.el tables on GUI Emacs. It can properly align tables containing variable-pitch font, CJK characters and images. Meanwhile, the text-based alignment generated by Org mode (or Markdown mode) is left untouched.
 Disabled cause org-modern already does the job.
@@ -2741,8 +2937,7 @@ Disabled cause org-modern already does the job.
 						))
 	)
 #+end_src
-** Notes
-*** Org-capture
+** Org-capture
 #+begin_src elisp
 	(use-package org-capture
 	:after org
@@ -2776,14 +2971,24 @@ Disabled cause org-modern already does the job.
 	)
 #+end_src
 
+** Backlinks
+What is a backlink? If there's a link at A pointing to B, and in the same time if there's also a link at B pointing to A, then the link at B can be called the backlink of the link at A.
+
+I'm using two plugins that handles backlink. =Org-super-links= handles inserting backlinks in current buffer. =Org-roam= inserts links and backlinks between different org files.
 *** Org-super-links
+Org super links handles backlink inside the current file. When inserting link to a target using ~org-super-links-link~, it automatically inserts a backlink at the target.
+
+I think this is what makes Org's tree-style structure more complete. A tree style structure is efficient in dividing a big object into many smaller ones. But it's possible that two children share something in common, but do not belong to the same parent. In this case backlinks does the job.
+
 #+begin_src elisp
-	(use-package org-super-links
-	:after org
-	:bind (("C-c s s" . org-super-links-link)
-				 ("C-c s l" . org-super-links-store-link)
-				 ("C-c s C-l" . org-super-links-insert-link))
-	)
+  (use-package org-super-links
+  :after org
+  :bind (("C-c s s" . org-super-links-link)
+  			 ("C-c s l" . org-super-links-store-link)
+  			 ("C-c s C-l" . org-super-links-insert-link))
+  :config
+      (setq org-super-links-search-function 'consult-outline)
+  )
 #+end_src
 
 *** Org-roam
@@ -3359,3 +3564,7 @@ tweaks to build eaf
 #+end_src
 
 *
+* COMMENT Tests
+This subtree is used to execute some elisps to test.
+ #+begin_src elisp :results value
+ #+end_src
