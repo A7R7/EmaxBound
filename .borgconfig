@@ -29,7 +29,7 @@
 [submodule "auctex"]
 	load-path = .
 	build-step = ./autogen.sh
-	build-step = ./configure --with-lispdir=~/.emacs.d/lib/auctex
+	build-step = ./configure --with-lispdir=~/.emacs.d/lib/auctex --with-texmf-dir=~/.emacs.d/lib/auctex/texmf
 	build-step = make
 	build-step = make doc
 	build-step = borg-maketexi

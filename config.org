@@ -24,6 +24,7 @@
 
 #+TITLE: EmaxBound Configuration
 #+AUTHOR: A7R7
+
 #+DESCRIPTION: My GNU Emacs's literate config
 #+HTML:<!--more-->
   -----
@@ -51,17 +52,16 @@ Last, run ~emacs --init-directory=<path-of-the-repo>~ (replace the path).
 
 ** How I built this config from the seed
 
-
 The whole config structure is built upon [[https://github.com/emacscollective/emacs.g][emacscollective/emacs.g]].
 It is a starter-kit using borg as the package manager, which utilizes git submodules to maintain all its packages.
 Check [[https://emacsmirror.net/manual/borg/Bootstrapping-using-a-seed.html][Bootstrapping-using-a-seed]] from Borg's manual to see how to build the config structure.
 
-- First, I generated the structure from the seed.
-- Then, I copied and pasted all the original code from init.el and early-init.el to this org file.
-- Last, most further config does not go beyond the following 3 steps:
-  + Run [[elisp: borg-assimilate][M-x borg-assimilate]] and input the name of the package to install this package.
-  + Write config codes into this org file, then run [[elisp:org-babel-tangle][M-x org-babel-tangle]] so that emacs writes the codes into the corresponding file. (the org-auto-tangle package that I installed enables auto tangling on saving org file)
-  + For some packages, specify its load path or build method in ~.borgconfig~ for them to be load or built as expected. This is auto tangled as well.
++ First, I generated the structure from the seed.
++ Then, I copied and pasted all the original code from init.el and early-init.el to this org file.
++ Last, most further config does not go beyond the following 3 steps:
+  - Run [[elisp: borg-assimilate][M-x borg-assimilate]] and input the name of the package to install this package.
+  - Write config codes into this org file, then run [[elisp:org-babel-tangle][M-x org-babel-tangle]] so that emacs writes the codes into the corresponding file. (the org-auto-tangle package that I installed enables auto tangling on saving org file)
+  - For some packages, specify its load path or build method in ~.borgconfig~ for them to be load or built as expected. This is auto tangled as well.
 
 ** Why it's called EmaxBound
 
@@ -73,9 +73,9 @@ Why it is "EmaxBound" but not "EmacsBound" ?
 
 ** Why not other popular emacs distros
 
-- Doom emacs, spacemacs and other emacs "distros", are pretty good. They did a good job in "working out of the box". However, their complexities is blocking me from gaining a further understanding of emacs and elisp.
-- Meanwhile, it's much harder to do customizations on those complex systems, especially when you do not know what it already have. However, self-configured emacs does not have this problem.
-- Those distros get updates from time to time. What if one update breaks your workflow?
++ Doom emacs, spacemacs and other emacs "distros", are pretty good. They did a good job in "working out of the box". However, their complexities is blocking me from gaining a further understanding of emacs and elisp.
++ Meanwhile, it's much harder to do customizations on those complex systems, especially when you do not know what it already have. However, self-configured emacs does not have this problem.
++ Those distros get updates from time to time. What if one update breaks your workflow?
 
 ** Why a literate config
 
@@ -193,17 +193,17 @@ Disable byte compile for init.el, same reason of early-init.el.
 
 Calculating time used loading emacs excutable, as well as setting some variables.
 #+begin_src elisp
-	(progn ;     startup
-				(defvar before-user-init-time (current-time)
-					"Value of `current-time' when Emacs begins loading `user-init-file'.")
-			;; (switch-to-buffer "*Messages*")
-	(message "Loading Emacs...done (%fs)"
-						 (float-time (time-subtract before-user-init-time
-											before-init-time)))
-				(setq user-init-file (or load-file-name buffer-file-name))
-				(setq user-emacs-directory (file-name-directory user-init-file))
-				(message "Loading %s..." user-init-file)
-			)
+  (progn ;     startup
+  	(defvar before-user-init-time (current-time)
+  		"Value of `current-time' when Emacs begins loading `user-init-file'.")
+  	;; (switch-to-buffer "*Messages*")
+  	(message "Loading Emacs...done (%fs)"
+  					 (float-time (time-subtract before-user-init-time
+  																			before-init-time)))
+  	(setq user-init-file (or load-file-name buffer-file-name))
+  	(setq user-emacs-directory (file-name-directory user-init-file))
+  	(message "Loading %s..." user-init-file)
+  )
 #+end_src
 Set some defaults of emacs
 #+begin_src elisp
@@ -229,9 +229,9 @@ Set some defaults of emacs
   	)
 #+end_src
 ** Borg
- [[https://github.com/emacscollective/borg][Borg]] assimilate Emacs packages as Git submodules. Core of the core units.
-   =borg-initialize= should be called in init.el for borg to initialize assimilated drones using =borg-activate=.
-    To skip the activation of the drone named DRONE, temporarily disable it by setting the value of the Git variable submodule.DRONE.disabled to true in ~/.config/emacs/.gitmodules.
+[[https://github.com/emacscollective/borg][Borg]] assimilate Emacs packages as Git submodules. Core of the core units.
+=borg-initialize= should be called in init.el for borg to initialize assimilated drones using =borg-activate=.
+To skip the activation of the drone named DRONE, temporarily disable it by setting the value of the Git variable submodule.DRONE.disabled to true in ~/.config/emacs/.gitmodules.
 
 #+begin_src elisp
 	(use-package borg
@@ -425,6 +425,7 @@ I do not use evil mode anymore because of Meow Edit.
 #+end_src
 ** Meow
 [[https://github.com/meow-edit/meow][Meow]] is yet another modal editing. Meow's freedom allows my setup to be very weird.
+
 #+begin_src elisp :noweb no-export
   (use-package meow
   :custom-face
@@ -641,6 +642,84 @@ I do not use evil mode anymore because of Meow Edit.
   (general-create-definer my/leader
     :prefix-command 'my/leader-prefix-cmd
     :prefix-map 'my/leader-prefix-map
+  	:wk-full-keys nil
+    "DEL"     '(which-key-undo                 :wk "󰕍 undo")
+    )
+#+end_src
+
+#+begin_src elisp
+  (my/leader
+    "SPC"     '((general-simulate-key "C-<escape>") :wk "Mode leader")
+    "/"       '(comment-dwim                   :wk "comment 󱀢")
+    "s"       '(save-buffer                    :wk "save ")
+    "e"       '(dirvish-side                   :wk "󰙅 dirvish-side ")
+    "E"       '(dirvish                        :wk "󰙅 dirvish")
+  	"x"       '(consult-mode-command           :wk "execute")
+  )
+#+end_src
+
+#+begin_src elisp
+  (my/leader :infix "c"
+    ""        '(nil                            :wk " Consult")
+  	"l"       '(consult-line                   :wk "line")
+  	"L"       '(consult-line-multi             :wk "line multi")
+  	"o"       '(consult-outline                :wk "outline")
+  	"i"       '(consult-imenu                  :wk "imenu")
+  	"I"       '(consult-imenu-multi            :wk "imenu multi")
+  	"r"       '(consult-ripgrep                :wk "ripgrep")
+  	"m"       '(consult-mark                   :wk "mark")
+  	"x"       '(consult-mode-command           :wk "execute")
+  	)
+#+end_src
+
+#+begin_src elisp
+  (my/leader :infix "w" ;; workspaces
+    ""        '(nil                            :wk " Workspace")
+    "\\"      '(tab-new                        :wk "tab 󰏌")
+    "|"       '(tab-close                      :wk "tab 󰅖")
+    "["       '(tab-previous                   :wk "tab ")
+    "]"       '(tab-next                       :wk "tab ")
+
+    ","       '(sort-tab-select-next-tab       :wk "buffer ")
+    "."       '(sort-tab-select-previous-tab   :wk "buffer ")
+    "?"       '(sort-tab-close-current-tab     :wk "buffer 󰅖")
+    "/"       '(consult-buffer                 :wk "buffer 󰏌")
+    "f"       '(find-file                      :wk "file 󰏌")
+
+    "j"       '(windmove-left                  :wk "window ")
+    "k"       '(windmove-up                    :wk "window ")
+    "l"       '(windmove-down                  :wk "window ")
+    ";"       '(windmove-right                 :wk "window ")
+    "'"       '(delete-window                  :wk "window 󰅖")
+    "o"       '(toggle-one-window              :wk "one-window")
+
+    "J"       '(split-window-right             :wk "split ")
+    "K"       '(split-window-below             :wk "split ")
+    "L"       '(split-window-above             :wk "split ")
+    ":"       '(split-window-left              :wk "split ")
+    )
+#+end_src
+
+#+RESULTS:
+
+#+begin_src elisp
+  ;; Borg
+  (my/leader :infix "B"
+    ""        '(nil                            :wk " Borg")
+    "a"       '(borg-assimilate                :wk "󱧕 assimilate ")
+    "A"       '(borg-activate                  :wk " activate")
+    "b"       '(borg-build                     :wk "󱇝 build")
+    "c"       '(borg-clone                     :wk " clone")
+    "r"       '(borg-remove                    :wk "󱧖 remove")
+    )
+  ;; toggle
+  (my/leader :infix "t"
+    ""        '(nil                            :wk " Toggle")
+    )
+  ;; Git
+  (my/leader :infix "g"
+    ""        '(nil                            :wk " Git")
+    "g"       '(magit                          :wk " magit")
     )
 #+end_src
 
@@ -700,69 +779,6 @@ I do not use evil mode anymore because of Meow Edit.
       new-window))
 #+end_src
 
-#+begin_src elisp
-  (my/leader :infix "b" ;; buffers
-  	"b"       '(consult-buffer                 :wk "buffer")
-  	"d"       '(     :wk "buffer ")
-  	)
-  (my/leader :infix "w" ;; workspaces
-    ""        '(nil                            :wk "workspaces")
-    "\\"      '(tab-new                        :wk "tab new 󰝜")
-    "|"       '(tab-close                      :wk "tab new 󰝜")
-    "["       '(tab-previous                   :wk "tab ")
-    "]"       '(tab-next                       :wk "tab ")
-
-    ","       '(sort-tab-select-next-tab       :wk "buffer ")
-    "."       '(sort-tab-select-previous-tab   :wk "buffer ")
-    "?"       '(sort-tab-close-current-tab     :wk "buffer 󰅖")
-    "/"       '(consult-buffer                 :wk "buffer")
-    "f"       '(find-file                      :wk "file")
-
-    "j"       '(windmove-left                  :wk "window ")
-    "k"       '(windmove-up                    :wk "window ")
-    "l"       '(windmove-down                  :wk "window ")
-    ";"       '(windmove-right                 :wk "window ")
-    "'"       '(delete-window                  :wk "window 󰅖")
-    "J"       '(split-window-right             :wk "split ")
-    "K"       '(split-window-below             :wk "split ")
-    "L"       '(split-window-above             :wk "split ")
-    ":"       '(split-window-left              :wk "split ")
-    )
-      ;; Borg
-  (my/leader :infix "B"
-    ""        '(nil                            :wk " 󰏗 Borg      ")
-    "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
-    "a"       '(borg-assimilate                :wk "󱧕 Assimilate ")
-    "A"       '(borg-activate                  :wk " Activate   ")
-    "b"       '(borg-build                     :wk "󱇝 Build      ")
-    "c"       '(borg-clone                     :wk " Clone      ")
-    "r"       '(borg-remove                    :wk "󱧖 Remove     ")
-    )
-      ;; toggle
-  (my/leader :infix "t"
-    ""        '(nil                            :wk " 󰭩 Toggle    ")
-    "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
-    )
-      ;; Git
-  (my/leader :infix "g"
-    ""        '(nil                            :wk " 󰊢 Git       ")
-    "DEL"     '(which-key-undo                 :wk "󰕍 Undo key   ")
-    "g"       '(magit                          :wk " Magit      ")
-    )
-      ;; dired
-  (my/leader
-    "e"       '(dirvish-side                   :wk "󰙅 Dirvish-side ")
-    ;;"E"       '(dirvish                        :wk " Dirvish      ")
-    ;;"qe"      '(save-buffers-kill-emacs         :wk "Quit Emacs ")
-    ;;"e"       '(treemacs                        :wk "󰙅 Treemacs ")
-    )
-  (my/leader
-    "/"       '(comment-dwim                   :wk "󱀢 Comment ")
-    )
-#+end_src
-
-#+RESULTS:
-
 *** Local leader
 :PROPERTIES:
 :header-args:elisp: :noweb-ref local-leader
@@ -779,41 +795,37 @@ Generally, I define my local leader as follows:
 Magit and meow all use transient maps, therefore we let which-key show transient maps.
 #+begin_src elisp
   (use-package which-key
-  :after general
   :init
-  	(setq
-  		which-key-sort-order 'which-key-prefix-then-key-order
-  		which-key-sort-uppercase-first t
-  		which-key-add-column-padding 1
-  		which-key-max-display-columns nil
-  		which-key-min-display-lines 6
-  		which-key-idle-delay 0.8 ; the first idle
-  		which-key-idle-secondary-delay 0.01 ; set to 0 will cause some problems
-  		which-key-max-description-length 25	;
-  		which-key-allow-imprecise-window-fit t ; reduce delay
-  		which-key-separator " " ; yeah I don't like the arrow icon
-  		Which-key-show-early-on-C-h t ; this somehow doesn't work
-  		which-key-show-transient-maps t
-   )
-  	;(general-define-key
-  	;:keymaps 'which-key-mode-map
-  	;  "DEL" '(which-key-undo :wk "undo")
-  	;)
+  	(setq which-key-sort-order 'which-key-key-order ;; default
+  				which-key-sort-uppercase-first nil
+  				;; which-key-add-column-padding 1
+  				which-key-max-display-columns nil
+  				which-key-min-display-lines 10
+  				which-key-idle-delay 0.01 ; the first idle
+  				which-key-idle-secondary-delay 0.01 ; set to 0 will cause some problems
+  				which-key-max-description-length 25	;
+  				which-key-allow-imprecise-window-fit t ; reduce delay
+  				which-key-separator " " ; yeah I don't like the arrow icon
+  				which-key-show-early-on-C-h t
+  				which-key-show-transient-maps t
+          which-key-frame-max-height 60
+  				)
+  	(setq which-key-popup-type 'side-window
+  				which-key-side-window-location 'right
+  				)
   	(which-key-mode 1)
   )
 #+end_src
 
-[[https://github.com/yanghaoxie/which-key-posframe][Which-key-posframe]] use posframe to show which-key popup.
-options for =which-key-posframe-poshandler=:
+[[https://github.com/yanghaoxie/which-key-posframe][Which-key-posframe]] use posframe to show which-key popup. Currently which key still have problems showing things correctly. I may fix them someday :(
 #+begin_src elisp
-	(use-package which-key-posframe
-	:config
-		(setq which-key-posframe-poshandler
-				'posframe-poshandler-window-bottom-center
-				;'posframe-poshandler-frame-bottom-center
-		)
-		(which-key-posframe-mode)
-	)
+  (use-package which-key-posframe
+  :after which-key
+  :config
+    (setq which-key-posframe-poshandler
+          'posframe-poshandler-frame-bottom-right-corner)
+    (which-key-posframe-mode)
+  )
 #+end_src
 ** Transient
 [[https://github.com/yanghaoxie/transient-posframe][Transient-posframe]] display transient popups using a posframe.
@@ -872,18 +884,21 @@ I recommend stick to only one of these modes and does all the font settings base
     ;; This cause some bugs
     ;; (add-to-list 'default-frame-alist '(font . "Sarasa Gothic SC-16" ))
     (set-face-attribute 'default nil
-      :font "Sarasa Gothic SC"
+      :font "Sarasa Gothic SC Nerd Font"
       :height 150)
     (set-face-attribute 'fixed-pitch nil
     ;:font "Sarasa Fixed SC"
       :font "RobotoMono Nerd Font Mono"
       :height 1.0)
+    (set-face-attribute 'variable-pitch nil
+      :font "Sarasa Gothic SC Nerd Font"
+      :height 1.0)
     ; (set-fontset-font t 'symbol "Noto Sans Symbols 2")
     (set-face-attribute 'link nil
       :foreground "#ffcc66" :underline t :bold nil)
     ;; This is a temporary fix for solaire mode
-    (set-face-attribute 'solaire-default-face nil
-      :inherit 'fixed-pitch)
+    ;; (set-face-attribute 'solaire-default-face nil
+    ;;   :inherit 'fixed-pitch)
     (fixed-pitch-mode)
   )
 #+end_src
@@ -911,11 +926,11 @@ You can use the bindings CTRL plus =/- for zooming in/out.  You can also use CTR
 [[https://github.com/domtronn/all-the-icons.el][All-the-icons]] is an icon set that can be used with dashboard, dired, ibuffer and other Emacs programs.
 
 #+begin_src elisp
-	(use-package all-the-icons
-		:if (display-graphic-p))
+  (use-package all-the-icons
+  	:if (display-graphic-p))
 
-	;(use-package all-the-icons-dired
-	;  :hook (dired-mode . (lambda () (all-the-icons-dired-mode t))))
+  ;(use-package all-the-icons-dired
+  ;  :hook (dired-mode . (lambda () (all-the-icons-dired-mode t))))
 #+end_src
 
 *NOTE*: In order for the icons to work it is very important that you install the Resource Fonts included in this package. Run [[elisp:all-the-icons-install-fonts][M-x all-the-icons-install-fonts]] to install necessary icons.
@@ -1017,6 +1032,8 @@ Note that a 'frame' is a window on the desktop, a 'window' is a subwindow of ema
   (use-package solaire-mode
   :defer t
   :init (solaire-global-mode)
+  :config
+    (add-hook 'org-src-mode-hook 'turn-off-solaire-mode)
   )
 #+end_src
 
@@ -1041,11 +1058,10 @@ But currently we only use olivetti mode.
         (dashboard-mode . variable-pitch-mode)
         (olivetti-mode . visual-line-mode)
   :init
-        (setq-default fill-column 90)
+        (setq-default fill-column 100)
   :config
         ;If nil (the default), use the value of fill-column + 2.
-        (setq olivetti-body-width nil
-                 olivetti-style 'fancy)
+        (setq olivetti-body-width nil olivetti-style 'fancy)
         ;; (set-face-attribute 'olivetti-fringe nil :background "#171B24")
         (defun config/window-center (width)
             (interactive)
@@ -1148,11 +1164,14 @@ Beacon makes the cursor shine when scrolling window or jumping. Somewhat buggy.
 	)
 #+end_src
 
-*** Pulse-Cursor
+*** COMMENT Pulse-Cursor
 Makes the cursor to blink with fade out animation.
+It's possible to take much ram when idle.
 #+begin_src elisp
   (use-package pulsing-cursor
-  		:config (pulsing-cursor-mode)
+  :config
+    (set-face-attribute 'pulsing-cursor-overlay-face1 nil :inherit cursor)
+    (pulsing-cursor-mode)
   )
 #+end_src
 *** Goggles
@@ -1234,12 +1253,6 @@ a MinorMode which shows you, in the echo area, the argument list of the function
 	(use-package man
 		:defer t
 		:config (setq Man-width 80))
-#+end_src
-
-*** Paren
-#+begin_src elisp
-	(use-package paren
-		:config (show-paren-mode))
 #+end_src
 
 *** Prog-mode
@@ -1335,6 +1348,7 @@ a MinorMode which shows you, in the echo area, the argument list of the function
 Dashboard is an extensible startup screen showing you recent files, bookmarks, agenda items and an Emacs banner.
 
 Emacs currently cannot display correpng or svg with alpha channels, when emacs's background is transparent. The solution is to use xpm format image.
+*** Emacs Dashboard
 #+begin_src elisp
   (use-package dashboard
   :init
@@ -1343,8 +1357,7 @@ Emacs currently cannot display correpng or svg with alpha channels, when emacs's
   			dashboard-set-heading-icons t
   			dashboard-center-content t ;; set to 't' for centered content
   			dashboard-set-file-icons t
-  			initial-buffer-choice
-  			(lambda () (get-buffer-create "*dashboard*"))
+  			initial-buffer-choice (lambda () (get-buffer-create "*scratch*"))
   			dashboard-startup-banner ;; use custom image as banner
   			(concat user-emacs-directory "assets/EmaxBound.webp")
   			dashboard-items '(
@@ -1370,6 +1383,16 @@ Emacs currently cannot display correpng or svg with alpha channels, when emacs's
   )
 #+end_src
 
+*** COMMENT Doom Dashboard
+#+begin_src elisp
+  (use-package doom-dashboard
+  :init
+    (setq doom-dashboard-banner-file "assets/EmaxBound-1400.xpm")
+  :config
+    (doom-dashboard-init-h)
+  	(doom-dashboard-load)
+  )
+#+end_src
 ** Modeline
 *** Doom-modeline
 [[https://github.com/seagle0128/doom-modeline][Doom-modeline]] is a very attractive and rich (yet still minimal) mode line configuration for Emacs.  The default configuration is quite good but you can check out the [[https://github.com/seagle0128/doom-modeline#customize][configuration options]] for more things you can enable or disable.
@@ -1434,6 +1457,7 @@ This package implements hiding or abbreviation of the modeline displays (lighter
   :config
     (setq awesome-tray-hide-mode-line nil)
   )
+
 #+end_src
 ** Minibuffer
 *** Vertico
@@ -1503,87 +1527,76 @@ Vertico-multiform configures Vertico modes per command or completion category.
 See [[* Posframe][Posframe]] for function defintion.
 
 #+begin_src elisp
-	(use-package vertico-posframe
-	;:disabled
-	:after vertico-multiform
-	:init
-				(setq vertico-posframe-poshandler
-								'posframe-poshandler-frame-top-center)
-				(setq vertico-count 15
-								vertico-posframe-border-width 3
-								vertico-posframe-width 140
-								vertico-resize nil)
-				(setq vertico-posframe-parameters
-							 '((left-fringe . 20)
-								 (right-fringe . 20)))
-				(setq vertico-multiform-commands '(
+  (use-package vertico-posframe
+  ;:disabled
+  :after vertico-multiform
+  :init
+  	(setq vertico-posframe-poshandler
+  				'posframe-poshandler-frame-top-center)
+  	(setq vertico-count 15
+  				vertico-posframe-border-width 3
+  				vertico-posframe-width 140
+  				vertico-resize nil)
+  	(setq vertico-posframe-parameters
+  				'((left-fringe . 20)
+  					(right-fringe . 20)))
+  	(setq vertico-multiform-commands
+  				'(
+  					(execute-extended-command ; M-x
+  		 			 (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
+  		 			 (vertico-posframe-width . 120))
 
-								(execute-extended-command ; M-x
-									(vertico-posframe-poshandler .
-										 posframe-poshandler-frame-top-center)
-									(vertico-posframe-width . 120))
+  					(meow-visit
+  					 (vertico-posframe-poshandler . posframe-poshandler-window-top-right-corner)
+  					 (vertico-posframe-width . 50))
 
-								(meow-visit
-									(vertico-posframe-poshandler .
-										 posframe-poshandler-window-top-right-corner)
-									(vertico-posframe-width . 50))
+  					(meow-yank-pop; M-x
+  					 (vertico-posframe-poshandler . posframe-poshandler-point-window-center)
+  					 (vertico-posframe-width . 50))
 
-								(meow-yank-pop; M-x
-									(vertico-posframe-poshandler .
-										 posframe-poshandler-point-window-center)
-									(vertico-posframe-width . 50))
+  					(find-file
+  					 (vertico-count . 25)
+  					 (vertico-posframe-width . 80)
+  					 (vertico-posframe-poshandler . posframe-poshandler-window-upper-center!))
 
-								(find-file
-									(vertico-count . 25)
-									(vertico-posframe-width . 80)
-									(vertico-posframe-poshandler .
-										 posframe-poshandler-window-upper-center!))
+  					(consult-buffer
+  					 (vertico-count . 25)
+  					 (vertico-posframe-width . 100)
+  					 (vertico-posframe-poshandler . posframe-poshandler-window-upper-center!))
 
-								(consult-buffer
-									(vertico-count . 25)
-									(vertico-posframe-width . 100)
-									(vertico-posframe-poshandler .
-										 posframe-poshandler-window-upper-center!))
+  					(switch-to-buffer
+  					 (vertico-count . 25)
+  					 (vertico-posframe-width . 100)
+  					 (vertico-posframe-poshandler . posframe-poshandler-window-upper-center!))
 
-								(switch-to-buffer
-									(vertico-count . 25)
-									(vertico-posframe-width . 100)
-									(vertico-posframe-poshandler .
-										 posframe-poshandler-window-upper-center!))
+  					(org-insert-link; C-c C-l
+  					 (vertico-posframe-poshandler . posframe-poshandler-point-top-left-corner)
+  					 (vertico-posframe-width . 70))
 
-								(org-insert-link; C-c C-l
-									(vertico-posframe-poshandler .
-										 posframe-poshandler-point-top-left-corner)
-									(vertico-posframe-width . 70))
+  					(consult-imenu
+  					 (vertico-count . 40)
+  					 (vertico-posframe-poshandler . posframe-poshandler-window-top-right-corner)
+  					 (vertico-posframe-width . 80))
 
-								(consult-imenu
-									(vertico-count . 40)
-									(vertico-posframe-poshandler .
-										 posframe-poshandler-window-top-right-corner)
-									(vertico-posframe-width . 80))
+  					(consult-outline
+  					 (vertico-count . 30)
+  					 (vertico-posframe-poshandler . posframe-poshandler-window-top-right-corner)
+  					 (vertico-posframe-width . 40))
 
-								(consult-outline
-									(vertico-count . 30)
-									(vertico-posframe-poshandler .
-										 posframe-poshandler-window-top-right-corner)
-									(vertico-posframe-width . 40))
+  					(consult-line
+  					 (vertico-count . 30)
+  					 (vertico-posframe-poshandler . posframe-poshandler-frame-top-right-corner)
+  					 (vertico-posframe-width . 60))
 
-								(consult-line
-						(vertico-count . 30)
-									(vertico-posframe-poshandler .
-										 posframe-poshandler-frame-top-right-corner)
-									(vertico-posframe-width . 60))
+  					(t
+  					 (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
+  					 (vertico-posframe-width . 120))
+  			))
 
-								(t
-									(vertico-posframe-poshandler .
-										 posframe-poshandler-frame-top-center)
-									(vertico-posframe-width . 120))
-				))
-
-	:config
-				(vertico-multiform-mode 1)
-				(vertico-posframe-mode 1)
-	)
+  :config
+  			(vertico-multiform-mode 1)
+  			(vertico-posframe-mode 1)
+  )
 #+end_src
 
 *** Savehist
@@ -1803,7 +1816,7 @@ Code stolen from [[https://emacs-china.org/t/27-1-tab-line-mode/20514][Emacs Chi
           )
 #+end_src
 **** Tab-bar-mode
-**** Centaur-tabs
+**** COMMENT Centaur-tabs
 
 #+begin_src elisp :tangle init.el
 	(use-package centaur-tabs
@@ -1866,6 +1879,18 @@ Code stolen from [[https://emacs-china.org/t/27-1-tab-line-mode/20514][Emacs Chi
 	:init (sort-tab-mode)
 	)
 #+end_src
+** Windows
+*** Popper
+
+#+begin_src elisp
+
+#+end_src
+
+*** Toggle-one-window
+[[https://github.com/manateelazycat/toggle-one-window][Toggle-one-window]] provides only one function, ~toggle-one-window~, to toggle between one window to multiple window. When you have a multiple windows, it remembers the window layout and deletes all other windows. The next call restores them.
+#+begin_src elisp
+  (use-package toggle-one-window)
+#+end_src
 ** Magit
 [[https://github.com/magit/magit][Magit]] is a VERY powerful git client.
 #+begin_src elisp
@@ -1885,7 +1910,7 @@ Code stolen from [[https://emacs-china.org/t/27-1-tab-line-mode/20514][Emacs Chi
 [submodule "magit"]
 	no-byte-compile = lisp/magit-libgit.el
 #+end_src
-** Treemacs
+** COMMENT Treemacs
 #+begin_src elisp
 	(use-package treemacs
 		:disabled
@@ -2013,76 +2038,83 @@ All the el files in treemacs are in =src/elisp= and =src/extra=
     load-path = src/extra
 #+end_src
 ** Dirvish
-Dropin replacement for dired.
+Dirvish is a dropin replacement for dired. It looks and feels like ranger.
 
 #+begin_src elisp
-	(use-package dirvish
-	:init
-		;(dirvish-override-dired-mode)
-	:hook
-		(dired-mode . solaire-mode)
-	:custom
-		(dirvish-quick-access-entries ;`setq' won't work for custom
-			'(("h" "~/"                          "Home")
-				("d" "~/Downloads/"                "Downloads")
-				("m" "/mnt/"                       "Drives")
-				("t" "~/.local/share/Trash/files/" "TrashCan"))
-		)
-	:config
-		(dirvish-define-preview exa (file)
-		"Use `exa' to generate directory preview."
-		:require ("exa") ; tell Dirvish to check if we have the executable
-		(when (file-directory-p file) ; we only interest in directories here
-				`(shell . ("exa" "-al" "--color=always" "--icons"
-						"--group-directories-first" ,file))))
+  (use-package dirvish
+  :after dired
+  :custom
+    (dirvish-quick-access-entries ;`setq' won't work for custom
+      '(("h" "~/"                          "Home")
+        ("d" "~/Downloads/"                "Downloads")
+        ("m" "/mnt/"                       "Drives")
+        ("t" "~/.local/share/Trash/files/" "TrashCan"))
+    )
+  :config
+    (dirvish-define-preview exa (file)
+    "Use `exa' to generate directory preview."
+    :require ("exa") ; tell Dirvish to check if we have the executable
+    (when (file-directory-p file) ; we only interest in directories here
+        `(shell . ("exa" "-al" "--color=always" "--icons"
+            "--group-directories-first" ,file))))
 
-		(add-to-list 'dirvish-preview-dispatchers 'exa)
-		;; (dirvish-peek-mode) ; Preview files in minibuffer
-		;; (dirvish-side-follow-mode) ; similar to `treemacs-follow-mode'
-		(setq dirvish-path-separators (list "  " "  " "  "))
-		(setq dirvish-mode-line-format
-				'(:left (sort symlink) :right (omit yank index)))
-		(setq dirvish-attributes
-				'(all-the-icons file-time file-size collapse subtree-state vc-state git-msg))
-		(setq delete-by-moving-to-trash t)
-		(setq dired-listing-switches
-				"-l --almost-all --human-readable --group-directories-first --no-group")
-		(nmap dirvish-mode-map
-				"?"      '(dirvish-dispatch          :wk "Dispatch")
-				"TAB"    '(dirvish-subtree-toggle    :wk "Subtre-toggle")
-				"q"      '(dirvish-quit              :wk "Quit")
-				"h"      '(dired-up-directory        :wk "Up-dir")
-				"l"      '(dired-find-file           :wk "Open/Toggle")
-				"a"      '(dirvish-quick-access      :wk "Access")
-				"f"      '(dirvish-file-info-menu    :wk "File Info Menu")
-				"y"      '(dirvish-yank-menu         :wk "Yank Menu")
-				"N"      '(dirvish-narrow            :wk "Narrow")
-				;         `dired-view-file'
-				"v"      '(dirvish-vc-menu           :wk "View-file")
-				;         `dired-sort-toggle-or-edit'
-				"s"      '(dirvish-quicksort         :wk "Quick-sort")
+    (add-to-list 'dirvish-preview-dispatchers 'exa)
+    ;; (dirvish-peek-mode) ; Preview files in minibuffer
+    ;; (dirvish-side-follow-mode) ; similar to `treemacs-follow-mode'
+    (setq dirvish-path-separators (list "  " "  " "  "))
+    (setq dirvish-mode-line-format
+        '(:left (sort symlink) :right (omit yank index)))
+    (setq dirvish-attributes
+        '(all-the-icons file-time file-size collapse subtree-state vc-state git-msg))
+    (setq delete-by-moving-to-trash t)
+    (setq dired-listing-switches
+        "-l --almost-all --human-readable --group-directories-first --no-group")
+    (general-def dirvish-mode-map
+      "q"      '(dirvish-quit              :wk "quit")
+      "j"      '(dired-up-directory        :wk "up-dir")
+      ";"      '(dired-find-file           :wk "open/toggle")
+      "a"      '(dirvish-quick-access      :wk "access")
+      "c"      '(dired-do-copy             :wk "copy")
+      "u"      '(dired-do-rename           :wk "rename")
+    )
+    ;; (nmap dirvish-mode-map
+    ;;    "?"      '(dirvish-dispatch          :wk "Dispatch")
+    ;;    "TAB"    '(dirvish-subtree-toggle    :wk "Subtre-toggle")
+    ;;    "q"      '(dirvish-quit              :wk "Quit")
+    ;;    "h"      '(dired-up-directory        :wk "Up-dir")
+    ;;    "l"      '(dired-find-file           :wk "Open/Toggle")
+    ;;    "a"      '(dirvish-quick-access      :wk "Access")
+    ;;    "f"      '(dirvish-file-info-menu    :wk "File Info Menu")
+    ;;    "y"      '(dirvish-yank-menu         :wk "Yank Menu")
+    ;;    "N"      '(dirvish-narrow            :wk "Narrow")
+    ;;    ;         `dired-view-file'
+    ;;    "v"      '(dirvish-vc-menu           :wk "View-file")
+    ;;    ;         `dired-sort-toggle-or-edit'
+    ;;    "s"      '(dirvish-quicksort         :wk "Quick-sort")
 
-				"M-f"    '(dirvish-history-go-forward  :wk "History-forward")
-				"M-b"    '(dirvish-history-go-backward :wk "History-back")
-				"M-l"    '(dirvish-ls-switches-menu    :wk "ls Switch Menu")
-				"M-m"    '(dirvish-mark-menu           :wk "Mark Menu")
-				"M-t"    '(dirvish-layout-toggle       :wk "Layout-toggle")
-				"M-s"    '(dirvish-setup-menu          :wk "Setup-Menu")
-				"M-e"    '(dirvish-emerge-menu         :wk "Emerge-Menu")
-				"M-j"    '(dirvish-fd-jump             :wk "fd-jump")
-		)
-	)
+    ;;    "M-f"    '(dirvish-history-go-forward  :wk "History-forward")
+    ;;    "M-b"    '(dirvish-history-go-backward :wk "History-back")
+    ;;    "M-l"    '(dirvish-ls-switches-menu    :wk "ls Switch Menu")
+    ;;    "M-m"    '(dirvish-mark-menu           :wk "Mark Menu")
+    ;;    "M-t"    '(dirvish-layout-toggle       :wk "Layout-toggle")
+    ;;    "M-s"    '(dirvish-setup-menu          :wk "Setup-Menu")
+    ;;    "M-e"    '(dirvish-emerge-menu         :wk "Emerge-Menu")
+    ;;    "M-j"    '(dirvish-fd-jump             :wk "fd-jump")
+    ;; )
+    (dirvish-override-dired-mode)
+  )
 #+end_src
 
+[[https://github.com/purcell/diredfl][Diredfl]] defines extra font lock rules to make dired more colorful.
 #+begin_src elisp
-	(use-package diredfl
-		:hook
-		((dired-mode . diredfl-mode)
-		 ;; highlight parent and directory preview as well
-		 (dirvish-directory-view-mode . diredfl-mode))
-		:config
-		(set-face-attribute 'diredfl-dir-name nil :bold t)
-	)
+  (use-package diredfl
+  :hook
+    ((dired-mode . diredfl-mode)
+     ;; highlight parent and directory preview as well
+  	 (dirvish-directory-view-mode . diredfl-mode))
+  :config
+    (set-face-attribute 'diredfl-dir-name nil :bold t)
+  )
 #+end_src
 
 Tweaks to build dirvish. Load dirvish and its extensions.
@@ -2296,13 +2328,14 @@ Disabled because I use lazycat's method instead.
 #+begin_src elisp
 	(use-package auctex)
 #+end_src
+
 AucTex needs some tweaks to be built.
 To build auctex, =autoconf= should be avaliable on your system.
 #+begin_src conf :tangle .borgconfig
 [submodule "auctex"]
 	load-path = .
 	build-step = ./autogen.sh
-	build-step = ./configure --with-lispdir=~/.emacs.d/lib/auctex
+	build-step = ./configure --with-lispdir=~/.emacs.d/lib/auctex --with-texmf-dir=~/.emacs.d/lib/auctex/texmf
 	build-step = make
 	build-step = make doc
 	build-step = borg-maketexi
@@ -2340,16 +2373,27 @@ To build auctex, =autoconf= should be avaliable on your system.
   :mode "\\.nix\\'"
   )
 #+end_src
-*** YAML
-#+begin_src elisp
-  (use-package yaml-mode
-  :mode "\\.yaml\\'"
-  )
-#+end_src
 *** PlantUML
 #+begin_src elisp
   (use-package plantuml-mode
   :mode "\\.plantuml\\'"
+  )
+#+end_src
+*** Python
+**** Jupyter
+#+begin_src elisp
+
+#+end_src
+*** Verilog
+#+begin_src elisp
+  (use-package verilog-mode
+  :mode "\\.v\\'"
+  )
+#+end_src
+*** YAML
+#+begin_src elisp
+  (use-package yaml-mode
+  :mode "\\.yaml\\'"
   )
 #+end_src
 ** UI
@@ -2394,7 +2438,7 @@ To build auctex, =autoconf= should be avaliable on your system.
 
 *** Rainbow-mode
 
-This minor mode sets background color to strings that match color names.
+This minor mode sets background color to strings that match color names, useful for UI and theme design.
 #+begin_src elisp
 
 #+end_src
@@ -2402,9 +2446,16 @@ This minor mode sets background color to strings that match color names.
 [[https://github.com/Fanael/rainbow-delimiters][Rainbow-delimiters]] is a "rainbow parentheses"-like mode which highlights
 parentheses, brackets, and braces according to their depth.
 #+begin_src elisp
-	(use-package rainbow-delimiters
-	:hook (prog-mode . rainbow-delimiters-mode)
-	)
+  (use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode)
+  )
+#+end_src
+*** Highlight-parentheses
+#+begin_src elisp
+  (use-package highlight-parentheses
+  :config
+    (global-highlight-parentheses-mode)
+    )
 #+end_src
 *** Highlight-Indent-Guides
 [[https://github.com/DarthFennec/highlight-indent-guides][Highlight-Indent-Guides]] is a minor mode that highlights indentation levels via font-lock.
@@ -2424,14 +2475,29 @@ parentheses, brackets, and braces according to their depth.
 	)
 #+end_src
 ** Smartparens
-[[https://github.com/Fuco1/smartparens][Smartparens]] is minor mode for Emacs that deals with parens pairs
-and tries to be smart about it.
+[[https://github.com/Fuco1/smartparens][Smartparens]] is minor mode for Emacs that deals with parens pairs and tries to be smart about it.
 #+begin_src elisp
 	(use-package smartparens
 	:config
 		(smartparens-global-mode)
 	)
 #+end_src
+** Vundo
+[[https://github.com/casouri/vundo][Vundo]] (visual undo) displays the undo history as a tree and lets you move in the tree to go back to previous buffer states.
+#+begin_src elisp
+  (use-package vundo
+  :config
+    (general-def vundo-mode-map
+      "j"  'vundo-backward
+      ";"  'vundo-forward
+      "k"  'vundo-previous
+      "l"  'vundo-next
+      "q"  'vundo-quit
+      "s"  'vundo-save
+      )
+  )
+#+end_src
+
 ** COMMENT Ts-fold
 #+begin_src elisp
   (use-package ts-fold)
@@ -2440,82 +2506,83 @@ and tries to be smart about it.
 
 fingertip.el is a plugin that provides grammatical edit base on treesit
 #+begin_src elisp
-	(use-package fingertip
-	:config
-		(dolist (hook (list
-					'c-mode-common-hook 'c-mode-hook 'c++-mode-hook
-					'c-ts-mode-hook 'c++-ts-mode-hook
-					'cmake-ts-mode-hook
-					'java-mode-hook
-					'haskell-mode-hook
-					'emacs-lisp-mode-hook
-						 'lisp-interaction-mode-hook 'lisp-mode-hook
-					'maxima-mode-hook
-					'ielm-mode-hook
-					'bash-ts-mode-hook 'sh-mode-hook
-					'makefile-gmake-mode-hook
-					'php-mode-hook
-					'python-mode-hook 'python-ts-mode-hook
-					'js-mode-hook
-					'go-mode-hook
-					'qml-mode-hook
-					'jade-mode-hook
-					'css-mode-hook 'css-ts-mode-hook
-					'ruby-mode-hook
-					'coffee-mode-hook
-					'rust-mode-hook 'rust-ts-mode-hook
-					'qmake-mode-hook
-					'lua-mode-hook
-					'swift-mode-hook
-					'web-mode-hook
-					'markdown-mode-hook
-					'llvm-mode-hook
-					'conf-conf-mode-hook 'conf-ts-mode-hook
-					'nim-mode-hook
-					'typescript-mode-hook 'typescript-ts-mode-hook
-					'js-ts-mode-hook 'json-ts-mode-hook
-					))
-		(add-hook hook #'(lambda () (fingertip-mode 1))))
-		(general-def
-			:keymaps 'fingertip-mode-map
-				"(" 'fingertip-open-round
-				"[" 'fingertip-open-bracket
-				"{" 'fingertip-open-curly
-				")" 'fingertip-close-round
-				"]" 'fingertip-close-bracket
-				"}" 'fingertip-close-curly
-				"=" 'fingertip-equal
+  (use-package fingertip
+  :config
+    (dolist (hook (list
+          'c-mode-common-hook 'c-mode-hook 'c++-mode-hook
+          'c-ts-mode-hook 'c++-ts-mode-hook
+          'cmake-ts-mode-hook
+          'java-mode-hook
+          'haskell-mode-hook
+          'emacs-lisp-mode-hook
+             'lisp-interaction-mode-hook 'lisp-mode-hook
+          'maxima-mode-hook
+          'ielm-mode-hook
+          'bash-ts-mode-hook 'sh-mode-hook
+          'makefile-gmake-mode-hook
+          'php-mode-hook
+          'python-mode-hook 'python-ts-mode-hook
+          'js-mode-hook
+          'go-mode-hook
+          'qml-mode-hook
+          'jade-mode-hook
+          'css-mode-hook 'css-ts-mode-hook
+          'ruby-mode-hook
+          'coffee-mode-hook
+          'rust-mode-hook 'rust-ts-mode-hook
+          'qmake-mode-hook
+          'lua-mode-hook
+          'swift-mode-hook
+          'web-mode-hook
+          'markdown-mode-hook
+          'llvm-mode-hook
+          'conf-conf-mode-hook 'conf-ts-mode-hook
+          'nim-mode-hook
+          'typescript-mode-hook 'typescript-ts-mode-hook
+          'js-ts-mode-hook 'json-ts-mode-hook
+          ))
+    (add-hook hook #'(lambda () (fingertip-mode 1))))
+    (general-def
+      :keymaps 'fingertip-mode-map
+        "(" 'fingertip-open-round
+        "[" 'fingertip-open-bracket
+        "{" 'fingertip-open-curly
+        ")" 'fingertip-close-round
+        "]" 'fingertip-close-bracket
+        "}" 'fingertip-close-curly
+        "=" 'fingertip-equal
 
-				"%" 'fingertip-match-paren
-				"\"" 'fingertip-double-quote
-				"'" 'fingertip-single-quote
+        "%" 'fingertip-match-paren
+        "\"" 'fingertip-double-quote
+        "'" 'fingertip-single-quote
 
-				"SPC" 'fingertip-space
-				"RET" 'fingertip-newline
+        "SPC" 'fingertip-space
+        "RET" 'fingertip-newline
 
-				"M-o" 'fingertip-backward-delete
-				"C-d" 'fingertip-forward-delete
-				"C-k" 'fingertip-kill
+        "M-o" 'fingertip-backward-delete
+        "C-d" 'fingertip-forward-delete
+        "C-k" 'fingertip-kill
 
-				"M-\"" 'fingertip-wrap-double-quote
-				"M-'" 'fingertip-wrap-single-quote
-				"M-[" 'fingertip-wrap-bracket
-				"M-{" 'fingertip-wrap-curly
-				"M-(" 'fingertip-wrap-round
-				"M-)" 'fingertip-unwrap
+        "M-\"" 'fingertip-wrap-double-quote
+        "M-'" 'fingertip-wrap-single-quote
+        "M-[" 'fingertip-wrap-bracket
+        "M-{" 'fingertip-wrap-curly
+        "M-(" 'fingertip-wrap-round
+        "M-)" 'fingertip-unwrap
 
-				"M-p" 'fingertip-jump-right
-				"M-n" 'fingertip-jump-left
-				"M-:" 'fingertip-jump-out-pair-and-newline
+        "M-p" 'fingertip-jump-right
+        "M-n" 'fingertip-jump-left
+        ;"M-:" 'fingertip-jump-out-pair-and-newline
 
-				"C-j" 'fingertip-jump-up
-		)
-	)
+        "C-j" 'fingertip-jump-up
+    )
+  )
 #+end_src
 ** Electric-Indent
 #+begin_src elisp
   (use-package electric
   :config
+    (setq-default indent-tabs-mode nil) ;; always indent with spaces
     (setq electric-pair-mode t) ;; global-minor mode
   )
 #+end_src
@@ -2667,10 +2734,12 @@ Change the font size of different org-levels.
     (set-face-attribute 'org-level-6 nil :height 1.1 )
     (set-face-attribute 'org-document-title nil :height 2.5 :bold t)
     (set-face-attribute 'org-document-info nil :height 1.8 :bold t)
-    ;; (set-face-attribute 'org-document-info-keyword nil
-    ;;   :foreground "LightSteelBlue4" :inherit 'org-document-info)
+    (set-face-attribute 'org-document-info-keyword nil
+       :inherit 'org-document-info)
     (set-face-attribute 'org-block nil
       :extend t :inherit 'fixed-pitch)
+    (set-face-attribute 'org-block-begin-line nil
+      :height 0.9 :inherit 'default)
   )
 #+end_src
 
@@ -2683,9 +2752,9 @@ Change the font size of different org-levels.
   ;;:hook (org-mode . org-modern-mode)
   :config
     (setq org-modern-keyword
-      (quote (("author" . "⛾")
-        ("title" . "❖")
-        ("subtitle" . "◈")
+      (quote (("author" . "◇")
+        ("title" . "◈")
+        ("subtitle" . "◉")
         ("html" . "󰅱 ")
         (t . t))))
     (setq org-modern-star
@@ -2695,14 +2764,18 @@ Change the font size of different org-levels.
   ; '("☰" "☱" "☲" "☳" "☴" "☵" "☶" "☷")
   ; '("◉" "○" "◈" "◇" "✳")
     (setq org-modern-list ;; for '+' '-' '*' respectively
-        '((43 . "⯌") (45 . "⮚") (42 . "⊛"))
+        '((43 . "∙") (45 . "➤") (42 . "✽"))
     )
     (setq org-modern-block-fringe nil)
     (setq org-modern-todo nil)
     (setq org-modern-block-name '("⇲ " . "⇱ "))
     (set-face-attribute 'org-modern-block-name nil
        :inherit 'variable-pitch)
-    (setq org-modern-table nil)
+    (set-face-attribute 'org-meta-line nil
+       :height 0.8)
+    (set-face-attribute 'org-modern-horizontal-rule nil
+       :inherit 'org-meta-line)
+  	(setq org-modern-table nil)
     (global-org-modern-mode)
   )
 #+end_src
@@ -2797,6 +2870,47 @@ This package provides visual alignment for Org Mode, Markdown and table.el table
 	)
 #+end_src
 ** Keybinds
+
+#+begin_src elisp
+  (use-package org
+    :config
+    (general-def
+      :keymaps '(org-mode-map)
+      "C-<escape>" '(my/org-cmd :wk "Org")
+      )
+    (general-def
+      :prefix-command 'my/org-cmd
+      :prefix-map 'my/org-map
+      "b"   '(my/org-babel-cmd                 :wk "Babel")
+      "c"   '(org-ctrl-c-ctrl-c                :wk "c dwim")
+      "l"   '(org-insert-link                  :wk "link")
+      "'"   '(org-edit-special                 :wk "edit")
+      ","   '(org-insert-structure-template    :wk "structure")
+      "C-j" '(my/outline-left                  :wk "outline left")
+      "C-k" '(my/outline-up                    :wk "outline up")
+      "C-l" '(my/outline-down                  :wk "outline down")
+      "C-;" '(my/outline-right                 :wk "outline right")
+      )
+    (general-def
+      :prefix-command 'my/org-babel-cmd
+      :prefix-map 'my/org-babel-map
+      "t" '(org-babel-tangle                   :wk "tangle")
+      "d" '(org-babel-demarcate-block          :wk "demarcate")
+      )
+    (general-def
+      :keymaps '(org-src-mode-map)
+      "C-<escape>" '(my/org-src-cmd :wk "Org-src")
+      )
+    (general-def
+      :prefix-command 'my/org-src-cmd
+      :prefix-map 'my/org-src-map
+  		"'"   'org-edit-src-exit
+  		"k"   'org-edit-src-abort
+      )
+    )
+#+end_src
+
+*** outline functions
 #+begin_src elisp
 
   (defun my/outline-left ()
@@ -2829,49 +2943,15 @@ This package provides visual alignment for Org Mode, Markdown and table.el table
   			(progn (outline-next-heading)
   						 (outline-show-children)
   						 (outline-show-entry))))
-
-  (use-package org
-    :config
-    (general-def
-      :keymaps '(org-mode-map)
-      "C-<escape>" '(my/org-cmd :wk "Org")
-      )
-    (general-def
-      :prefix-command 'my/org-cmd
-      :prefix-map 'my/org-map
-      "b"   '(my/org-babel-cmd                 :wk "Babel")
-      "c"   '(org-ctrl-c-ctrl-c                :wk "c dwim")
-      "l"   '(org-insert-link                  :wk "link")
-      "'"   '(org-edit-special                 :wk "edit")
-      "C-j" '(my/outline-left                  :wk "back heading")
-      "C-k" '(my/outline-up                    :wk "prev heading")
-      "C-l" '(my/outline-down                  :wk "next heading")
-      "C-;" '(my/outline-right                 :wk "forw heading")
-      )
-    (general-def
-      :prefix-command 'my/org-babel-cmd
-      :prefix-map 'my/org-babel-map
-      "t" '(org-babel-tangle  :wk "tangle")
-      )
-    (general-def
-      :keymaps '(org-src-mode-map)
-      "C-<escape>" '(my/org-src-cmd :wk "Org-src")
-      )
-    (general-def
-      :prefix-command 'my/org-src-cmd
-      :prefix-map 'my/org-src-map
-  		"'"   'org-edit-src-exit
-  		"k"   'org-edit-src-abort
-      )
-    )
 #+end_src
+
 ** Blocks
 *** Code block
 #+begin_src elisp
   (use-package org
   :init
-    ;; (setq org-babel-load-languages
-  	;; 			'((emacs-lisp . t) (C . t) (nix .t)))
+    (setq org-babel-load-languages
+  				'((emacs-lisp . t) (C . t) (python . t) (java . t)))
   :config
     (setq org-src-tab-acts-natively t
   				org-src-preserve-indentation nil
@@ -3422,6 +3502,12 @@ Easy-hugo
 
 ** Org-transclusion
 * Emacs OS
+** Telega
+#+begin_src elisp
+  (use-package telega
+  :defer t
+  )
+#+end_src
 ** PDF-Tools
 PDF-tools is a replacement for DocView for PDF files.
 The rendering is performed by poppler.
@@ -3520,7 +3606,7 @@ tweaks to build eaf
   load-path = extension
 #+end_src
 ** Games
-** Tetris
+*** Tetris
 #+begin_src elisp
 	(add-hook 'tetris-mode-hook
 		(defun config/tetris-center ()
@@ -3529,7 +3615,7 @@ tweaks to build eaf
 	)
 #+end_src
 
-** 2048
+*** 2048
 #+begin_src elisp
 	(add-hook '2048-mode-hook
 		(defun config/2048-center ()
@@ -3538,25 +3624,30 @@ tweaks to build eaf
 	)
 #+end_src
 
+** Emacs-Everywhere
+Takes emacs-everywhere with you, all over your system
+#+begin_src elisp
+
+#+end_src
 * End
 #+begin_src elisp
   (progn ;     startup
-  				(message "Loading %s...done (%fs)" user-init-file
+  	(message "Loading %s...done (%fs)" user-init-file
   					 (float-time (time-subtract (current-time)
-  										before-user-init-time)))
-  				(add-hook 'after-init-hook
+  																			before-user-init-time)))
+  	(add-hook 'after-init-hook
   						(lambda ()
   							(message
   							 "Loading %s...done (%fs) [after-init]" user-init-file
   							 (float-time (time-subtract (current-time)
-  									before-user-init-time))))
+  																					before-user-init-time))))
   						t))
 
-  			(progn ;     personalize
-  				(let ((file (expand-file-name (concat (user-real-login-name) ".el")
-  							user-emacs-directory)))
-  					(when (file-exists-p file)
-  						(load file))))
+  (progn ;     personalize
+  	(let ((file (expand-file-name (concat (user-real-login-name) ".el")
+  																user-emacs-directory)))
+  		(when (file-exists-p file)
+  			(load file))))
   ;; Local Variables:
   ;; indent-tabs-mode: nil
   ;; End:
