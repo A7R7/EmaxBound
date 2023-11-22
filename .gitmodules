@@ -303,9 +303,6 @@
 [submodule "orderless"]
 	path = lib/orderless
 	url = https://github.com/oantolin/orderless
-[submodule "org"]
-	path = lib/org
-	url = https://git.tecosaur.net/tec/org-mode.git
 [submodule "org-agenda-property"]
 	path = lib/org-agenda-property
 	url = https://github.com/Malabarba/org-agenda-property
@@ -324,6 +321,9 @@
 [submodule "org-edna"]
 	path = lib/org-edna
 	url = git@github.com:emacsmirror/org-edna.git
+[submodule "org-fragtog"]
+	path = lib/org-fragtog
+	url = https://github.com/io12/org-fragtog
 [submodule "org-gtd"]
 	path = lib/org-gtd
 	url = https://github.com/Trevoke/org-gtd.el
@@ -571,3 +571,6 @@
 [submodule "zoxide"]
 	path = lib/zoxide
 	url = https://gitlab.com/Vonfry/zoxide.el
+[submodule "org"]
+	path = lib/org
+	url = git@github.com:emacsmirror/org.git
