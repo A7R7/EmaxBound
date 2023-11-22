@@ -15,10 +15,6 @@
 [submodule "magit"]
 	no-byte-compile = lisp/magit-libgit.el
 
-[submodule "treemacs"]
-  load-path = src/elisp
-  load-path = src/extra
-
 [submodule "dirvish"]
 	load-path = .
 	load-path = extensions

@@ -108,12 +108,6 @@
 [submodule "doom-themes"]
 	path = lib/doom-themes
 	url = https://github.com/doomemacs/themes
-[submodule "doremi"]
-	path = lib/doremi
-	url = git@github.com:emacsmirror/doremi.git
-[submodule "doremi-cmd"]
-	path = lib/doremi-cmd
-	url = git@github.com:emacsmirror/doremi-cmd.git
 [submodule "eaf"]
 	path = lib/eaf
 	url = https://github.com/emacs-eaf/emacs-application-framework
@@ -330,9 +324,6 @@
 [submodule "org-edna"]
 	path = lib/org-edna
 	url = git@github.com:emacsmirror/org-edna.git
-[submodule "org-fragtog"]
-	path = lib/org-fragtog
-	url = https://github.com/io12/org-fragtog
 [submodule "org-gtd"]
 	path = lib/org-gtd
 	url = https://github.com/Trevoke/org-gtd.el
@@ -375,6 +366,9 @@
 [submodule "ox-hugo"]
 	path = lib/ox-hugo
 	url = https://github.com/kaushalmodi/ox-hugo
+[submodule "ox-ipynb"]
+	path = lib/ox-ipynb
+	url = git@github.com:jkitchin/ox-ipynb.git
 [submodule "ox-pandoc"]
 	path = lib/ox-pandoc
 	url = https://github.com/emacsorphanage/ox-pandoc
