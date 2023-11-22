@@ -3308,7 +3308,7 @@ I think this is what makes Org's tree-style structure more complete. A tree styl
 #+end_src
 
 ** LaTeX
-*** COMMENT Org-fragtog
+*** Org-fragtog
 [[https://github.com/io12/org-fragtog][Org-fragtog]] automatically toggle Org mode LaTeX fragment previews as the cursor enters and exits them
 
 Code under :config is taken from https://emacs-china.org/t/org-mode-latex-mode/22490

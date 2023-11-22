@@ -1,44 +1,44 @@
 [submodule "dash"]
-	no-byte-compile = dash-functional.el
-	no-makeinfo = dash-template.texi
+  no-byte-compile = dash-functional.el
+  no-makeinfo = dash-template.texi
 
 [submodule "emacsql"]
-      no-byte-compile = emacsql-pg.el
+no-byte-compile = emacsql-pg.el
 
 [submodule "sqlite3"]
-	build-step = make
+  build-step = make
 
 [submodule "vertico"]
-	load-path = .
-	load-path = extensions
+  load-path = .
+  load-path = extensions
 
 [submodule "magit"]
-	no-byte-compile = lisp/magit-libgit.el
+  no-byte-compile = lisp/magit-libgit.el
 
 [submodule "dirvish"]
-	load-path = .
-	load-path = extensions
+  load-path = .
+  load-path = extensions
 
 [submodule "lsp-bridge"]
   build-step = borg-update-autoloads
 
 [submodule "auctex"]
-	load-path = .
-	build-step = ./autogen.sh
-	build-step = ./configure --with-lispdir=~/.emacs.d/lib/auctex --with-texmf-dir=~/.emacs.d/lib/auctex/texmf
-	build-step = make
-	build-step = make doc
-	build-step = borg-maketexi
-	build-step = borg-makeinfo
-	build-step = borg-update-autoloads
+  load-path = .
+  build-step = ./autogen.sh
+  build-step = ./configure --with-lispdir=~/.emacs.d/lib/auctex --with-texmf-dir=~/.emacs.d/lib/auctex/texmf
+  build-step = make
+  build-step = make doc
+  build-step = borg-maketexi
+  build-step = borg-makeinfo
+  build-step = borg-update-autoloads
 
 [submodule "org"]
-	load-path = lisp
-	build-step = make autoloads
-	build-step = borg-update-autoloads
-	build-step = borg-compile
-	build-step = borg-maketexi
-	build-step = borg-makeinfo
+  load-path = lisp
+  build-step = make autoloads
+  build-step = borg-update-autoloads
+  build-step = borg-compile
+  build-step = borg-maketexi
+  build-step = borg-makeinfo
 
 [submodule "mu4e"]
   build-step = ./autogen.sh

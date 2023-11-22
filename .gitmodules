@@ -571,6 +571,3 @@
 [submodule "zoxide"]
 	path = lib/zoxide
 	url = https://gitlab.com/Vonfry/zoxide.el
-[submodule "org"]
-	path = lib/org
-	url = git@github.com:emacsmirror/org.git

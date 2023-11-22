@@ -42,6 +42,10 @@
 ;; Early Init:7 ends here
 
 ;; [[file:config.org::*Early Init][Early Init:8]]
+(setq pgtk-use-im-context-on-new-connection nil)
+;; Early Init:8 ends here
+
+;; [[file:config.org::*Early Init][Early Init:9]]
 (setq load-prefer-newer t)
 
 (let ((dir (file-name-directory (or load-file-name buffer-file-name))))
@@ -56,4 +60,4 @@
 
 (with-eval-after-load 'package
   (add-to-list 'package-archives (cons "melpa" "https://melpa.org/packages/") t))
-;; Early Init:8 ends here
+;; Early Init:9 ends here
