@@ -303,6 +303,9 @@
 [submodule "orderless"]
 	path = lib/orderless
 	url = https://github.com/oantolin/orderless
+[submodule "org"]
+	path = lib/org
+	url = https://git.tecosaur.net/tec/org-mode
 [submodule "org-agenda-property"]
 	path = lib/org-agenda-property
 	url = https://github.com/Malabarba/org-agenda-property
@@ -336,6 +339,9 @@
 [submodule "org-preview-html"]
 	path = lib/org-preview-html
 	url = https://github.com/jakebox/org-preview-html
+[submodule "org-ql"]
+	path = lib/org-ql
+	url = https://github.com/alphapapa/org-ql
 [submodule "org-roam"]
 	path = lib/org-roam
 	url = https://github.com/org-roam/org-roam

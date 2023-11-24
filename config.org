@@ -169,23 +169,30 @@ Disable fcitx5 on linux, because I use emacs-rime, an internal input method of e
 
 Below codes belongs to the original Borg seed.
 #+begin_src elisp :tangle early-init.el
-  (setq load-prefer-newer t)
+   (setq load-prefer-newer t)
 
-  (let ((dir (file-name-directory (or load-file-name buffer-file-name))))
-    (add-to-list 'load-path (expand-file-name "lib/compat" dir))
-    (add-to-list 'load-path (expand-file-name "lib/packed" dir))
-    (add-to-list 'load-path (expand-file-name "lib/auto-compile" dir)))
+   (let ((dir (file-name-directory (or load-file-name buffer-file-name))))
+     (add-to-list 'load-path (expand-file-name "lib/compat" dir))
+     (add-to-list 'load-path (expand-file-name "lib/packed" dir))
+     (add-to-list 'load-path (expand-file-name "lib/auto-compile" dir))
+     (add-to-list 'load-path (expand-file-name "lib/org" dir))
+     )
+
   (require 'auto-compile)
-  (auto-compile-on-load-mode)
-  (auto-compile-on-save-mode)
+   (auto-compile-on-load-mode)
+   (auto-compile-on-save-mode)
 
-  (setq package-enable-at-startup nil)
+   (setq package-enable-at-startup nil)
 
-  (with-eval-after-load 'package
-    (add-to-list 'package-archives (cons "melpa" "https://melpa.org/packages/") t))
+   (with-eval-after-load 'package
+     (add-to-list 'package-archives (cons "melpa" "https://melpa.org/packages/") t))
 #+end_src
 
 * Init
+:PROPERTIES:
+:header-args:elisp: :noweb-ref debug-init :tangle init.el
+:END:
+
 ** Begin of init
 *NOTE*: Starting from here, elisp codes are tangled to init.el
 
@@ -325,6 +332,10 @@ Calculate loading time of core units.
   (progn ;     startup
     (message "Loading core units...done (%fs)"
        (float-time (time-subtract (current-time) before-user-init-time))))
+#+end_src
+* Debug init
+#+begin_src elisp :tangle debug-init.el :noweb no-export
+  <<debug-init>>
 #+end_src
 * Libraries
 ** S
@@ -1178,13 +1189,16 @@ Beacon makes the cursor shine when scrolling window or jumping. Somewhat buggy.
   )
 #+end_src
 
-*** COMMENT Pulse-Cursor
+*** Pulse-Cursor
 Makes the cursor to blink with fade out animation.
 It's possible to take much ram when idle.
 #+begin_src elisp
   (use-package pulsing-cursor
   :config
-    (set-face-attribute 'pulsing-cursor-overlay-face1 nil :inherit cursor)
+    (setq pulse-delay 0.08
+          pulse-iterations 2)
+    (setq pulsing-cursor-blinks 20)
+    (set-face-attribute 'pulsing-cursor-overlay-face1 nil :inherit 'cursor)
     (pulsing-cursor-mode)
   )
 #+end_src
@@ -1384,13 +1398,13 @@ Emacs currently cannot display correpng or svg with alpha channels, when emacs's
         initial-buffer-choice (lambda () (get-buffer-create "*scratch*"))
         dashboard-startup-banner ;; use custom image as banner
         (concat user-emacs-directory "assets/EmaxBound.webp")
-        dashboard-items '(
-        (recents . 5)
-        (agenda . 5 )
-        (bookmarks . 3)
-        (projects . 3)
-        (registers . 3)
-        )
+        dashboard-items
+        '((recents . 5)
+          (agenda . 5 )
+          (bookmarks . 3)
+          (projects . 3)
+          (registers . 3)
+          )
     )
   :config
     (dashboard-setup-startup-hook)
@@ -1446,7 +1460,7 @@ Emacs currently cannot display correpng or svg with alpha channels, when emacs's
 
 *NOTE2:* [[All-the-icons]] hasn't been supported since 4.0.0. If prefer all-the-icons, use release 3.4.0, then run [[elisp:all-the-icons-install-fonts][M-x all-the-icons-install-fonts]] to install necessary icons.
 
-*** Nano-modline
+*** COMMENT Nano-modline
 #+begin_src elisp
   (use-package nano-modeline
   :defer t
@@ -1788,8 +1802,34 @@ See [[* Posframe][Posframe]] for function defintion.
 *** Embark
 #+begin_src elisp
   (use-package embark
-  :after consult
-  )
+    :bind
+    (("C-." . embark-act)         ;; pick some comfortable binding
+     ("C-;" . embark-dwim)        ;; good alternative: M-.
+     ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
+
+    :init
+
+    ;; Optionally replace the key help with a completing-read interface
+    (setq prefix-help-command #'embark-prefix-help-command)
+
+    ;; Show the Embark target at point via Eldoc.  You may adjust the Eldoc
+    ;; strategy, if you want to see the documentation from multiple providers.
+    (add-hook 'eldoc-documentation-functions #'embark-eldoc-first-target)
+    ;; (setq eldoc-documentation-strategy #'eldoc-documentation-compose-eagerly)
+
+    :config
+
+    ;; Hide the mode line of the Embark live/completions buffers
+    (add-to-list 'display-buffer-alist
+                 '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                   nil
+                   (window-parameters (mode-line-format . none)))))
+#+end_src
+
+#+begin_src elisp
+  (use-package embark-consult
+    :hook
+    (embark-collect-mode . consult-preview-at-point-mode))
 #+end_src
 ** Tabs
 **** COMMENT Tab-line-mode
@@ -2356,12 +2396,6 @@ Disabled because I use lazycat's method instead.
 *** LaTeX
 **** AUCTeX
 #+begin_src elisp
-  (use-package ox-latex
-  :defer t
-  :after ox
-  )
-#+end_src
-#+begin_src elisp
   (use-package auctex)
 #+end_src
 
@@ -2380,7 +2414,7 @@ To build auctex, =autoconf= should be avaliable on your system.
 #+end_src
 **** CDTeX
 #+begin_src elisp
-
+  (use-package cdlatex)
 #+end_src
 **** COMMENT LAAS
 
@@ -2419,7 +2453,7 @@ To build auctex, =autoconf= should be avaliable on your system.
 **** Jupyter
 #+begin_src elisp
   (use-package jupyter
-
+  :defer t
     )
 #+end_src
 *** Verilog
@@ -2734,7 +2768,7 @@ https://github.com/zerolfx/copilot.el
     (setq org-latex-preview-numbered t)
   :config
     (add-hook 'org-mode-hook #'olivetti-mode)
-    (add-hook 'org-mode-hook #'org-visual-indent-mode)
+    ;(add-hook 'org-mode-hook #'org-visual-indent-mode)
     (add-hook 'org-mode-hook #'turn-on-org-cdlatex)
   )
 #+end_src
@@ -2813,7 +2847,8 @@ Change the font size of different org-levels.
     (set-face-attribute 'org-meta-line nil
        :height 0.9)
     (set-face-attribute 'org-modern-horizontal-rule nil
-       :inherit 'org-meta-line)
+        :strike-through (face-foreground 'org-meta-line) :inherit 'org-hide)
+
     (setq org-modern-table nil)
     (global-org-modern-mode)
   )
@@ -2855,20 +2890,21 @@ Have drawbacks when using mixed-pitch-mode.
   )
 #+end_src
 
-[[https://github.com/legalnonsense/org-visual-outline][Org-visual-outline]] does the same as Org-bars-mode. It is split into two independent packages:
+[[https://github.com/legalnonsense/org-visual-outline][Org-visual-outline]] does the same as Org-bars-mode. It has two independent packages:
 - Org-dynamic-bullets :: handles the dynamic bullets. =Brokes highlight=.
 - Org-visual-indent  :: adds vertical lines to org-indent. =Does better than Org-bars-mode=, as it do not need to set bar's height.
 
 #+begin_src elisp
   (use-package org-visual-outline
-  :custom-face
-   (org-visual-indent-blank-pipe-face ((t
-         (:background "#1f2430" :foreground "#1f2430"
-      :height 0.1 :width extra-expanded))))
-   (org-visual-indent-pipe-face ((t
-         (:background "#454d6d" :foreground "#454d6d"
-      :height 0.1 :width extra-expanded))))
+  ;; :custom-face
+    ;;  (org-visual-indent-blank-pipe-face ((t
+    ;;        (:background "#1f2430" :foreground "#1f2430"
+    ;;     :height 0.1 :width extra-expanded))))
+    ;; (org-visual-indent-pipe-face ((t
+    ;;       (:background "#454d6d" :foreground "#454d6d"
+    ;;    :height 0.1 :width extra-expanded))))
   :hook (org-mode . org-visual-indent-mode)
+  :after org
   )
 #+end_src
 
@@ -2899,13 +2935,14 @@ This package provides visual alignment for Org Mode, Markdown and table.el table
     :hook (org-mode . org-appear-mode)
     :init
     (setq org-appear-autoemphasis  t
-          org-appear-autolinks t
+          ;; org-appear-autolinks t
           org-appear-autosubmarkers t
           org-appear-autoentities t
           org-appear-autokeywords t
-          ;org-appear-inside-latex t
+          ;; org-appear-inside-latex t
           org-hide-emphasis-markers t
     )
+
   )
 #+end_src
 ** Keybinds
@@ -2955,25 +2992,40 @@ This package provides visual alignment for Org Mode, Markdown and table.el table
 
   (defun my/outline-left ()
     (interactive)
-    (hide-subtree)
-    (outline-up-heading 1)
-    (hide-subtree)
-    (outline-show-children)
-    (outline-show-entry))
+    (cond ((outline-on-heading-p)
+           (hide-subtree)
+           (outline-up-heading 1)
+           (hide-subtree)
+           (outline-show-children)
+           (outline-show-entry))
+          (t
+           (outline-back-to-heading)
+           ))
+    )
 
   (defun my/outline-up ()
     (interactive)
-    (hide-subtree)
-    (outline-backward-same-level 1)
-    (outline-show-children)
-    (outline-show-entry))
+    (cond ((outline-on-heading-p)
+           (hide-subtree)
+           (outline-backward-same-level 1)
+           (outline-show-children)
+           (outline-show-entry)
+           )
+          (t
+           (org-previous-block 1)))
+  )
 
   (defun my/outline-down ()
     (interactive)
-    (hide-subtree)
-    (outline-forward-same-level 1)
-    (outline-show-children)
-    (outline-show-entry))
+    (cond ((outline-on-heading-p)
+           (hide-subtree)
+           (outline-forward-same-level 1)
+           (outline-show-children)
+           (outline-show-entry)
+           )
+          (t
+           (org-next-block 1)))
+    )
 
   (defun my/outline-right ()
     (interactive)
@@ -3029,10 +3081,95 @@ Or setting =org-auto-tangle-default= to t to configure auto-tangle as the defaul
 #+end_src
 *** Table-block
 [[https://github.com/casouri/valign][Valign]] provides visual alignment for Org Mode, Markdown and table.el tables on GUI Emacs. It can properly align tables containing variable-pitch font, CJK characters and images. Meanwhile, the text-based alignment generated by Org mode (or Markdown mode) is left untouched.
-Disabled cause org-modern already does the job.
 
 [[https://github.com/tbanel/orgaggregate][Orgtbl-aggregate]] can creat a new table by computing sums, averages, and so on, out of material from the first table.
+*** LaTeX
+Disable hiding of ~{}~, ~_~ and ~^~, from [[https://emacs-china.org/t/org/26045][this post in emacs china]].
+#+begin_src elisp
+  (use-package org
+  :config
+    (defconst org-match-substring-regexp
+      (concat
+       "\\(\\S-\\)\\([_^]\\)\\("
+       "\\(?:" (org-create-multibrace-regexp "{" "}" org-match-sexp-depth) "\\)"
+       "\\|"
+       "\\(?:" (org-create-multibrace-regexp "(" ")" org-match-sexp-depth) "\\)"
+       "\\|"
+       "\\(?:.\\)"
+       "\\|"
+       "\\(?:\\\\[[:alnum:].,\\]*[[:alnum:]]\\)"
+       "\\)")
+      "The regular expression matching a sub- or superscript.")
 
+    (defun +org-raise-scripts (limit)
+      "Add raise properties to sub/superscripts."
+      (when (and org-pretty-entities org-pretty-entities-include-sub-superscripts
+                 (re-search-forward org-match-substring-regexp limit t))
+        (let* ((pos (point)) table-p comment-p
+               (mpos (match-beginning 3))
+               (emph-p (get-text-property mpos 'org-emphasis))
+               (link-p (get-text-property mpos 'mouse-face))
+               (keyw-p (eq 'org-special-keyword (get-text-property mpos 'face)))
+               (tex-p (eq 'org-latex-and-related (get-text-property mpos 'face))))
+          (goto-char (line-beginning-position))
+          (setq table-p (looking-at-p org-table-dataline-regexp)
+                comment-p (looking-at-p "^[ \t]*#[ +]"))
+          (goto-char pos)
+          ;; Handle a_b^c
+          (when (member (char-after) '(?_ ?^)) (goto-char (1- pos)))
+          (if (not (or comment-p emph-p link-p keyw-p))
+              (put-text-property (match-beginning 3) (match-end 0)
+                                 'display
+                                 (if (equal (char-after (match-beginning 2)) ?^)
+                                     (nth (if table-p 3 1) org-script-display)
+                                   (nth (if table-p 2 0) org-script-display)))
+            (put-text-property (match-beginning 2) (match-end 3) 'org-emphasis t))
+          t)))
+
+    (advice-add #'org-raise-scripts :override #'+org-raise-scripts)
+  )
+#+end_src
+
+Org-entities-user
+#+begin_src elisp
+  (use-package org
+  :config
+    (setq org-entities-user
+          '(("vdash" "\\vdash" t "⊢" "⊢" "⊢" "⊢")
+            ("vDash" "\\vDash" t "⊨" "⊨" "⊨" "⊨")
+            ("Vdash" "\\Vdash" t "⊩" "⊩" "⊩" "⊩")
+            ("Vvdash" "\\Vvdash" t "⊪" "⊪" "⊪" "⊪")
+            ("nvdash" "\\nvdash" t "⊬" "⊬" "⊬" "⊬")
+            ("nvDash" "\\nvDash" t "⊭" "⊭" "⊭" "⊭")
+            ("nVdash" "\\nVdash" t "⊮" "⊮" "⊮" "⊮")
+            ("nVDash" "\\nVDash" t "⊯" "⊯" "⊯" "⊯")
+            ("subseteq" "\\subseteq" t "⊆" "⊆" "⊆" "⊆")
+            ("supseteq" "\\supseteq" t "⊇" "⊇" "⊇" "⊇")
+            ("subsetneq" "\\subsetneq" t "⊊" "⊊" "⊊" "⊊")
+            ("supsetneq" "\\supsetneq" t "⊋" "⊋" "⊋" "⊋")
+            ("nsubseteq" "\\nsubseteq" t "⊈" "⊈" "⊈" "⊈")
+            ("nsupseteq" "\\nsupseteq" t "⊉" "⊉" "⊉" "⊉")
+            ("nsubseteqq" "\\nsubseteqq" t "⊈" "⊈" "⊈" "⊈")
+            ("nsupseteqq" "\\nsupseteqq" t "⊉" "⊉" "⊉" "⊉")
+            ("subsetneqq" "\\subsetneqq" t "⊊" "⊊" "⊊" "⊊")
+            ("supsetneqq" "\\supsetneqq" t "⊋" "⊋" "⊋" "⊋")
+            ("nsubset" "\\nsubset" t "⊄" "⊄" "⊄" "⊄")
+            ("nsupset" "\\nsupset" t "⊅" "⊅" "⊅" "⊅")
+            ("nsubseteq" "\\nsubseteq" t "⊈" "⊈" "⊈" "⊈")
+            ("nsupseteq" "\\nsupseteq" t "⊉" "⊉" "⊉" "⊉")))
+    )
+
+#+end_src
+
+Org Latex Preview configs. This makes the preview looks nicer.
+#+begin_src elisp
+  (use-package org
+  :init
+    (setq org-latex-preview-numbered t)
+    (plist-put org-latex-preview-options :zoom 1.25)
+    (let ((pos (assoc 'dvisvgm org-latex-preview-process-alist)))
+      (plist-put (cdr pos) :image-converter '("dvisvgm --page=1- --optimize --clipjoin --relative --no-fonts --bbox=preview -o %B-%%9p.svg %f"))))
+#+end_src
 ** Images
 *** Org-download
 #+begin_src elisp
@@ -3098,10 +3235,35 @@ Disabled cause org-modern already does the job.
   )
 #+end_src
 
-** Backlinks
+** Links
 What is a backlink? If there's a link at A pointing to B, and in the same time if there's also a link at B pointing to A, then the link at B can be called the backlink of the link at A.
 
 I'm using two plugins that handles backlink. =Org-super-links= handles inserting backlinks in current buffer. =Org-roam= inserts links and backlinks between different org files.
+
+*** Custom-ID
+#+begin_src elisp
+  (use-package org
+  :config
+    (defun org-add-custom-id ()
+      "Add CUSTOM_ID property to current heading, skip if already have"
+      (interactive)
+      (let ((custom-id (org-entry-get nil "CUSTOM_ID")))
+        (unless custom-id
+          (org-set-property "CUSTOM_ID" (org-id-new))))
+      )
+
+    (defun org-add-custom-id-to-all-headings ()
+      "Add CUSTOM_ID properties to headings without a CUSTOM_ID property in current Org buffer."
+      (interactive)
+      (org-map-entries
+       (lambda ()
+         (let ((custom-id (org-entry-get nil "CUSTOM_ID")))
+           (unless custom-id
+             (org-set-property "CUSTOM_ID" (org-id-new)))))
+       nil 'file)
+      )
+  )
+#+end_src
 *** Org-super-links
 Org super links handles backlink inside the current file. When inserting link to a target using ~org-super-links-link~, it automatically inserts a backlink at the target.
 
@@ -3110,11 +3272,19 @@ I think this is what makes Org's tree-style structure more complete. A tree styl
 #+begin_src elisp
   (use-package org-super-links
   :after org
-  :bind (("C-c s s" . org-super-links-link)
-         ("C-c s l" . org-super-links-store-link)
-         ("C-c s C-l" . org-super-links-insert-link))
   :config
-      (setq org-super-links-search-function 'consult-outline)
+
+    (defun my/org-insert-backlink ()
+      "insert backlink using consult-org-heading in current org file"
+      (interactive)
+      (let ((target-position
+             (save-excursion (consult-org-heading) (point) )))
+        (org-super-links--insert-link
+         (set-marker (make-marker) target-position)))
+      (recenter)
+      )
+    (setq org-super-links-search-function 'my/org-insert-backlink)
+    (setq org-super-links-backlink-prefix nil)
   )
 #+end_src
 
@@ -3307,8 +3477,8 @@ I think this is what makes Org's tree-style structure more complete. A tree styl
    ("C-c d f" . org-gtd-clarify-finalize)))
 #+end_src
 
-** LaTeX
-*** Org-fragtog
+** COMMENT LaTeX
+*** COMMENT Org-fragtog
 [[https://github.com/io12/org-fragtog][Org-fragtog]] automatically toggle Org mode LaTeX fragment previews as the cursor enters and exits them
 
 Code under :config is taken from https://emacs-china.org/t/org-mode-latex-mode/22490
@@ -3403,13 +3573,6 @@ Code under :config is taken from https://emacs-china.org/t/org-mode-latex-mode/2
   )
 #+end_src
 
-*** grip-mode
-#+begin_src elisp
-  (use-package grip-mode
-  :after org
-  )
-#+end_src
-
 ** Export
 *** Ox
 #+begin_src elisp
@@ -3453,6 +3616,13 @@ Code under :config is taken from https://emacs-china.org/t/org-mode-latex-mode/2
     (setq htmlize-pre-style t
             htmlize-output-type 'inline-css))
 #+end_src
+**** grip-mode
+#+begin_src elisp
+  (use-package grip-mode
+  :after org
+  )
+#+end_src
+
 *** PDF
 There're 3 common ways to export org into PDF.
 - ox-html, then export to pdf via browser.
@@ -3507,7 +3677,9 @@ There're 3 common ways to export org into PDF.
 #+end_src
 *** Ipynb
 #+begin_src elisp
-  (use-package ox-ipynb)
+  (use-package ox-ipynb
+  :after ox
+    )
 #+end_src
 *** Slides
 Use [[revealjs.com][reveal.js]] to generate beautiful presentations.
