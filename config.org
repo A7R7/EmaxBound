@@ -38,6 +38,7 @@
 :PROPERTIES:
 :CUSTOM_ID: f3aacf74-1f96-4b4f-932c-60805a632437
 :END:
+
 ** How to deploy this config
 :PROPERTIES:
 :CUSTOM_ID: 5e6cc345-e6c5-4652-9041-7ba1d6eb58b8
@@ -126,10 +127,13 @@ min (last time the config get's updated, last time I refered to the config)
 :header-args:elisp: :tangle early-init.el :language elisp :comments link
 :CUSTOM_ID: b343e4f2-36db-4558-8e69-3bb52bcb5190
 :END:
+:BACKLINKS:
+[[*Transparency][Transparency]]
+:END:
 
 *NOTE*: elisp codes under this headline are tangled to early-init.el.
 
-Emacs load early-init.el before init.el.
+Emacs load early-init.el before the initalization of GUI, which is before init.el.
 
 Enable lexical-binding. Disable byte-compile for early-init.el.
 
@@ -152,7 +156,7 @@ Prevent unwanted runtime compilation for native-comp.
 #+end_src
 
 Disable tool-bar, menu-bar and scroll-bar before they're loaded.
-#+begin_src elisp :tangle early-init.el
+#+begin_src elisp
   (push '(menu-bar-lines . 0) default-frame-alist)
   (push '(tool-bar-lines . 0) default-frame-alist)
   (push '(vertical-scroll-bars) default-frame-alist)
@@ -184,30 +188,30 @@ Make emacs startup with background Transparency.
   (add-to-list 'default-frame-alist '(alpha-background . 96))
 #+end_src
 
-Disable fcitx5 on linux, because I use emacs-rime, an internal input method of emacs.
+Disable fcitx5 on linux, because I use emacs rime, an internal input method of emacs, which is setuped [[#c418f945-d240-4dcb-bd38-c656bb9253b8][here]],
 #+begin_src elisp
   (setq pgtk-use-im-context-on-new-connection nil)
 #+end_src
 
 Below codes belongs to the original Borg seed.
-#+begin_src elisp :tangle early-init.el
-   (setq load-prefer-newer t)
+#+begin_src elisp
+  (setq load-prefer-newer t)
 
-   (let ((dir (file-name-directory (or load-file-name buffer-file-name))))
-     (add-to-list 'load-path (expand-file-name "lib/compat" dir))
-     (add-to-list 'load-path (expand-file-name "lib/packed" dir))
-     (add-to-list 'load-path (expand-file-name "lib/auto-compile" dir))
-     (add-to-list 'load-path (expand-file-name "lib/org" dir))
-     )
+  (let ((dir (file-name-directory (or load-file-name buffer-file-name))))
+    (add-to-list 'load-path (expand-file-name "lib/compat" dir))
+    (add-to-list 'load-path (expand-file-name "lib/packed" dir))
+    (add-to-list 'load-path (expand-file-name "lib/auto-compile" dir))
+    (add-to-list 'load-path (expand-file-name "lib/org" dir))
+    )
 
   (require 'auto-compile)
-   (auto-compile-on-load-mode)
-   (auto-compile-on-save-mode)
+  (auto-compile-on-load-mode)
+  (auto-compile-on-save-mode)
 
-   (setq package-enable-at-startup nil)
+  (setq package-enable-at-startup nil)
 
-   (with-eval-after-load 'package
-     (add-to-list 'package-archives (cons "melpa" "https://melpa.org/packages/") t))
+  (with-eval-after-load 'package
+    (add-to-list 'package-archives (cons "melpa" "https://melpa.org/packages/") t))
 #+end_src
 
 * Init
@@ -216,11 +220,12 @@ Below codes belongs to the original Borg seed.
 :CUSTOM_ID: fb6f20e1-1c32-44ef-ae11-1e78e6ae3cef
 :END:
 
+*NOTE*: Starting from here, elisp codes are tangled to init.el
+
 ** Begin of init
 :PROPERTIES:
 :CUSTOM_ID: 34e4f990-1bd5-45a7-a3f9-8b7ea719c0d6
 :END:
-*NOTE*: Starting from here, elisp codes are tangled to init.el
 
 After loading early-init.el, emacs begin to load init.el.
 
@@ -243,6 +248,7 @@ Calculating time used loading emacs excutable, as well as setting some variables
     (message "Loading %s..." user-init-file)
   )
 #+end_src
+
 Set some defaults of emacs
 #+begin_src elisp
   (progn
@@ -270,10 +276,14 @@ Set some defaults of emacs
 :PROPERTIES:
 :CUSTOM_ID: c420faba-8328-4d7d-a379-c22f29d828d6
 :END:
-[[https://github.com/emacscollective/borg][Borg]] assimilate Emacs packages as Git submodules. Core of the core units.
-=borg-initialize= should be called in init.el for borg to initialize assimilated drones using =borg-activate=.
-To skip the activation of the drone named DRONE, temporarily disable it by setting the value of the Git variable submodule.DRONE.disabled to true in ~/.config/emacs/.gitmodules.
+[[https://github.com/emacscollective/borg][Borg]] is the package manager that I use for my configuration. It assimilate Emacs packages as git submodules, which are called "=drones=" in borg's specific.
 
+Borg clones all drones into ~borg-drones-directory~ (by default ~user-emacs-directory/lib~).
+The drones are not added to the load path until ~borg-initialize~ is called. In a nut shell ~borg-initialize~ is a loop of ~borg-activate~ on all assimilated (and not disabled) drones, which adds the drone to the load path and eval its autoloads.
+
+Here we add ~lib/borg~ to the load-path before borg is loaded, and then call ~borg-initialize~ to add all packages to the load path and eval their autoloads.
+
+And then we switch to the message buffer in an attempt to make the loading process not that boring.
 #+begin_src elisp
   (use-package borg
   :init
@@ -285,7 +295,106 @@ To skip the activation of the drone named DRONE, temporarily disable it by setti
   )
 #+end_src
 
-** Dash
+** Auto-Compile
+:PROPERTIES:
+:CUSTOM_ID: 7ae05ee5-af80-48d3-90d3-ce206daee4da
+:END:
+[[https://github.com/emacscollective/auto-compile][Auto-Compile]] automatically compile Emacs Lisp libraries.
+But comp warnings are always boring. Suppress comp warnings.
+#+begin_src elisp
+  (use-package auto-compile
+  :config
+    (setq auto-compile-display-buffer             nil
+          auto-compile-mode-line-counter            t
+          auto-compile-source-recreate-deletes-dest t
+          auto-compile-toggle-deletes-nonlib-dest   t
+          auto-compile-update-autoloads             t
+          warning-suppress-log-types        '((comp))
+    )
+  )
+#+end_src
+
+** Epkg
+:PROPERTIES:
+:CUSTOM_ID: c2d5ac28-75b7-4914-956a-ddd1d003585a
+:END:
+[[https://github.com/emacscollective/epkg][Epkg]] allows you browse the Emacsmirror package database. It also provides a command ~epkg-describe-package~ that looks nicer than the built-in describe-package.
+#+begin_src elisp
+  (use-package epkg
+  :defer t
+  :bind
+    ([remap describe-package] . epkg-describe-package)
+  :init
+    (setq epkg-repository
+          (expand-file-name "var/epkgs/" user-emacs-directory))
+    (setq epkg-database-connector 'sqlite-builtin ) ; requires emacs >=29
+  )
+#+end_src
+** Custom
+:PROPERTIES:
+:CUSTOM_ID: 2d77e7c8-32a4-44bc-b48c-cac9e26e60cb
+:END:
+[[https://www.emacswiki.org/emacs/CustomizingAndSaving#Customize][Custom]] is a built-in package, provides the customize system of emacs.
+We set the custom-file to custom.el and then load it.
+
+It's not a good idea to put too many customizations in the custom file, especially for a =declarative configuration=. If one wants to make something permanent, he should write them down in the user configuration file (like here).
+
+On the other hand, some unimportant customizations that change over time based on user's likes are better suited to be placed in the custom file, a good example is the =theme=.
+#+begin_src elisp
+  (use-package custom
+  :no-require t
+  :config
+    (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+    (setf custom-safe-themes t) ;Treat all themes as safe
+    (when (file-exists-p custom-file)
+      (load custom-file))
+  )
+#+end_src
+
+** Server
+:PROPERTIES:
+:CUSTOM_ID: fa0a264a-cc5d-476f-9ce5-44c0002dbec1
+:END:
+Server allows Emacs to operate as a server for other processes. Built in.
+#+begin_src elisp
+  (use-package server
+  :commands (server-running-p)
+  :config (or (server-running-p) (server-mode)))
+#+end_src
+** GCMH
+:PROPERTIES:
+:CUSTOM_ID: 3aeaad54-3694-4ad4-a887-ac1d06ccc9c4
+:END:
+:BACKLINKS:
+[[#bdf3a8f0-d259-491b-99cd-16e72cc3f605][Pulse-Cursor]]
+:END:
+
+The [[https://github.com/emacsmirror/gcmh][Garbage Collector Magic Hack]] enforce a sneaky Garbage Collection strategy to minimize GC interference with user activity.
+#+begin_src elisp
+  (use-package gcmh
+  :init
+    (setq gcmh-high-cons-threshold 536870912) ;; 512mb
+  :config
+    (gcmh-mode 1)
+    )
+#+end_src
+
+** Libraries
+:PROPERTIES:
+:CUSTOM_ID: 47db424a-224f-4ff7-b29d-86ff149fbda6
+:END:
+*** S
+:PROPERTIES:
+:CUSTOM_ID: 9ee8fcaa-3b39-496a-afc3-c295eda309c4
+:END:
+[[https://github.com/magnars/s.el][S]] is the long lost Emacs string manipulation library.
+
+*** F
+:PROPERTIES:
+:CUSTOM_ID: c47d9db7-47e0-4b53-ad56-971574886bbc
+:END:
+[[https://github.com/rejeep/f.el][F]] is a modern API for working with files and directories in Emacs.
+*** Dash
 :PROPERTIES:
 :CUSTOM_ID: d34df8ba-bb6d-410e-bc33-2425d668b24d
 :END:
@@ -304,75 +413,317 @@ Dash needs some tweaks to be built
   no-makeinfo = dash-template.texi
 #+end_src
 
-** EIEIO
+*** EIEIO
 :PROPERTIES:
 :CUSTOM_ID: 154d69e1-e292-4fe3-9650-a420f37aceac
 :END:
-[[https://www.gnu.org/software/emacs][EIEIO]] is a series of Lisp routines which implements a subset of CLOS, the Common Lisp Object System. In addition, EIEIO also adds a few new features which help it integrate more strongly with the Emacs running environment.
+[[https://www.gnu.org/software/emacs][EIEIO]] is a series of Lisp routines which implements a subset of =CLOS, the Common Lisp Object System=. In addition, EIEIO also adds a few new features which help it integrate more strongly with the Emacs running environment.
 #+begin_src elisp
   (use-package eieio)
 #+end_src
 
-** Auto-Compile
+*** Annalist
 :PROPERTIES:
-:CUSTOM_ID: 7ae05ee5-af80-48d3-90d3-ce206daee4da
+:CUSTOM_ID: 864c3d87-4e35-41e5-8b5a-15a200164207
 :END:
-[[https://github.com/emacscollective/auto-compile][Auto-Compile]] automatically compile Emacs Lisp libraries
-   Suppress comp warnings.
+[[https://github.com/noctuid/annalist.el][annalist.el]] is a library that can be used to record information and later print that information using org-mode headings and tables. It allows defining different types of things that can be recorded (e.g. keybindings, settings, hooks, and advice) and supports custom filtering, sorting, and formatting. annalist is primarily intended for use in other packages like general and evil-collection, but it can also be used directly in a user’s configuration.
+
+*** Shrink path
+:PROPERTIES:
+:CUSTOM_ID: 03bb7e45-a788-4a19-8296-4dc5b5aa3e35
+:END:
+[[https://github.com/zbelial/shrink-path.el][Shrink path]] is a small utility functions that allow for fish-style trunctated directories in eshell and for example modeline.
 #+begin_src elisp
-  (use-package auto-compile
+  (use-package shrink-path :demand t)
+#+end_src
+
+*** Sqlite3
+:PROPERTIES:
+:CUSTOM_ID: b312e319-00e3-4c04-a855-8d6b8c71e9ba
+:END:
+#+begin_src conf
+[submodule "sqlite3"]
+  build-step = make
+#+end_src
+
+*** Emacsql
+:PROPERTIES:
+:CUSTOM_ID: 16777f9e-a96f-467a-ba65-f86746e23d45
+:END:
+tweaks to buiild emacsql
+#+begin_src conf
+  [submodule "emacsql"]
+  no-byte-compile = emacsql-pg.el
+#+end_src
+
+*** Emacs Async
+:PROPERTIES:
+:CUSTOM_ID: e73c946b-a803-44e9-89a0-8c4a421edd14
+:END:
+** Builtins
+:PROPERTIES:
+:CUSTOM_ID: 3811cabb-2894-4b06-9234-42e26b54d24a
+:END:
+*** DIff mode
+:PROPERTIES:
+:CUSTOM_ID: 7742d6fb-5f74-40ac-9dc6-24df18e3a8e2
+:END:
+#+begin_src elisp
+  (use-package diff-mode
+    :defer t
     :config
-    (setq auto-compile-display-buffer             nil
-            auto-compile-mode-line-counter            t
-            auto-compile-source-recreate-deletes-dest t
-            auto-compile-toggle-deletes-nonlib-dest   t
-            auto-compile-update-autoloads             t
-            warning-suppress-log-types        '((comp))
-    )
+    (when (>= emacs-major-version 27)
+      (set-face-attribute 'diff-refine-changed nil :extend t)
+      (set-face-attribute 'diff-refine-removed nil :extend t)
+      (set-face-attribute 'diff-refine-added   nil :extend t)))
+#+end_src
+*** Dired
+:PROPERTIES:
+:CUSTOM_ID: 48d4fd1d-c1f0-410d-96d1-d5221c8bcaeb
+:END:
+#+begin_src elisp
+  (use-package dired
+    :defer t
+    :config (setq dired-listing-switches "-alh"))
+#+end_src
+
+*** ELdoc
+:PROPERTIES:
+:CUSTOM_ID: 40fc2f2b-5d78-4eea-bbe6-10239d6b1c0e
+:END:
+a MinorMode which shows you, in the echo area, the argument list of the function call you are currently writing.
+#+begin_src elisp
+  (use-package eldoc
+    :when (version< "25" emacs-version)
+    :config (global-eldoc-mode))
+#+end_src
+*** Help
+:PROPERTIES:
+:CUSTOM_ID: d3472f01-1cdc-47b4-8505-7dda94ee4864
+:END:
+#+begin_src elisp
+  (use-package help
+    :defer t
+    :config (temp-buffer-resize-mode))
+#+end_src
+*** Helpful
+:PROPERTIES:
+:CUSTOM_ID: 14bddefb-9db5-485e-91d6-d47ed73b6775
+:END:
+
+[[https://github.com/Wilfred/helpful][Helpful]] adds a lot of very helpful information to Emacs' =describe-= command buffers.
+For example, if you use =describe-function=, you will not only get the documentation about the function,
+you will also see the source code of the function and where it gets used in other places in the Emacs configuration.
+It is very useful for figuring out how things work in Emacs.
+
+It's not a built in package. I put it here simply because it's near help.
+#+begin_src elisp
+  (use-package helpful
+  :bind
+     ([remap describe-key]      . helpful-key)
+     ([remap describe-command]  . helpful-command)
+     ([remap describe-variable] . helpful-variable)
+     ([remap describe-function] . helpful-callable)
+     ("C-h F" . describe-face)
+     ("C-h K" . describe-keymap)
   )
 #+end_src
-
-** Epkg
+*** Info+
 :PROPERTIES:
-:CUSTOM_ID: c2d5ac28-75b7-4914-956a-ddd1d003585a
+:CUSTOM_ID: af99c97f-1ac8-4ab2-b322-ae66c78cc960
 :END:
-[[https://github.com/emacscollective/epkg][Epkg]] allows you browse the Emacsmirror package database. We're using emacs >= 29 which has builtin support for sqlite, so we let epkg-database-connector to use builtin sqlite.
 #+begin_src elisp
-  (use-package epkg
-    :defer t
-    :bind
-       ([remap describe-package] . epkg-describe-package)
-    :init
-    (setq epkg-repository
-    (expand-file-name "var/epkgs/" user-emacs-directory))
-    (setq epkg-database-connector 'sqlite-builtin ))
+  (use-package info+
+  :defer t
+  :config
+  )
 #+end_src
-** Custom
-:PROPERTIES:
-:CUSTOM_ID: 2d77e7c8-32a4-44bc-b48c-cac9e26e60cb
-:END:
-[[https://www.emacswiki.org/emacs/CustomizingAndSaving#Customize][Custom]] is a built-in package, the customize system of emacs. Set the file path used for storing customization information here.
 #+begin_src elisp
-  (use-package custom
-    :no-require t
+  (use-package info-colors
+  :config
+    (add-hook 'Info-selection-hook 'info-colors-fontify-node)
+    (add-hook 'Info-mode-hook 'olivetti-mode)
+    (add-hook 'Info-mode-hook 'mixed-pitch-mode)
+  )
+#+end_src
+*** Isearch
+:PROPERTIES:
+:CUSTOM_ID: 95631f66-29f3-46aa-9088-d18bf0b925d8
+:END:
+#+begin_src elisp
+  (progn ;    `isearch'
+    (setq isearch-allow-scroll t))
+#+end_src
+*** Lisp-mode
+:PROPERTIES:
+:CUSTOM_ID: 499297a3-67cd-46ab-bda6-2587b64c4cc0
+:END:
+#+begin_src elisp
+  (use-package lisp-mode
     :config
-    (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-    (setf custom-safe-themes t) ;Treat all themes as safe
-    (when (file-exists-p custom-file)
-      (load custom-file)))
+    (add-hook 'emacs-lisp-mode-hook 'outline-minor-mode)
+    (add-hook 'emacs-lisp-mode-hook 'reveal-mode)
+    (defun indent-spaces-mode ()
+      (setq indent-tabs-mode nil))
+    (add-hook 'lisp-interaction-mode-hook 'indent-spaces-mode))
 #+end_src
-
-** Server
+*** Man
 :PROPERTIES:
-:CUSTOM_ID: fa0a264a-cc5d-476f-9ce5-44c0002dbec1
+:CUSTOM_ID: 5e9fb076-8f0f-496a-8860-bce104072a19
 :END:
-Server allows Emacs to operate as a server for other processes. Built in.
 #+begin_src elisp
-  (use-package server
-    :commands (server-running-p)
-    :config (or (server-running-p) (server-mode)))
+  (use-package man
+    :defer t
+    :config (setq Man-width 80))
 #+end_src
 
+*** Prog-mode
+:PROPERTIES:
+:CUSTOM_ID: 26d1c604-e1c0-42d0-8e07-539614dfd757
+:END:
+#+begin_src elisp
+  (use-package prog-mode
+    :config (global-prettify-symbols-mode)
+    (defun indicate-buffer-boundaries-left ()
+      (setq indicate-buffer-boundaries 'left))
+    (add-hook 'prog-mode-hook 'indicate-buffer-boundaries-left))
+#+end_src
+*** Recentf
+:PROPERTIES:
+:CUSTOM_ID: 723104c7-10be-4782-84fd-451b8bf0e4bf
+:END:
+#+begin_src elisp
+  (use-package recentf
+    :demand t
+    :config (add-to-list 'recentf-exclude "^/\\(?:ssh\\|su\\|sudo\\)?x?:"))
+#+end_src
+*** Savehist
+:PROPERTIES:
+:CUSTOM_ID: 202d5f4c-fca3-4a81-87c5-390798ca293e
+:END:
+#+begin_src elisp
+  ;; Persist history over Emacs restarts. Vertico sorts by history position.
+    (use-package savehist
+        :init
+        (savehist-mode))
+#+end_src
+*** Saveplace
+:PROPERTIES:
+:CUSTOM_ID: 5113ee1e-df60-4452-a21e-6386cc6913ca
+:END:
+#+begin_src elisp
+  ;; A few more useful configurations...
+    (use-package emacs
+        :init
+        ;; Add prompt indicator to `completing-read-multiple'.
+        ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
+        (defun crm-indicator (args)
+        (cons (format "[CRM%s] %s"
+            (replace-regexp-in-string
+            "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+            crm-separator)
+            (car args))
+          (cdr args)))
+        (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+
+        ;; Do not allow the cursor in the minibuffer prompt
+        (setq minibuffer-prompt-properties
+      '(read-only t cursor-intangible t face minibuffer-prompt))
+        (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
+        ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
+        ;; Vertico commands are hidden in normal buffers.
+        ;; (setq read-extended-command-predicate
+        ;;       #'command-completion-default-include-p)
+        ;; Enable recursive minibuffers
+        (setq enable-recursive-minibuffers t))
+#+end_src
+*** Simple
+:PROPERTIES:
+:CUSTOM_ID: 4e860888-be36-4c64-b8f3-be05dc030d31
+:END:
+#+begin_src elisp
+  (use-package simple
+    :config (column-number-mode))
+#+end_src
+*** Smerge
+:PROPERTIES:
+:CUSTOM_ID: 57fe9b41-0e6f-443a-a0b3-742f0c005543
+:END:
+#+begin_src elisp
+  (use-package smerge-mode
+    :defer t
+    :config
+    (when (>= emacs-major-version 27)
+      (set-face-attribute 'smerge-refined-removed nil :extend t)
+      (set-face-attribute 'smerge-refined-added   nil :extend t)))
+#+end_src
+*** Text
+:PROPERTIES:
+:CUSTOM_ID: 950b2287-ffed-4baa-a3e1-fb47798612c2
+:END:
+#+begin_src elisp
+  (progn ;    `text-mode'
+    (add-hook 'text-mode-hook 'indicate-buffer-boundaries-left))
+#+end_src
+*** Tramp
+:PROPERTIES:
+:CUSTOM_ID: 07612efe-a2a9-4164-90e5-164f00637886
+:END:
+#+begin_src elisp
+  (use-package tramp
+    :defer t
+    :config
+    (add-to-list 'tramp-default-proxies-alist '(nil "\\`root\\'" "/ssh:%h:"))
+    (add-to-list 'tramp-default-proxies-alist '("localhost" nil nil))
+    (add-to-list 'tramp-default-proxies-alist
+           (list (regexp-quote (system-name)) nil nil))
+    (setq vc-ignore-dir-regexp
+    (format "\\(%s\\)\\|\\(%s\\)"
+      vc-ignore-dir-regexp
+      tramp-file-name-regexp)))
+#+end_src
+*** Tramp-sh
+:PROPERTIES:
+:CUSTOM_ID: 00d16929-6ff7-4edd-a6ad-24f9b225ee96
+:END:
+#+begin_src elisp
+  (use-package tramp-sh
+    :defer t
+    :config (cl-pushnew 'tramp-own-remote-path tramp-remote-path))
+#+end_src
+
+*** Pixel-scroll
+:PROPERTIES:
+:CUSTOM_ID: b783d068-76ae-483c-8eee-5adcedc2cc94
+:END:
+#+begin_src elisp
+  (use-package pixel-scroll
+  :config
+    (setq scroll-conservatively 97)
+    (setq scroll-preserve-screen-position 1)
+    (setq mouse-wheel-progressive-speed nil)
+    ;; The following piece of code is stolen from
+    ;; https://emacs-china.org/t/topic/25114/5
+    (pixel-scroll-precision-mode 1)
+    (setq pixel-scroll-precision-interpolate-page t)
+    (defun +pixel-scroll-interpolate-down (&optional lines)
+        (interactive)
+        (if lines
+            (pixel-scroll-precision-interpolate (* -1 lines (pixel-line-height)))
+        (pixel-scroll-interpolate-down)))
+
+    (defun +pixel-scroll-interpolate-up (&optional lines)
+        (interactive)
+        (if lines
+            (pixel-scroll-precision-interpolate (* lines
+            (pixel-line-height))))
+        (pixel-scroll-interpolate-up))
+
+    (defalias 'scroll-up-command '+pixel-scroll-interpolate-down)
+    (defalias 'scroll-down-command '+pixel-scroll-interpolate-up)
+  )
+#+end_src
 ** End of core units
 :PROPERTIES:
 :CUSTOM_ID: a95c065e-97dd-4229-aa32-ed64ead673c4
@@ -390,315 +741,22 @@ Calculate loading time of core units.
 #+begin_src elisp :tangle debug-init.el :noweb no-export
   <<debug-init>>
 #+end_src
-* Libraries
-:PROPERTIES:
-:CUSTOM_ID: 47db424a-224f-4ff7-b29d-86ff149fbda6
-:END:
-** S
-:PROPERTIES:
-:CUSTOM_ID: 9ee8fcaa-3b39-496a-afc3-c295eda309c4
-:END:
-[[https://github.com/magnars/s.el][S]] is the long lost Emacs string manipulation library.
-
-** F
-:PROPERTIES:
-:CUSTOM_ID: c47d9db7-47e0-4b53-ad56-971574886bbc
-:END:
-[[https://github.com/rejeep/f.el][F]] is a modern API for working with files and directories in Emacs.
-
-** Annalist
-:PROPERTIES:
-:CUSTOM_ID: 864c3d87-4e35-41e5-8b5a-15a200164207
-:END:
-[[https://github.com/noctuid/annalist.el][annalist.el]] is a library that can be used to record information and later print that information using org-mode headings and tables. It allows defining different types of things that can be recorded (e.g. keybindings, settings, hooks, and advice) and supports custom filtering, sorting, and formatting. annalist is primarily intended for use in other packages like general and evil-collection, but it can also be used directly in a user’s configuration.
-
-** Shrink path
-:PROPERTIES:
-:CUSTOM_ID: 03bb7e45-a788-4a19-8296-4dc5b5aa3e35
-:END:
-[[https://github.com/zbelial/shrink-path.el][Shrink path]] is a small utility functions that allow for fish-style trunctated directories in eshell and for example modeline.
-#+begin_src elisp
-  (use-package shrink-path :demand t)
-#+end_src
-
-** Emacsql
-:PROPERTIES:
-:CUSTOM_ID: 16777f9e-a96f-467a-ba65-f86746e23d45
-:END:
-tweaks to buiild emacsql
-#+begin_src conf
-  [submodule "emacsql"]
-  no-byte-compile = emacsql-pg.el
-#+end_src
-
-** Sqlite3
-:PROPERTIES:
-:CUSTOM_ID: b312e319-00e3-4c04-a855-8d6b8c71e9ba
-:END:
-#+begin_src conf
-[submodule "sqlite3"]
-  build-step = make
-#+end_src
-
-* Keybinds & Input
+* Keybindings
 :PROPERTIES:
 :CUSTOM_ID: 793ddb0b-2cad-49d0-8b2f-3886744f748a
+:TOC: headlines 1
 :END:
 
-We setup keybinding framworks and basic keybindings at this place. Note that not all keybindings are set here. Some package specific keybinding configs are set under where the package is configured.
+An overview of this outline:
++ General :: Setup the ~general.el~ keybinding framework. Define global keybindings.
++ Local Keybindings :: Gather links of headlines that defines local keybindings.
++ Meow :: Setup the ~Meow-edit~, yet another modal editing framework.
++ Which-key :: Setup ~Which-key~,
++ Rime :: Setup ~Rime~, an internal input method of emacs.
+We setup keybinding framworks and global keybindings under this subtree.
+Mode/package specific keybinding configs are defined under where the package is configured.
 
-** COMMENT Evil
-:PROPERTIES:
-:CUSTOM_ID: bd479272-28ec-4552-bd41-9178ae7af148
-:END:
-I guess evil surround and evil nerd commentor should be better to put under Coding.
-I do not use evil mode anymore because of Meow Edit.
-*** Evil mode
-:PROPERTIES:
-:CUSTOM_ID: 9e2741ae-3fba-4db2-afc2-1100a454a70b
-:END:
-[[https://github.com/emacs-evil/evil][Evil mode]] that turns you into an evil.
-
-#+begin_src elisp
-  (use-package evil
-    :disabled
-    :init
-      (setq evil-want-integration t) ;; t by default
-      (setq evil-want-keybinding nil)
-      (setq evil-vsplit-window-right t)
-      (setq evil-split-window-below t)
-      (setq evil-want-C-u-scroll t)
-
-    :config
-      (evil-mode 1)
-     ;; Use visual line motions even outside of visual-line-mode buffers
-      (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-      (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
-      (evil-set-initial-state 'messages-buffer-mode 'normal)
-      (evil-set-initial-state 'dashboard-mode 'normal)
-      (evil-set-undo-system 'undo-redo)
-      (evil-define-key 'normal 'foo-mode "e" 'baz)
-  )
-#+end_src
-#+begin_src conf
-  [submodule "evil"]
-    info-path = doc/build/texinfo
-#+end_src
-*** Evil collection
-:PROPERTIES:
-:CUSTOM_ID: 69599a36-31aa-4ebd-acd1-e798f84e9b8f
-:END:
-[[https://github.com/emacs-evil/evil-collection][Evil-collection]] automatically configures various Emacs modes with Vi-like keybindings.
-
-#+begin_src elisp
-  (use-package evil-collection
-    ;; :demand t
-    :disabled
-    :after evil
-    :custom (evil-collection-setup-minibuffer t)
-    :config
-    ;(setq evil-collection-mode-list '(dashboard dired ibuffer))
-    (evil-collection-init))
-
-  (use-package evil-tutor
-    :demand t)
-
-  (use-package emacs
-    :config (setq ring-bell-function #'ignore)
-  )
-#+end_src
-
-*** Evil Surround
-:PROPERTIES:
-:CUSTOM_ID: 951d378a-487a-4113-945b-df3c01b87610
-:END:
-#+begin_src elisp
-  (use-package evil-surround
-  :after evil
-  :disabled
-  :config
-    (global-evil-surround-mode 1))
-#+end_src
-*** Evil Nerd commenter
-:PROPERTIES:
-:CUSTOM_ID: 6b17c871-86e5-4746-b8f5-00a899f1051c
-:END:
-[[https://github.com/redguardtoo/evil-nerd-commenter][Evi Nerd Commenter]] helps you comment code efficiently!
-#+begin_src elisp
-  (use-package evil-nerd-commenter
-  :after evil
-  :disabled
-  :config
-  )
-#+end_src
-
-** Meow
-:PROPERTIES:
-:CUSTOM_ID: bac687ce-13c4-413c-b92d-7f7df81fa6ff
-:END:
-[[https://github.com/meow-edit/meow][Meow]] is yet another modal editing. Meow's freedom allows my setup to be very weird.
-
-#+begin_src elisp :noweb no-export
-  (use-package meow
-  :custom-face
-    (meow-cheatsheet-command ((t (:height 180 :inherit fixed-pitch))))
-  :config
-   ;cate the behavior of vi's
-    (defun my-meow-append ()
-      "Move to the end of selection, switch to INSERT state."
-      (interactive)
-      (if meow--temp-normal
-             (progn
-               (message "Quit temporary normal mode")
-               (meow--switch-state 'motion))
-      (if (not (region-active-p))
-               (when (and (not (use-region-p))
-                          (< (point) (point-max)))
-                 (forward-char 1))
-       (meow--direction-forward)
-       (meow--cancel-selection))
-       (meow--switch-state 'insert)))
-
-     (advice-add 'meow-append :override #'my-meow-append)
-
-    (defun my-meow-open-below ()
-      "Open a newline below and switch to INSERT state."
-      (interactive)
-      (if meow--temp-normal
-          (progn
-            (message "Quit temporary normal mode")
-            (meow--switch-state 'motion))
-        (meow--switch-state 'insert)
-        ;(goto-char (line-end-position))
-        (move-end-of-line 1)
-        (meow--execute-kbd-macro "RET")))
-     (advice-add 'meow-open-below :override #'my-meow-open-below)
-
-   (setq meow-keypad-self-insert-undefined nil)
-   (setq meow-selection-command-fallback '(
-      (meow-grab . meow-right-expand)
-      (meow-change . meow-change-char)
-      (meow-kill . meow-delete)
-      (meow-cancel-selection . keyboard-quit)
-      (meow-pop-selection . meow-pop-grab)
-      (meow-beacon-change . meow-beacon-change-char)
-      (meow-replace . meow-yank)
-      (meow-reverse . negative-argument)
-    ))
-
-   (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
-   <<meow-normal>>
-   <<meow-motion>>
-   <<meow-keypad>>
-   (meow-global-mode)
-  )
-#+end_src
-*** Meow-normal
-:PROPERTIES:
-:header-args:elisp: :noweb-ref meow-normal
-:CUSTOM_ID: 0bb7f8a0-4c80-4139-bf84-c9944308c64a
-:END:
-
-#+begin_src elisp
-  (meow-normal-define-key
-    '("<escape>" . meow-cancel-selection)
-    '("\\" . "C-<escape>") ;; where I define all my custom major mode binding
-    '("SPC" . my/leader-prefix-cmd) ;; defined latter
-    '("1" . meow-expand-1) '("2" . meow-expand-2)
-    '("3" . meow-expand-3) '("4" . meow-expand-4)
-    '("5" . meow-expand-5) '("6" . meow-expand-6)
-    '("7" . meow-expand-7) '("8" . meow-expand-8)
-    '("9" . meow-expand-9) '("0" . meow-expand-0)
-
-    '("q" . meow-quit) '("Q" . meow-quit)
-       ;'("w" . meow-window) '("W" . meow-window)
-       ;'("e" . meow-) '("E" . meow-e)
-       ;'("r" . meow-) '("R" . meow-e)
-    '("t" . meow-till) '("T" . meow-till-expand)
-
-    '("a" . begin-of-line) '("a" . meow-beginning-of-thing)
-    '("s" . meow) '("s" . meow-bounds-of-thing)
-    '("d" . meow) '("d" . meow-inner-of-thing)
-    '("f" . end-of-line) '("f" . meow-end-of-thing)
-    '("g" . meow-right-expand) '("G" . meow-grab)
-
-    '("z" . meow-undo) '("Z" . meow-undo-in-selection)
-    '("x" . meow-kill) '("X" . meow-clipboard-kill)
-    '("c" . meow-save)
-    '("C-c" . meow-clipboard-save)
-    '("v" . meow-replace) '("V" . meow-yank-pop)
-    '("C-v" . meow-clipboard-yank)
-    '("b". meow-block) '("B" . meow-to-block)
-
-    '("y" . meow-visit)
-    '("u" . meow-change) '("U" . meow-reverse)
-    '("i" . meow-insert) '("I" . meow-open-above)
-    '("o" . meow-append) '("O" . meow-open-below)
-    '("p" . meow-pop-selection)
-    '("[" . meow-beginning-of-thing) '("]" . meow-end-of-thing)
-
-    '("h" . meow-join)  '("H" . meow-join)
-    '("j" . meow-left)  '("J" . meow-left-expand)
-    '("k" . meow-prev)  '("K" . meow-prev-expand)
-    '("l" . meow-next)  '("L" . meow-next-expand)
-    '(";" . meow-right) '(":" . meow-right-expand)
-    '("'" . meow-line) '("\"" . meow-line)
-
-    '("C-j" . "C-<escape> C-j")
-    '("C-k" . "C-<escape> C-k")
-    '("C-l" . "C-<escape> C-l")
-    '("C-;" . "C-<escape> C-;")
-
-    '("n" . meow-search)      '("N" . meow-pop-search)
-    '("m" . meow-mark-word)   '("M" . meow-mark-symbol)
-    '("," . meow-back-word)   '("<" . meow-back-symbol)
-    '("." . meow-next-word)   '(">" . meow-next-symbol)
-    '("/" . meow-reverse)
-
-    '("\"" . fingertip-wrap-double-quote)
-    '("(" . fingertip-wrap-round)
-    '("[" . fingertip-wrap-bracket)
-    '("{" . fingertip-wrap-curly)
-    )
-#+end_src
-
-*** Meow-motion
-:PROPERTIES:
-:header-args:elisp: :noweb-ref meow-motion
-:CUSTOM_ID: 108e1a69-3e19-4a36-9547-86e7370974af
-:END:
-
-#+begin_src elisp
-  (meow-motion-overwrite-define-key
-   '("l" . meow-next)
-   '("k" . meow-prev)
-   '("SPC" . my/leader-prefix-cmd) ;; defined latter
-   '("<escape>" . ignore)
-  )
-#+end_src
-
-*** Meow-keypad
-:PROPERTIES:
-:header-args:elisp: :noweb-ref meow-keypad
-:CUSTOM_ID: c276b705-4a1d-4da3-aac2-96848e79eb9a
-:END:
-#+begin_src elisp
-  (meow-leader-define-key
-  ;; Use SPC (0-9) for digit arguments.
-   '("1" . meow-digit-argument) '("2" . meow-digit-argument)
-   '("3" . meow-digit-argument) '("4" . meow-digit-argument)
-   '("5" . meow-digit-argument) '("6" . meow-digit-argument)
-   '("7" . meow-digit-argument) '("8" . meow-digit-argument)
-   '("9" . meow-digit-argument) '("0" . meow-digit-argument)
-   '("/" . meow-keypad-describe-key) '("?" . meow-cheatsheet)
-   ;;'("SPC" . config/leader-prefix-cmd)
-  )
-
-#+end_src
-
-#+RESULTS:
-
-** General
+** General.el
 :PROPERTIES:
 :CUSTOM_ID: 6377b946-b638-4773-93e6-21abada88d59
 :END:
@@ -717,7 +775,7 @@ I do not use evil mode anymore because of Meow Edit.
     <<local-leader>>
   )
 #+end_src
-*** Global map
+*** Global keybindings
 :PROPERTIES:
 :header-args:elisp: :noweb-ref global-map
 :CUSTOM_ID: f764a901-b07e-4d34-97e0-158cbfc8d519
@@ -737,8 +795,8 @@ I do not use evil mode anymore because of Meow Edit.
   (general-def
   :keymaps '(meow-normal-state-keymap meow-motion-state-keymap)
     "M-j"       '(windmove-left               :wk " Win H ")
-    "M-k"       '(windmove-down               :wk " Win J ")
-    "M-l"       '(windmove-up                 :wk " Win K ")
+    "M-k"       '(windmove-up                 :wk " Win K ")
+    "M-l"       '(windmove-down               :wk " Win J ")
     "M-;"       '(windmove-right              :wk " Win L ")
     "M-,"       '(sort-tab-select-prev-tab    :wk " Tab L ")
     "M-."       '(sort-tab-select-next-tab    :wk " Tab R ")
@@ -915,11 +973,194 @@ Generally, I define my local leader as follows:
 - Let ~C-<escape>~ be the local leader. The convention is to use ~C-c~, but I make ~C-c~ save to system clipboard ;)
 - I do not directly press ~C-<escape>~. Instead, I map ~\~ to ~C-<escape>~ in meow's normal mode.
 - The keybindings are bind to those major mode maps.
-*** Others
+
+** Local Keybindings
 :PROPERTIES:
 :CUSTOM_ID: 20dbcac9-a7cb-4447-8b96-a490d1637b75
 :END:
+Keybindings defined else where
 
++ [[#4e4b8f79-8616-4cc0-bcc8-2b1a2ca03de2][Org mode Keybinds]]
+** Meow
+:PROPERTIES:
+:CUSTOM_ID: bac687ce-13c4-413c-b92d-7f7df81fa6ff
+:END:
+[[https://github.com/meow-edit/meow][Meow]] is yet another modal editing. Meow's freedom allows my setup to be very weird.
+
+#+begin_src elisp :noweb no-export
+  (use-package meow
+  :custom-face
+    (meow-cheatsheet-command ((t (:height 180 :inherit fixed-pitch))))
+  :config
+   ;cate the behavior of vi's
+    (defun my-meow-append ()
+      "Move to the end of selection, switch to INSERT state."
+      (interactive)
+      (if meow--temp-normal
+             (progn
+               (message "Quit temporary normal mode")
+               (meow--switch-state 'motion))
+      (if (not (region-active-p))
+               (when (and (not (use-region-p))
+                          (< (point) (point-max)))
+                 (forward-char 1))
+       (meow--direction-forward)
+       (meow--cancel-selection))
+       (meow--switch-state 'insert)))
+
+     (advice-add 'meow-append :override #'my-meow-append)
+
+    (defun my-meow-open-below ()
+      "Open a newline below and switch to INSERT state."
+      (interactive)
+      (if meow--temp-normal
+          (progn
+            (message "Quit temporary normal mode")
+            (meow--switch-state 'motion))
+        (meow--switch-state 'insert)
+        ;(goto-char (line-end-position))
+        (move-end-of-line 1)
+        (meow--execute-kbd-macro "RET")))
+     (advice-add 'meow-open-below :override #'my-meow-open-below)
+
+   (setq meow-keypad-self-insert-undefined nil)
+   (setq meow-selection-command-fallback '(
+      (meow-grab . meow-right-expand)
+      (meow-change . meow-change-char)
+      (meow-kill . meow-delete)
+      (meow-cancel-selection . keyboard-quit)
+      (meow-pop-selection . meow-pop-grab)
+      (meow-beacon-change . meow-beacon-change-char)
+      (meow-replace . meow-yank)
+      (meow-reverse . negative-argument)
+    ))
+
+   (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
+   <<meow-normal>>
+   <<meow-motion>>
+   <<meow-keypad>>
+   (meow-global-mode)
+  )
+#+end_src
+*** Meow-normal
+:PROPERTIES:
+:header-args:elisp: :noweb-ref meow-normal
+:CUSTOM_ID: 0bb7f8a0-4c80-4139-bf84-c9944308c64a
+:END:
+
+#+begin_src elisp
+  (meow-normal-define-key
+    '("<escape>" . meow-cancel-selection)
+    '("\\" . "C-<escape>") ;; where I define all my custom major mode binding
+    '("SPC" . my/leader-prefix-cmd) ;; defined latter
+    '("1" . meow-expand-1) '("2" . meow-expand-2)
+    '("3" . meow-expand-3) '("4" . meow-expand-4)
+    '("5" . meow-expand-5) '("6" . meow-expand-6)
+    '("7" . meow-expand-7) '("8" . meow-expand-8)
+    '("9" . meow-expand-9) '("0" . meow-expand-0)
+
+    '("q" . meow-quit) '("Q" . meow-quit)
+       ;'("w" . meow-window) '("W" . meow-window)
+       ;'("e" . meow-) '("E" . meow-e)
+       ;'("r" . meow-) '("R" . meow-e)
+    '("t" . meow-till) '("T" . meow-till-expand)
+
+    '("a" . begin-of-line) '("a" . meow-beginning-of-thing)
+    '("s" . meow) '("s" . meow-bounds-of-thing)
+    '("d" . meow) '("d" . meow-inner-of-thing)
+    '("f" . end-of-line) '("f" . meow-end-of-thing)
+    '("g" . meow-right-expand) '("G" . meow-grab)
+
+    '("z" . meow-undo) '("Z" . meow-undo-in-selection)
+    '("x" . meow-kill) '("X" . meow-clipboard-kill)
+    '("c" . meow-save)
+    '("C-c" . meow-clipboard-save)
+    '("v" . meow-replace) '("V" . meow-yank-pop)
+    '("C-v" . meow-clipboard-yank)
+    '("b". meow-block) '("B" . meow-to-block)
+
+    '("y" . meow-visit)
+    '("u" . meow-change) '("U" . meow-reverse)
+    '("i" . meow-insert) '("I" . meow-open-above)
+    '("o" . meow-append) '("O" . meow-open-below)
+    '("p" . meow-pop-selection)
+    '("[" . meow-beginning-of-thing) '("]" . meow-end-of-thing)
+
+    '("h" . meow-join)  '("H" . meow-join)
+    '("j" . meow-left)  '("J" . meow-left-expand)
+    '("k" . meow-prev)  '("K" . meow-prev-expand)
+    '("l" . meow-next)  '("L" . meow-next-expand)
+    '(";" . meow-right) '(":" . meow-right-expand)
+    '("'" . meow-line) '("\"" . meow-line)
+
+    '("C-j" . "C-<escape> C-j")
+    '("C-k" . "C-<escape> C-k")
+    '("C-l" . "C-<escape> C-l")
+    '("C-;" . "C-<escape> C-;")
+
+    '("n" . meow-search)      '("N" . meow-pop-search)
+    '("m" . meow-mark-word)   '("M" . meow-mark-symbol)
+    '("," . meow-back-word)   '("<" . meow-back-symbol)
+    '("." . meow-next-word)   '(">" . meow-next-symbol)
+    '("/" . meow-reverse)
+
+    '("\"" . fingertip-wrap-double-quote)
+    '("(" . fingertip-wrap-round)
+    '("[" . fingertip-wrap-bracket)
+    '("{" . fingertip-wrap-curly)
+    )
+#+end_src
+
+*** Meow-motion
+:PROPERTIES:
+:header-args:elisp: :noweb-ref meow-motion
+:CUSTOM_ID: 108e1a69-3e19-4a36-9547-86e7370974af
+:END:
+
+#+begin_src elisp
+  (meow-motion-overwrite-define-key
+   '("l" . meow-next)
+   '("k" . meow-prev)
+   '("SPC" . my/leader-prefix-cmd) ;; defined latter
+   '("<escape>" . ignore)
+  )
+#+end_src
+
+*** Meow-keypad
+:PROPERTIES:
+:header-args:elisp: :noweb-ref meow-keypad
+:CUSTOM_ID: c276b705-4a1d-4da3-aac2-96848e79eb9a
+:END:
+#+begin_src elisp
+  (meow-leader-define-key
+  ;; Use SPC (0-9) for digit arguments.
+   '("1" . meow-digit-argument) '("2" . meow-digit-argument)
+   '("3" . meow-digit-argument) '("4" . meow-digit-argument)
+   '("5" . meow-digit-argument) '("6" . meow-digit-argument)
+   '("7" . meow-digit-argument) '("8" . meow-digit-argument)
+   '("9" . meow-digit-argument) '("0" . meow-digit-argument)
+   '("/" . meow-keypad-describe-key) '("?" . meow-cheatsheet)
+   ;;'("SPC" . config/leader-prefix-cmd)
+  )
+
+#+end_src
+
+#+RESULTS:
+
+** Transient
+:PROPERTIES:
+:CUSTOM_ID: b7838793-3629-4d7d-88d3-19c1cbefe997
+:END:
+[[https://github.com/yanghaoxie/transient-posframe][Transient-posframe]] display transient popups using a posframe.
+#+begin_src elisp :tangle no
+  (use-package transient-posframe
+  :after transient
+  :disabled
+  :config
+    (setq transient-posframe-min-height 1)
+    (setq transient-posframe-mode t)
+  )
+#+end_src
 ** Which-key
 :PROPERTIES:
 :CUSTOM_ID: 1b5d6414-c2e4-41a8-b04d-f150f6883d8e
@@ -961,35 +1202,12 @@ Magit and meow all use transient maps, therefore we let which-key show transient
     (which-key-posframe-mode)
   )
 #+end_src
-** Transient
-:PROPERTIES:
-:CUSTOM_ID: b7838793-3629-4d7d-88d3-19c1cbefe997
-:END:
-[[https://github.com/yanghaoxie/transient-posframe][Transient-posframe]] display transient popups using a posframe.
-#+begin_src elisp :tangle no
-  (use-package transient-posframe
-  :after transient
-  :disabled
-  :config
-    (setq transient-posframe-min-height 1)
-    (setq transient-posframe-mode t)
-  )
-#+end_src
-** COMMENT Key-echo
-:PROPERTIES:
-:CUSTOM_ID: ed65190a-9a2b-43ce-83d9-5d73bec899f5
-:END:
-[[https://github.com/manateelazycat/key-echo][Key-Echo]] is an Emacs plugin that uses XRecord technology to listen to system key events.
-#+begin_src elisp
-  (use-package key-echo
-  :disabled
-  :config
-    (key-echo-enable)
-  )
-#+end_src
 ** Rime
 :PROPERTIES:
 :CUSTOM_ID: c418f945-d240-4dcb-bd38-c656bb9253b8
+:END:
+:BACKLINKS:
+[[#b343e4f2-36db-4558-8e69-3bb52bcb5190][Early Init]]
 :END:
 
 #+begin_src elisp
@@ -1010,12 +1228,112 @@ Magit and meow all use transient maps, therefore we let which-key show transient
   )
 #+end_src
 
-* Basic UI
+** COMMENT Evil
+:PROPERTIES:
+:CUSTOM_ID: bd479272-28ec-4552-bd41-9178ae7af148
+:END:
+I guess evil surround and evil nerd commentor should be better to put under Coding.
+I do not use evil mode anymore because of Meow Edit.
+*** Evil mode
+:PROPERTIES:
+:CUSTOM_ID: 9e2741ae-3fba-4db2-afc2-1100a454a70b
+:END:
+[[https://github.com/emacs-evil/evil][Evil mode]] that turns you into an evil.
+
+#+begin_src elisp
+  (use-package evil
+    :disabled
+    :init
+      (setq evil-want-integration t) ;; t by default
+      (setq evil-want-keybinding nil)
+      (setq evil-vsplit-window-right t)
+      (setq evil-split-window-below t)
+      (setq evil-want-C-u-scroll t)
+
+    :config
+      (evil-mode 1)
+     ;; Use visual line motions even outside of visual-line-mode buffers
+      (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+      (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+      (evil-set-initial-state 'messages-buffer-mode 'normal)
+      (evil-set-initial-state 'dashboard-mode 'normal)
+      (evil-set-undo-system 'undo-redo)
+      (evil-define-key 'normal 'foo-mode "e" 'baz)
+  )
+#+end_src
+#+begin_src conf
+  [submodule "evil"]
+    info-path = doc/build/texinfo
+#+end_src
+*** Evil collection
+:PROPERTIES:
+:CUSTOM_ID: 69599a36-31aa-4ebd-acd1-e798f84e9b8f
+:END:
+[[https://github.com/emacs-evil/evil-collection][Evil-collection]] automatically configures various Emacs modes with Vi-like keybindings.
+
+#+begin_src elisp
+  (use-package evil-collection
+    ;; :demand t
+    :disabled
+    :after evil
+    :custom (evil-collection-setup-minibuffer t)
+    :config
+    ;(setq evil-collection-mode-list '(dashboard dired ibuffer))
+    (evil-collection-init))
+
+  (use-package evil-tutor
+    :demand t)
+
+  (use-package emacs
+    :config (setq ring-bell-function #'ignore)
+  )
+#+end_src
+
+*** Evil Surround
+:PROPERTIES:
+:CUSTOM_ID: 951d378a-487a-4113-945b-df3c01b87610
+:END:
+#+begin_src elisp
+  (use-package evil-surround
+  :after evil
+  :disabled
+  :config
+    (global-evil-surround-mode 1))
+#+end_src
+*** Evil Nerd commenter
+:PROPERTIES:
+:CUSTOM_ID: 6b17c871-86e5-4746-b8f5-00a899f1051c
+:END:
+[[https://github.com/redguardtoo/evil-nerd-commenter][Evi Nerd Commenter]] helps you comment code efficiently!
+#+begin_src elisp
+  (use-package evil-nerd-commenter
+  :after evil
+  :disabled
+  :config
+  )
+#+end_src
+** COMMENT Key-echo
+:PROPERTIES:
+:CUSTOM_ID: ed65190a-9a2b-43ce-83d9-5d73bec899f5
+:END:
+[[https://github.com/manateelazycat/key-echo][Key-Echo]] is an Emacs plugin that uses XRecord technology to listen to system key events.
+#+begin_src elisp
+  (use-package key-echo
+  :disabled
+  :config
+    (key-echo-enable)
+  )
+#+end_src
+
+* Displays
 :PROPERTIES:
 :CUSTOM_ID: cb45a662-f7d3-4afa-a9c4-f2795b01c9d0
 :END:
-We setup UI for basic emacs widgets at this place. Again, not all UI's are set here.
-Some package specific UI configs are set under where the package is configured.
+
+We try to decide what emacs would look like beneath this outline.
+However, many packages affect how emacs looks.
+To make it simplier, we'll just define things that only changes how emacs looks, but do not provides extra functionalities or stuffs, meanning that deleting them will not affect how emacs works (hopefully).
+
 ** Fonts
 :PROPERTIES:
 :CUSTOM_ID: 94ead78c-1e1b-4f6f-b78f-5d805c08519b
@@ -1079,11 +1397,11 @@ You can use the bindings CTRL plus =/- for zooming in/out.  You can also use CTR
 (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
 (global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
 #+end_src
-** Icons
+*** Icons
 :PROPERTIES:
 :CUSTOM_ID: 2debde78-476a-4961-a003-b37166d772c7
 :END:
-*** All-the-icons
+**** All-the-icons
 :PROPERTIES:
 :CUSTOM_ID: 97c26c8f-dfbc-47ae-83ae-f40b44379ac6
 :END:
@@ -1100,7 +1418,7 @@ You can use the bindings CTRL plus =/- for zooming in/out.  You can also use CTR
 
 *NOTE*: In order for the icons to work it is very important that you install the Resource Fonts included in this package. Run [[elisp:all-the-icons-install-fonts][M-x all-the-icons-install-fonts]] to install necessary icons.
 
-*** All-the-icons-completion
+**** All-the-icons-completion
 :PROPERTIES:
 :CUSTOM_ID: 701c4747-737c-43c3-b63d-f133c36cffb2
 :END:
@@ -1112,7 +1430,7 @@ All-the-icons-completion makes icons appear in the minibuffer. Cool.
     :init
     (all-the-icons-completion-mode))
 #+end_src
-*** Nerd-icons
+**** Nerd-icons
 :PROPERTIES:
 :CUSTOM_ID: c9b35d34-1c55-45fa-a648-6669cf6ed8ac
 :END:
@@ -1128,7 +1446,31 @@ Run [[elisp:nerd-icons-install-fonts][M-x nerd-icons-install-fonts]] to install 
   )
 #+end_src
 
-** Widgets
+** Themes
+:PROPERTIES:
+:CUSTOM_ID: 440ed820-dd6b-4c79-8859-3e039c268121
+:END:
+*** Doom-themes
+:PROPERTIES:
+:CUSTOM_ID: 96b9a835-6606-478b-98f8-4792101b6e81
+:END:
+[[https://github.com/hlissner/emacs-doom-themes][Doom-themes]] is a great set of themes with a lot of variety and support for many different Emacs modes. Taking a look at the [[https://github.com/hlissner/emacs-doom-themes/tree/screenshots][screenshots]] might help you decide which one you like best. Run =M-x counsel-load-theme= to choose between them easily.
+
+*** Solaire mode
+:PROPERTIES:
+:CUSTOM_ID: 549aabd9-a7a3-4f40-adc0-20c029630a4e
+:END:
+[[https://github.com/hlissner/emacs-solaire-mode][Solaire-mode]] makes certain buffers grossly incandescent. Useful to distinguish the main  buffers from others.
+#+begin_src elisp
+  (use-package solaire-mode
+  :defer t
+  :init (solaire-global-mode)
+  :config
+    (add-hook 'org-src-mode-hook 'turn-off-solaire-mode)
+  )
+#+end_src
+
+** Frames
 :PROPERTIES:
 :CUSTOM_ID: 6774a05e-f776-46b8-b7c8-40e9b7699c11
 :END:
@@ -1186,54 +1528,23 @@ Note that a 'frame' is a window on the desktop, a 'window' is a subwindow of ema
   )
 #+end_src
 
-*** Holo-layer
+*** Transparency
 :PROPERTIES:
-:CUSTOM_ID: d2ccade1-d85f-4dff-a67f-e508b1fa6f46
+:CUSTOM_ID: ace4738e-27d7-44c7-b7c8-c18c82acf961
 :END:
-[[https://github.com/manateelazycat/holo-layer][Holo-layer]] is developed based on PyQt, aiming to significantly enhance the visual experience of Emacs.
+We have already set transparency in [[#b343e4f2-36db-4558-8e69-3bb52bcb5190][Early Init]]
+Here lets define a function to interactively set transparency value.
 #+begin_src elisp
-  (use-package holo-layer
-  :defer t
-  :if (memq window-system '(pgtk mac ns))
-  :config
-    (setq holo-layer-enable-cursor-animation 1
-          holo-layer-enable-window-border 1
-          holo-layer-sort-tab-ui 1
-          ;;holo-layer-cursor-animation-type "arrow easing"
-          )
-    (holo-layer-enable)
-  )
+  (defun my/set-transparency (value)
+    "Sets the transparency of the frame window. 0=transparent/100=opaque"
+    (interactive "nTransparency Value 0 - 100 opaque:")
+    (set-frame-parameter nil 'alpha-background value))
 #+end_src
-
-** Colors
-:PROPERTIES:
-:CUSTOM_ID: 440ed820-dd6b-4c79-8859-3e039c268121
-:END:
-*** Doom-themes
-:PROPERTIES:
-:CUSTOM_ID: 96b9a835-6606-478b-98f8-4792101b6e81
-:END:
-[[https://github.com/hlissner/emacs-doom-themes][Doom-themes]] is a great set of themes with a lot of variety and support for many different Emacs modes. Taking a look at the [[https://github.com/hlissner/emacs-doom-themes/tree/screenshots][screenshots]] might help you decide which one you like best. Run =M-x counsel-load-theme= to choose between them easily.
-
-*** Solaire mode
-:PROPERTIES:
-:CUSTOM_ID: 549aabd9-a7a3-4f40-adc0-20c029630a4e
-:END:
-[[https://github.com/hlissner/emacs-solaire-mode][Solaire-mode]] makes certain buffers grossly incandescent. Useful to distinguish the main  buffers from others.
-#+begin_src elisp
-  (use-package solaire-mode
-  :defer t
-  :init (solaire-global-mode)
-  :config
-    (add-hook 'org-src-mode-hook 'turn-off-solaire-mode)
-  )
-#+end_src
-
-** Spacing
+** Margin
 :PROPERTIES:
 :CUSTOM_ID: 8e96278e-1713-4186-b967-6064a6a8f67f
 :END:
-*** Margin
+*** Horizontal
 :PROPERTIES:
 :CUSTOM_ID: 8f648737-5ac5-4187-8d2f-13344efd4a59
 :END:
@@ -1287,512 +1598,43 @@ But currently we only use olivetti mode.
 :CUSTOM_ID: 7ab32bc9-054e-495f-b946-aa235cfe3357
 :END:
 
-*** Vertical Spacing
+*** Vertical
 :PROPERTIES:
 :CUSTOM_ID: deee099a-b78e-4c82-a662-4a796f2736d5
 :END:
 
-[[https://github.com/trevorpogue/topspace][Topspace]] recenter line 1 with scrollable upper margin/padding
+[[https://github.com/trevorpogue/topspace][Topspace]] recenter line 1 with scrollable upper margin/padding.
 #+begin_src elisp
   (use-package topspace
   :init (global-topspace-mode)
+  :config
+  ;; Zen mode, the hack is from
+  ;; https://github.com/trevorpogue/topspace/issues/17#issuecomment-1637004205
+    (defun zen-mode-bodge ()
+      (let ((ov (make-overlay 1 1 nil t t)))
+        (overlay-put ov 'priority 9999999)
+        (overlay-put ov 'before-string (propertize "    1 " 'face 'line-number))
+        (overlay-put ov 'zen--remove-from-buffer-tag t))
+      (let ((ov (make-overlay 1 2)))
+        (overlay-put ov 'display-line-numbers-disable t)
+        (overlay-put ov 'zen--remove-from-buffer-tag t)))
+
+    (defun zen-mode-clear ()
+      (remove-overlays 1 2 'zen--remove-from-buffer-tag t))
+
+    ;; install hooks
+    ;; (advice-add 'topspace--enable :after #'zen-mode-bodge)
+    ;; (advice-add 'topspace--disable :after #'zen-mode-clear)
   )
 #+end_src
 
-** Whitespace mode
+* The Four
 :PROPERTIES:
-:CUSTOM_ID: 60025927-e86d-4ea4-94f1-097e91ac871b
+:CUSTOM_ID: 5d02391b-fb05-43ae-abb3-d6d7a4052b6e
 :END:
+These four things are basically what you're gonna to see =anywhere, anytime= in emacs.
+Therefore I grouped them together.
 
-[[https://www.emacswiki.org/emacs/WhiteSpace][Whitespace mode]] is a built in mode of emacs that visualizes whitespaces, tab symbols, indentations and related stuffs.
-#+begin_src elisp
-  ;; (config/leader :infix "t"
-  ;;   "SPC"  '(whitespace-mode  :wk "󰡭 Show Space")
-  ;; )
-#+end_src
-** Transparency
-:PROPERTIES:
-:CUSTOM_ID: 84414e9e-fdde-4195-9600-026352a9f4fc
-:END:
-
-Set background Transparency, according to [[https://www.emacswiki.org/emacs/TransparentEmacs][this page]].
-#+begin_src elisp
-  (set-frame-parameter nil 'alpha-background 96)
-  (add-to-list 'default-frame-alist '(alpha-background . 96))
-
-  (defun config/transparency (value)
-        "Sets the transparency of the frame window. 0=transparent/100=opaque"
-        (interactive "nTransparency Value 0 - 100 opaque:")
-        (set-frame-parameter nil 'alpha-background value))
-#+end_src
-
-** Scroll
-:PROPERTIES:
-:CUSTOM_ID: b783d068-76ae-483c-8eee-5adcedc2cc94
-:END:
-#+begin_src elisp
-  (use-package emacs
-  :config
-    (setq scroll-conservatively 97)
-    (setq scroll-preserve-screen-position 1)
-    (setq mouse-wheel-progressive-speed nil)
-    ;; The following piece of code is stolen from
-    ;; https://emacs-china.org/t/topic/25114/5
-    (pixel-scroll-precision-mode 1)
-    (setq pixel-scroll-precision-interpolate-page t)
-    (defun +pixel-scroll-interpolate-down (&optional lines)
-        (interactive)
-        (if lines
-            (pixel-scroll-precision-interpolate (* -1 lines (pixel-line-height)))
-        (pixel-scroll-interpolate-down)))
-
-    (defun +pixel-scroll-interpolate-up (&optional lines)
-        (interactive)
-        (if lines
-            (pixel-scroll-precision-interpolate (* lines
-            (pixel-line-height))))
-        (pixel-scroll-interpolate-up))
-
-    (defalias 'scroll-up-command '+pixel-scroll-interpolate-down)
-    (defalias 'scroll-down-command '+pixel-scroll-interpolate-up)
-  )
-#+end_src
-** Diff
-:PROPERTIES:
-:CUSTOM_ID: a7e7f5b2-64ce-4430-95a4-9ee10af93f9b
-:END:
-#+begin_src elisp
-  (use-package diff-hl
-  :custom-face
-    (diff-hl-change ((t (:background "#2c5f72" :foreground "#77a8d9"))))
-    (diff-hl-delete ((t (:background "#844953" :foreground "#f27983"))))
-    (diff-hl-insert ((t (:background "#5E734A" :foreground "#a6cc70"))))
-  :config
-    (setq diff-hl-draw-borders nil)
-    (global-diff-hl-mode)
-    ;(diff-hl-margin-mode)
-    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
-  )
-#+end_src
-
-** Cursor
-:PROPERTIES:
-:CUSTOM_ID: 6777738a-7c6e-45bd-95c2-759d714ee9da
-:END:
-*** Beacon
-:PROPERTIES:
-:CUSTOM_ID: 8c20fc21-c98e-4ca2-bb4e-728d66b76ad2
-:END:
-Beacon makes the cursor shine when scrolling window or jumping. Somewhat buggy.
-#+begin_src elisp
-  (use-package beacon
-  :defer t
-  :config
-        (beacon-mode)
-  )
-#+end_src
-
-*** Pulse-Cursor
-:PROPERTIES:
-:CUSTOM_ID: bdf3a8f0-d259-491b-99cd-16e72cc3f605
-:END:
-Makes the cursor to blink with fade out animation.
-It's possible to take much ram when idle.
-#+begin_src elisp
-  (use-package pulsing-cursor
-  :config
-    (setq pulse-delay 0.08
-          pulse-iterations 2)
-    (setq pulsing-cursor-blinks 20)
-    (set-face-attribute 'pulsing-cursor-overlay-face1 nil :inherit 'cursor)
-    (pulsing-cursor-mode)
-  )
-#+end_src
-*** Goggles
-:PROPERTIES:
-:CUSTOM_ID: 1adcfc39-e4d0-4559-acaa-43355f608c4f
-:END:
-Goggles highlights the modified region using pulse. Currently the commands undo, yank, kill and delete are supported.
-
-#+begin_src elisp
-  (use-package goggles
-  :hook ((prog-mode text-mode org-mode) . goggles-mode)
-  :config
-    (setq-default goggles-pulse t)) ;; set to nil to disable pulsing
-#+end_src
-*** Hl-line
-:PROPERTIES:
-:CUSTOM_ID: 6000d6d5-dec0-4bbf-8496-cfddc6fba15d
-:END:
-#+begin_src elisp
-  (use-package hl-line
-  :init
-    (global-hl-line-mode)
-  )
-#+end_src
-
-* Facilities
-:PROPERTIES:
-:CUSTOM_ID: af3f5fdd-8550-4cd7-869b-18989f6c0ea9
-:END:
-** Auto-save
-:PROPERTIES:
-:CUSTOM_ID: 1c6aa069-acd3-4f3c-94dd-0890bc30efb4
-:END:
-#+begin_src elisp
-  (use-package auto-save
-  :after lsp-bridge
-  :config
-    (auto-save-enable)
-    (setq auto-save-silent t)   ; quietly save
-    (setq auto-save-delete-trailing-whitespace t)
-  )
-#+end_src
-** GCMH
-:PROPERTIES:
-:CUSTOM_ID: 3aeaad54-3694-4ad4-a887-ac1d06ccc9c4
-:END:
-The [[https://github.com/emacsmirror/gcmh][Garbage Collector Magic Hack]] enforce a sneaky Garbage Collection strategy to minimize GC interference with user activity.
-#+begin_src elisp
-  (use-package gcmh
-  :init
-    (setq gcmh-high-cons-threshold 536870912) ;; 512mb
-  :config
-    (gcmh-mode 1)
-    )
-#+end_src
-** Long tail
-:PROPERTIES:
-:CUSTOM_ID: 3811cabb-2894-4b06-9234-42e26b54d24a
-:END:
-*** DIff mode
-:PROPERTIES:
-:CUSTOM_ID: 7742d6fb-5f74-40ac-9dc6-24df18e3a8e2
-:END:
-#+begin_src elisp
-  (use-package diff-mode
-    :defer t
-    :config
-    (when (>= emacs-major-version 27)
-      (set-face-attribute 'diff-refine-changed nil :extend t)
-      (set-face-attribute 'diff-refine-removed nil :extend t)
-      (set-face-attribute 'diff-refine-added   nil :extend t)))
-#+end_src
-*** Dired
-:PROPERTIES:
-:CUSTOM_ID: 48d4fd1d-c1f0-410d-96d1-d5221c8bcaeb
-:END:
-#+begin_src elisp
-  (use-package dired
-    :defer t
-    :config (setq dired-listing-switches "-alh"))
-#+end_src
-
-*** ELdoc
-:PROPERTIES:
-:CUSTOM_ID: 40fc2f2b-5d78-4eea-bbe6-10239d6b1c0e
-:END:
-a MinorMode which shows you, in the echo area, the argument list of the function call you are currently writing.
-#+begin_src elisp
-  (use-package eldoc
-    :when (version< "25" emacs-version)
-    :config (global-eldoc-mode))
-#+end_src
-*** Help
-:PROPERTIES:
-:CUSTOM_ID: d3472f01-1cdc-47b4-8505-7dda94ee4864
-:END:
-#+begin_src elisp
-  (use-package help
-    :defer t
-    :config (temp-buffer-resize-mode))
-#+end_src
-*** Isearch
-:PROPERTIES:
-:CUSTOM_ID: 95631f66-29f3-46aa-9088-d18bf0b925d8
-:END:
-#+begin_src elisp
-  (progn ;    `isearch'
-    (setq isearch-allow-scroll t))
-#+end_src
-*** Lisp-mode
-:PROPERTIES:
-:CUSTOM_ID: 499297a3-67cd-46ab-bda6-2587b64c4cc0
-:END:
-#+begin_src elisp
-  (use-package lisp-mode
-    :config
-    (add-hook 'emacs-lisp-mode-hook 'outline-minor-mode)
-    (add-hook 'emacs-lisp-mode-hook 'reveal-mode)
-    (defun indent-spaces-mode ()
-      (setq indent-tabs-mode nil))
-    (add-hook 'lisp-interaction-mode-hook 'indent-spaces-mode))
-#+end_src
-*** Man
-:PROPERTIES:
-:CUSTOM_ID: 5e9fb076-8f0f-496a-8860-bce104072a19
-:END:
-#+begin_src elisp
-  (use-package man
-    :defer t
-    :config (setq Man-width 80))
-#+end_src
-
-*** Prog-mode
-:PROPERTIES:
-:CUSTOM_ID: 26d1c604-e1c0-42d0-8e07-539614dfd757
-:END:
-#+begin_src elisp
-  (use-package prog-mode
-    :config (global-prettify-symbols-mode)
-    (defun indicate-buffer-boundaries-left ()
-      (setq indicate-buffer-boundaries 'left))
-    (add-hook 'prog-mode-hook 'indicate-buffer-boundaries-left))
-#+end_src
-*** Recentf
-:PROPERTIES:
-:CUSTOM_ID: 723104c7-10be-4782-84fd-451b8bf0e4bf
-:END:
-#+begin_src elisp
-  (use-package recentf
-    :demand t
-    :config (add-to-list 'recentf-exclude "^/\\(?:ssh\\|su\\|sudo\\)?x?:"))
-#+end_src
-*** Savehist
-:PROPERTIES:
-:CUSTOM_ID: 202d5f4c-fca3-4a81-87c5-390798ca293e
-:END:
-#+begin_src elisp
-  ;; Persist history over Emacs restarts. Vertico sorts by history position.
-    (use-package savehist
-        :init
-        (savehist-mode))
-#+end_src
-*** Saveplace
-:PROPERTIES:
-:CUSTOM_ID: 5113ee1e-df60-4452-a21e-6386cc6913ca
-:END:
-#+begin_src elisp
-  ;; A few more useful configurations...
-    (use-package emacs
-        :init
-        ;; Add prompt indicator to `completing-read-multiple'.
-        ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
-        (defun crm-indicator (args)
-        (cons (format "[CRM%s] %s"
-            (replace-regexp-in-string
-            "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
-            crm-separator)
-            (car args))
-          (cdr args)))
-        (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
-
-        ;; Do not allow the cursor in the minibuffer prompt
-        (setq minibuffer-prompt-properties
-      '(read-only t cursor-intangible t face minibuffer-prompt))
-        (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
-
-        ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
-        ;; Vertico commands are hidden in normal buffers.
-        ;; (setq read-extended-command-predicate
-        ;;       #'command-completion-default-include-p)
-        ;; Enable recursive minibuffers
-        (setq enable-recursive-minibuffers t))
-#+end_src
-*** Simple
-:PROPERTIES:
-:CUSTOM_ID: 4e860888-be36-4c64-b8f3-be05dc030d31
-:END:
-#+begin_src elisp
-  (use-package simple
-    :config (column-number-mode))
-#+end_src
-*** Smerge
-:PROPERTIES:
-:CUSTOM_ID: 57fe9b41-0e6f-443a-a0b3-742f0c005543
-:END:
-#+begin_src elisp
-  (use-package smerge-mode
-    :defer t
-    :config
-    (when (>= emacs-major-version 27)
-      (set-face-attribute 'smerge-refined-removed nil :extend t)
-      (set-face-attribute 'smerge-refined-added   nil :extend t)))
-#+end_src
-*** Text
-:PROPERTIES:
-:CUSTOM_ID: 950b2287-ffed-4baa-a3e1-fb47798612c2
-:END:
-#+begin_src elisp
-  (progn ;    `text-mode'
-    (add-hook 'text-mode-hook 'indicate-buffer-boundaries-left))
-#+end_src
-*** Tramp
-:PROPERTIES:
-:CUSTOM_ID: 07612efe-a2a9-4164-90e5-164f00637886
-:END:
-#+begin_src elisp
-  (use-package tramp
-    :defer t
-    :config
-    (add-to-list 'tramp-default-proxies-alist '(nil "\\`root\\'" "/ssh:%h:"))
-    (add-to-list 'tramp-default-proxies-alist '("localhost" nil nil))
-    (add-to-list 'tramp-default-proxies-alist
-           (list (regexp-quote (system-name)) nil nil))
-    (setq vc-ignore-dir-regexp
-    (format "\\(%s\\)\\|\\(%s\\)"
-      vc-ignore-dir-regexp
-      tramp-file-name-regexp)))
-#+end_src
-*** Tramp-sh
-:PROPERTIES:
-:CUSTOM_ID: 00d16929-6ff7-4edd-a6ad-24f9b225ee96
-:END:
-#+begin_src elisp
-  (use-package tramp-sh
-    :defer t
-    :config (cl-pushnew 'tramp-own-remote-path tramp-remote-path))
-#+end_src
-
-** Dashboard
-:PROPERTIES:
-:CUSTOM_ID: ada74755-5de2-4552-802e-5d3c71945b3a
-:END:
-Dashboard is an extensible startup screen showing you recent files, bookmarks, agenda items and an Emacs banner.
-
-Emacs currently cannot display correpng or svg with alpha channels, when emacs's background is transparent. The solution is to use xpm format image.
-*** Emacs Dashboard
-:PROPERTIES:
-:CUSTOM_ID: ad0fd7bc-d40c-4bc7-a556-4a128dd293ae
-:END:
-#+begin_src elisp
-  (use-package dashboard
-  :init
-    (setq initial-buffer-choice 'dashboard-open
-        dashboard-image-banner-max-width 1100
-        dashboard-set-heading-icons t
-        dashboard-center-content t ;; set to 't' for centered content
-        dashboard-set-file-icons t
-        initial-buffer-choice (lambda () (get-buffer-create "*scratch*"))
-        dashboard-startup-banner ;; use custom image as banner
-        (concat user-emacs-directory "assets/EmaxBound.webp")
-        dashboard-items
-        '((recents . 5)
-          (agenda . 5 )
-          (bookmarks . 3)
-          (projects . 3)
-          (registers . 3)
-          )
-    )
-  :config
-    (dashboard-setup-startup-hook)
-    (setq-default header-line-format mode-line-format)
-    (setq-default mode-line-format nil)
-    (set-face-attribute 'dashboard-items-face nil)
-
-  :bind (:map dashboard-mode-map
-    ("k" . 'dashboard-previous-line)
-    ("l" . 'dashboard-next-line)
-    (";" . 'dashboard-next-section)
-    ("j" . 'dashboard-previous-section)
-    )
-  )
-#+end_src
-
-*** COMMENT Doom Dashboard
-:PROPERTIES:
-:CUSTOM_ID: f0f8c236-f5ab-485c-8cd1-2647e0877b0a
-:END:
-#+begin_src elisp
-  (use-package doom-dashboard
-  :init
-    (setq doom-dashboard-banner-file "assets/EmaxBound-1400.xpm")
-  :config
-    (doom-dashboard-init-h)
-    (doom-dashboard-load)
-  )
-#+end_src
-** Modeline
-:PROPERTIES:
-:CUSTOM_ID: 0ab7afcf-8449-465e-99b8-bbe18870171f
-:END:
-*** Doom-modeline
-:PROPERTIES:
-:CUSTOM_ID: da367cb2-cf54-4e86-9c3e-83e07a7b89f2
-:END:
-[[https://github.com/seagle0128/doom-modeline][Doom-modeline]] is a very attractive and rich (yet still minimal) mode line configuration for Emacs.  The default configuration is quite good but you can check out the [[https://github.com/seagle0128/doom-modeline#customize][configuration options]] for more things you can enable or disable.
-
-#+begin_src elisp
-  (use-package doom-modeline
-  :init
-        (setq
-            doom-modeline-height 37
-            doom-modeline-enable-word-count t)
-        (doom-modeline-mode 1)
-  :config
-        (set-face-attribute 'doom-modeline t
-            :inherit 'variable-pitch)
-    ;; let modeline show on the header, not bottom
-    (defun move-up-modeline ()
-      (interactive)
-      (progn
-        (setq-default header-line-format mode-line-format)
-        (setq-default mode-line-format nil)
-      ))
-    (move-up-modeline)
-  )
-#+end_src
-
-*NOTE1*: [[Nerd-icons]] are necessary. Run [[elisp:nerd-icons-install-fonts][M-x nerd-icons-install-fonts]] to install the resource fonts.
-
-*NOTE2:* [[All-the-icons]] hasn't been supported since 4.0.0. If prefer all-the-icons, use release 3.4.0, then run [[elisp:all-the-icons-install-fonts][M-x all-the-icons-install-fonts]] to install necessary icons.
-
-*** COMMENT Nano-modline
-:PROPERTIES:
-:CUSTOM_ID: 699f2b2b-289d-4151-b870-3145646e1404
-:END:
-#+begin_src elisp
-  (use-package nano-modeline
-  :defer t
-  :config
-    (add-hook 'prog-mode-hook            #'nano-modeline-prog-mode)
-    (add-hook 'text-mode-hook            #'nano-modeline-text-mode)
-    (add-hook 'org-mode-hook             #'nano-modeline-org-mode)
-    (add-hook 'pdf-view-mode-hook        #'nano-modeline-pdf-mode)
-    (add-hook 'mu4e-headers-mode-hook    #'nano-modeline-mu4e-headers-mode)
-    (add-hook 'mu4e-view-mode-hook       #'nano-modeline-mu4e-message-mode)
-    (add-hook 'elfeed-show-mode-hook     #'nano-modeline-elfeed-entry-mode)
-    (add-hook 'elfeed-search-mode-hook   #'nano-modeline-elfeed-search-mode)
-    (add-hook 'term-mode-hook            #'nano-modeline-term-mode)
-    (add-hook 'xwidget-webkit-mode-hook  #'nano-modeline-xwidget-mode)
-    (add-hook 'messages-buffer-mode-hook #'nano-modeline-message-mode)
-    (add-hook 'org-capture-mode-hook     #'nano-modeline-org-capture-mode)
-    (add-hook 'org-agenda-mode-hook      #'nano-modeline-org-agenda-mode)
-  )
-#+end_src
-*** Diminish
-:PROPERTIES:
-:CUSTOM_ID: 5f5bbdb2-3644-40a3-8bf9-9226e6063a65
-:END:
-This package implements hiding or abbreviation of the modeline displays (lighters) of minor-modes.  With this package installed, you can add ':diminish' to any use-package block to hide that particular mode in the modeline.
-#+begin_src elisp
-  (use-package diminish)
-#+end_src
-
-*** Awesome-tray
-:PROPERTIES:
-:CUSTOM_ID: 2d50c10f-6c78-40b0-8944-6dbbc0070eb0
-:END:
-#+begin_src elisp
-  (use-package awesome-tray
-  :defer t
-  :init
-    ;(awesome-tray-mode)
-  :config
-    (setq awesome-tray-hide-mode-line nil)
-  )
-
-#+end_src
 ** Minibuffer
 :PROPERTIES:
 :CUSTOM_ID: 0f18c662-2e67-43ce-b083-aa38cf1bb77e
@@ -2122,46 +1964,33 @@ See [[* Posframe][Posframe]] for function defintion.
   )
 #+end_src
 
-*** Embark
-:PROPERTIES:
-:CUSTOM_ID: 6e9e24f1-5d7c-4e11-a8a0-fe7a3307a8d4
-:END:
-#+begin_src elisp
-  (use-package embark
-    :bind
-    (("C-." . embark-act)         ;; pick some comfortable binding
-     ("C-;" . embark-dwim)        ;; good alternative: M-.
-     ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
-
-    :init
-
-    ;; Optionally replace the key help with a completing-read interface
-    (setq prefix-help-command #'embark-prefix-help-command)
-
-    ;; Show the Embark target at point via Eldoc.  You may adjust the Eldoc
-    ;; strategy, if you want to see the documentation from multiple providers.
-    (add-hook 'eldoc-documentation-functions #'embark-eldoc-first-target)
-    ;; (setq eldoc-documentation-strategy #'eldoc-documentation-compose-eagerly)
-
-    :config
-
-    ;; Hide the mode line of the Embark live/completions buffers
-    (add-to-list 'display-buffer-alist
-                 '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
-                   nil
-                   (window-parameters (mode-line-format . none)))))
-#+end_src
-
-#+begin_src elisp
-  (use-package embark-consult
-    :hook
-    (embark-collect-mode . consult-preview-at-point-mode))
-#+end_src
 ** Tabs
 :PROPERTIES:
 :CUSTOM_ID: 7ed80fba-c7b3-4fb8-9bfd-20557b4d2e2c
 :END:
-**** COMMENT Tab-line-mode
+*** Tab-bar-mode
+:PROPERTIES:
+:CUSTOM_ID: c1a1309e-1e38-4149-aa3f-f8c0ae968367
+:END:
+*** Sort-tab
+:PROPERTIES:
+:CUSTOM_ID: ba49602c-1d1a-43bd-99c8-50ef27584561
+:END:
+
+#+begin_src elisp
+  (use-package sort-tab
+  :init (sort-tab-mode)
+  :config
+    (defun my/sort-tab-filter (buffer)
+      "a filter functioni for sort-tab. return t hides the buffer"
+      (let ((major-mode (buffer-local-value 'major-mode buffer)))
+        (cond ((eq major-mode 'dired-mode) t)
+              (t nil)))
+      )
+    (setq sort-tab-hide-function 'my/sort-tab-filter)
+  )
+#+end_src
+*** COMMENT Tab-line-mode
 :PROPERTIES:
 :CUSTOM_ID: 30ab2a21-2272-4965-b721-4af3a31fa51a
 :END:
@@ -2211,11 +2040,7 @@ Code stolen from [[https://emacs-china.org/t/27-1-tab-line-mode/20514][Emacs Chi
           (global-tab-line-mode 1)
           )
 #+end_src
-**** Tab-bar-mode
-:PROPERTIES:
-:CUSTOM_ID: c1a1309e-1e38-4149-aa3f-f8c0ae968367
-:END:
-**** COMMENT Centaur-tabs
+*** COMMENT Centaur-tabs
 :PROPERTIES:
 :CUSTOM_ID: 0d6f7e8e-7cf3-4137-8d10-f000168193e5
 :END:
@@ -2274,24 +2099,6 @@ Code stolen from [[https://emacs-china.org/t/27-1-tab-line-mode/20514][Emacs Chi
 
   )
 #+end_src
-**** Sort-tab
-:PROPERTIES:
-:CUSTOM_ID: ba49602c-1d1a-43bd-99c8-50ef27584561
-:END:
-
-#+begin_src elisp
-  (use-package sort-tab
-  :init (sort-tab-mode)
-  :config
-    (defun my/sort-tab-filter (buffer)
-      "a filter functioni for sort-tab. return t hides the buffer"
-      (let ((major-mode (buffer-local-value 'major-mode buffer)))
-        (cond ((eq major-mode 'dired-mode) t)
-              (t nil)))
-      )
-    (setq sort-tab-hide-function 'my/sort-tab-filter)
-  )
-#+end_src
 ** Windows
 :PROPERTIES:
 :CUSTOM_ID: e2e5d1ce-cb29-4bcd-8642-8c041fe8a5c5
@@ -2313,7 +2120,180 @@ Code stolen from [[https://emacs-china.org/t/27-1-tab-line-mode/20514][Emacs Chi
 #+begin_src elisp
   (use-package toggle-one-window)
 #+end_src
-** Magit
+** Modeline
+:PROPERTIES:
+:CUSTOM_ID: 0ab7afcf-8449-465e-99b8-bbe18870171f
+:END:
+*** Doom-modeline
+:PROPERTIES:
+:CUSTOM_ID: da367cb2-cf54-4e86-9c3e-83e07a7b89f2
+:END:
+[[https://github.com/seagle0128/doom-modeline][Doom-modeline]] is a very attractive and rich (yet still minimal) mode line configuration for Emacs.  The default configuration is quite good but you can check out the [[https://github.com/seagle0128/doom-modeline#customize][configuration options]] for more things you can enable or disable.
+
+#+begin_src elisp
+  (use-package doom-modeline
+  :init
+        (setq
+            doom-modeline-height 37
+            doom-modeline-enable-word-count t)
+        (doom-modeline-mode 1)
+  :config
+        (set-face-attribute 'doom-modeline t
+            :inherit 'variable-pitch)
+    ;; let modeline show on the header, not bottom
+    (defun move-up-modeline ()
+      (interactive)
+      (progn
+        (setq-default header-line-format mode-line-format)
+        (setq-default mode-line-format nil)
+      ))
+    (move-up-modeline)
+  )
+#+end_src
+
+*NOTE1*: [[Nerd-icons]] are necessary. Run [[elisp:nerd-icons-install-fonts][M-x nerd-icons-install-fonts]] to install the resource fonts.
+
+*NOTE2:* [[All-the-icons]] hasn't been supported since 4.0.0. If prefer all-the-icons, use release 3.4.0, then run [[elisp:all-the-icons-install-fonts][M-x all-the-icons-install-fonts]] to install necessary icons.
+
+*** COMMENT Nano-modline
+:PROPERTIES:
+:CUSTOM_ID: 699f2b2b-289d-4151-b870-3145646e1404
+:END:
+#+begin_src elisp
+  (use-package nano-modeline
+  :defer t
+  :config
+    (add-hook 'prog-mode-hook            #'nano-modeline-prog-mode)
+    (add-hook 'text-mode-hook            #'nano-modeline-text-mode)
+    (add-hook 'org-mode-hook             #'nano-modeline-org-mode)
+    (add-hook 'pdf-view-mode-hook        #'nano-modeline-pdf-mode)
+    (add-hook 'mu4e-headers-mode-hook    #'nano-modeline-mu4e-headers-mode)
+    (add-hook 'mu4e-view-mode-hook       #'nano-modeline-mu4e-message-mode)
+    (add-hook 'elfeed-show-mode-hook     #'nano-modeline-elfeed-entry-mode)
+    (add-hook 'elfeed-search-mode-hook   #'nano-modeline-elfeed-search-mode)
+    (add-hook 'term-mode-hook            #'nano-modeline-term-mode)
+    (add-hook 'xwidget-webkit-mode-hook  #'nano-modeline-xwidget-mode)
+    (add-hook 'messages-buffer-mode-hook #'nano-modeline-message-mode)
+    (add-hook 'org-capture-mode-hook     #'nano-modeline-org-capture-mode)
+    (add-hook 'org-agenda-mode-hook      #'nano-modeline-org-agenda-mode)
+  )
+#+end_src
+*** Diminish
+:PROPERTIES:
+:CUSTOM_ID: 5f5bbdb2-3644-40a3-8bf9-9226e6063a65
+:END:
+This package implements hiding or abbreviation of the modeline displays (lighters) of minor-modes.  With this package installed, you can add ':diminish' to any use-package block to hide that particular mode in the modeline.
+#+begin_src elisp
+  (use-package diminish)
+#+end_src
+
+*** Awesome-tray
+:PROPERTIES:
+:CUSTOM_ID: 2d50c10f-6c78-40b0-8944-6dbbc0070eb0
+:END:
+#+begin_src elisp
+  (use-package awesome-tray
+  :defer t
+  :init
+    ;(awesome-tray-mode)
+  :config
+    (setq awesome-tray-hide-mode-line nil)
+  )
+
+#+end_src
+
+* Interface
+:PROPERTIES:
+:CUSTOM_ID: cb12123c-aeb2-46ed-8bc4-dec0c9e5324c
+:END:
+Packages beneath this outline implements some functionalities by creating new buffers or windows.
+Packages that serves for a specific mode is not configured here.
+
+** Dashboard
+:PROPERTIES:
+:CUSTOM_ID: ada74755-5de2-4552-802e-5d3c71945b3a
+:END:
+*** Emacs Dashboard
+:PROPERTIES:
+:CUSTOM_ID: ad0fd7bc-d40c-4bc7-a556-4a128dd293ae
+:END:
+
+Dashboard is an extensible startup screen showing you recent files, bookmarks, agenda items and an Emacs banner.
+
+Emacs currently cannot display correpng or svg with alpha channels, when emacs's background is transparent. A workaround is to use xpm or webp format image.
+
+#+begin_src elisp
+  (use-package dashboard
+  :init
+    (setq initial-buffer-choice 'dashboard-open
+        dashboard-image-banner-max-width 1100
+        dashboard-set-heading-icons t
+        dashboard-center-content t ;; set to 't' for centered content
+        dashboard-set-file-icons t
+        initial-buffer-choice (lambda () (get-buffer-create "*scratch*"))
+        dashboard-startup-banner ;; use custom image as banner
+        (concat user-emacs-directory "assets/EmaxBound.webp")
+        dashboard-items
+        '((recents . 5)
+          (agenda . 5 )
+          (bookmarks . 3)
+          (projects . 3)
+          (registers . 3)
+          )
+    )
+  :config
+    (dashboard-setup-startup-hook)
+    (setq-default header-line-format mode-line-format)
+    (setq-default mode-line-format nil)
+    (set-face-attribute 'dashboard-items-face nil)
+
+  :bind (:map dashboard-mode-map
+    ("k" . 'dashboard-previous-line)
+    ("l" . 'dashboard-next-line)
+    (";" . 'dashboard-next-section)
+    ("j" . 'dashboard-previous-section)
+    )
+  )
+#+end_src
+
+*** COMMENT Doom Dashboard
+:PROPERTIES:
+:CUSTOM_ID: f0f8c236-f5ab-485c-8cd1-2647e0877b0a
+:END:
+#+begin_src elisp
+  (use-package doom-dashboard
+  :init
+    (setq doom-dashboard-banner-file "assets/EmaxBound-1400.xpm")
+  :config
+    (doom-dashboard-init-h)
+    (doom-dashboard-load)
+  )
+#+end_src
+
+** Visual Undo
+:PROPERTIES:
+:CUSTOM_ID: 6529ab53-c72d-451e-a9b9-acea32b79987
+:END:
+[[https://github.com/casouri/vundo][Vundo]] (visual undo) displays the undo history as a tree and lets you move in the tree to go back to previous buffer states.
+#+begin_src elisp
+  (use-package vundo
+  :config
+    (general-def vundo-mode-map
+      "j"  'vundo-backward
+      ";"  'vundo-forward
+      "k"  'vundo-previous
+      "l"  'vundo-next
+      "q"  'vundo-quit
+      "s"  'vundo-save
+      )
+  )
+#+end_src
+
+** Version Control
+:PROPERTIES:
+:CUSTOM_ID: 298a7b94-ac37-4f39-a15e-d68bc4fba61d
+:END:
+*** Magit
 :PROPERTIES:
 :CUSTOM_ID: fb0d621a-2819-4171-bb76-17314d4d027f
 :END:
@@ -2338,7 +2318,126 @@ Code stolen from [[https://emacs-china.org/t/27-1-tab-line-mode/20514][Emacs Chi
 [submodule "magit"]
   no-byte-compile = lisp/magit-libgit.el
 #+end_src
-** COMMENT Treemacs
+*** Diff
+:PROPERTIES:
+:CUSTOM_ID: a7e7f5b2-64ce-4430-95a4-9ee10af93f9b
+:END:
+
+Diff highlight highlights the fringe of lines that have been edited.
+#+begin_src elisp
+  (use-package diff-hl
+  :custom-face
+    (diff-hl-change ((t (:background "#2c5f72" :foreground "#77a8d9"))))
+    (diff-hl-delete ((t (:background "#844953" :foreground "#f27983"))))
+    (diff-hl-insert ((t (:background "#5E734A" :foreground "#a6cc70"))))
+  :config
+    (setq diff-hl-draw-borders nil)
+    (global-diff-hl-mode)
+    ;(diff-hl-margin-mode)
+    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
+  )
+#+end_src
+
+** File-manager
+:PROPERTIES:
+:CUSTOM_ID: 206f2252-10b8-49ed-bba3-f70dc0eb3b8d
+:END:
+*** Dirvish
+:PROPERTIES:
+:CUSTOM_ID: 4a83db9a-d850-49a5-9d00-84010319e6f6
+:END:
+Dirvish is a dropin replacement for dired. It looks and feels like ranger.
+
+#+begin_src elisp
+  (use-package dirvish
+  :after dired
+  :custom
+    (dirvish-quick-access-entries ;`setq' won't work for custom
+      '(("h" "~/"                          "Home")
+        ("d" "~/Downloads/"                "Downloads")
+        ("m" "/mnt/"                       "Drives")
+        ("t" "~/.local/share/Trash/files/" "TrashCan"))
+    )
+  :config
+    (dirvish-define-preview exa (file)
+    "Use `exa' to generate directory preview."
+    :require ("exa") ; tell Dirvish to check if we have the executable
+    (when (file-directory-p file) ; we only interest in directories here
+        `(shell . ("exa" "-al" "--color=always" "--icons"
+            "--group-directories-first" ,file))))
+
+    (add-to-list 'dirvish-preview-dispatchers 'exa)
+    ;; (dirvish-peek-mode) ; Preview files in minibuffer
+    ;; (dirvish-side-follow-mode) ; similar to `treemacs-follow-mode'
+    (setq dirvish-path-separators (list "  " "  " "  "))
+    (setq dirvish-mode-line-format
+        '(:left (sort symlink) :right (omit yank index)))
+    (setq dirvish-attributes
+        '(all-the-icons file-time file-size collapse subtree-state vc-state git-msg))
+    (setq delete-by-moving-to-trash t)
+    (setq dired-listing-switches
+        "-l --almost-all --human-readable --group-directories-first --no-group")
+
+    (general-def dirvish-mode-map
+      "q"      '(dirvish-quit              :wk "quit")
+      "j"      '(dired-up-directory        :wk "up-dir")
+      ";"      '(dired-find-file           :wk "open/toggle")
+      "a"      '(dirvish-quick-access      :wk "access")
+      "c"      '(dired-do-copy             :wk "copy")
+      "u"      '(dired-do-rename           :wk "rename")
+    )
+    ;; (nmap dirvish-mode-map
+    ;;    "?"      '(dirvish-dispatch          :wk "Dispatch")
+    ;;    "TAB"    '(dirvish-subtree-toggle    :wk "Subtre-toggle")
+    ;;    "q"      '(dirvish-quit              :wk "Quit")
+    ;;    "h"      '(dired-up-directory        :wk "Up-dir")
+    ;;    "l"      '(dired-find-file           :wk "Open/Toggle")
+    ;;    "a"      '(dirvish-quick-access      :wk "Access")
+    ;;    "f"      '(dirvish-file-info-menu    :wk "File Info Menu")
+    ;;    "y"      '(dirvish-yank-menu         :wk "Yank Menu")
+    ;;    "N"      '(dirvish-narrow            :wk "Narrow")
+    ;;    ;         `dired-view-file'
+    ;;    "v"      '(dirvish-vc-menu           :wk "View-file")
+    ;;    ;         `dired-sort-toggle-or-edit'
+    ;;    "s"      '(dirvish-quicksort         :wk "Quick-sort")
+
+    ;;    "M-f"    '(dirvish-history-go-forward  :wk "History-forward")
+    ;;    "M-b"    '(dirvish-history-go-backward :wk "History-back")
+    ;;    "M-l"    '(dirvish-ls-switches-menu    :wk "ls Switch Menu")
+    ;;    "M-m"    '(dirvish-mark-menu           :wk "Mark Menu")
+    ;;    "M-t"    '(dirvish-layout-toggle       :wk "Layout-toggle")
+    ;;    "M-s"    '(dirvish-setup-menu          :wk "Setup-Menu")
+    ;;    "M-e"    '(dirvish-emerge-menu         :wk "Emerge-Menu")
+    ;;    "M-j"    '(dirvish-fd-jump             :wk "fd-jump")
+    ;; )
+    (dirvish-override-dired-mode)
+  )
+#+end_src
+
+*** Diredfl
+:PROPERTIES:
+:CUSTOM_ID: af5fc17a-95de-4c3f-a1af-85b005311873
+:END:
+[[https://github.com/purcell/diredfl][Diredfl]] defines extra font lock rules to make dired more colorful.
+#+begin_src elisp
+  (use-package diredfl
+  :hook
+    ((dired-mode . diredfl-mode)
+     ;; highlight parent and directory preview as well
+     (dirvish-directory-view-mode . diredfl-mode))
+  :config
+    (set-face-attribute 'diredfl-dir-name nil :bold t)
+  )
+#+end_src
+
+Tweaks to build dirvish. Load dirvish and its extensions.
+#+begin_src conf
+[submodule "dirvish"]
+  load-path = .
+  load-path = extensions
+#+end_src
+
+*** COMMENT Treemacs
 :PROPERTIES:
 :CUSTOM_ID: 5c283b5d-4f73-4cae-8745-9c85512a6002
 :END:
@@ -2468,136 +2567,40 @@ All the el files in treemacs are in =src/elisp= and =src/extra=
     load-path = src/elisp
     load-path = src/extra
 #+end_src
-** Dirvish
+** Embark
 :PROPERTIES:
-:CUSTOM_ID: 4a83db9a-d850-49a5-9d00-84010319e6f6
-:END:
-Dirvish is a dropin replacement for dired. It looks and feels like ranger.
-
-#+begin_src elisp
-  (use-package dirvish
-  :after dired
-  :custom
-    (dirvish-quick-access-entries ;`setq' won't work for custom
-      '(("h" "~/"                          "Home")
-        ("d" "~/Downloads/"                "Downloads")
-        ("m" "/mnt/"                       "Drives")
-        ("t" "~/.local/share/Trash/files/" "TrashCan"))
-    )
-  :config
-    (dirvish-define-preview exa (file)
-    "Use `exa' to generate directory preview."
-    :require ("exa") ; tell Dirvish to check if we have the executable
-    (when (file-directory-p file) ; we only interest in directories here
-        `(shell . ("exa" "-al" "--color=always" "--icons"
-            "--group-directories-first" ,file))))
-
-    (add-to-list 'dirvish-preview-dispatchers 'exa)
-    ;; (dirvish-peek-mode) ; Preview files in minibuffer
-    ;; (dirvish-side-follow-mode) ; similar to `treemacs-follow-mode'
-    (setq dirvish-path-separators (list "  " "  " "  "))
-    (setq dirvish-mode-line-format
-        '(:left (sort symlink) :right (omit yank index)))
-    (setq dirvish-attributes
-        '(all-the-icons file-time file-size collapse subtree-state vc-state git-msg))
-    (setq delete-by-moving-to-trash t)
-    (setq dired-listing-switches
-        "-l --almost-all --human-readable --group-directories-first --no-group")
-
-    (general-def dirvish-mode-map
-      "q"      '(dirvish-quit              :wk "quit")
-      "j"      '(dired-up-directory        :wk "up-dir")
-      ";"      '(dired-find-file           :wk "open/toggle")
-      "a"      '(dirvish-quick-access      :wk "access")
-      "c"      '(dired-do-copy             :wk "copy")
-      "u"      '(dired-do-rename           :wk "rename")
-    )
-    ;; (nmap dirvish-mode-map
-    ;;    "?"      '(dirvish-dispatch          :wk "Dispatch")
-    ;;    "TAB"    '(dirvish-subtree-toggle    :wk "Subtre-toggle")
-    ;;    "q"      '(dirvish-quit              :wk "Quit")
-    ;;    "h"      '(dired-up-directory        :wk "Up-dir")
-    ;;    "l"      '(dired-find-file           :wk "Open/Toggle")
-    ;;    "a"      '(dirvish-quick-access      :wk "Access")
-    ;;    "f"      '(dirvish-file-info-menu    :wk "File Info Menu")
-    ;;    "y"      '(dirvish-yank-menu         :wk "Yank Menu")
-    ;;    "N"      '(dirvish-narrow            :wk "Narrow")
-    ;;    ;         `dired-view-file'
-    ;;    "v"      '(dirvish-vc-menu           :wk "View-file")
-    ;;    ;         `dired-sort-toggle-or-edit'
-    ;;    "s"      '(dirvish-quicksort         :wk "Quick-sort")
-
-    ;;    "M-f"    '(dirvish-history-go-forward  :wk "History-forward")
-    ;;    "M-b"    '(dirvish-history-go-backward :wk "History-back")
-    ;;    "M-l"    '(dirvish-ls-switches-menu    :wk "ls Switch Menu")
-    ;;    "M-m"    '(dirvish-mark-menu           :wk "Mark Menu")
-    ;;    "M-t"    '(dirvish-layout-toggle       :wk "Layout-toggle")
-    ;;    "M-s"    '(dirvish-setup-menu          :wk "Setup-Menu")
-    ;;    "M-e"    '(dirvish-emerge-menu         :wk "Emerge-Menu")
-    ;;    "M-j"    '(dirvish-fd-jump             :wk "fd-jump")
-    ;; )
-    (dirvish-override-dired-mode)
-  )
-#+end_src
-
-[[https://github.com/purcell/diredfl][Diredfl]] defines extra font lock rules to make dired more colorful.
-#+begin_src elisp
-  (use-package diredfl
-  :hook
-    ((dired-mode . diredfl-mode)
-     ;; highlight parent and directory preview as well
-     (dirvish-directory-view-mode . diredfl-mode))
-  :config
-    (set-face-attribute 'diredfl-dir-name nil :bold t)
-  )
-#+end_src
-
-Tweaks to build dirvish. Load dirvish and its extensions.
-#+begin_src conf
-[submodule "dirvish"]
-  load-path = .
-  load-path = extensions
-#+end_src
-
-** Helpful
-:PROPERTIES:
-:CUSTOM_ID: 14bddefb-9db5-485e-91d6-d47ed73b6775
-:END:
-
-[[https://github.com/Wilfred/helpful][Helpful]] adds a lot of very helpful information to Emacs' =describe-= command buffers.
-For example, if you use =describe-function=, you will not only get the documentation about the function,
-you will also see the source code of the function and where it gets used in other places in the Emacs configuration.
-It is very useful for figuring out how things work in Emacs.
-
-#+begin_src elisp
-  (use-package helpful
-  :bind
-     ([remap describe-key]      . helpful-key)
-     ([remap describe-command]  . helpful-command)
-     ([remap describe-variable] . helpful-variable)
-     ([remap describe-function] . helpful-callable)
-     ("C-h F" . describe-face)
-     ("C-h K" . describe-keymap)
-  )
-#+end_src
-
-** Info+
-:PROPERTIES:
-:CUSTOM_ID: af99c97f-1ac8-4ab2-b322-ae66c78cc960
+:CUSTOM_ID: 6e9e24f1-5d7c-4e11-a8a0-fe7a3307a8d4
 :END:
 #+begin_src elisp
-  (use-package info+
-  :defer t
-  :config
-  )
+  (use-package embark
+    :bind
+    (("C-." . embark-act)         ;; pick some comfortable binding
+     ("C-;" . embark-dwim)        ;; good alternative: M-.
+     ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
+
+    :init
+
+    ;; Optionally replace the key help with a completing-read interface
+    (setq prefix-help-command #'embark-prefix-help-command)
+
+    ;; Show the Embark target at point via Eldoc.  You may adjust the Eldoc
+    ;; strategy, if you want to see the documentation from multiple providers.
+    (add-hook 'eldoc-documentation-functions #'embark-eldoc-first-target)
+    ;; (setq eldoc-documentation-strategy #'eldoc-documentation-compose-eagerly)
+
+    :config
+
+    ;; Hide the mode line of the Embark live/completions buffers
+    (add-to-list 'display-buffer-alist
+                 '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                   nil
+                   (window-parameters (mode-line-format . none)))))
 #+end_src
+
 #+begin_src elisp
-  (use-package info-colors
-  :config
-    (add-hook 'Info-selection-hook 'info-colors-fontify-node)
-    (add-hook 'Info-mode-hook 'olivetti-mode)
-    (add-hook 'Info-mode-hook 'mixed-pitch-mode)
-  )
+  (use-package embark-consult
+    :hook
+    (embark-collect-mode . consult-preview-at-point-mode))
 #+end_src
 ** Blink search
 :PROPERTIES:
@@ -2632,265 +2635,110 @@ It is very useful for figuring out how things work in Emacs.
 :PROPERTIES:
 :CUSTOM_ID: 9f6cd50b-6766-4f7e-ba85-393b35c8502a
 :END:
+
 [[https://github.com/manateelazycat/voyager][Voyager]] is an Emacs debugging plugin based on the DAP protocol.
 #+begin_src elisp
   (use-package voyager)
 #+end_src
 
-* Coding
+** Holo-layer
 :PROPERTIES:
-:CUSTOM_ID: da3e4dda-4fd1-4f9a-8c50-b71203fe58bd
+:CUSTOM_ID: d2ccade1-d85f-4dff-a67f-e508b1fa6f46
 :END:
-** LSP-bridge
-:PROPERTIES:
-:CUSTOM_ID: ade7813c-6a0a-4c9b-a47b-7b3ee5df0fc2
-:END:
-[[https://github.com/manateelazycat/lsp-bridge][lsp-bridge]] builds a high-speed cache between Emacs and the LSP server.
+[[https://github.com/manateelazycat/holo-layer][Holo-layer]] is developed based on PyQt, aiming to significantly enhance the visual experience of Emacs.
 #+begin_src elisp
-  (use-package lsp-bridge
-  :init
-    (global-lsp-bridge-mode)
-  :config
-    ;(set-face-attributes 'lsp-bridge-alive-mode-line nil
-    ;  :inherit 'variable-pitch
-    ;)
-  )
-#+end_src
-tweaks to build lsp-bridge
-#+begin_src conf
-[submodule "lsp-bridge"]
-  build-step = borg-update-autoloads
-#+end_src
-
-** Treesit
-:PROPERTIES:
-:CUSTOM_ID: b631d5dd-1e0a-4499-b2b1-7275666b5f1f
-:END:
-You can find the addresses of language parsers at [[https://tree-sitter.github.io/tree-sitter/][treesitter's official doc]].
-To enable treesit support for a language, you need to run =M-x treesit-install-language-grammar= and select the language. This will clone the language's tree-sitter repo and build it (requires system =cc=).
-#+begin_src elisp
-  (use-package treesit
-  :commands (treesit-install-language-grammar
-             config/treesit-install-all-languages)
-  :init
-    (setq treesit-language-source-alist
-      '((bash . ("https://github.com/tree-sitter/tree-sitter-bash"))
-        (c . ("https://github.com/tree-sitter/tree-sitter-c"))
-        (cpp . ("https://github.com/tree-sitter/tree-sitter-cpp"))
-        (css . ("https://github.com/tree-sitter/tree-sitter-css"))
-        (cmake . ("https://github.com/uyha/tree-sitter-cmake"))
-        (common-lisp . ("https://github.com/theHamsta/tree-sitter-commonlisp"))
-        (csharp . ("https://github.com/tree-sitter/tree-sitter-c-sharp.git"))
-        (dockerfile . ("https://github.com/camdencheek/tree-sitter-dockerfile"))
-        (elisp . ("https://github.com/Wilfred/tree-sitter-elisp"))
-        (go . ("https://github.com/tree-sitter/tree-sitter-go"))
-        (gomod . ("https://github.com/camdencheek/tree-sitter-go-mod.git"))
-        (html . ("https://github.com/tree-sitter/tree-sitter-html"))
-        (java . ("https://github.com/tree-sitter/tree-sitter-java.git"))
-        (javascript . ("https://github.com/tree-sitter/tree-sitter-javascript"))
-        (json . ("https://github.com/tree-sitter/tree-sitter-json"))
-        (lua . ("https://github.com/Azganoth/tree-sitter-lua"))
-        (make . ("https://github.com/alemuller/tree-sitter-make"))
-        (markdown . ("https://github.com/MDeiml/tree-sitter-markdown" nil
-          "tree-sitter-markdown/src"))
-        (nix . ("https://github.com/nix-community/tree-sitter-nix.git"))
-        (ocaml . ("https://github.com/tree-sitter/tree-sitter-ocaml" nil "ocaml/src"))
-        (org . ("https://github.com/milisims/tree-sitter-org"))
-        (python . ("https://github.com/tree-sitter/tree-sitter-python"))
-        (php . ("https://github.com/tree-sitter/tree-sitter-php"))
-        (typescript . ("https://github.com/tree-sitter/tree-sitter-typescript" nil
-            "typescript/src"))
-        (tsx . ("https://github.com/tree-sitter/tree-sitter-typescript" nil
-            "tsx/src"))
-        (ruby . ("https://github.com/tree-sitter/tree-sitter-ruby"))
-        (rust . ("https://github.com/tree-sitter/tree-sitter-rust"))
-        (sql . ("https://github.com/m-novikov/tree-sitter-sql"))
-        (vue . ("https://github.com/merico-dev/tree-sitter-vue"))
-        (yaml . ("https://github.com/ikatyang/tree-sitter-yaml"))
-        (toml . ("https://github.com/tree-sitter/tree-sitter-toml"))
-        (zig . ("https://github.com/GrayJack/tree-sitter-zig"))))
-  :config
-  (defun config/treesit-install-all-languages ()
-    "Install all languages specified by `treesit-language-source-alist'."
-    (interactive)
-    (let ((languages (mapcar 'car treesit-language-source-alist)))
-      (dolist (lang languages)
-        (treesit-install-language-grammar lang)
-        (message "`%s' parser was installed." lang)
-        (sit-for 0.75)))))
-  ;; stolen from lazycat
-  (setq major-mode-remap-alist
-        '((c-mode          . c-ts-mode)
-          (c++-mode        . c++-ts-mode)
-          (cmake-mode      . cmake-ts-mode)
-          (conf-toml-mode  . toml-ts-mode)
-          (css-mode        . css-ts-mode)
-          (js-mode         . js-ts-mode)
-          (js-json-mode    . json-ts-mode)
-          (nix-mode        . nix-ts-mode)
-          (python-mode     . python-ts-mode)
-          (sh-mode         . bash-ts-mode)
-          (typescript-mode . typescript-ts-mode)
-          (rust-mode       . rust-ts-mode)
-          ))
-
-  (add-hook 'markdown-mode-hook #'(lambda ()
-            (treesit-parser-create 'markdown)))
-
-  (add-hook 'web-mode-hook #'(lambda ()
-             (let ((file-name (buffer-file-name)))
-               (when file-name
-                 (treesit-parser-create
-            (pcase (file-name-extension file-name)
-              ("vue" 'vue)
-              ("html" 'html)
-              ("php" 'php))))
-               )))
-
-  (add-hook 'emacs-lisp-mode-hook #'(lambda () (treesit-parser-create 'elisp)))
-  (add-hook 'ielm-mode-hook #'(lambda () (treesit-parser-create 'elisp)))
-  (add-hook 'json-mode-hook #'(lambda () (treesit-parser-create 'json)))
-  (add-hook 'go-mode-hook #'(lambda () (treesit-parser-create 'go)))
-  (add-hook 'java-mode-hook #'(lambda () (treesit-parser-create 'java)))
-  (add-hook 'java-ts-mode-hook #'(lambda () (treesit-parser-create 'java)))
-  (add-hook 'php-mode-hook #'(lambda () (treesit-parser-create 'php)))
-  (add-hook 'php-ts-mode-hook #'(lambda () (treesit-parser-create 'php)))
-#+end_src
-
-[[https://github.com/renzmann/treesit-auto][Treesit-auto]] automatically installs and uses tree-sitter major modes in Emacs 29+. If the tree-sitter version can't be used, fall back to the original major mode.
-Disabled because I use lazycat's method instead.
-#+begin_src elisp
-  (use-package treesit-auto
-  :disabled
-  :config
-    (global-treesit-auto-mode))
-#+end_src
-** Languages
-:PROPERTIES:
-:CUSTOM_ID: 0d2cb490-c0f4-4e42-acfe-55e0ee789fb7
-:END:
-*** Elisp
-:PROPERTIES:
-:CUSTOM_ID: f998e88f-3234-4f94-a86f-683caaab3483
-:END:
-- buttercup
-- elisp-def
-- elisp-demos
-- highlight-quoted
-- macrostep
-- oversee
-  #+begin_src elisp
-    (setq-default lexical-binding t)
-  #+end_src
-*** LaTeX
-:PROPERTIES:
-:CUSTOM_ID: 76c817ec-2dac-425e-b8a3-a04d6946892f
-:END:
-**** AUCTeX
-:PROPERTIES:
-:CUSTOM_ID: 9543c01b-f1dc-4d85-9056-ce73e2019dbb
-:END:
-#+begin_src elisp
-  (use-package auctex)
-#+end_src
-
-AucTex needs some tweaks to be built.
-To build auctex, =autoconf= should be avaliable on your system.
-#+begin_src conf :tangle .borgconfig
-[submodule "auctex"]
-  load-path = .
-  build-step = ./autogen.sh
-  build-step = ./configure --with-lispdir=~/.emacs.d/lib/auctex --with-texmf-dir=~/.emacs.d/lib/auctex/texmf
-  build-step = make
-  build-step = make doc
-  build-step = borg-maketexi
-  build-step = borg-makeinfo
-  build-step = borg-update-autoloads
-#+end_src
-**** CDTeX
-:PROPERTIES:
-:CUSTOM_ID: e4c612e7-07a4-47b7-95dd-01a881a715cc
-:END:
-#+begin_src elisp
-  (use-package cdlatex)
-#+end_src
-**** COMMENT LAAS
-:PROPERTIES:
-:CUSTOM_ID: 94ce08e7-d4dd-4804-985d-b154934f9442
-:END:
-
-[[https://github.com/tecosaur/LaTeX-auto-activating-snippets][LASS (LaTeX Auto Activating Snippets)]] is a chunky set of LaTeX snippets for the auto-activating-snippets engine.
-
-#+begin_src elisp
-  (use-package laas
-  :after ass
-  :hook (LaTeX-mode . laas-mode))
-#+end_src
-
-*** Nix
-:PROPERTIES:
-:CUSTOM_ID: 58e308df-8796-4406-b89b-136adc972ddb
-:END:
-#+begin_src elisp
-  (use-package nix-mode
-  :mode "\\.nix\\'"
-  :config
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     '((nix . t))
-     )
-  )
-#+end_src
-
-#+begin_src elisp
-  (use-package nix-ts-mode
-  :mode "\\.nix\\'"
-  )
-#+end_src
-*** PlantUML
-:PROPERTIES:
-:CUSTOM_ID: 060fbe09-da11-47fa-83c1-1492fc4a5295
-:END:
-#+begin_src elisp
-  (use-package plantuml-mode
-  :mode "\\.plantuml\\'"
-  )
-#+end_src
-*** Python
-:PROPERTIES:
-:CUSTOM_ID: c0695b7a-e139-4c5c-bcd5-d5be5d3fae89
-:END:
-**** Jupyter
-:PROPERTIES:
-:CUSTOM_ID: d67b0864-7efe-4341-baad-cf2a9f2c6345
-:END:
-#+begin_src elisp
-  (use-package jupyter
+  (use-package holo-layer
   :defer t
-    )
-#+end_src
-*** Verilog
-:PROPERTIES:
-:CUSTOM_ID: 0f43d38a-0d54-441d-ac37-c2c8b4abc1a9
-:END:
-#+begin_src elisp
-  (use-package verilog-mode
-  :mode "\\.v\\'"
+  :if (memq window-system '(pgtk mac ns))
+  :config
+    (setq holo-layer-enable-cursor-animation 1
+          holo-layer-enable-window-border 1
+          holo-layer-sort-tab-ui 1
+          ;;holo-layer-cursor-animation-type "arrow easing"
+          )
+    (holo-layer-enable)
   )
 #+end_src
-*** YAML
+
+* Editing
 :PROPERTIES:
-:CUSTOM_ID: f38fbcdd-6212-442d-9b43-64bf9823ac6f
+:CUSTOM_ID: 869d2b71-ad29-495f-9686-a7f0681a5f81
 :END:
-#+begin_src elisp
-  (use-package yaml-mode
-  :mode "\\.yaml\\'"
-  )
-#+end_src
-** UI
+
+** Displays
 :PROPERTIES:
 :CUSTOM_ID: e6d01f82-1e1f-4f68-bd34-2ab7d6ab3b2e
 :END:
+*** Cursor
+:PROPERTIES:
+:CUSTOM_ID: 6777738a-7c6e-45bd-95c2-759d714ee9da
+:END:
+**** Beacon
+:PROPERTIES:
+:CUSTOM_ID: 8c20fc21-c98e-4ca2-bb4e-728d66b76ad2
+:END:
+Beacon makes the cursor shine when scrolling window or jumping. Somewhat buggy.
+#+begin_src elisp
+  (use-package beacon
+  :defer t
+  :config
+        (beacon-mode)
+  )
+#+end_src
+
+**** Pulse-Cursor
+:PROPERTIES:
+:CUSTOM_ID: bdf3a8f0-d259-491b-99cd-16e72cc3f605
+:END:
+Makes the cursor to blink with fade out animation when idle. Cool.
+
+Be careful that it's possible to consume a horrible amount of memory with =pulsing-cursor-blinks= set to 0 (means infinite blinks) and without proper gc configuration (can be done with [[#3aeaad54-3694-4ad4-a887-ac1d06ccc9c4][GCMH]]).
+#+begin_src elisp
+  (use-package pulsing-cursor
+  :config
+    (setq pulse-delay 0.08
+          pulse-iterations 2)
+    (setq pulsing-cursor-blinks 20)
+    (set-face-attribute 'pulsing-cursor-overlay-face1 nil :inherit 'cursor)
+    (pulsing-cursor-mode)
+  )
+#+end_src
+**** Goggles
+:PROPERTIES:
+:CUSTOM_ID: 1adcfc39-e4d0-4559-acaa-43355f608c4f
+:END:
+Goggles highlights the modified region using pulse. Currently the commands undo, yank, kill and delete are supported.
+
+#+begin_src elisp
+  (use-package goggles
+  :hook ((prog-mode text-mode org-mode) . goggles-mode)
+  :config
+    (setq-default goggles-pulse t)) ;; set to nil to disable pulsing
+#+end_src
+**** Hl-line
+:PROPERTIES:
+:CUSTOM_ID: 6000d6d5-dec0-4bbf-8496-cfddc6fba15d
+:END:
+
+Highlights the line that the cursor locates.
+#+begin_src elisp
+  (use-package hl-line
+  :init
+    (global-hl-line-mode)
+  )
+#+end_src
+
+*** Whitespace mode
+:PROPERTIES:
+:CUSTOM_ID: 60025927-e86d-4ea4-94f1-097e91ac871b
+:END:
+
+[[https://www.emacswiki.org/emacs/WhiteSpace][Whitespace mode]] is a built in mode of emacs that visualizes whitespaces, tab symbols, indentations and related stuffs.
+#+begin_src elisp
+  ;; (config/leader :infix "t"
+  ;;   "SPC"  '(whitespace-mode  :wk "󰡭 Show Space")
+  ;; )
+#+end_src
 *** Line Number
 :PROPERTIES:
 :CUSTOM_ID: 438334d9-53c1-4a75-bd5a-90ee0fd26cc9
@@ -2983,6 +2831,7 @@ parentheses, brackets, and braces according to their depth.
 
   )
 #+end_src
+
 ** Smartparens
 :PROPERTIES:
 :CUSTOM_ID: c5380826-f396-48b3-8983-40cd1317425c
@@ -2994,35 +2843,76 @@ parentheses, brackets, and braces according to their depth.
     (smartparens-global-mode)
   )
 #+end_src
-** Vundo
+** Electric-Indent
 :PROPERTIES:
-:CUSTOM_ID: 6529ab53-c72d-451e-a9b9-acea32b79987
+:CUSTOM_ID: e9971fa5-52b4-4f85-93a5-28b0dab46b80
 :END:
-[[https://github.com/casouri/vundo][Vundo]] (visual undo) displays the undo history as a tree and lets you move in the tree to go back to previous buffer states.
 #+begin_src elisp
-  (use-package vundo
+  (use-package electric
   :config
-    (general-def vundo-mode-map
-      "j"  'vundo-backward
-      ";"  'vundo-forward
-      "k"  'vundo-previous
-      "l"  'vundo-next
-      "q"  'vundo-quit
-      "s"  'vundo-save
-      )
+    (setq-default indent-tabs-mode nil) ;; always indent with spaces
+    (setq electric-pair-mode t) ;; global-minor mode
   )
 #+end_src
-
-** COMMENT Ts-fold
+** Aggressive-Indent
 :PROPERTIES:
-:CUSTOM_ID: a0b69753-a991-49d7-8625-a93082f06ca6
+:CUSTOM_ID: 4532c3c9-2f73-4ccc-acb4-250156b08309
 :END:
+[[https://github.com/Malabarba/aggressive-indent-mode][Aggressive-indent-mode]] is a minor mode that keeps your code always
+indented.  It reindents after every change, making it more reliable
+than `electric-indent-mode'.
 #+begin_src elisp
-  (use-package ts-fold)
+  (use-package aggressive-indent
+  :disabled
+  :config
+    (global-aggressive-indent-mode 1)
+  )
 #+end_src
+* Coding
+:PROPERTIES:
+:CUSTOM_ID: da3e4dda-4fd1-4f9a-8c50-b71203fe58bd
+:END:
+** Auto-save
+:PROPERTIES:
+:CUSTOM_ID: 1c6aa069-acd3-4f3c-94dd-0890bc30efb4
+:END:
+Auto save saves your buffer after entering idle state.
+#+begin_src elisp
+  (use-package auto-save
+  :after lsp-bridge
+  :config
+    (auto-save-enable)
+    (setq auto-save-silent t)   ; quietly save
+    (setq auto-save-delete-trailing-whitespace t)
+  )
+#+end_src
+** LSP-bridge
+:PROPERTIES:
+:CUSTOM_ID: ade7813c-6a0a-4c9b-a47b-7b3ee5df0fc2
+:END:
+[[https://github.com/manateelazycat/lsp-bridge][lsp-bridge]] builds a high-speed cache between Emacs and the LSP server.
+#+begin_src elisp
+  (use-package lsp-bridge
+  :init
+    (global-lsp-bridge-mode)
+  :config
+    ;(set-face-attributes 'lsp-bridge-alive-mode-line nil
+    ;  :inherit 'variable-pitch
+    ;)
+  )
+#+end_src
+tweaks to build lsp-bridge
+#+begin_src conf
+[submodule "lsp-bridge"]
+  build-step = borg-update-autoloads
+#+end_src
+
 ** Fingertip
 :PROPERTIES:
 :CUSTOM_ID: e58e3846-e182-414e-b006-77690c4f6e61
+:END:
+:BACKLINKS:
+[[#e59e6985-9ec3-4bea-8bf0-552741c5029d][Treesit-auto]]
 :END:
 
 fingertip.el is a plugin that provides grammatical edit base on treesit
@@ -3036,7 +2926,7 @@ fingertip.el is a plugin that provides grammatical edit base on treesit
           'java-mode-hook
           'haskell-mode-hook
           'emacs-lisp-mode-hook
-             'lisp-interaction-mode-hook 'lisp-mode-hook
+          'lisp-interaction-mode-hook 'lisp-mode-hook
           'maxima-mode-hook
           'ielm-mode-hook
           'bash-ts-mode-hook 'sh-mode-hook
@@ -3099,30 +2989,143 @@ fingertip.el is a plugin that provides grammatical edit base on treesit
     )
   )
 #+end_src
-** Electric-Indent
+
+** Treesit
 :PROPERTIES:
-:CUSTOM_ID: e9971fa5-52b4-4f85-93a5-28b0dab46b80
+:CUSTOM_ID: b631d5dd-1e0a-4499-b2b1-7275666b5f1f
 :END:
+*** Treesit-auto
+:PROPERTIES:
+:CUSTOM_ID: e59e6985-9ec3-4bea-8bf0-552741c5029d
+:END:
+[[https://github.com/renzmann/treesit-auto][Treesit-auto]] automatically installs and uses tree-sitter major modes in Emacs 29+. If the tree-sitter version can't be used, fall back to the original major mode.
+
+When configuring treesit the following things are worth considering:
++ [[#b8ff6dfc-3a9c-46e4-be9e-b95c496d4697][Org src block]] which by default do not use ts-mode
++ [[#e58e3846-e182-414e-b006-77690c4f6e61][Fingertip]] which relies on treesit to work
 #+begin_src elisp
-  (use-package electric
+  (use-package treesit-auto
   :config
-    (setq-default indent-tabs-mode nil) ;; always indent with spaces
-    (setq electric-pair-mode t) ;; global-minor mode
-  )
+
+    (defun my/remap-mode (mode)
+      "A hack to make org-src-get-lang-mode respect major-mode-remap-alist"
+      (treesit-auto--set-major-remap)
+      (alist-get mode major-mode-remap-alist mode)
+      )
+    (advice-add 'org-src-get-lang-mode :filter-return #'my/remap-mode)
+
+    ;; a workaround for emacs29 do not come up with elisp-ts-mode
+    (add-hook 'emacs-lisp-mode-hook #'(lambda () (treesit-parser-create 'elisp)))
+    (global-treesit-auto-mode))
 #+end_src
-** Aggressive-Indent
-:PROPERTIES:
-:CUSTOM_ID: 4532c3c9-2f73-4ccc-acb4-250156b08309
-:END:
-[[https://github.com/Malabarba/aggressive-indent-mode][Aggressive-indent-mode]] is a minor mode that keeps your code always
-indented.  It reindents after every change, making it more reliable
-than `electric-indent-mode'.
+*** Treesitter-context
+[[https://github.com/zbelial/treesitter-context.el][Treesitter-context]] utilize emacs built-in treesit to show code context.
 #+begin_src elisp
-  (use-package aggressive-indent
-  :disabled
+  (use-package treesitter-context
   :config
-    (global-aggressive-indent-mode 1)
-  )
+    (add-hook 'python-ts-mode-hook #'treesitter-context-mode)
+    )
+#+end_src
+*** COMMENT Lazycat's method
+:PROPERTIES:
+:CUSTOM_ID: ad854d70-6c48-4e35-8fb6-0591ba5e5c20
+:END:
+You can find the addresses of language parsers at [[https://tree-sitter.github.io/tree-sitter/][treesitter's official doc]].
+To enable treesit support for a language, you need to run =M-x treesit-install-language-grammar= and select the language. This will clone the language's tree-sitter repo and build it (requires system =cc=).
+#+begin_src elisp
+  (use-package treesit
+  :commands (treesit-install-language-grammar
+             config/treesit-install-all-languages)
+  :init
+    (setq treesit-language-source-alist
+      '((bash . ("https://github.com/tree-sitter/tree-sitter-bash"))
+        (c . ("https://github.com/tree-sitter/tree-sitter-c"))
+        (cpp . ("https://github.com/tree-sitter/tree-sitter-cpp"))
+        (css . ("https://github.com/tree-sitter/tree-sitter-css"))
+        (cmake . ("https://github.com/uyha/tree-sitter-cmake"))
+        (common-lisp . ("https://github.com/theHamsta/tree-sitter-commonlisp"))
+        (csharp . ("https://github.com/tree-sitter/tree-sitter-c-sharp.git"))
+        (dockerfile . ("https://github.com/camdencheek/tree-sitter-dockerfile"))
+        (elisp . ("https://github.com/Wilfred/tree-sitter-elisp"))
+        (go . ("https://github.com/tree-sitter/tree-sitter-go"))
+        (gomod . ("https://github.com/camdencheek/tree-sitter-go-mod.git"))
+        (html . ("https://github.com/tree-sitter/tree-sitter-html"))
+        (java . ("https://github.com/tree-sitter/tree-sitter-java.git"))
+        (javascript . ("https://github.com/tree-sitter/tree-sitter-javascript"))
+        (json . ("https://github.com/tree-sitter/tree-sitter-json"))
+        (lua . ("https://github.com/Azganoth/tree-sitter-lua"))
+        (make . ("https://github.com/alemuller/tree-sitter-make"))
+        (markdown . ("https://github.com/MDeiml/tree-sitter-markdown" nil
+          "tree-sitter-markdown/src"))
+        (nix . ("https://github.com/nix-community/tree-sitter-nix.git"))
+        (ocaml . ("https://github.com/tree-sitter/tree-sitter-ocaml" nil "ocaml/src"))
+        (org . ("https://github.com/milisims/tree-sitter-org"))
+        (python . ("https://github.com/tree-sitter/tree-sitter-python"))
+        (php . ("https://github.com/tree-sitter/tree-sitter-php"))
+        (typescript . ("https://github.com/tree-sitter/tree-sitter-typescript" nil
+            "typescript/src"))
+        (tsx . ("https://github.com/tree-sitter/tree-sitter-typescript" nil
+            "tsx/src"))
+        (ruby . ("https://github.com/tree-sitter/tree-sitter-ruby"))
+        (rust . ("https://github.com/tree-sitter/tree-sitter-rust"))
+        (sql . ("https://github.com/m-novikov/tree-sitter-sql"))
+        (vue . ("https://github.com/merico-dev/tree-sitter-vue"))
+        (yaml . ("https://github.com/ikatyang/tree-sitter-yaml"))
+        (toml . ("https://github.com/tree-sitter/tree-sitter-toml"))
+        (zig . ("https://github.com/GrayJack/tree-sitter-zig"))))
+  :config
+  (defun config/treesit-install-all-languages ()
+    "Install all languages specified by `treesit-language-source-alist'."
+    (interactive)
+    (let ((languages (mapcar 'car treesit-language-source-alist)))
+      (dolist (lang languages)
+        (treesit-install-language-grammar lang)
+        (message "`%s' parser was installed." lang)
+        (sit-for 0.75)))))
+  ;; stolen from lazycat
+  (setq major-mode-remap-alist
+        '((c-mode          . c-ts-mode)
+          (c++-mode        . c++-ts-mode)
+          (cmake-mode      . cmake-ts-mode)
+          (conf-toml-mode  . toml-ts-mode)
+          (css-mode        . css-ts-mode)
+          (js-mode         . js-ts-mode)
+          (js-json-mode    . json-ts-mode)
+          (nix-mode        . nix-ts-mode)
+          (python-mode     . python-ts-mode)
+          (sh-mode         . bash-ts-mode)
+          (typescript-mode . typescript-ts-mode)
+          (rust-mode       . rust-ts-mode)
+          ))
+
+  (add-hook 'markdown-mode-hook #'(lambda ()
+            (treesit-parser-create 'markdown)))
+
+  (add-hook 'web-mode-hook #'(lambda ()
+             (let ((file-name (buffer-file-name)))
+               (when file-name
+                 (treesit-parser-create
+            (pcase (file-name-extension file-name)
+              ("vue" 'vue)
+              ("html" 'html)
+              ("php" 'php))))
+               )))
+
+  (add-hook 'emacs-lisp-mode-hook #'(lambda () (treesit-parser-create 'elisp)))
+  (add-hook 'ielm-mode-hook #'(lambda () (treesit-parser-create 'elisp)))
+  (add-hook 'json-mode-hook #'(lambda () (treesit-parser-create 'json)))
+  (add-hook 'go-mode-hook #'(lambda () (treesit-parser-create 'go)))
+  (add-hook 'java-mode-hook #'(lambda () (treesit-parser-create 'java)))
+  (add-hook 'java-ts-mode-hook #'(lambda () (treesit-parser-create 'java)))
+  (add-hook 'php-mode-hook #'(lambda () (treesit-parser-create 'php)))
+  (add-hook 'php-ts-mode-hook #'(lambda () (treesit-parser-create 'php)))
+#+end_src
+** COMMENT Ts-fold
+:PROPERTIES:
+:CUSTOM_ID: a0b69753-a991-49d7-8625-a93082f06ca6
+:END:
+#+begin_src elisp
+  (use-package ts-fold)
 #+end_src
 ** YASnippet
 :PROPERTIES:
@@ -3223,10 +3226,133 @@ than `electric-indent-mode'.
 :END:
 https://github.com/zerolfx/copilot.el
 
+* Languages
+:PROPERTIES:
+:CUSTOM_ID: 0d2cb490-c0f4-4e42-acfe-55e0ee789fb7
+:END:
+*** Elisp
+:PROPERTIES:
+:CUSTOM_ID: f998e88f-3234-4f94-a86f-683caaab3483
+:END:
+- buttercup
+- elisp-def
+- elisp-demos
+- highlight-quoted
+- macrostep
+- oversee
+  #+begin_src elisp
+    (setq-default lexical-binding t)
+  #+end_src
+*** LaTeX
+:PROPERTIES:
+:CUSTOM_ID: 76c817ec-2dac-425e-b8a3-a04d6946892f
+:END:
+**** AUCTeX
+:PROPERTIES:
+:CUSTOM_ID: 9543c01b-f1dc-4d85-9056-ce73e2019dbb
+:END:
+#+begin_src elisp
+  (use-package auctex)
+#+end_src
+
+AucTex needs some tweaks to be built.
+To build auctex, =autoconf= should be avaliable on your system.
+#+begin_src conf :tangle .borgconfig
+[submodule "auctex"]
+  load-path = .
+  build-step = ./autogen.sh
+  build-step = ./configure --with-lispdir=~/.emacs.d/lib/auctex --with-texmf-dir=~/.emacs.d/lib/auctex/texmf
+  build-step = make
+  build-step = make doc
+  build-step = borg-maketexi
+  build-step = borg-makeinfo
+  build-step = borg-update-autoloads
+#+end_src
+**** CDTeX
+:PROPERTIES:
+:CUSTOM_ID: e4c612e7-07a4-47b7-95dd-01a881a715cc
+:END:
+#+begin_src elisp
+  (use-package cdlatex)
+#+end_src
+**** LAAS
+:PROPERTIES:
+:CUSTOM_ID: 94ce08e7-d4dd-4804-985d-b154934f9442
+:END:
+
+[[https://github.com/tecosaur/LaTeX-auto-activating-snippets][LASS (LaTeX Auto Activating Snippets)]] is a chunky set of LaTeX snippets for the auto-activating-snippets engine.
+
+#+begin_src elisp
+  (use-package laas
+  :after ass
+  :hook (LaTeX-mode . laas-mode))
+#+end_src
+
+*** Nix
+:PROPERTIES:
+:CUSTOM_ID: 58e308df-8796-4406-b89b-136adc972ddb
+:END:
+#+begin_src elisp
+  (use-package nix-mode
+  :mode "\\.nix\\'"
+  :config
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((nix . t))
+     )
+  )
+#+end_src
+
+#+begin_src elisp
+  (use-package nix-ts-mode
+  :mode "\\.nix\\'"
+  )
+#+end_src
+*** PlantUML
+:PROPERTIES:
+:CUSTOM_ID: 060fbe09-da11-47fa-83c1-1492fc4a5295
+:END:
+#+begin_src elisp
+  (use-package plantuml-mode
+  :mode "\\.plantuml\\'"
+  )
+#+end_src
+*** Python
+:PROPERTIES:
+:CUSTOM_ID: c0695b7a-e139-4c5c-bcd5-d5be5d3fae89
+:END:
+**** Jupyter
+:PROPERTIES:
+:CUSTOM_ID: d67b0864-7efe-4341-baad-cf2a9f2c6345
+:END:
+#+begin_src elisp
+  (use-package jupyter
+  :defer t
+    )
+#+end_src
+*** Verilog
+:PROPERTIES:
+:CUSTOM_ID: 0f43d38a-0d54-441d-ac37-c2c8b4abc1a9
+:END:
+#+begin_src elisp
+  (use-package verilog-mode
+  :mode "\\.v\\'"
+  )
+#+end_src
+*** YAML
+:PROPERTIES:
+:CUSTOM_ID: f38fbcdd-6212-442d-9b43-64bf9823ac6f
+:END:
+#+begin_src elisp
+  (use-package yaml-mode
+  :mode "\\.yaml\\'"
+  )
+#+end_src
 * Org
 :PROPERTIES:
 :CUSTOM_ID: 9b0a5dda-16ef-4e5d-a408-26a4d0ce3e75
 :END:
+Org mode is a reason to use emacs.
 ** Init
 :PROPERTIES:
 :CUSTOM_ID: 99ce76ad-c694-486e-8e3e-3fd72508b0f8
@@ -3443,6 +3569,9 @@ This package provides visual alignment for Org Mode, Markdown and table.el table
 :PROPERTIES:
 :CUSTOM_ID: 4e4b8f79-8616-4cc0-bcc8-2b1a2ca03de2
 :END:
+:BACKLINKS:
+[[#20dbcac9-a7cb-4447-8b96-a490d1637b75][Local Keybindings]]
+:END:
 
 #+begin_src elisp
   (use-package org
@@ -3537,13 +3666,16 @@ This package provides visual alignment for Org Mode, Markdown and table.el table
                (outline-show-entry))))
 #+end_src
 
-** Blocks
+** Objects
 :PROPERTIES:
 :CUSTOM_ID: 538ca1a1-0f04-418d-932e-a69a165c2923
 :END:
-*** Code block
+*** Src block
 :PROPERTIES:
 :CUSTOM_ID: b8ff6dfc-3a9c-46e4-be9e-b95c496d4697
+:END:
+:BACKLINKS:
+[[#e59e6985-9ec3-4bea-8bf0-552741c5029d][Treesit-auto]]
 :END:
 #+begin_src elisp
   (use-package org
@@ -3585,7 +3717,7 @@ Or setting =org-auto-tangle-default= to t to configure auto-tangle as the defaul
     (setq ob-async-no-async-languages-alist '("jupyter-python" "jupyter-julia"))
     )
 #+end_src
-*** Table-block
+*** Table
 :PROPERTIES:
 :CUSTOM_ID: 8c93381a-2a6e-43e5-af2b-6dafcdcf0c23
 :END:

@@ -45,6 +45,9 @@
 [submodule "avy"]
 	path = lib/avy
 	url = https://github.com/abo-abo/avy
+[submodule "awesome-emacs"]
+	path = lib/awesome-emacs
+	url = git@github.com:emacs-tw/awesome-emacs.git
 [submodule "awesome-tray"]
 	path = lib/awesome-tray
 	url = git@github.com:manateelazycat/awesome-tray.git
@@ -409,6 +412,9 @@
 [submodule "posframe"]
 	path = lib/posframe
 	url = https://github.com/tumashu/posframe
+[submodule "posframe-plus"]
+	path = lib/posframe-plus
+	url = git@github.com:zbelial/posframe-plus.git
 [submodule "powerline"]
 	path = lib/powerline
 	url = https://github.com/milkypostman/powerline
@@ -508,6 +514,9 @@
 [submodule "treesit-auto"]
 	path = lib/treesit-auto
 	url = https://github.com/renzmann/treesit-auto
+[submodule "treesitter-context"]
+	path = lib/treesitter-context
+	url = https://github.com/zbelial/treesitter-context.el
 [submodule "ts"]
 	path = lib/ts
 	url = https://github.com/alphapapa/ts.el

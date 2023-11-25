@@ -1,8 +1,5 @@
-;; [[file:config.org::*Begin of init][Begin of init:1]]
 ;;; -*- lexical-binding: t; no-byte-compile: t -*-
-;; Begin of init:1 ends here
 
-;; [[file:config.org::*Begin of init][Begin of init:2]]
 (progn ;     startup
   (defvar before-user-init-time (current-time)
     "Value of `current-time' when Emacs begins loading `user-init-file'.")
@@ -14,9 +11,7 @@
   (setq user-emacs-directory (file-name-directory user-init-file))
   (message "Loading %s..." user-init-file)
 )
-;; Begin of init:2 ends here
 
-;; [[file:config.org::*Begin of init][Begin of init:3]]
 (progn
   (setq inhibit-startup-buffer-menu t)
   (setq inhibit-startup-screen t)
@@ -37,9 +32,7 @@
   (put 'downcase-region 'disabled nil)
   (put 'upcase-region 'disabled nil)
   )
-;; Begin of init:3 ends here
 
-;; [[file:config.org::*Borg][Borg:1]]
 (use-package borg
 :init
   (add-to-list 'load-path
@@ -48,66 +41,389 @@
   (borg-initialize)
   (switch-to-buffer "*Messages*")
 )
-;; Borg:1 ends here
 
-;; [[file:config.org::*Dash][Dash:1]]
-(use-package dash
-  :config (global-dash-fontify-mode))
-;; Dash:1 ends here
-
-;; [[file:config.org::*EIEIO][EIEIO:1]]
-(use-package eieio)
-;; EIEIO:1 ends here
-
-;; [[file:config.org::*Auto-Compile][Auto-Compile:1]]
 (use-package auto-compile
-  :config
+:config
   (setq auto-compile-display-buffer             nil
-          auto-compile-mode-line-counter            t
-          auto-compile-source-recreate-deletes-dest t
-          auto-compile-toggle-deletes-nonlib-dest   t
-          auto-compile-update-autoloads             t
-          warning-suppress-log-types        '((comp))
+        auto-compile-mode-line-counter            t
+        auto-compile-source-recreate-deletes-dest t
+        auto-compile-toggle-deletes-nonlib-dest   t
+        auto-compile-update-autoloads             t
+        warning-suppress-log-types        '((comp))
   )
 )
-;; Auto-Compile:1 ends here
 
-;; [[file:config.org::*Epkg][Epkg:1]]
 (use-package epkg
-  :defer t
-  :bind
-     ([remap describe-package] . epkg-describe-package)
-  :init
+:defer t
+:bind
+  ([remap describe-package] . epkg-describe-package)
+:init
   (setq epkg-repository
-  (expand-file-name "var/epkgs/" user-emacs-directory))
-  (setq epkg-database-connector 'sqlite-builtin ))
-;; Epkg:1 ends here
+        (expand-file-name "var/epkgs/" user-emacs-directory))
+  (setq epkg-database-connector 'sqlite-builtin ) ; requires emacs >=29
+)
 
-;; [[file:config.org::*Custom][Custom:1]]
 (use-package custom
-  :no-require t
-  :config
+:no-require t
+:config
   (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
   (setf custom-safe-themes t) ;Treat all themes as safe
   (when (file-exists-p custom-file)
-    (load custom-file)))
-;; Custom:1 ends here
+    (load custom-file))
+)
 
-;; [[file:config.org::*Server][Server:1]]
 (use-package server
-  :commands (server-running-p)
-  :config (or (server-running-p) (server-mode)))
-;; Server:1 ends here
+:commands (server-running-p)
+:config (or (server-running-p) (server-mode)))
 
-;; [[file:config.org::*End of core units][End of core units:1]]
+(use-package gcmh
+:init
+  (setq gcmh-high-cons-threshold 536870912) ;; 512mb
+:config
+  (gcmh-mode 1)
+  )
+
+(use-package dash
+  :config (global-dash-fontify-mode))
+
+(use-package eieio)
+
+(use-package shrink-path :demand t)
+
+(use-package diff-mode
+  :defer t
+  :config
+  (when (>= emacs-major-version 27)
+    (set-face-attribute 'diff-refine-changed nil :extend t)
+    (set-face-attribute 'diff-refine-removed nil :extend t)
+    (set-face-attribute 'diff-refine-added   nil :extend t)))
+
+(use-package dired
+  :defer t
+  :config (setq dired-listing-switches "-alh"))
+
+(use-package eldoc
+  :when (version< "25" emacs-version)
+  :config (global-eldoc-mode))
+
+(use-package help
+  :defer t
+  :config (temp-buffer-resize-mode))
+
+(use-package helpful
+:bind
+   ([remap describe-key]      . helpful-key)
+   ([remap describe-command]  . helpful-command)
+   ([remap describe-variable] . helpful-variable)
+   ([remap describe-function] . helpful-callable)
+   ("C-h F" . describe-face)
+   ("C-h K" . describe-keymap)
+)
+
+(use-package info+
+:defer t
+:config
+)
+
+(use-package info-colors
+:config
+  (add-hook 'Info-selection-hook 'info-colors-fontify-node)
+  (add-hook 'Info-mode-hook 'olivetti-mode)
+  (add-hook 'Info-mode-hook 'mixed-pitch-mode)
+)
+
+(progn ;    `isearch'
+  (setq isearch-allow-scroll t))
+
+(use-package lisp-mode
+  :config
+  (add-hook 'emacs-lisp-mode-hook 'outline-minor-mode)
+  (add-hook 'emacs-lisp-mode-hook 'reveal-mode)
+  (defun indent-spaces-mode ()
+    (setq indent-tabs-mode nil))
+  (add-hook 'lisp-interaction-mode-hook 'indent-spaces-mode))
+
+(use-package man
+  :defer t
+  :config (setq Man-width 80))
+
+(use-package prog-mode
+  :config (global-prettify-symbols-mode)
+  (defun indicate-buffer-boundaries-left ()
+    (setq indicate-buffer-boundaries 'left))
+  (add-hook 'prog-mode-hook 'indicate-buffer-boundaries-left))
+
+(use-package recentf
+  :demand t
+  :config (add-to-list 'recentf-exclude "^/\\(?:ssh\\|su\\|sudo\\)?x?:"))
+
+;; Persist history over Emacs restarts. Vertico sorts by history position.
+  (use-package savehist
+      :init
+      (savehist-mode))
+
+;; A few more useful configurations...
+  (use-package emacs
+      :init
+      ;; Add prompt indicator to `completing-read-multiple'.
+      ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
+      (defun crm-indicator (args)
+      (cons (format "[CRM%s] %s"
+          (replace-regexp-in-string
+          "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+          crm-separator)
+          (car args))
+        (cdr args)))
+      (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+
+      ;; Do not allow the cursor in the minibuffer prompt
+      (setq minibuffer-prompt-properties
+    '(read-only t cursor-intangible t face minibuffer-prompt))
+      (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+
+      ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
+      ;; Vertico commands are hidden in normal buffers.
+      ;; (setq read-extended-command-predicate
+      ;;       #'command-completion-default-include-p)
+      ;; Enable recursive minibuffers
+      (setq enable-recursive-minibuffers t))
+
+(use-package simple
+  :config (column-number-mode))
+
+(use-package smerge-mode
+  :defer t
+  :config
+  (when (>= emacs-major-version 27)
+    (set-face-attribute 'smerge-refined-removed nil :extend t)
+    (set-face-attribute 'smerge-refined-added   nil :extend t)))
+
+(progn ;    `text-mode'
+  (add-hook 'text-mode-hook 'indicate-buffer-boundaries-left))
+
+(use-package tramp
+  :defer t
+  :config
+  (add-to-list 'tramp-default-proxies-alist '(nil "\\`root\\'" "/ssh:%h:"))
+  (add-to-list 'tramp-default-proxies-alist '("localhost" nil nil))
+  (add-to-list 'tramp-default-proxies-alist
+         (list (regexp-quote (system-name)) nil nil))
+  (setq vc-ignore-dir-regexp
+  (format "\\(%s\\)\\|\\(%s\\)"
+    vc-ignore-dir-regexp
+    tramp-file-name-regexp)))
+
+(use-package tramp-sh
+  :defer t
+  :config (cl-pushnew 'tramp-own-remote-path tramp-remote-path))
+
+(use-package pixel-scroll
+:config
+  (setq scroll-conservatively 97)
+  (setq scroll-preserve-screen-position 1)
+  (setq mouse-wheel-progressive-speed nil)
+  ;; The following piece of code is stolen from
+  ;; https://emacs-china.org/t/topic/25114/5
+  (pixel-scroll-precision-mode 1)
+  (setq pixel-scroll-precision-interpolate-page t)
+  (defun +pixel-scroll-interpolate-down (&optional lines)
+      (interactive)
+      (if lines
+          (pixel-scroll-precision-interpolate (* -1 lines (pixel-line-height)))
+      (pixel-scroll-interpolate-down)))
+
+  (defun +pixel-scroll-interpolate-up (&optional lines)
+      (interactive)
+      (if lines
+          (pixel-scroll-precision-interpolate (* lines
+          (pixel-line-height))))
+      (pixel-scroll-interpolate-up))
+
+  (defalias 'scroll-up-command '+pixel-scroll-interpolate-down)
+  (defalias 'scroll-down-command '+pixel-scroll-interpolate-up)
+)
+
 (progn ;     startup
   (message "Loading core units...done (%fs)"
      (float-time (time-subtract (current-time) before-user-init-time))))
-;; End of core units:1 ends here
 
-;; [[file:config.org::*Shrink path][Shrink path:1]]
-(use-package shrink-path :demand t)
-;; Shrink path:1 ends here
+;; [[file:config.org::*General.el][General.el:1]]
+;; Make ESC quit prompts
+;; (global-set-key ([kbd] "<escape>") 'keyboard-escape-quit)
+
+(use-package general
+:config
+  ;; [[file:config.org::*General.el][]]
+  (general-def
+  :keymaps '(global-map)
+    "C-v"       '(clipboard-yank              :wk "paste")
+    "C-SPC"     '(toggle-input-method         :wk "input method")
+    "C-j"       'backward-char
+    "C-;"       'forward-char
+    "C-k"       'previous-line
+    "C-l"       'next-line
+    ;"C-/"      '(yank                        :wk "comment-dwim")
+  )
+  (general-def
+  :keymaps '(meow-normal-state-keymap meow-motion-state-keymap)
+    "M-j"       '(windmove-left               :wk " Win H ")
+    "M-k"       '(windmove-up                 :wk " Win K ")
+    "M-l"       '(windmove-down               :wk " Win J ")
+    "M-;"       '(windmove-right              :wk " Win L ")
+    "M-,"       '(sort-tab-select-prev-tab    :wk " Tab L ")
+    "M-."       '(sort-tab-select-next-tab    :wk " Tab R ")
+  )
+  
+  (general-def
+  :keymaps '(vertico-map)
+    "C-l"       '(vertico-next                  :wk "")
+    "C-k"       '(vertico-previous              :wk "")
+    "C-j"       '(vertico-directory-delete-word :wk "")
+    "C-;"       '(vertico-directory-enter       :wk "")
+    "C-,"       '(vertico-previous-group        :wk "")
+    "C-."       '(vertico-next-group            :wk "")
+    "RET"       'vertico-directory-enter
+    "DEL"       'vertico-directory-delete-char
+    "M-DEL"     'vertico-directory-delete-word
+  )
+  ;; ends here
+  ;; [[file:config.org::*General.el][]]
+  (general-create-definer my/leader
+    :prefix-command 'my/leader-prefix-cmd
+    :prefix-map 'my/leader-prefix-map
+    :wk-full-keys nil
+    "DEL"     '(which-key-undo                 :wk "󰕍 undo")
+    )
+  ;; ends here
+  ;; [[file:config.org::*General.el][]]
+  (my/leader
+    "SPC"     '((general-simulate-key "C-<escape>") :wk "Mode leader")
+    "/"       '(comment-dwim                   :wk "comment 󱀢")
+    "s"       '(save-buffer                    :wk "save ")
+    "e"       '(dirvish-side                   :wk "󰙅 dirvish-side ")
+    "E"       '(dirvish                        :wk "󰙅 dirvish")
+    "x"       '(consult-mode-command           :wk "execute")
+    "z"       '(vundo                          :wk "visual undo")
+  )
+  ;; ends here
+  ;; [[file:config.org::*General.el][]]
+  (my/leader :infix "c"
+    ""        '(nil                            :wk " Consult")
+    "l"       '(consult-line                   :wk "line")
+    "L"       '(consult-line-multi             :wk "line multi")
+    "o"       '(consult-outline                :wk "outline")
+    "i"       '(consult-imenu                  :wk "imenu")
+    "I"       '(consult-imenu-multi            :wk "imenu multi")
+    "r"       '(consult-ripgrep                :wk "ripgrep")
+    "m"       '(consult-mark                   :wk "mark")
+    "x"       '(consult-mode-command           :wk "execute")
+    )
+  ;; ends here
+  ;; [[file:config.org::*General.el][]]
+  (my/leader :infix "w" ;; workspaces
+    ""        '(nil                            :wk " Workspace")
+    "\\"      '(tab-new                        :wk "tab 󰏌")
+    "|"       '(tab-close                      :wk "tab 󰅖")
+    "["       '(tab-previous                   :wk "tab ")
+    "]"       '(tab-next                       :wk "tab ")
+  
+    ","       '(sort-tab-select-next-tab       :wk "buffer ")
+    "."       '(sort-tab-select-previous-tab   :wk "buffer ")
+    "?"       '(sort-tab-close-current-tab     :wk "buffer 󰅖")
+    "/"       '(consult-buffer                 :wk "buffer 󰏌")
+    "f"       '(find-file                      :wk "file 󰏌")
+  
+    "j"       '(windmove-left                  :wk "window ")
+    "k"       '(windmove-up                    :wk "window ")
+    "l"       '(windmove-down                  :wk "window ")
+    ";"       '(windmove-right                 :wk "window ")
+    "'"       '(delete-window                  :wk "window 󰅖")
+    "o"       '(toggle-one-window              :wk "one-window")
+  
+    "J"       '(split-window-right             :wk "split ")
+    "K"       '(split-window-below             :wk "split ")
+    "L"       '(split-window-above             :wk "split ")
+    ":"       '(split-window-left              :wk "split ")
+    )
+  ;; ends here
+  ;; [[file:config.org::*General.el][]]
+  ;; Borg
+  (my/leader :infix "B"
+    ""        '(nil                            :wk " Borg")
+    "a"       '(borg-assimilate                :wk "󱧕 assimilate ")
+    "A"       '(borg-activate                  :wk " activate")
+    "b"       '(borg-build                     :wk "󱇝 build")
+    "c"       '(borg-clone                     :wk " clone")
+    "r"       '(borg-remove                    :wk "󱧖 remove")
+    )
+  ;; toggle
+  (my/leader :infix "t"
+    ""        '(nil                            :wk " Toggle")
+    )
+  ;; Git
+  (my/leader :infix "g"
+    ""        '(nil                            :wk " Git")
+    "g"       '(magit                          :wk " magit")
+    )
+  ;; ends here
+  ;; [[file:config.org::*General.el][]]
+  ;; windows, buffers and tabs(workspaces)
+  ;; these are copied from emacs source code
+  (defun split-window-left (&optional size window-to-split)
+    (interactive `(,(when current-prefix-arg
+                      (prefix-numeric-value current-prefix-arg))
+                   ,(selected-window)))
+    (let (new-window)
+      (when (and size (< size 0) (< (- size) window-min-width))
+        ;; `split-window' would not signal an error here.
+        (error "Size of new window too small"))
+      (setq new-window (split-window window-to-split size 'left))
+      ;; Always copy quit-restore parameter in interactive use.
+      (let ((quit-restore (window-parameter window-to-split 'quit-restore)))
+        (when quit-restore
+          (set-window-parameter new-window 'quit-restore quit-restore)))
+      new-window))
+  
+  (defun split-window-above (&optional size window-to-split)
+    (interactive `(,(when current-prefix-arg
+                      (prefix-numeric-value current-prefix-arg))
+                   ,(selected-window)))
+    (let ((old-point (window-point))
+          moved-by-window-height moved new-window bottom)
+      (when (and size (< size 0) (< (- size) window-min-height))
+        ;; `split-window' would not signal an error here.
+        (error "Size of new window too small"))
+      (setq new-window (split-window window-to-split size 'above))
+      (when (and (null split-window-keep-point)
+                 (or (null window-to-split)
+                     (eq window-to-split (selected-window))))
+        (with-current-buffer (window-buffer window-to-split)
+          (save-excursion
+            (goto-char (window-start))
+            (setq moved (vertical-motion (window-height)))
+            (set-window-start new-window (point))
+            (when (> (point) (window-point new-window))
+              (set-window-point new-window (point)))
+            (when (= moved (window-height))
+              (setq moved-by-window-height t)
+              (vertical-motion -1))
+            (setq bottom (point)))
+          (and moved-by-window-height
+               (<= bottom (point))
+               (set-window-point window-to-split (1- bottom)))
+          (and moved-by-window-height
+               (<= (window-start new-window) old-point)
+               (set-window-point new-window old-point)
+               (select-window new-window))))
+      ;; Always copy quit-restore parameter in interactive use.
+      (let ((quit-restore (window-parameter window-to-split 'quit-restore)))
+        (when quit-restore
+          (set-window-parameter new-window 'quit-restore quit-restore)))
+      new-window))
+  ;; ends here
+  
+)
+;; General.el:1 ends here
 
 ;; [[file:config.org::*Meow][Meow:1]]
 (use-package meow
@@ -245,184 +561,6 @@
 )
 ;; Meow:1 ends here
 
-;; [[file:config.org::*General][General:1]]
-;; Make ESC quit prompts
-;; (global-set-key ([kbd] "<escape>") 'keyboard-escape-quit)
-
-(use-package general
-:config
-  ;; [[file:config.org::*General][]]
-  (general-def
-  :keymaps '(global-map)
-    "C-v"       '(clipboard-yank              :wk "paste")
-    "C-SPC"     '(toggle-input-method         :wk "input method")
-    "C-j"       'backward-char
-    "C-;"       'forward-char
-    "C-k"       'previous-line
-    "C-l"       'next-line
-    ;"C-/"      '(yank                        :wk "comment-dwim")
-  )
-  (general-def
-  :keymaps '(meow-normal-state-keymap meow-motion-state-keymap)
-    "M-j"       '(windmove-left               :wk " Win H ")
-    "M-k"       '(windmove-down               :wk " Win J ")
-    "M-l"       '(windmove-up                 :wk " Win K ")
-    "M-;"       '(windmove-right              :wk " Win L ")
-    "M-,"       '(sort-tab-select-prev-tab    :wk " Tab L ")
-    "M-."       '(sort-tab-select-next-tab    :wk " Tab R ")
-  )
-  
-  (general-def
-  :keymaps '(vertico-map)
-    "C-l"       '(vertico-next                  :wk "")
-    "C-k"       '(vertico-previous              :wk "")
-    "C-j"       '(vertico-directory-delete-word :wk "")
-    "C-;"       '(vertico-directory-enter       :wk "")
-    "C-,"       '(vertico-previous-group        :wk "")
-    "C-."       '(vertico-next-group            :wk "")
-    "RET"       'vertico-directory-enter
-    "DEL"       'vertico-directory-delete-char
-    "M-DEL"     'vertico-directory-delete-word
-  )
-  ;; ends here
-  ;; [[file:config.org::*General][]]
-  (general-create-definer my/leader
-    :prefix-command 'my/leader-prefix-cmd
-    :prefix-map 'my/leader-prefix-map
-    :wk-full-keys nil
-    "DEL"     '(which-key-undo                 :wk "󰕍 undo")
-    )
-  ;; ends here
-  ;; [[file:config.org::*General][]]
-  (my/leader
-    "SPC"     '((general-simulate-key "C-<escape>") :wk "Mode leader")
-    "/"       '(comment-dwim                   :wk "comment 󱀢")
-    "s"       '(save-buffer                    :wk "save ")
-    "e"       '(dirvish-side                   :wk "󰙅 dirvish-side ")
-    "E"       '(dirvish                        :wk "󰙅 dirvish")
-    "x"       '(consult-mode-command           :wk "execute")
-    "z"       '(vundo                          :wk "visual undo")
-  )
-  ;; ends here
-  ;; [[file:config.org::*General][]]
-  (my/leader :infix "c"
-    ""        '(nil                            :wk " Consult")
-    "l"       '(consult-line                   :wk "line")
-    "L"       '(consult-line-multi             :wk "line multi")
-    "o"       '(consult-outline                :wk "outline")
-    "i"       '(consult-imenu                  :wk "imenu")
-    "I"       '(consult-imenu-multi            :wk "imenu multi")
-    "r"       '(consult-ripgrep                :wk "ripgrep")
-    "m"       '(consult-mark                   :wk "mark")
-    "x"       '(consult-mode-command           :wk "execute")
-    )
-  ;; ends here
-  ;; [[file:config.org::*General][]]
-  (my/leader :infix "w" ;; workspaces
-    ""        '(nil                            :wk " Workspace")
-    "\\"      '(tab-new                        :wk "tab 󰏌")
-    "|"       '(tab-close                      :wk "tab 󰅖")
-    "["       '(tab-previous                   :wk "tab ")
-    "]"       '(tab-next                       :wk "tab ")
-  
-    ","       '(sort-tab-select-next-tab       :wk "buffer ")
-    "."       '(sort-tab-select-previous-tab   :wk "buffer ")
-    "?"       '(sort-tab-close-current-tab     :wk "buffer 󰅖")
-    "/"       '(consult-buffer                 :wk "buffer 󰏌")
-    "f"       '(find-file                      :wk "file 󰏌")
-  
-    "j"       '(windmove-left                  :wk "window ")
-    "k"       '(windmove-up                    :wk "window ")
-    "l"       '(windmove-down                  :wk "window ")
-    ";"       '(windmove-right                 :wk "window ")
-    "'"       '(delete-window                  :wk "window 󰅖")
-    "o"       '(toggle-one-window              :wk "one-window")
-  
-    "J"       '(split-window-right             :wk "split ")
-    "K"       '(split-window-below             :wk "split ")
-    "L"       '(split-window-above             :wk "split ")
-    ":"       '(split-window-left              :wk "split ")
-    )
-  ;; ends here
-  ;; [[file:config.org::*General][]]
-  ;; Borg
-  (my/leader :infix "B"
-    ""        '(nil                            :wk " Borg")
-    "a"       '(borg-assimilate                :wk "󱧕 assimilate ")
-    "A"       '(borg-activate                  :wk " activate")
-    "b"       '(borg-build                     :wk "󱇝 build")
-    "c"       '(borg-clone                     :wk " clone")
-    "r"       '(borg-remove                    :wk "󱧖 remove")
-    )
-  ;; toggle
-  (my/leader :infix "t"
-    ""        '(nil                            :wk " Toggle")
-    )
-  ;; Git
-  (my/leader :infix "g"
-    ""        '(nil                            :wk " Git")
-    "g"       '(magit                          :wk " magit")
-    )
-  ;; ends here
-  ;; [[file:config.org::*General][]]
-  ;; windows, buffers and tabs(workspaces)
-  ;; these are copied from emacs source code
-  (defun split-window-left (&optional size window-to-split)
-    (interactive `(,(when current-prefix-arg
-                      (prefix-numeric-value current-prefix-arg))
-                   ,(selected-window)))
-    (let (new-window)
-      (when (and size (< size 0) (< (- size) window-min-width))
-        ;; `split-window' would not signal an error here.
-        (error "Size of new window too small"))
-      (setq new-window (split-window window-to-split size 'left))
-      ;; Always copy quit-restore parameter in interactive use.
-      (let ((quit-restore (window-parameter window-to-split 'quit-restore)))
-        (when quit-restore
-          (set-window-parameter new-window 'quit-restore quit-restore)))
-      new-window))
-  
-  (defun split-window-above (&optional size window-to-split)
-    (interactive `(,(when current-prefix-arg
-                      (prefix-numeric-value current-prefix-arg))
-                   ,(selected-window)))
-    (let ((old-point (window-point))
-          moved-by-window-height moved new-window bottom)
-      (when (and size (< size 0) (< (- size) window-min-height))
-        ;; `split-window' would not signal an error here.
-        (error "Size of new window too small"))
-      (setq new-window (split-window window-to-split size 'above))
-      (when (and (null split-window-keep-point)
-                 (or (null window-to-split)
-                     (eq window-to-split (selected-window))))
-        (with-current-buffer (window-buffer window-to-split)
-          (save-excursion
-            (goto-char (window-start))
-            (setq moved (vertical-motion (window-height)))
-            (set-window-start new-window (point))
-            (when (> (point) (window-point new-window))
-              (set-window-point new-window (point)))
-            (when (= moved (window-height))
-              (setq moved-by-window-height t)
-              (vertical-motion -1))
-            (setq bottom (point)))
-          (and moved-by-window-height
-               (<= bottom (point))
-               (set-window-point window-to-split (1- bottom)))
-          (and moved-by-window-height
-               (<= (window-start new-window) old-point)
-               (set-window-point new-window old-point)
-               (select-window new-window))))
-      ;; Always copy quit-restore parameter in interactive use.
-      (let ((quit-restore (window-parameter window-to-split 'quit-restore)))
-        (when quit-restore
-          (set-window-parameter new-window 'quit-restore quit-restore)))
-      new-window))
-  ;; ends here
-  
-)
-;; General:1 ends here
-
 ;; [[file:config.org::*Which-key][Which-key:1]]
 (use-package which-key
 :init
@@ -533,6 +671,15 @@
 )
 ;; Nerd-icons:1 ends here
 
+;; [[file:config.org::*Solaire mode][Solaire mode:1]]
+(use-package solaire-mode
+:defer t
+:init (solaire-global-mode)
+:config
+  (add-hook 'org-src-mode-hook 'turn-off-solaire-mode)
+)
+;; Solaire mode:1 ends here
+
 ;; [[file:config.org::*Posframe][Posframe:1]]
 (use-package posframe
 :config
@@ -575,28 +722,12 @@
 )
 ;; Mini-frame:1 ends here
 
-;; [[file:config.org::*Holo-layer][Holo-layer:1]]
-(use-package holo-layer
-:defer t
-:if (memq window-system '(pgtk mac ns))
-:config
-  (setq holo-layer-enable-cursor-animation 1
-        holo-layer-enable-window-border 1
-        holo-layer-sort-tab-ui 1
-        ;;holo-layer-cursor-animation-type "arrow easing"
-        )
-  (holo-layer-enable)
-)
-;; Holo-layer:1 ends here
-
-;; [[file:config.org::*Solaire mode][Solaire mode:1]]
-(use-package solaire-mode
-:defer t
-:init (solaire-global-mode)
-:config
-  (add-hook 'org-src-mode-hook 'turn-off-solaire-mode)
-)
-;; Solaire mode:1 ends here
+;; [[file:config.org::*Transparency][Transparency:1]]
+(defun my/set-transparency (value)
+  "Sets the transparency of the frame window. 0=transparent/100=opaque"
+  (interactive "nTransparency Value 0 - 100 opaque:")
+  (set-frame-parameter nil 'alpha-background value))
+;; Transparency:1 ends here
 
 ;; [[file:config.org::*Olivetti][Olivetti:1]]
 (use-package olivetti
@@ -623,336 +754,29 @@
 )
 ;; Olivetti:1 ends here
 
-;; [[file:config.org::*Vertical Spacing][Vertical Spacing:1]]
+;; [[file:config.org::*Vertical][Vertical:1]]
 (use-package topspace
 :init (global-topspace-mode)
-)
-;; Vertical Spacing:1 ends here
-
-;; [[file:config.org::*Whitespace mode][Whitespace mode:1]]
-;; (config/leader :infix "t"
-;;   "SPC"  '(whitespace-mode  :wk "󰡭 Show Space")
-;; )
-;; Whitespace mode:1 ends here
-
-;; [[file:config.org::*Transparency][Transparency:1]]
-(set-frame-parameter nil 'alpha-background 96)
-(add-to-list 'default-frame-alist '(alpha-background . 96))
-
-(defun config/transparency (value)
-      "Sets the transparency of the frame window. 0=transparent/100=opaque"
-      (interactive "nTransparency Value 0 - 100 opaque:")
-      (set-frame-parameter nil 'alpha-background value))
-;; Transparency:1 ends here
-
-;; [[file:config.org::*Scroll][Scroll:1]]
-(use-package emacs
 :config
-  (setq scroll-conservatively 97)
-  (setq scroll-preserve-screen-position 1)
-  (setq mouse-wheel-progressive-speed nil)
-  ;; The following piece of code is stolen from
-  ;; https://emacs-china.org/t/topic/25114/5
-  (pixel-scroll-precision-mode 1)
-  (setq pixel-scroll-precision-interpolate-page t)
-  (defun +pixel-scroll-interpolate-down (&optional lines)
-      (interactive)
-      (if lines
-          (pixel-scroll-precision-interpolate (* -1 lines (pixel-line-height)))
-      (pixel-scroll-interpolate-down)))
+;; Zen mode, the hack is from
+;; https://github.com/trevorpogue/topspace/issues/17#issuecomment-1637004205
+  (defun zen-mode-bodge ()
+    (let ((ov (make-overlay 1 1 nil t t)))
+      (overlay-put ov 'priority 9999999)
+      (overlay-put ov 'before-string (propertize "    1 " 'face 'line-number))
+      (overlay-put ov 'zen--remove-from-buffer-tag t))
+    (let ((ov (make-overlay 1 2)))
+      (overlay-put ov 'display-line-numbers-disable t)
+      (overlay-put ov 'zen--remove-from-buffer-tag t)))
 
-  (defun +pixel-scroll-interpolate-up (&optional lines)
-      (interactive)
-      (if lines
-          (pixel-scroll-precision-interpolate (* lines
-          (pixel-line-height))))
-      (pixel-scroll-interpolate-up))
+  (defun zen-mode-clear ()
+    (remove-overlays 1 2 'zen--remove-from-buffer-tag t))
 
-  (defalias 'scroll-up-command '+pixel-scroll-interpolate-down)
-  (defalias 'scroll-down-command '+pixel-scroll-interpolate-up)
+  ;; install hooks
+  ;; (advice-add 'topspace--enable :after #'zen-mode-bodge)
+  ;; (advice-add 'topspace--disable :after #'zen-mode-clear)
 )
-;; Scroll:1 ends here
-
-;; [[file:config.org::*Diff][Diff:1]]
-(use-package diff-hl
-:custom-face
-  (diff-hl-change ((t (:background "#2c5f72" :foreground "#77a8d9"))))
-  (diff-hl-delete ((t (:background "#844953" :foreground "#f27983"))))
-  (diff-hl-insert ((t (:background "#5E734A" :foreground "#a6cc70"))))
-:config
-  (setq diff-hl-draw-borders nil)
-  (global-diff-hl-mode)
-  ;(diff-hl-margin-mode)
-  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
-)
-;; Diff:1 ends here
-
-;; [[file:config.org::*Beacon][Beacon:1]]
-(use-package beacon
-:defer t
-:config
-      (beacon-mode)
-)
-;; Beacon:1 ends here
-
-;; [[file:config.org::*Goggles][Goggles:1]]
-(use-package goggles
-:hook ((prog-mode text-mode org-mode) . goggles-mode)
-:config
-  (setq-default goggles-pulse t)) ;; set to nil to disable pulsing
-;; Goggles:1 ends here
-
-;; [[file:config.org::*Hl-line][Hl-line:1]]
-(use-package hl-line
-:init
-  (global-hl-line-mode)
-)
-;; Hl-line:1 ends here
-
-;; [[file:config.org::*Auto-save][Auto-save:1]]
-(use-package auto-save
-:after lsp-bridge
-:config
-  (auto-save-enable)
-  (setq auto-save-silent t)   ; quietly save
-  (setq auto-save-delete-trailing-whitespace t)
-)
-;; Auto-save:1 ends here
-
-;; [[file:config.org::*GCMH][GCMH:1]]
-(use-package gcmh
-:init
-  (setq gcmh-high-cons-threshold 536870912) ;; 512mb
-:config
-  (gcmh-mode 1)
-  )
-;; GCMH:1 ends here
-
-;; [[file:config.org::*DIff mode][DIff mode:1]]
-(use-package diff-mode
-  :defer t
-  :config
-  (when (>= emacs-major-version 27)
-    (set-face-attribute 'diff-refine-changed nil :extend t)
-    (set-face-attribute 'diff-refine-removed nil :extend t)
-    (set-face-attribute 'diff-refine-added   nil :extend t)))
-;; DIff mode:1 ends here
-
-;; [[file:config.org::*Dired][Dired:1]]
-(use-package dired
-  :defer t
-  :config (setq dired-listing-switches "-alh"))
-;; Dired:1 ends here
-
-;; [[file:config.org::*ELdoc][ELdoc:1]]
-(use-package eldoc
-  :when (version< "25" emacs-version)
-  :config (global-eldoc-mode))
-;; ELdoc:1 ends here
-
-;; [[file:config.org::*Help][Help:1]]
-(use-package help
-  :defer t
-  :config (temp-buffer-resize-mode))
-;; Help:1 ends here
-
-;; [[file:config.org::*Isearch][Isearch:1]]
-(progn ;    `isearch'
-  (setq isearch-allow-scroll t))
-;; Isearch:1 ends here
-
-;; [[file:config.org::*Lisp-mode][Lisp-mode:1]]
-(use-package lisp-mode
-  :config
-  (add-hook 'emacs-lisp-mode-hook 'outline-minor-mode)
-  (add-hook 'emacs-lisp-mode-hook 'reveal-mode)
-  (defun indent-spaces-mode ()
-    (setq indent-tabs-mode nil))
-  (add-hook 'lisp-interaction-mode-hook 'indent-spaces-mode))
-;; Lisp-mode:1 ends here
-
-;; [[file:config.org::*Man][Man:1]]
-(use-package man
-  :defer t
-  :config (setq Man-width 80))
-;; Man:1 ends here
-
-;; [[file:config.org::*Prog-mode][Prog-mode:1]]
-(use-package prog-mode
-  :config (global-prettify-symbols-mode)
-  (defun indicate-buffer-boundaries-left ()
-    (setq indicate-buffer-boundaries 'left))
-  (add-hook 'prog-mode-hook 'indicate-buffer-boundaries-left))
-;; Prog-mode:1 ends here
-
-;; [[file:config.org::*Recentf][Recentf:1]]
-(use-package recentf
-  :demand t
-  :config (add-to-list 'recentf-exclude "^/\\(?:ssh\\|su\\|sudo\\)?x?:"))
-;; Recentf:1 ends here
-
-;; [[file:config.org::*Savehist][Savehist:1]]
-;; Persist history over Emacs restarts. Vertico sorts by history position.
-  (use-package savehist
-      :init
-      (savehist-mode))
-;; Savehist:1 ends here
-
-;; [[file:config.org::*Saveplace][Saveplace:1]]
-;; A few more useful configurations...
-  (use-package emacs
-      :init
-      ;; Add prompt indicator to `completing-read-multiple'.
-      ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
-      (defun crm-indicator (args)
-      (cons (format "[CRM%s] %s"
-          (replace-regexp-in-string
-          "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
-          crm-separator)
-          (car args))
-        (cdr args)))
-      (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
-
-      ;; Do not allow the cursor in the minibuffer prompt
-      (setq minibuffer-prompt-properties
-    '(read-only t cursor-intangible t face minibuffer-prompt))
-      (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
-
-      ;; Emacs 28: Hide commands in M-x which do not work in the current mode.
-      ;; Vertico commands are hidden in normal buffers.
-      ;; (setq read-extended-command-predicate
-      ;;       #'command-completion-default-include-p)
-      ;; Enable recursive minibuffers
-      (setq enable-recursive-minibuffers t))
-;; Saveplace:1 ends here
-
-;; [[file:config.org::*Simple][Simple:1]]
-(use-package simple
-  :config (column-number-mode))
-;; Simple:1 ends here
-
-;; [[file:config.org::*Smerge][Smerge:1]]
-(use-package smerge-mode
-  :defer t
-  :config
-  (when (>= emacs-major-version 27)
-    (set-face-attribute 'smerge-refined-removed nil :extend t)
-    (set-face-attribute 'smerge-refined-added   nil :extend t)))
-;; Smerge:1 ends here
-
-;; [[file:config.org::*Text][Text:1]]
-(progn ;    `text-mode'
-  (add-hook 'text-mode-hook 'indicate-buffer-boundaries-left))
-;; Text:1 ends here
-
-;; [[file:config.org::*Tramp][Tramp:1]]
-(use-package tramp
-  :defer t
-  :config
-  (add-to-list 'tramp-default-proxies-alist '(nil "\\`root\\'" "/ssh:%h:"))
-  (add-to-list 'tramp-default-proxies-alist '("localhost" nil nil))
-  (add-to-list 'tramp-default-proxies-alist
-         (list (regexp-quote (system-name)) nil nil))
-  (setq vc-ignore-dir-regexp
-  (format "\\(%s\\)\\|\\(%s\\)"
-    vc-ignore-dir-regexp
-    tramp-file-name-regexp)))
-;; Tramp:1 ends here
-
-;; [[file:config.org::*Tramp-sh][Tramp-sh:1]]
-(use-package tramp-sh
-  :defer t
-  :config (cl-pushnew 'tramp-own-remote-path tramp-remote-path))
-;; Tramp-sh:1 ends here
-
-;; [[file:config.org::*Emacs Dashboard][Emacs Dashboard:1]]
-(use-package dashboard
-:init
-  (setq initial-buffer-choice 'dashboard-open
-      dashboard-image-banner-max-width 1100
-      dashboard-set-heading-icons t
-      dashboard-center-content t ;; set to 't' for centered content
-      dashboard-set-file-icons t
-      initial-buffer-choice (lambda () (get-buffer-create "*scratch*"))
-      dashboard-startup-banner ;; use custom image as banner
-      (concat user-emacs-directory "assets/EmaxBound.webp")
-      dashboard-items '(
-      (recents . 5)
-      (agenda . 5 )
-      (bookmarks . 3)
-      (projects . 3)
-      (registers . 3)
-      )
-  )
-:config
-  (dashboard-setup-startup-hook)
-  (setq-default header-line-format mode-line-format)
-  (setq-default mode-line-format nil)
-  (set-face-attribute 'dashboard-items-face nil)
-
-:bind (:map dashboard-mode-map
-  ("k" . 'dashboard-previous-line)
-  ("l" . 'dashboard-next-line)
-  (";" . 'dashboard-next-section)
-  ("j" . 'dashboard-previous-section)
-  )
-)
-;; Emacs Dashboard:1 ends here
-
-;; [[file:config.org::*Doom-modeline][Doom-modeline:1]]
-(use-package doom-modeline
-:init
-      (setq
-          doom-modeline-height 37
-          doom-modeline-enable-word-count t)
-      (doom-modeline-mode 1)
-:config
-      (set-face-attribute 'doom-modeline t
-          :inherit 'variable-pitch)
-  ;; let modeline show on the header, not bottom
-  (defun move-up-modeline ()
-    (interactive)
-    (progn
-      (setq-default header-line-format mode-line-format)
-      (setq-default mode-line-format nil)
-    ))
-  (move-up-modeline)
-)
-;; Doom-modeline:1 ends here
-
-;; [[file:config.org::*Nano-modline][Nano-modline:1]]
-(use-package nano-modeline
-:defer t
-:config
-  (add-hook 'prog-mode-hook            #'nano-modeline-prog-mode)
-  (add-hook 'text-mode-hook            #'nano-modeline-text-mode)
-  (add-hook 'org-mode-hook             #'nano-modeline-org-mode)
-  (add-hook 'pdf-view-mode-hook        #'nano-modeline-pdf-mode)
-  (add-hook 'mu4e-headers-mode-hook    #'nano-modeline-mu4e-headers-mode)
-  (add-hook 'mu4e-view-mode-hook       #'nano-modeline-mu4e-message-mode)
-  (add-hook 'elfeed-show-mode-hook     #'nano-modeline-elfeed-entry-mode)
-  (add-hook 'elfeed-search-mode-hook   #'nano-modeline-elfeed-search-mode)
-  (add-hook 'term-mode-hook            #'nano-modeline-term-mode)
-  (add-hook 'xwidget-webkit-mode-hook  #'nano-modeline-xwidget-mode)
-  (add-hook 'messages-buffer-mode-hook #'nano-modeline-message-mode)
-  (add-hook 'org-capture-mode-hook     #'nano-modeline-org-capture-mode)
-  (add-hook 'org-agenda-mode-hook      #'nano-modeline-org-agenda-mode)
-)
-;; Nano-modline:1 ends here
-
-;; [[file:config.org::*Diminish][Diminish:1]]
-(use-package diminish)
-;; Diminish:1 ends here
-
-;; [[file:config.org::*Awesome-tray][Awesome-tray:1]]
-(use-package awesome-tray
-:defer t
-:init
-  ;(awesome-tray-mode)
-:config
-  (setq awesome-tray-hide-mode-line nil)
-)
-;; Awesome-tray:1 ends here
+;; Vertical:1 ends here
 
 ;; [[file:config.org::*Vertico][Vertico:1]]
 (use-package vertico
@@ -1226,12 +1050,6 @@
 )
 ;; Marginalia:1 ends here
 
-;; [[file:config.org::*Embark][Embark:1]]
-(use-package embark
-:after consult
-)
-;; Embark:1 ends here
-
 ;; [[file:config.org::*Sort-tab][Sort-tab:1]]
 (use-package sort-tab
 :init (sort-tab-mode)
@@ -1254,6 +1072,89 @@
 (use-package toggle-one-window)
 ;; Toggle-one-window:1 ends here
 
+;; [[file:config.org::*Doom-modeline][Doom-modeline:1]]
+(use-package doom-modeline
+:init
+      (setq
+          doom-modeline-height 37
+          doom-modeline-enable-word-count t)
+      (doom-modeline-mode 1)
+:config
+      (set-face-attribute 'doom-modeline t
+          :inherit 'variable-pitch)
+  ;; let modeline show on the header, not bottom
+  (defun move-up-modeline ()
+    (interactive)
+    (progn
+      (setq-default header-line-format mode-line-format)
+      (setq-default mode-line-format nil)
+    ))
+  (move-up-modeline)
+)
+;; Doom-modeline:1 ends here
+
+;; [[file:config.org::*Diminish][Diminish:1]]
+(use-package diminish)
+;; Diminish:1 ends here
+
+;; [[file:config.org::*Awesome-tray][Awesome-tray:1]]
+(use-package awesome-tray
+:defer t
+:init
+  ;(awesome-tray-mode)
+:config
+  (setq awesome-tray-hide-mode-line nil)
+)
+;; Awesome-tray:1 ends here
+
+;; [[file:config.org::*Emacs Dashboard][Emacs Dashboard:1]]
+(use-package dashboard
+:init
+  (setq initial-buffer-choice 'dashboard-open
+      dashboard-image-banner-max-width 1100
+      dashboard-set-heading-icons t
+      dashboard-center-content t ;; set to 't' for centered content
+      dashboard-set-file-icons t
+      initial-buffer-choice (lambda () (get-buffer-create "*scratch*"))
+      dashboard-startup-banner ;; use custom image as banner
+      (concat user-emacs-directory "assets/EmaxBound.webp")
+      dashboard-items
+      '((recents . 5)
+        (agenda . 5 )
+        (bookmarks . 3)
+        (projects . 3)
+        (registers . 3)
+        )
+  )
+:config
+  (dashboard-setup-startup-hook)
+  (setq-default header-line-format mode-line-format)
+  (setq-default mode-line-format nil)
+  (set-face-attribute 'dashboard-items-face nil)
+
+:bind (:map dashboard-mode-map
+  ("k" . 'dashboard-previous-line)
+  ("l" . 'dashboard-next-line)
+  (";" . 'dashboard-next-section)
+  ("j" . 'dashboard-previous-section)
+  )
+)
+;; Emacs Dashboard:1 ends here
+
+;; [[file:config.org::*Visual Undo][Visual Undo:1]]
+(use-package vundo
+:config
+  (general-def vundo-mode-map
+    "j"  'vundo-backward
+    ";"  'vundo-forward
+    "k"  'vundo-previous
+    "l"  'vundo-next
+    "q"  'vundo-quit
+    "s"  'vundo-save
+    )
+)
+;; Visual Undo:1 ends here
+
 ;; [[file:config.org::*Magit][Magit:1]]
 (use-package magit
   :defer t
@@ -1268,6 +1169,20 @@
   (setq magit-show-long-lines-warning nil)
 )
 ;; Magit:1 ends here
+
+;; [[file:config.org::*Diff][Diff:1]]
+(use-package diff-hl
+:custom-face
+  (diff-hl-change ((t (:background "#2c5f72" :foreground "#77a8d9"))))
+  (diff-hl-delete ((t (:background "#844953" :foreground "#f27983"))))
+  (diff-hl-insert ((t (:background "#5E734A" :foreground "#a6cc70"))))
+:config
+  (setq diff-hl-draw-borders nil)
+  (global-diff-hl-mode)
+  ;(diff-hl-margin-mode)
+  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
+)
+;; Diff:1 ends here
 
 ;; [[file:config.org::*Dirvish][Dirvish:1]]
 (use-package dirvish
@@ -1335,7 +1250,7 @@
 )
 ;; Dirvish:1 ends here
 
-;; [[file:config.org::*Dirvish][Dirvish:2]]
+;; [[file:config.org::*Diredfl][Diredfl:1]]
 (use-package diredfl
 :hook
   ((dired-mode . diredfl-mode)
@@ -1344,35 +1259,39 @@
 :config
   (set-face-attribute 'diredfl-dir-name nil :bold t)
 )
-;; Dirvish:2 ends here
+;; Diredfl:1 ends here
 
-;; [[file:config.org::*Helpful][Helpful:1]]
-(use-package helpful
-:bind
-   ([remap describe-key]      . helpful-key)
-   ([remap describe-command]  . helpful-command)
-   ([remap describe-variable] . helpful-variable)
-   ([remap describe-function] . helpful-callable)
-   ("C-h F" . describe-face)
-   ("C-h K" . describe-keymap)
-)
-;; Helpful:1 ends here
+;; [[file:config.org::*Embark][Embark:1]]
+(use-package embark
+  :bind
+  (("C-." . embark-act)         ;; pick some comfortable binding
+   ("C-;" . embark-dwim)        ;; good alternative: M-.
+   ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
 
-;; [[file:config.org::*Info+][Info+:1]]
-(use-package info+
-:defer t
-:config
-)
-;; Info+:1 ends here
+  :init
 
-;; [[file:config.org::*Info+][Info+:2]]
-(use-package info-colors
-:config
-  (add-hook 'Info-selection-hook 'info-colors-fontify-node)
-  (add-hook 'Info-mode-hook 'olivetti-mode)
-  (add-hook 'Info-mode-hook 'mixed-pitch-mode)
-)
-;; Info+:2 ends here
+  ;; Optionally replace the key help with a completing-read interface
+  (setq prefix-help-command #'embark-prefix-help-command)
+
+  ;; Show the Embark target at point via Eldoc.  You may adjust the Eldoc
+  ;; strategy, if you want to see the documentation from multiple providers.
+  (add-hook 'eldoc-documentation-functions #'embark-eldoc-first-target)
+  ;; (setq eldoc-documentation-strategy #'eldoc-documentation-compose-eagerly)
+
+  :config
+
+  ;; Hide the mode line of the Embark live/completions buffers
+  (add-to-list 'display-buffer-alist
+               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                 nil
+                 (window-parameters (mode-line-format . none)))))
+;; Embark:1 ends here
+
+;; [[file:config.org::*Embark][Embark:2]]
+(use-package embark-consult
+  :hook
+  (embark-collect-mode . consult-preview-at-point-mode))
+;; Embark:2 ends here
 
 ;; [[file:config.org::*Blink search][Blink search:1]]
 (use-package blink-search
@@ -1395,172 +1314,58 @@
 (use-package voyager)
 ;; Voyager:1 ends here
 
-;; [[file:config.org::*LSP-bridge][LSP-bridge:1]]
-(use-package lsp-bridge
-:init
-  (global-lsp-bridge-mode)
-:config
-  ;(set-face-attributes 'lsp-bridge-alive-mode-line nil
-  ;  :inherit 'variable-pitch
-  ;)
-)
-;; LSP-bridge:1 ends here
-
-;; [[file:config.org::*Treesit][Treesit:1]]
-(use-package treesit
-:commands (treesit-install-language-grammar
-           config/treesit-install-all-languages)
-:init
-  (setq treesit-language-source-alist
-    '((bash . ("https://github.com/tree-sitter/tree-sitter-bash"))
-      (c . ("https://github.com/tree-sitter/tree-sitter-c"))
-      (cpp . ("https://github.com/tree-sitter/tree-sitter-cpp"))
-      (css . ("https://github.com/tree-sitter/tree-sitter-css"))
-      (cmake . ("https://github.com/uyha/tree-sitter-cmake"))
-      (common-lisp . ("https://github.com/theHamsta/tree-sitter-commonlisp"))
-      (csharp . ("https://github.com/tree-sitter/tree-sitter-c-sharp.git"))
-      (dockerfile . ("https://github.com/camdencheek/tree-sitter-dockerfile"))
-      (elisp . ("https://github.com/Wilfred/tree-sitter-elisp"))
-      (go . ("https://github.com/tree-sitter/tree-sitter-go"))
-      (gomod . ("https://github.com/camdencheek/tree-sitter-go-mod.git"))
-      (html . ("https://github.com/tree-sitter/tree-sitter-html"))
-      (java . ("https://github.com/tree-sitter/tree-sitter-java.git"))
-      (javascript . ("https://github.com/tree-sitter/tree-sitter-javascript"))
-      (json . ("https://github.com/tree-sitter/tree-sitter-json"))
-      (lua . ("https://github.com/Azganoth/tree-sitter-lua"))
-      (make . ("https://github.com/alemuller/tree-sitter-make"))
-      (markdown . ("https://github.com/MDeiml/tree-sitter-markdown" nil
-        "tree-sitter-markdown/src"))
-      (nix . ("https://github.com/nix-community/tree-sitter-nix.git"))
-      (ocaml . ("https://github.com/tree-sitter/tree-sitter-ocaml" nil "ocaml/src"))
-      (org . ("https://github.com/milisims/tree-sitter-org"))
-      (python . ("https://github.com/tree-sitter/tree-sitter-python"))
-      (php . ("https://github.com/tree-sitter/tree-sitter-php"))
-      (typescript . ("https://github.com/tree-sitter/tree-sitter-typescript" nil
-          "typescript/src"))
-      (tsx . ("https://github.com/tree-sitter/tree-sitter-typescript" nil
-          "tsx/src"))
-      (ruby . ("https://github.com/tree-sitter/tree-sitter-ruby"))
-      (rust . ("https://github.com/tree-sitter/tree-sitter-rust"))
-      (sql . ("https://github.com/m-novikov/tree-sitter-sql"))
-      (vue . ("https://github.com/merico-dev/tree-sitter-vue"))
-      (yaml . ("https://github.com/ikatyang/tree-sitter-yaml"))
-      (toml . ("https://github.com/tree-sitter/tree-sitter-toml"))
-      (zig . ("https://github.com/GrayJack/tree-sitter-zig"))))
-:config
-(defun config/treesit-install-all-languages ()
-  "Install all languages specified by `treesit-language-source-alist'."
-  (interactive)
-  (let ((languages (mapcar 'car treesit-language-source-alist)))
-    (dolist (lang languages)
-      (treesit-install-language-grammar lang)
-      (message "`%s' parser was installed." lang)
-      (sit-for 0.75)))))
-;; stolen from lazycat
-(setq major-mode-remap-alist
-      '((c-mode          . c-ts-mode)
-        (c++-mode        . c++-ts-mode)
-        (cmake-mode      . cmake-ts-mode)
-        (conf-toml-mode  . toml-ts-mode)
-        (css-mode        . css-ts-mode)
-        (js-mode         . js-ts-mode)
-        (js-json-mode    . json-ts-mode)
-        (nix-mode        . nix-ts-mode)
-        (python-mode     . python-ts-mode)
-        (sh-mode         . bash-ts-mode)
-        (typescript-mode . typescript-ts-mode)
-        (rust-mode       . rust-ts-mode)
-        ))
-
-(add-hook 'markdown-mode-hook #'(lambda ()
-          (treesit-parser-create 'markdown)))
-
-(add-hook 'web-mode-hook #'(lambda ()
-           (let ((file-name (buffer-file-name)))
-             (when file-name
-               (treesit-parser-create
-          (pcase (file-name-extension file-name)
-            ("vue" 'vue)
-            ("html" 'html)
-            ("php" 'php))))
-             )))
-
-(add-hook 'emacs-lisp-mode-hook #'(lambda () (treesit-parser-create 'elisp)))
-(add-hook 'ielm-mode-hook #'(lambda () (treesit-parser-create 'elisp)))
-(add-hook 'json-mode-hook #'(lambda () (treesit-parser-create 'json)))
-(add-hook 'go-mode-hook #'(lambda () (treesit-parser-create 'go)))
-(add-hook 'java-mode-hook #'(lambda () (treesit-parser-create 'java)))
-(add-hook 'java-ts-mode-hook #'(lambda () (treesit-parser-create 'java)))
-(add-hook 'php-mode-hook #'(lambda () (treesit-parser-create 'php)))
-(add-hook 'php-ts-mode-hook #'(lambda () (treesit-parser-create 'php)))
-;; Treesit:1 ends here
-
-;; [[file:config.org::*Treesit][Treesit:2]]
-(use-package treesit-auto
-:disabled
-:config
-  (global-treesit-auto-mode))
-;; Treesit:2 ends here
-
-;; [[file:config.org::*Elisp][Elisp:1]]
-(setq-default lexical-binding t)
-;; Elisp:1 ends here
-
-;; [[file:config.org::*AUCTeX][AUCTeX:1]]
-(use-package ox-latex
+;; [[file:config.org::*Holo-layer][Holo-layer:1]]
+(use-package holo-layer
 :defer t
-:after ox
-)
-;; AUCTeX:1 ends here
-
-;; [[file:config.org::*AUCTeX][AUCTeX:2]]
-(use-package auctex)
-;; AUCTeX:2 ends here
-
-;; [[file:config.org::*CDTeX][CDTeX:1]]
-
-;; CDTeX:1 ends here
-
-;; [[file:config.org::*Nix][Nix:1]]
-(use-package nix-mode
-:mode "\\.nix\\'"
+:if (memq window-system '(pgtk mac ns))
 :config
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((nix . t))
-   )
+  (setq holo-layer-enable-cursor-animation 1
+        holo-layer-enable-window-border 1
+        holo-layer-sort-tab-ui 1
+        ;;holo-layer-cursor-animation-type "arrow easing"
+        )
+  (holo-layer-enable)
 )
-;; Nix:1 ends here
+;; Holo-layer:1 ends here
 
-;; [[file:config.org::*Nix][Nix:2]]
-(use-package nix-ts-mode
-:mode "\\.nix\\'"
+;; [[file:config.org::*Beacon][Beacon:1]]
+(use-package beacon
+:defer t
+:config
+      (beacon-mode)
 )
-;; Nix:2 ends here
+;; Beacon:1 ends here
 
-;; [[file:config.org::*PlantUML][PlantUML:1]]
-(use-package plantuml-mode
-:mode "\\.plantuml\\'"
+;; [[file:config.org::*Pulse-Cursor][Pulse-Cursor:1]]
+(use-package pulsing-cursor
+:config
+  (setq pulse-delay 0.08
+        pulse-iterations 2)
+  (setq pulsing-cursor-blinks 20)
+  (set-face-attribute 'pulsing-cursor-overlay-face1 nil :inherit 'cursor)
+  (pulsing-cursor-mode)
 )
-;; PlantUML:1 ends here
+;; Pulse-Cursor:1 ends here
 
-;; [[file:config.org::*Jupyter][Jupyter:1]]
-(use-package jupyter
+;; [[file:config.org::*Goggles][Goggles:1]]
+(use-package goggles
+:hook ((prog-mode text-mode org-mode) . goggles-mode)
+:config
+  (setq-default goggles-pulse t)) ;; set to nil to disable pulsing
+;; Goggles:1 ends here
 
-  )
-;; Jupyter:1 ends here
-
-;; [[file:config.org::*Verilog][Verilog:1]]
-(use-package verilog-mode
-:mode "\\.v\\'"
+;; [[file:config.org::*Hl-line][Hl-line:1]]
+(use-package hl-line
+:init
+  (global-hl-line-mode)
 )
-;; Verilog:1 ends here
+;; Hl-line:1 ends here
 
-;; [[file:config.org::*YAML][YAML:1]]
-(use-package yaml-mode
-:mode "\\.yaml\\'"
-)
-;; YAML:1 ends here
+;; [[file:config.org::*Whitespace mode][Whitespace mode:1]]
+;; (config/leader :infix "t"
+;;   "SPC"  '(whitespace-mode  :wk "󰡭 Show Space")
+;; )
+;; Whitespace mode:1 ends here
 
 ;; [[file:config.org::*Line Number][Line Number:1]]
 (use-package emacs
@@ -1640,19 +1445,42 @@
 )
 ;; Smartparens:1 ends here
 
-;; [[file:config.org::*Vundo][Vundo:1]]
-(use-package vundo
+;; [[file:config.org::*Electric-Indent][Electric-Indent:1]]
+(use-package electric
 :config
-  (general-def vundo-mode-map
-    "j"  'vundo-backward
-    ";"  'vundo-forward
-    "k"  'vundo-previous
-    "l"  'vundo-next
-    "q"  'vundo-quit
-    "s"  'vundo-save
-    )
+  (setq-default indent-tabs-mode nil) ;; always indent with spaces
+  (setq electric-pair-mode t) ;; global-minor mode
 )
-;; Vundo:1 ends here
+;; Electric-Indent:1 ends here
+
+;; [[file:config.org::*Aggressive-Indent][Aggressive-Indent:1]]
+(use-package aggressive-indent
+:disabled
+:config
+  (global-aggressive-indent-mode 1)
+)
+;; Aggressive-Indent:1 ends here
+
+;; [[file:config.org::*Auto-save][Auto-save:1]]
+(use-package auto-save
+:after lsp-bridge
+:config
+  (auto-save-enable)
+  (setq auto-save-silent t)   ; quietly save
+  (setq auto-save-delete-trailing-whitespace t)
+)
+;; Auto-save:1 ends here
+
+;; [[file:config.org::*LSP-bridge][LSP-bridge:1]]
+(use-package lsp-bridge
+:init
+  (global-lsp-bridge-mode)
+:config
+  ;(set-face-attributes 'lsp-bridge-alive-mode-line nil
+  ;  :inherit 'variable-pitch
+  ;)
+)
+;; LSP-bridge:1 ends here
 
 ;; [[file:config.org::*Fingertip][Fingertip:1]]
 (use-package fingertip
@@ -1664,7 +1492,7 @@
         'java-mode-hook
         'haskell-mode-hook
         'emacs-lisp-mode-hook
-           'lisp-interaction-mode-hook 'lisp-mode-hook
+        'lisp-interaction-mode-hook 'lisp-mode-hook
         'maxima-mode-hook
         'ielm-mode-hook
         'bash-ts-mode-hook 'sh-mode-hook
@@ -1728,21 +1556,28 @@
 )
 ;; Fingertip:1 ends here
 
-;; [[file:config.org::*Electric-Indent][Electric-Indent:1]]
-(use-package electric
+;; [[file:config.org::*Treesit-auto][Treesit-auto:1]]
+(use-package treesit-auto
 :config
-  (setq-default indent-tabs-mode nil) ;; always indent with spaces
-  (setq electric-pair-mode t) ;; global-minor mode
-)
-;; Electric-Indent:1 ends here
 
-;; [[file:config.org::*Aggressive-Indent][Aggressive-Indent:1]]
-(use-package aggressive-indent
-:disabled
+  (defun my/remap-mode (mode)
+    "A hack to make org-src-get-lang-mode respect major-mode-remap-alist"
+    (treesit-auto--set-major-remap)
+    (alist-get mode major-mode-remap-alist mode)
+    )
+  (advice-add 'org-src-get-lang-mode :filter-return #'my/remap-mode)
+
+  ;; a workaround for emacs29 do not come up with elisp-ts-mode
+  (add-hook 'emacs-lisp-mode-hook #'(lambda () (treesit-parser-create 'elisp)))
+  (global-treesit-auto-mode))
+;; Treesit-auto:1 ends here
+
+;; [[file:config.org::*Treesitter-context][Treesitter-context:1]]
+(use-package treesitter-context
 :config
-  (global-aggressive-indent-mode 1)
-)
-;; Aggressive-Indent:1 ends here
+  (add-hook 'python-ts-mode-hook #'treesitter-context-mode)
+  )
+;; Treesitter-context:1 ends here
 
 ;; [[file:config.org::*YASnippet][YASnippet:1]]
 (use-package yasnippet
@@ -1790,6 +1625,65 @@
 (use-package tempel-collection)
 ;; Tempel:1 ends here
 
+;; [[file:config.org::*Elisp][Elisp:1]]
+(setq-default lexical-binding t)
+;; Elisp:1 ends here
+
+;; [[file:config.org::*AUCTeX][AUCTeX:1]]
+(use-package auctex)
+;; AUCTeX:1 ends here
+
+;; [[file:config.org::*CDTeX][CDTeX:1]]
+(use-package cdlatex)
+;; CDTeX:1 ends here
+
+;; [[file:config.org::*LAAS][LAAS:1]]
+(use-package laas
+:after ass
+:hook (LaTeX-mode . laas-mode))
+;; LAAS:1 ends here
+
+;; [[file:config.org::*Nix][Nix:1]]
+(use-package nix-mode
+:mode "\\.nix\\'"
+:config
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((nix . t))
+   )
+)
+;; Nix:1 ends here
+
+;; [[file:config.org::*Nix][Nix:2]]
+(use-package nix-ts-mode
+:mode "\\.nix\\'"
+)
+;; Nix:2 ends here
+
+;; [[file:config.org::*PlantUML][PlantUML:1]]
+(use-package plantuml-mode
+:mode "\\.plantuml\\'"
+)
+;; PlantUML:1 ends here
+
+;; [[file:config.org::*Jupyter][Jupyter:1]]
+(use-package jupyter
+:defer t
+  )
+;; Jupyter:1 ends here
+
+;; [[file:config.org::*Verilog][Verilog:1]]
+(use-package verilog-mode
+:mode "\\.v\\'"
+)
+;; Verilog:1 ends here
+
+;; [[file:config.org::*YAML][YAML:1]]
+(use-package yaml-mode
+:mode "\\.yaml\\'"
+)
+;; YAML:1 ends here
+
 ;; [[file:config.org::*Init][Init:1]]
 (use-package org
 :after emacs
@@ -1799,7 +1693,7 @@
   (setq org-latex-preview-numbered t)
 :config
   (add-hook 'org-mode-hook #'olivetti-mode)
-  (add-hook 'org-mode-hook #'org-visual-indent-mode)
+  ;(add-hook 'org-mode-hook #'org-visual-indent-mode)
   (add-hook 'org-mode-hook #'turn-on-org-cdlatex)
 )
 ;; Init:1 ends here
@@ -1858,7 +1752,8 @@
   (set-face-attribute 'org-meta-line nil
      :height 0.9)
   (set-face-attribute 'org-modern-horizontal-rule nil
-     :inherit 'org-meta-line)
+      :strike-through (face-foreground 'org-meta-line) :inherit 'org-hide)
+
   (setq org-modern-table nil)
   (global-org-modern-mode)
 )
@@ -1894,14 +1789,15 @@
 
 ;; [[file:config.org::*Indent lines][Indent lines:2]]
 (use-package org-visual-outline
-:custom-face
- (org-visual-indent-blank-pipe-face ((t
-       (:background "#1f2430" :foreground "#1f2430"
-    :height 0.1 :width extra-expanded))))
- (org-visual-indent-pipe-face ((t
-       (:background "#454d6d" :foreground "#454d6d"
-    :height 0.1 :width extra-expanded))))
+;; :custom-face
+  ;;  (org-visual-indent-blank-pipe-face ((t
+  ;;        (:background "#1f2430" :foreground "#1f2430"
+  ;;     :height 0.1 :width extra-expanded))))
+  ;; (org-visual-indent-pipe-face ((t
+  ;;       (:background "#454d6d" :foreground "#454d6d"
+  ;;    :height 0.1 :width extra-expanded))))
 :hook (org-mode . org-visual-indent-mode)
+:after org
 )
 ;; Indent lines:2 ends here
 
@@ -1925,13 +1821,14 @@
   :hook (org-mode . org-appear-mode)
   :init
   (setq org-appear-autoemphasis  t
-        org-appear-autolinks t
+        ;; org-appear-autolinks t
         org-appear-autosubmarkers t
         org-appear-autoentities t
         org-appear-autokeywords t
-        ;org-appear-inside-latex t
+        ;; org-appear-inside-latex t
         org-hide-emphasis-markers t
   )
+
 )
 ;; Org-appear:1 ends here
 
@@ -1978,25 +1875,40 @@
 ;; [[file:config.org::*outline functions][outline functions:1]]
 (defun my/outline-left ()
   (interactive)
-  (hide-subtree)
-  (outline-up-heading 1)
-  (hide-subtree)
-  (outline-show-children)
-  (outline-show-entry))
+  (cond ((outline-on-heading-p)
+         (hide-subtree)
+         (outline-up-heading 1)
+         (hide-subtree)
+         (outline-show-children)
+         (outline-show-entry))
+        (t
+         (outline-back-to-heading)
+         ))
+  )
 
 (defun my/outline-up ()
   (interactive)
-  (hide-subtree)
-  (outline-backward-same-level 1)
-  (outline-show-children)
-  (outline-show-entry))
+  (cond ((outline-on-heading-p)
+         (hide-subtree)
+         (outline-backward-same-level 1)
+         (outline-show-children)
+         (outline-show-entry)
+         )
+        (t
+         (org-previous-block 1)))
+)
 
 (defun my/outline-down ()
   (interactive)
-  (hide-subtree)
-  (outline-forward-same-level 1)
-  (outline-show-children)
-  (outline-show-entry))
+  (cond ((outline-on-heading-p)
+         (hide-subtree)
+         (outline-forward-same-level 1)
+         (outline-show-children)
+         (outline-show-entry)
+         )
+        (t
+         (org-next-block 1)))
+  )
 
 (defun my/outline-right ()
   (interactive)
@@ -2008,7 +1920,7 @@
              (outline-show-entry))))
 ;; outline functions:1 ends here
 
-;; [[file:config.org::*Code block][Code block:1]]
+;; [[file:config.org::*Src block][Src block:1]]
 (use-package org
 :init
   (setq org-babel-load-languages
@@ -2028,22 +1940,105 @@
   (general-define-key :keymap 'org-src-mode-map
      "C-c C-c" 'eval-buffer)
 )
-;; Code block:1 ends here
+;; Src block:1 ends here
 
-;; [[file:config.org::*Code block][Code block:2]]
+;; [[file:config.org::*Src block][Src block:2]]
 (use-package org-auto-tangle
 :hook (org-mode . org-auto-tangle-mode)
 )
-;; Code block:2 ends here
+;; Src block:2 ends here
 
-;; [[file:config.org::*Code block][Code block:3]]
+;; [[file:config.org::*Src block][Src block:3]]
 (use-package ob-async
 :after org
 :config
   ;; below languages may have independent implementation of async
   (setq ob-async-no-async-languages-alist '("jupyter-python" "jupyter-julia"))
   )
-;; Code block:3 ends here
+;; Src block:3 ends here
+
+;; [[file:config.org::*LaTeX][LaTeX:1]]
+(use-package org
+:config
+  (defconst org-match-substring-regexp
+    (concat
+     "\\(\\S-\\)\\([_^]\\)\\("
+     "\\(?:" (org-create-multibrace-regexp "{" "}" org-match-sexp-depth) "\\)"
+     "\\|"
+     "\\(?:" (org-create-multibrace-regexp "(" ")" org-match-sexp-depth) "\\)"
+     "\\|"
+     "\\(?:.\\)"
+     "\\|"
+     "\\(?:\\\\[[:alnum:].,\\]*[[:alnum:]]\\)"
+     "\\)")
+    "The regular expression matching a sub- or superscript.")
+
+  (defun +org-raise-scripts (limit)
+    "Add raise properties to sub/superscripts."
+    (when (and org-pretty-entities org-pretty-entities-include-sub-superscripts
+               (re-search-forward org-match-substring-regexp limit t))
+      (let* ((pos (point)) table-p comment-p
+             (mpos (match-beginning 3))
+             (emph-p (get-text-property mpos 'org-emphasis))
+             (link-p (get-text-property mpos 'mouse-face))
+             (keyw-p (eq 'org-special-keyword (get-text-property mpos 'face)))
+             (tex-p (eq 'org-latex-and-related (get-text-property mpos 'face))))
+        (goto-char (line-beginning-position))
+        (setq table-p (looking-at-p org-table-dataline-regexp)
+              comment-p (looking-at-p "^[ \t]*#[ +]"))
+        (goto-char pos)
+        ;; Handle a_b^c
+        (when (member (char-after) '(?_ ?^)) (goto-char (1- pos)))
+        (if (not (or comment-p emph-p link-p keyw-p))
+            (put-text-property (match-beginning 3) (match-end 0)
+                               'display
+                               (if (equal (char-after (match-beginning 2)) ?^)
+                                   (nth (if table-p 3 1) org-script-display)
+                                 (nth (if table-p 2 0) org-script-display)))
+          (put-text-property (match-beginning 2) (match-end 3) 'org-emphasis t))
+        t)))
+
+  (advice-add #'org-raise-scripts :override #'+org-raise-scripts)
+)
+;; LaTeX:1 ends here
+
+;; [[file:config.org::*LaTeX][LaTeX:2]]
+(use-package org
+:config
+  (setq org-entities-user
+        '(("vdash" "\\vdash" t "⊢" "⊢" "⊢" "⊢")
+          ("vDash" "\\vDash" t "⊨" "⊨" "⊨" "⊨")
+          ("Vdash" "\\Vdash" t "⊩" "⊩" "⊩" "⊩")
+          ("Vvdash" "\\Vvdash" t "⊪" "⊪" "⊪" "⊪")
+          ("nvdash" "\\nvdash" t "⊬" "⊬" "⊬" "⊬")
+          ("nvDash" "\\nvDash" t "⊭" "⊭" "⊭" "⊭")
+          ("nVdash" "\\nVdash" t "⊮" "⊮" "⊮" "⊮")
+          ("nVDash" "\\nVDash" t "⊯" "⊯" "⊯" "⊯")
+          ("subseteq" "\\subseteq" t "⊆" "⊆" "⊆" "⊆")
+          ("supseteq" "\\supseteq" t "⊇" "⊇" "⊇" "⊇")
+          ("subsetneq" "\\subsetneq" t "⊊" "⊊" "⊊" "⊊")
+          ("supsetneq" "\\supsetneq" t "⊋" "⊋" "⊋" "⊋")
+          ("nsubseteq" "\\nsubseteq" t "⊈" "⊈" "⊈" "⊈")
+          ("nsupseteq" "\\nsupseteq" t "⊉" "⊉" "⊉" "⊉")
+          ("nsubseteqq" "\\nsubseteqq" t "⊈" "⊈" "⊈" "⊈")
+          ("nsupseteqq" "\\nsupseteqq" t "⊉" "⊉" "⊉" "⊉")
+          ("subsetneqq" "\\subsetneqq" t "⊊" "⊊" "⊊" "⊊")
+          ("supsetneqq" "\\supsetneqq" t "⊋" "⊋" "⊋" "⊋")
+          ("nsubset" "\\nsubset" t "⊄" "⊄" "⊄" "⊄")
+          ("nsupset" "\\nsupset" t "⊅" "⊅" "⊅" "⊅")
+          ("nsubseteq" "\\nsubseteq" t "⊈" "⊈" "⊈" "⊈")
+          ("nsupseteq" "\\nsupseteq" t "⊉" "⊉" "⊉" "⊉")))
+  )
+;; LaTeX:2 ends here
+
+;; [[file:config.org::*LaTeX][LaTeX:3]]
+(use-package org
+:init
+  (setq org-latex-preview-numbered t)
+  (plist-put org-latex-preview-options :zoom 1.25)
+  (let ((pos (assoc 'dvisvgm org-latex-preview-process-alist)))
+    (plist-put (cdr pos) :image-converter '("dvisvgm --page=1- --optimize --clipjoin --relative --no-fonts --bbox=preview -o %B-%%9p.svg %f"))))
+;; LaTeX:3 ends here
 
 ;; [[file:config.org::*Org-download][Org-download:1]]
 (use-package org-download
@@ -2107,14 +2102,46 @@
 )
 ;; Org-capture:1 ends here
 
+;; [[file:config.org::*Custom-ID][Custom-ID:1]]
+(use-package org
+:config
+  (defun org-add-custom-id ()
+    "Add CUSTOM_ID property to current heading, skip if already have"
+    (interactive)
+    (let ((custom-id (org-entry-get nil "CUSTOM_ID")))
+      (unless custom-id
+        (org-set-property "CUSTOM_ID" (org-id-new))))
+    )
+
+  (defun org-add-custom-id-to-all-headings ()
+    "Add CUSTOM_ID properties to headings without a CUSTOM_ID property in current Org buffer."
+    (interactive)
+    (org-map-entries
+     (lambda ()
+       (let ((custom-id (org-entry-get nil "CUSTOM_ID")))
+         (unless custom-id
+           (org-set-property "CUSTOM_ID" (org-id-new)))))
+     nil 'file)
+    )
+)
+;; Custom-ID:1 ends here
+
 ;; [[file:config.org::*Org-super-links][Org-super-links:1]]
 (use-package org-super-links
 :after org
-:bind (("C-c s s" . org-super-links-link)
-       ("C-c s l" . org-super-links-store-link)
-       ("C-c s C-l" . org-super-links-insert-link))
 :config
-    (setq org-super-links-search-function 'consult-outline)
+
+  (defun my/org-insert-backlink ()
+    "insert backlink using consult-org-heading in current org file"
+    (interactive)
+    (let ((target-position
+           (save-excursion (consult-org-heading) (point) )))
+      (org-super-links--insert-link
+       (set-marker (make-marker) target-position)))
+    (recenter)
+    )
+  (setq org-super-links-search-function 'my/org-insert-backlink)
+  (setq org-super-links-backlink-prefix nil)
 )
 ;; Org-super-links:1 ends here
 
@@ -2254,12 +2281,6 @@
  ("C-c d f" . org-gtd-clarify-finalize)))
 ;; GTD:1 ends here
 
-;; [[file:config.org::*grip-mode][grip-mode:1]]
-(use-package grip-mode
-:after org
-)
-;; grip-mode:1 ends here
-
 ;; [[file:config.org::*Ox][Ox:1]]
 (use-package ox
 :after org
@@ -2300,6 +2321,12 @@
   (setq htmlize-pre-style t
           htmlize-output-type 'inline-css))
 ;; HTML:2 ends here
+
+;; [[file:config.org::*grip-mode][grip-mode:1]]
+(use-package grip-mode
+:after org
+)
+;; grip-mode:1 ends here
 
 ;; [[file:config.org::*PDF][PDF:1]]
 
@@ -2350,7 +2377,9 @@
 ;; LaTeX:1 ends here
 
 ;; [[file:config.org::*Ipynb][Ipynb:1]]
-(use-package ox-ipynb)
+(use-package ox-ipynb
+:after ox
+  )
 ;; Ipynb:1 ends here
 
 ;; [[file:config.org::*Slides][Slides:2]]
