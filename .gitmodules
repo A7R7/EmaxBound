@@ -45,6 +45,9 @@
 [submodule "avy"]
 	path = lib/avy
 	url = https://github.com/abo-abo/avy
+[submodule "awesome-emacs"]
+	path = lib/awesome-emacs
+	url = git@github.com:emacs-tw/awesome-emacs.git
 [submodule "awesome-tray"]
 	path = lib/awesome-tray
 	url = git@github.com:manateelazycat/awesome-tray.git
@@ -99,18 +102,15 @@
 [submodule "dirvish"]
 	path = lib/dirvish
 	url = https://github.com/alexluigit/dirvish
+[submodule "doom-dashboard"]
+	path = lib/doom-dashboard
+	url = git@github.com:A7R7/doom-dashboard.git
 [submodule "doom-modeline"]
 	path = lib/doom-modeline
 	url = https://github.com/seagle0128/doom-modeline
 [submodule "doom-themes"]
 	path = lib/doom-themes
 	url = https://github.com/doomemacs/themes
-[submodule "doremi"]
-	path = lib/doremi
-	url = git@github.com:emacsmirror/doremi.git
-[submodule "doremi-cmd"]
-	path = lib/doremi-cmd
-	url = git@github.com:emacsmirror/doremi-cmd.git
 [submodule "eaf"]
 	path = lib/eaf
 	url = https://github.com/emacs-eaf/emacs-application-framework
@@ -129,6 +129,9 @@
 [submodule "elisp-refs"]
 	path = lib/elisp-refs
 	url = https://github.com/Wilfred/elisp-refs
+[submodule "emacs-everywhere"]
+	path = lib/emacs-everywhere
+	url = https://github.com/tecosaur/emacs-everywhere
 [submodule "emacsql"]
 	path = lib/emacsql
 	url = https://github.com/magit/emacsql
@@ -138,6 +141,9 @@
 [submodule "epkg"]
 	path = lib/epkg
 	url = https://github.com/emacscollective/epkg
+[submodule "esxml"]
+	path = lib/esxml
+	url = https://github.com/tali713/esxml
 [submodule "etexshow"]
 	path = lib/etexshow
 	url = https://github.com/pgundlach/etexshow
@@ -168,6 +174,9 @@
 [submodule "general"]
 	path = lib/general
 	url = https://github.com/noctuid/general.el
+[submodule "geo"]
+	path = lib/geo
+	url = git@github.com:emacsmirror/geo.git
 [submodule "git-modes"]
 	path = lib/git-modes
 	url = https://github.com/magit/git-modes
@@ -183,6 +192,9 @@
 [submodule "highlight-indent-guides"]
 	path = lib/highlight-indent-guides
 	url = https://github.com/DarthFennec/highlight-indent-guides
+[submodule "highlight-parentheses"]
+	path = lib/highlight-parentheses
+	url = git@github.com:emacsmirror/highlight-parentheses.git
 [submodule "hl-todo"]
 	path = lib/hl-todo
 	url = https://github.com/tarsius/hl-todo
@@ -207,6 +219,9 @@
 [submodule "info-colors"]
 	path = lib/info-colors
 	url = https://github.com/ubolonton/info-colors
+[submodule "ivy"]
+	path = lib/ivy
+	url = https://github.com/abo-abo/swiper
 [submodule "js2-mode"]
 	path = lib/js2-mode
 	url = https://github.com/mooz/js2-mode
@@ -216,9 +231,15 @@
 [submodule "json-snatcher"]
 	path = lib/json-snatcher
 	url = https://github.com/Sterlingg/json-snatcher
+[submodule "jupyter"]
+	path = lib/jupyter
+	url = https://github.com/emacs-jupyter/jupyter
 [submodule "key-echo"]
 	path = lib/key-echo
 	url = https://github.com/manateelazycat/key-echo.git
+[submodule "kv"]
+	path = lib/kv
+	url = https://github.com/nicferrier/emacs-kv
 [submodule "laas"]
 	path = lib/laas
 	url = https://github.com/tecosaur/LaTeX-auto-activating-snippets
@@ -287,7 +308,7 @@
 	url = https://github.com/oantolin/orderless
 [submodule "org"]
 	path = lib/org
-	url = https://git.tecosaur.net/tec/org-mode.git
+	url = https://git.tecosaur.net/tec/org-mode
 [submodule "org-agenda-property"]
 	path = lib/org-agenda-property
 	url = https://github.com/Malabarba/org-agenda-property
@@ -321,6 +342,9 @@
 [submodule "org-preview-html"]
 	path = lib/org-preview-html
 	url = https://github.com/jakebox/org-preview-html
+[submodule "org-ql"]
+	path = lib/org-ql
+	url = https://github.com/alphapapa/org-ql
 [submodule "org-roam"]
 	path = lib/org-roam
 	url = https://github.com/org-roam/org-roam
@@ -351,6 +375,9 @@
 [submodule "ox-hugo"]
 	path = lib/ox-hugo
 	url = https://github.com/kaushalmodi/ox-hugo
+[submodule "ox-ipynb"]
+	path = lib/ox-ipynb
+	url = git@github.com:jkitchin/ox-ipynb.git
 [submodule "ox-pandoc"]
 	path = lib/ox-pandoc
 	url = https://github.com/emacsorphanage/ox-pandoc
@@ -385,6 +412,9 @@
 [submodule "posframe"]
 	path = lib/posframe
 	url = https://github.com/tumashu/posframe
+[submodule "posframe-plus"]
+	path = lib/posframe-plus
+	url = git@github.com:zbelial/posframe-plus.git
 [submodule "powerline"]
 	path = lib/powerline
 	url = https://github.com/milkypostman/powerline
@@ -400,6 +430,9 @@
 [submodule "rainbow-delimiters"]
 	path = lib/rainbow-delimiters
 	url = https://github.com/Fanael/rainbow-delimiters
+[submodule "rainbow-identifiers"]
+	path = lib/rainbow-identifiers
+	url = https://github.com/Fanael/rainbow-identifiers
 [submodule "rainbow-mode"]
 	path = lib/rainbow-mode
 	url = git@github.com:emacsmirror/rainbow-mode.git
@@ -448,12 +481,18 @@
 [submodule "tablist"]
 	path = lib/tablist
 	url = https://github.com/emacsorphanage/tablist
+[submodule "telega"]
+	path = lib/telega
+	url = https://github.com/zevlg/telega.el
 [submodule "tempel"]
 	path = lib/tempel
 	url = https://github.com/minad/tempel
 [submodule "tempel-collection"]
 	path = lib/tempel-collection
 	url = https://github.com/Crandel/tempel-collection
+[submodule "toggle-one-window"]
+	path = lib/toggle-one-window
+	url = git@github.com:manateelazycat/toggle-one-window.git
 [submodule "tomelr"]
 	path = lib/tomelr
 	url = https://github.com/kaushalmodi/tomelr
@@ -475,6 +514,9 @@
 [submodule "treesit-auto"]
 	path = lib/treesit-auto
 	url = https://github.com/renzmann/treesit-auto
+[submodule "treesitter-context"]
+	path = lib/treesitter-context
+	url = https://github.com/zbelial/treesitter-context.el
 [submodule "ts"]
 	path = lib/ts
 	url = https://github.com/alphapapa/ts.el
@@ -484,6 +526,9 @@
 [submodule "valign"]
 	path = lib/valign
 	url = https://github.com/casouri/valign
+[submodule "verilog-mode"]
+	path = lib/verilog-mode
+	url = git@github.com:veripool/verilog-mode.git
 [submodule "vertico"]
 	path = lib/vertico
 	url = https://github.com/minad/vertico
@@ -508,6 +553,9 @@
 [submodule "vundo"]
 	path = lib/vundo
 	url = https://github.com/casouri/vundo
+[submodule "websocket"]
+	path = lib/websocket
+	url = https://github.com/ahyatt/emacs-websocket
 [submodule "which-key"]
 	path = lib/which-key
 	url = https://github.com/justbur/emacs-which-key
@@ -532,6 +580,9 @@
 [submodule "yasnippet"]
 	path = lib/yasnippet
 	url = https://github.com/joaotavora/yasnippet
+[submodule "zmq"]
+	path = lib/zmq
+	url = https://github.com/nnicandro/emacs-zmq
 [submodule "zoxide"]
 	path = lib/zoxide
 	url = https://gitlab.com/Vonfry/zoxide.el
