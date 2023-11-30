@@ -27,6 +27,9 @@
 [submodule "all-the-icons-completion"]
 	path = lib/all-the-icons-completion
 	url = https://github.com/iyefrat/all-the-icons-completion
+[submodule "anaphora"]
+	path = lib/anaphora
+	url = https://github.com/rolandwalker/anaphora
 [submodule "annalist"]
 	path = lib/annalist
 	url = https://github.com/noctuid/annalist.el
@@ -255,6 +258,9 @@
 [submodule "magit"]
 	path = lib/magit
 	url = https://github.com/magit/magit
+[submodule "makefile-ts-mode"]
+	path = lib/makefile-ts-mode
+	url = git@github.com:nverno/makefile-ts-mode.git
 [submodule "marginalia"]
 	path = lib/marginalia
 	url = https://github.com/minad/marginalia
@@ -267,9 +273,6 @@
 [submodule "meow"]
 	path = lib/meow
 	url = https://github.com/meow-edit/meow
-[submodule "mini-frame"]
-	path = lib/mini-frame
-	url = https://github.com/muffinmad/emacs-mini-frame
 [submodule "minimap"]
 	path = lib/minimap
 	url = git@github.com:emacsmirror/minimap.git
@@ -300,6 +303,9 @@
 [submodule "ob-async"]
 	path = lib/ob-async
 	url = https://github.com/astahlman/ob-async
+[submodule "ob-nix"]
+	path = lib/ob-nix
+	url = https://github.com/emacsmirror/ob-nix
 [submodule "olivetti"]
 	path = lib/olivetti
 	url = https://github.com/rnkn/olivetti
@@ -339,6 +345,12 @@
 [submodule "org-modern"]
 	path = lib/org-modern
 	url = https://github.com/minad/org-modern
+[submodule "org-modern-indent"]
+	path = lib/org-modern-indent
+	url = git@github.com:jdtsmith/org-modern-indent.git
+[submodule "org-pandoc-import"]
+	path = lib/org-pandoc-import
+	url = git@github.com:tecosaur/org-pandoc-import.git
 [submodule "org-preview-html"]
 	path = lib/org-preview-html
 	url = https://github.com/jakebox/org-preview-html
@@ -454,6 +466,9 @@
 [submodule "shrink-path"]
 	path = lib/shrink-path
 	url = https://gitlab.com/bennya/shrink-path.el
+[submodule "simple-call-tree"]
+	path = lib/simple-call-tree
+	url = https://github.com/vapniks/simple-call-tree
 [submodule "simple-httpd"]
 	path = lib/simple-httpd
 	url = https://github.com/skeeto/emacs-web-server

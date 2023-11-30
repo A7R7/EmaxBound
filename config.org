@@ -1,8 +1,8 @@
 :DOC-CONFIG:
 
 # for all elisp codes, if not explicitly set rules, they're tangled to init.el, with comments style noweb (in order to do org-babel-detangle), and when C-c C-c, they're evaled without output.
-#+PROPERTY: header-args:elisp :tangle init.el :comments noweb :results silent
-#+PROPERTY: header-args:emacs-lisp :tangle init.el :comments noweb :results silent
+#+PROPERTY: header-args:elisp :tangle init.el :comments link :results silent
+#+PROPERTY: header-args:emacs-lisp :tangle init.el :comments link :results silent
 
 # for all conf codes, they're tangled to .borgconfig
 #+PROPERTY: header-args:conf :tangle .borgconfig :language conf
@@ -139,53 +139,53 @@ Enable lexical-binding. Disable byte-compile for early-init.el.
 
 According to the [[https://www.gnu.org/software/emacs/manual/html_node/emacs/Init-File.html][emacs manual]], byte-compiling the init does not startup very much, and often leads to problems when you forget to recompile the file. Also, from my experience, it may lead to bugs that do not happen when not using byte-compile.
 #+begin_src elisp
-  ;;; -*- lexical-binding: t; no-byte-compile: t -*-
+;;; -*- lexical-binding: t; no-byte-compile: t -*-
 #+end_src
 
 Defer garbage collection in the startup process.
 #+begin_src elisp
-  (setq gc-cons-threshold most-positive-fixnum)
-  ;; copied from lazycat
-  (setq gc-cons-percentage 0.6)
+(setq gc-cons-threshold most-positive-fixnum)
+;; copied from lazycat
+(setq gc-cons-percentage 0.6)
 #+end_src
 
 Prevent unwanted runtime compilation for native-comp.
 #+begin_src elisp
-  (setq native-comp-deferred-compilation nil ;; obsolete since 29.1
-        native-comp-jit-compilation nil)
+(setq native-comp-deferred-compilation nil ;; obsolete since 29.1
+      native-comp-jit-compilation nil)
 #+end_src
 
 Disable tool-bar, menu-bar and scroll-bar before they're loaded.
 #+begin_src elisp
-  (push '(menu-bar-lines . 0) default-frame-alist)
-  (push '(tool-bar-lines . 0) default-frame-alist)
-  (push '(vertical-scroll-bars) default-frame-alist)
-  ;; Prevent flashing of unstyled modeline at startup
-  (setq-default mode-line-format nil)
+(push '(menu-bar-lines . 0) default-frame-alist)
+(push '(tool-bar-lines . 0) default-frame-alist)
+(push '(vertical-scroll-bars) default-frame-alist)
+;; Prevent flashing of unstyled modeline at startup
+(setq-default mode-line-format nil)
 #+end_src
 
 Smooth window on startup
 #+begin_src elisp
-  (setq frame-inhibit-implied-resize t)
+(setq frame-inhibit-implied-resize t)
 #+end_src
 
 Config use-package before loading use-package.
 When start emacs with =--debug-init=, the =init-file-debug= condition is meet, and use-package will print out more info.
 #+begin_src elisp
-  ;; (if init-file-debug
-    (setq use-package-verbose t
-          use-package-expand-minimally nil
-          use-package-compute-statistics t
-          ;;debug-on-error t
-    )
-    ;; (setq use-package-verbose nil
-    ;;       use-package-expand-minimally t))
+;; (if init-file-debug
+  (setq use-package-verbose t
+        use-package-expand-minimally nil
+        use-package-compute-statistics t
+        ;;debug-on-error t
+  )
+  ;; (setq use-package-verbose nil
+  ;;       use-package-expand-minimally t))
 #+end_src
 
 Make emacs startup with background Transparency.
 #+begin_src elisp
-  (set-frame-parameter nil 'alpha-background 96)
-  (add-to-list 'default-frame-alist '(alpha-background . 96))
+(set-frame-parameter nil 'alpha-background 96)
+(add-to-list 'default-frame-alist '(alpha-background . 96))
 #+end_src
 
 Disable fcitx5 on linux, because I use emacs rime, an internal input method of emacs, which is setuped [[#c418f945-d240-4dcb-bd38-c656bb9253b8][here]],
@@ -195,23 +195,23 @@ Disable fcitx5 on linux, because I use emacs rime, an internal input method of e
 
 Below codes belongs to the original Borg seed.
 #+begin_src elisp
-  (setq load-prefer-newer t)
+(setq load-prefer-newer t)
 
-  (let ((dir (file-name-directory (or load-file-name buffer-file-name))))
-    (add-to-list 'load-path (expand-file-name "lib/compat" dir))
-    (add-to-list 'load-path (expand-file-name "lib/packed" dir))
-    (add-to-list 'load-path (expand-file-name "lib/auto-compile" dir))
-    (add-to-list 'load-path (expand-file-name "lib/org" dir))
-    )
+(let ((dir (file-name-directory (or load-file-name buffer-file-name))))
+  (add-to-list 'load-path (expand-file-name "lib/compat" dir))
+  (add-to-list 'load-path (expand-file-name "lib/packed" dir))
+  (add-to-list 'load-path (expand-file-name "lib/auto-compile" dir))
+  (add-to-list 'load-path (expand-file-name "lib/org" dir))
+  )
 
-  (require 'auto-compile)
-  (auto-compile-on-load-mode)
-  (auto-compile-on-save-mode)
+(require 'auto-compile)
+(auto-compile-on-load-mode)
+(auto-compile-on-save-mode)
 
-  (setq package-enable-at-startup nil)
+(setq package-enable-at-startup nil)
 
-  (with-eval-after-load 'package
-    (add-to-list 'package-archives (cons "melpa" "https://melpa.org/packages/") t))
+(with-eval-after-load 'package
+  (add-to-list 'package-archives (cons "melpa" "https://melpa.org/packages/") t))
 #+end_src
 
 * Init
@@ -231,46 +231,46 @@ After loading early-init.el, emacs begin to load init.el.
 
 Disable byte compile for init.el, same reason of early-init.el.
 #+begin_src elisp
-  ;;; -*- lexical-binding: t; no-byte-compile: t -*-
+;;; -*- lexical-binding: t; no-byte-compile: t -*-
 #+end_src
 
 Calculating time used loading emacs excutable, as well as setting some variables.
 #+begin_src elisp
-  (progn ;     startup
-    (defvar before-user-init-time (current-time)
-      "Value of `current-time' when Emacs begins loading `user-init-file'.")
-    ;; (switch-to-buffer "*Messages*")
-    (message "Loading Emacs...done (%fs)"
-             (float-time (time-subtract before-user-init-time
-                                        before-init-time)))
-    (setq user-init-file (or load-file-name buffer-file-name))
-    (setq user-emacs-directory (file-name-directory user-init-file))
-    (message "Loading %s..." user-init-file)
-  )
+(progn ;     startup
+  (defvar before-user-init-time (current-time)
+    "Value of `current-time' when Emacs begins loading `user-init-file'.")
+  ;; (switch-to-buffer "*Messages*")
+  (message "Loading Emacs...done (%fs)"
+           (float-time (time-subtract before-user-init-time
+                                      before-init-time)))
+  (setq user-init-file (or load-file-name buffer-file-name))
+  (setq user-emacs-directory (file-name-directory user-init-file))
+  (message "Loading %s..." user-init-file)
+)
 #+end_src
 
 Set some defaults of emacs
 #+begin_src elisp
-  (progn
-    (setq inhibit-startup-buffer-menu t)
-    (setq inhibit-startup-screen t)
-    (setq inhibit-startup-echo-area-message "locutus")
-    (setq initial-buffer-choice t)
-    ;; (setq initial-scratch-message "")
-    ;; This improves performance for some fonts
-    (setq inhibit-compacting-font-cache t)
-    ;; emacs.stackexchange/how-to-disable-emacs-bidi
-    (setq-default bidi-paragraph-direction 'left-to-right)
-    (setq bidi-inhibit-bpa t
-          long-line-threshold 1000
-          large-hscroll-threshold 1000
-          syntax-wholeline-max 1000)
-    (setq global-auto-revert-mode 1)
-    (setq use-dialog-box nil)
-    (setq confirm-kill-emacs 'y-or-n-p)
-    (put 'downcase-region 'disabled nil)
-    (put 'upcase-region 'disabled nil)
-    )
+(progn
+  (setq inhibit-startup-buffer-menu t)
+  (setq inhibit-startup-screen t)
+  (setq inhibit-startup-echo-area-message "locutus")
+  (setq initial-buffer-choice t)
+  ;; (setq initial-scratch-message "")
+  ;; This improves performance for some fonts
+  (setq inhibit-compacting-font-cache t)
+  ;; emacs.stackexchange/how-to-disable-emacs-bidi
+  (setq-default bidi-paragraph-direction 'left-to-right)
+  (setq bidi-inhibit-bpa t
+        long-line-threshold 1000
+        large-hscroll-threshold 1000
+        syntax-wholeline-max 1000)
+  (setq global-auto-revert-mode 1)
+  (setq use-dialog-box nil)
+  (setq confirm-kill-emacs 'y-or-n-p)
+  (put 'downcase-region 'disabled nil)
+  (put 'upcase-region 'disabled nil)
+  )
 #+end_src
 ** Borg
 :PROPERTIES:
@@ -302,16 +302,16 @@ And then we switch to the message buffer in an attempt to make the loading proce
 [[https://github.com/emacscollective/auto-compile][Auto-Compile]] automatically compile Emacs Lisp libraries.
 But comp warnings are always boring. Suppress comp warnings.
 #+begin_src elisp
-  (use-package auto-compile
-  :config
-    (setq auto-compile-display-buffer             nil
-          auto-compile-mode-line-counter            t
-          auto-compile-source-recreate-deletes-dest t
-          auto-compile-toggle-deletes-nonlib-dest   t
-          auto-compile-update-autoloads             t
-          warning-suppress-log-types        '((comp))
-    )
+(use-package auto-compile
+:config
+  (setq auto-compile-display-buffer             nil
+        auto-compile-mode-line-counter            t
+        auto-compile-source-recreate-deletes-dest t
+        auto-compile-toggle-deletes-nonlib-dest   t
+        auto-compile-update-autoloads             t
+        warning-suppress-log-types        '((comp))
   )
+)
 #+end_src
 
 ** Epkg
@@ -320,15 +320,15 @@ But comp warnings are always boring. Suppress comp warnings.
 :END:
 [[https://github.com/emacscollective/epkg][Epkg]] allows you browse the Emacsmirror package database. It also provides a command ~epkg-describe-package~ that looks nicer than the built-in describe-package.
 #+begin_src elisp
-  (use-package epkg
-  :defer t
-  :bind
-    ([remap describe-package] . epkg-describe-package)
-  :init
-    (setq epkg-repository
-          (expand-file-name "var/epkgs/" user-emacs-directory))
-    (setq epkg-database-connector 'sqlite-builtin ) ; requires emacs >=29
-  )
+(use-package epkg
+:defer t
+:bind
+  ([remap describe-package] . epkg-describe-package)
+:init
+  (setq epkg-repository
+        (expand-file-name "var/epkgs/" user-emacs-directory))
+  (setq epkg-database-connector 'sqlite-builtin ) ; requires emacs >=29
+)
 #+end_src
 ** Custom
 :PROPERTIES:
@@ -341,14 +341,14 @@ It's not a good idea to put too many customizations in the custom file, especial
 
 On the other hand, some unimportant customizations that change over time based on user's likes are better suited to be placed in the custom file, a good example is the =theme=.
 #+begin_src elisp
-  (use-package custom
-  :no-require t
-  :config
-    (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-    (setf custom-safe-themes t) ;Treat all themes as safe
-    (when (file-exists-p custom-file)
-      (load custom-file))
-  )
+(use-package custom
+:no-require t
+:config
+  (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+  (setf custom-safe-themes t) ;Treat all themes as safe
+  (when (file-exists-p custom-file)
+    (load custom-file))
+)
 #+end_src
 
 ** Server
@@ -357,9 +357,9 @@ On the other hand, some unimportant customizations that change over time based o
 :END:
 Server allows Emacs to operate as a server for other processes. Built in.
 #+begin_src elisp
-  (use-package server
-  :commands (server-running-p)
-  :config (or (server-running-p) (server-mode)))
+(use-package server
+:commands (server-running-p)
+:config (or (server-running-p) (server-mode)))
 #+end_src
 ** GCMH
 :PROPERTIES:
@@ -371,12 +371,12 @@ Server allows Emacs to operate as a server for other processes. Built in.
 
 The [[https://github.com/emacsmirror/gcmh][Garbage Collector Magic Hack]] enforce a sneaky Garbage Collection strategy to minimize GC interference with user activity.
 #+begin_src elisp
-  (use-package gcmh
-  :init
-    (setq gcmh-high-cons-threshold 536870912) ;; 512mb
-  :config
-    (gcmh-mode 1)
-    )
+(use-package gcmh
+:init
+  (setq gcmh-high-cons-threshold 536870912) ;; 512mb
+:config
+  (gcmh-mode 1)
+  )
 #+end_src
 
 ** Libraries
@@ -402,8 +402,8 @@ The [[https://github.com/emacsmirror/gcmh][Garbage Collector Magic Hack]] enforc
     =Dash-Fontify mode= is a buffer-local minor mode intended for Emacs Lisp buffers.  Enabling it causes the special variables bound in anaphoric Dash macros to be fontified.  These anaphoras include ‘it’, ‘it-index’, ‘acc’, and ‘other’.  In older Emacs versions which do not dynamically detect macros, Dash-Fontify mode additionally fontifies Dash macro calls.
 
 #+begin_src elisp
-  (use-package dash
-    :config (global-dash-fontify-mode))
+(use-package dash
+  :config (global-dash-fontify-mode))
 #+end_src
 
 Dash needs some tweaks to be built
@@ -419,7 +419,7 @@ Dash needs some tweaks to be built
 :END:
 [[https://www.gnu.org/software/emacs][EIEIO]] is a series of Lisp routines which implements a subset of =CLOS, the Common Lisp Object System=. In addition, EIEIO also adds a few new features which help it integrate more strongly with the Emacs running environment.
 #+begin_src elisp
-  (use-package eieio)
+(use-package eieio)
 #+end_src
 
 *** Annalist
@@ -434,7 +434,7 @@ Dash needs some tweaks to be built
 :END:
 [[https://github.com/zbelial/shrink-path.el][Shrink path]] is a small utility functions that allow for fish-style trunctated directories in eshell and for example modeline.
 #+begin_src elisp
-  (use-package shrink-path :demand t)
+(use-package shrink-path :demand t)
 #+end_src
 
 *** Sqlite3
@@ -452,8 +452,8 @@ Dash needs some tweaks to be built
 :END:
 tweaks to buiild emacsql
 #+begin_src conf
-  [submodule "emacsql"]
-  no-byte-compile = emacsql-pg.el
+[submodule "emacsql"]
+no-byte-compile = emacsql-pg.el
 #+end_src
 
 *** Emacs Async
@@ -469,22 +469,22 @@ tweaks to buiild emacsql
 :CUSTOM_ID: 7742d6fb-5f74-40ac-9dc6-24df18e3a8e2
 :END:
 #+begin_src elisp
-  (use-package diff-mode
-    :defer t
-    :config
-    (when (>= emacs-major-version 27)
-      (set-face-attribute 'diff-refine-changed nil :extend t)
-      (set-face-attribute 'diff-refine-removed nil :extend t)
-      (set-face-attribute 'diff-refine-added   nil :extend t)))
+(use-package diff-mode
+  :defer t
+  :config
+  (when (>= emacs-major-version 27)
+    (set-face-attribute 'diff-refine-changed nil :extend t)
+    (set-face-attribute 'diff-refine-removed nil :extend t)
+    (set-face-attribute 'diff-refine-added   nil :extend t)))
 #+end_src
 *** Dired
 :PROPERTIES:
 :CUSTOM_ID: 48d4fd1d-c1f0-410d-96d1-d5221c8bcaeb
 :END:
 #+begin_src elisp
-  (use-package dired
-    :defer t
-    :config (setq dired-listing-switches "-alh"))
+(use-package dired
+  :defer t
+  :config (setq dired-listing-switches "-alh"))
 #+end_src
 
 *** ELdoc
@@ -493,18 +493,18 @@ tweaks to buiild emacsql
 :END:
 a MinorMode which shows you, in the echo area, the argument list of the function call you are currently writing.
 #+begin_src elisp
-  (use-package eldoc
-    :when (version< "25" emacs-version)
-    :config (global-eldoc-mode))
+(use-package eldoc
+  :when (version< "25" emacs-version)
+  :config (global-eldoc-mode))
 #+end_src
 *** Help
 :PROPERTIES:
 :CUSTOM_ID: d3472f01-1cdc-47b4-8505-7dda94ee4864
 :END:
 #+begin_src elisp
-  (use-package help
-    :defer t
-    :config (temp-buffer-resize-mode))
+(use-package help
+  :defer t
+  :config (temp-buffer-resize-mode))
 #+end_src
 *** Helpful
 :PROPERTIES:
@@ -518,63 +518,63 @@ It is very useful for figuring out how things work in Emacs.
 
 It's not a built in package. I put it here simply because it's near help.
 #+begin_src elisp
-  (use-package helpful
-  :bind
-     ([remap describe-key]      . helpful-key)
-     ([remap describe-command]  . helpful-command)
-     ([remap describe-variable] . helpful-variable)
-     ([remap describe-function] . helpful-callable)
-     ("C-h F" . describe-face)
-     ("C-h K" . describe-keymap)
-  )
+(use-package helpful
+:bind
+   ([remap describe-key]      . helpful-key)
+   ([remap describe-command]  . helpful-command)
+   ([remap describe-variable] . helpful-variable)
+   ([remap describe-function] . helpful-callable)
+   ("C-h F" . describe-face)
+   ("C-h K" . describe-keymap)
+)
 #+end_src
 *** Info+
 :PROPERTIES:
 :CUSTOM_ID: af99c97f-1ac8-4ab2-b322-ae66c78cc960
 :END:
 #+begin_src elisp
-  (use-package info+
-  :defer t
-  :config
-  )
+(use-package info+
+:defer t
+:config
+)
 #+end_src
 #+begin_src elisp
-  (use-package info-colors
-  :config
-    (add-hook 'Info-selection-hook 'info-colors-fontify-node)
-    (add-hook 'Info-mode-hook 'olivetti-mode)
-    (add-hook 'Info-mode-hook 'mixed-pitch-mode)
-  )
+(use-package info-colors
+:config
+  (add-hook 'Info-selection-hook 'info-colors-fontify-node)
+  (add-hook 'Info-mode-hook 'olivetti-mode)
+  (add-hook 'Info-mode-hook 'mixed-pitch-mode)
+)
 #+end_src
 *** Isearch
 :PROPERTIES:
 :CUSTOM_ID: 95631f66-29f3-46aa-9088-d18bf0b925d8
 :END:
 #+begin_src elisp
-  (progn ;    `isearch'
-    (setq isearch-allow-scroll t))
+(progn ;    `isearch'
+  (setq isearch-allow-scroll t))
 #+end_src
 *** Lisp-mode
 :PROPERTIES:
 :CUSTOM_ID: 499297a3-67cd-46ab-bda6-2587b64c4cc0
 :END:
 #+begin_src elisp
-  (use-package lisp-mode
-    :config
-    (add-hook 'emacs-lisp-mode-hook 'outline-minor-mode)
-    (add-hook 'emacs-lisp-mode-hook 'reveal-mode)
-    (defun indent-spaces-mode ()
-      (setq indent-tabs-mode nil))
-    (add-hook 'lisp-interaction-mode-hook 'indent-spaces-mode))
+(use-package lisp-mode
+  :config
+  (add-hook 'emacs-lisp-mode-hook 'outline-minor-mode)
+  (add-hook 'emacs-lisp-mode-hook 'reveal-mode)
+  (defun indent-spaces-mode ()
+    (setq indent-tabs-mode nil))
+  (add-hook 'lisp-interaction-mode-hook 'indent-spaces-mode))
 #+end_src
 *** Man
 :PROPERTIES:
 :CUSTOM_ID: 5e9fb076-8f0f-496a-8860-bce104072a19
 :END:
 #+begin_src elisp
-  (use-package man
-    :defer t
-    :config (setq Man-width 80))
+(use-package man
+  :defer t
+  :config (setq Man-width 80))
 #+end_src
 
 *** Prog-mode
@@ -582,11 +582,11 @@ It's not a built in package. I put it here simply because it's near help.
 :CUSTOM_ID: 26d1c604-e1c0-42d0-8e07-539614dfd757
 :END:
 #+begin_src elisp
-  (use-package prog-mode
-    :config (global-prettify-symbols-mode)
-    (defun indicate-buffer-boundaries-left ()
-      (setq indicate-buffer-boundaries 'left))
-    (add-hook 'prog-mode-hook 'indicate-buffer-boundaries-left))
+(use-package prog-mode
+  :config (global-prettify-symbols-mode)
+  (defun indicate-buffer-boundaries-left ()
+    (setq indicate-buffer-boundaries 'left))
+  (add-hook 'prog-mode-hook 'indicate-buffer-boundaries-left))
 #+end_src
 *** Recentf
 :PROPERTIES:
@@ -666,14 +666,14 @@ It's not a built in package. I put it here simply because it's near help.
   (progn ;    `text-mode'
     (add-hook 'text-mode-hook 'indicate-buffer-boundaries-left))
 #+end_src
+
 *** Tramp
 :PROPERTIES:
 :CUSTOM_ID: 07612efe-a2a9-4164-90e5-164f00637886
 :END:
 #+begin_src elisp
   (use-package tramp
-    :defer t
-    :config
+  :config
     (add-to-list 'tramp-default-proxies-alist '(nil "\\`root\\'" "/ssh:%h:"))
     (add-to-list 'tramp-default-proxies-alist '("localhost" nil nil))
     (add-to-list 'tramp-default-proxies-alist
@@ -682,14 +682,8 @@ It's not a built in package. I put it here simply because it's near help.
     (format "\\(%s\\)\\|\\(%s\\)"
       vc-ignore-dir-regexp
       tramp-file-name-regexp)))
-#+end_src
-*** Tramp-sh
-:PROPERTIES:
-:CUSTOM_ID: 00d16929-6ff7-4edd-a6ad-24f9b225ee96
-:END:
-#+begin_src elisp
+
   (use-package tramp-sh
-    :defer t
     :config (cl-pushnew 'tramp-own-remote-path tramp-remote-path))
 #+end_src
 
@@ -748,13 +742,8 @@ Calculate loading time of core units.
 :END:
 
 An overview of this outline:
-+ General :: Setup the ~general.el~ keybinding framework. Define global keybindings.
-+ Local Keybindings :: Gather links of headlines that defines local keybindings.
-+ Meow :: Setup the ~Meow-edit~, yet another modal editing framework.
-+ Which-key :: Setup ~Which-key~,
-+ Rime :: Setup ~Rime~, an internal input method of emacs.
-We setup keybinding framworks and global keybindings under this subtree.
-Mode/package specific keybinding configs are defined under where the package is configured.
+In =General.el= and =Meow.el=, we setup the keybinding framework.
+Then in =Keybindings=, define keybindings.
 
 ** General.el
 :PROPERTIES:
@@ -765,60 +754,235 @@ Mode/package specific keybinding configs are defined under where the package is 
 
 *Note*: byte compile init.el will lead to function created by general-create-definer failed to work.
 #+begin_src elisp :noweb no-export
-  ;; Make ESC quit prompts
-  ;; (global-set-key ([kbd] "<escape>") 'keyboard-escape-quit)
+;; Make ESC quit prompts
+;; (global-set-key ([kbd] "<escape>") 'keyboard-escape-quit)
 
-  (use-package general
-  :config
-    <<global-map>>
-    <<global-leader>>
-    <<local-leader>>
+(use-package general
+:config
+  (defvar my/mode-leader "C-<escape>")
+
+  (defmacro my/key (&optional key)
+    `(general-key
+         (if ,key
+             (concat ,my/mode-leader " " ,key)
+           ,my/mode-leader)))
+
+  (general-create-definer my/mode-leader-def
+    :prefix my/mode-leader
+  )
+
+)
+#+end_src
+** Meow.el
+:PROPERTIES:
+:CUSTOM_ID: bac687ce-13c4-413c-b92d-7f7df81fa6ff
+:END:
+[[https://github.com/meow-edit/meow][Meow]] is yet another modal editing.
+
+#+begin_src elisp :noweb no-export
+(use-package meow
+:custom-face
+  (meow-cheatsheet-command ((t (:height 180 :inherit fixed-pitch))))
+:config
+ ;cate the behavior of vi's
+  (defun my-meow-append ()
+    "Move to the end of selection, switch to INSERT state."
+    (interactive)
+    (if meow--temp-normal
+           (progn
+             (message "Quit temporary normal mode")
+             (meow--switch-state 'motion))
+    (if (not (region-active-p))
+             (when (and (not (use-region-p))
+                        (< (point) (point-max)))
+               (forward-char 1))
+     (meow--direction-forward)
+     (meow--cancel-selection))
+     (meow--switch-state 'insert)))
+
+   (advice-add 'meow-append :override #'my-meow-append)
+
+  (defun my-meow-open-below ()
+    "Open a newline below and switch to INSERT state."
+    (interactive)
+    (if meow--temp-normal
+        (progn
+          (message "Quit temporary normal mode")
+          (meow--switch-state 'motion))
+      (meow--switch-state 'insert)
+      ;(goto-char (line-end-position))
+      (move-end-of-line 1)
+      (meow--execute-kbd-macro "RET")))
+   (advice-add 'meow-open-below :override #'my-meow-open-below)
+
+ (setq meow-keypad-self-insert-undefined nil)
+ (setq meow-selection-command-fallback '(
+    (meow-grab . meow-right-expand)
+    (meow-change . meow-change-char)
+    (meow-kill . meow-delete)
+    (meow-cancel-selection . keyboard-quit)
+    (meow-pop-selection . meow-pop-grab)
+    (meow-beacon-change . meow-beacon-change-char)
+    (meow-replace . meow-yank)
+    (meow-reverse . negative-argument)
+  ))
+
+ (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
+ (meow-global-mode)
+)
+#+end_src
+** Keybindings
+*** Meow-normal
+:PROPERTIES:
+:CUSTOM_ID: 0bb7f8a0-4c80-4139-bf84-c9944308c64a
+:END:
+
+#+begin_src elisp
+(meow-normal-define-key
+  '("<escape>" . meow-cancel-selection)
+  '("SPC" . my/leader-prefix-cmd) ;; defined latter
+  '("1" . meow-expand-1) '("2" . meow-expand-2)
+  '("3" . meow-expand-3) '("4" . meow-expand-4)
+  '("5" . meow-expand-5) '("6" . meow-expand-6)
+  '("7" . meow-expand-7) '("8" . meow-expand-8)
+  '("9" . meow-expand-9) '("0" . meow-expand-0)
+  '("*" . tempel-insert) '("+" . tempel-expand)
+
+  '("q" . meow-quit) '("Q" . meow-quit)
+     ;'("w" . meow-window) '("W" . meow-window)
+     ;'("e" . meow-) '("E" . meow-e)
+     ;'("r" . meow-) '("R" . meow-e)
+  '("t" . meow-till) '("T" . meow-till-expand)
+
+  '("a" . begin-of-line) '("a" . meow-beginning-of-thing)
+  '("s" . meow) '("s" . meow-bounds-of-thing)
+  '("d" . meow) '("d" . meow-inner-of-thing)
+  '("f" . end-of-line) '("f" . meow-end-of-thing)
+  '("g" . meow-right-expand) '("G" . meow-grab)
+
+  '("z" . meow-undo) '("Z" . meow-undo-in-selection)
+  '("x" . meow-kill) '("X" . meow-clipboard-kill)
+  '("c" . meow-save)
+  '("C-c" . meow-clipboard-save)
+  '("v" . meow-replace) '("V" . meow-yank-pop)
+  '("C-v" . meow-clipboard-yank)
+  '("b". meow-block) '("B" . meow-to-block)
+
+  '("y" . meow-visit)
+  '("u" . meow-change) '("U" . meow-reverse)
+  '("i" . meow-insert) '("I" . meow-open-above)
+  '("o" . meow-append) '("O" . meow-open-below)
+  '("p" . meow-pop-selection)
+  '("[" . meow-beginning-of-thing) '("]" . meow-end-of-thing)
+
+  '("h" . meow-join)  '("H" . meow-join)
+  '("j" . meow-left)  '("J" . meow-left-expand)
+  '("k" . meow-prev)  '("K" . meow-prev-expand)
+  '("l" . meow-next)  '("L" . meow-next-expand)
+  '(";" . meow-right) '(":" . meow-right-expand)
+  '("'" . meow-line) '("\"" . meow-line)
+
+  '("C-j" . "C-<escape> C-j")
+  '("C-k" . "C-<escape> C-k")
+  '("C-l" . "C-<escape> C-l")
+  '("C-;" . "C-<escape> C-;")
+
+  '("n" . meow-search)      '("N" . meow-pop-search)
+  '("m" . meow-mark-word)   '("M" . meow-mark-symbol)
+  '("," . meow-back-word)   '("<" . meow-back-symbol)
+  '("." . meow-next-word)   '(">" . meow-next-symbol)
+  '("/" . meow-reverse)
+
+  '("\"" . fingertip-wrap-double-quote)
+  '("(" . fingertip-wrap-round)
+  '("[" . fingertip-wrap-bracket)
+  '("{" . fingertip-wrap-curly)
   )
 #+end_src
-*** Global keybindings
+
+#+RESULTS:
+
+*** Meow-motion
 :PROPERTIES:
-:header-args:elisp: :noweb-ref global-map
+:CUSTOM_ID: 108e1a69-3e19-4a36-9547-86e7370974af
+:END:
+
+#+begin_src elisp
+(meow-motion-overwrite-define-key
+ '("l" . meow-next)
+ '("k" . meow-prev)
+ '("SPC" . my/leader-prefix-cmd) ;; defined latter
+ '("<escape>" . ignore)
+)
+#+end_src
+
+*** Meow-keypad
+:PROPERTIES:
+:CUSTOM_ID: c276b705-4a1d-4da3-aac2-96848e79eb9a
+:END:
+I generally do not use meow's keypad, because meow's keypad highly relies on vanilla emacs's keybindings, which is what I do not prefer.
+#+begin_src elisp
+(meow-leader-define-key
+;; Use SPC (0-9) for digit arguments.
+ '("1" . meow-digit-argument) '("2" . meow-digit-argument)
+ '("3" . meow-digit-argument) '("4" . meow-digit-argument)
+ '("5" . meow-digit-argument) '("6" . meow-digit-argument)
+ '("7" . meow-digit-argument) '("8" . meow-digit-argument)
+ '("9" . meow-digit-argument) '("0" . meow-digit-argument)
+ '("/" . meow-keypad-describe-key) '("?" . meow-cheatsheet)
+ ;;'("SPC" . config/leader-prefix-cmd)
+)
+
+#+end_src
+
+#+RESULTS:
+
+*** Global map & Meow-insert
+:PROPERTIES:
 :CUSTOM_ID: f764a901-b07e-4d34-97e0-158cbfc8d519
 :END:
 
 #+begin_src elisp
-  (general-def
-  :keymaps '(global-map)
-    "C-v"       '(clipboard-yank              :wk "paste")
-    "C-SPC"     '(toggle-input-method         :wk "input method")
-    "C-j"       'backward-char
-    "C-;"       'forward-char
-    "C-k"       'previous-line
-    "C-l"       'next-line
-    ;"C-/"      '(yank                        :wk "comment-dwim")
-  )
-  (general-def
-  :keymaps '(meow-normal-state-keymap meow-motion-state-keymap)
-    "M-j"       '(windmove-left               :wk " Win H ")
-    "M-k"       '(windmove-up                 :wk " Win K ")
-    "M-l"       '(windmove-down               :wk " Win J ")
-    "M-;"       '(windmove-right              :wk " Win L ")
-    "M-,"       '(sort-tab-select-prev-tab    :wk " Tab L ")
-    "M-."       '(sort-tab-select-next-tab    :wk " Tab R ")
-  )
+(general-def
+:keymaps '(global-map)
+  "C-v"       '(clipboard-yank              :wk "paste")
+  "C-SPC"     '(toggle-input-method         :wk "input method")
+  "C-j"       (my/key "C-j")
+  "C-;"       (my/key "C-;")
+  "C-k"       (my/key "C-k")
+  "C-l"       (my/key "C-l")
 
-  (general-def
-  :keymaps '(vertico-map)
-    "C-l"       '(vertico-next                  :wk "")
-    "C-k"       '(vertico-previous              :wk "")
-    "C-j"       '(vertico-directory-delete-word :wk "")
-    "C-;"       '(vertico-directory-enter       :wk "")
-    "C-,"       '(vertico-previous-group        :wk "")
-    "C-."       '(vertico-next-group            :wk "")
-    "RET"       'vertico-directory-enter
-    "DEL"       'vertico-directory-delete-char
-    "M-DEL"     'vertico-directory-delete-word
-  )
+  ;"C-/"      '(yank                        :wk "comment-dwim")
+)
+(general-def
+:keymaps '(meow-normal-state-keymap meow-motion-state-keymap)
+  "\\"         (my/key)
+  "M-j"       '(windmove-left               :wk " Win H ")
+  "M-k"       '(windmove-up                 :wk " Win K ")
+  "M-l"       '(windmove-down               :wk " Win J ")
+  "M-;"       '(windmove-right              :wk " Win L ")
+  "M-,"       '(sort-tab-select-prev-tab    :wk " Tab L ")
+  "M-."       '(sort-tab-select-next-tab    :wk " Tab R ")
+)
+
+(general-def
+:keymaps '(vertico-map)
+  "C-l"       '(vertico-next                  :wk "")
+  "C-k"       '(vertico-previous              :wk "")
+  "C-j"       '(vertico-directory-delete-word :wk "")
+  "C-;"       '(vertico-directory-enter       :wk "")
+  "C-,"       '(vertico-previous-group        :wk "")
+  "C-."       '(vertico-next-group            :wk "")
+  "RET"       'vertico-directory-enter
+  "DEL"       'vertico-directory-delete-char
+  "M-DEL"     'vertico-directory-delete-word
+)
 #+end_src
+
+#+RESULTS:
 
 *** Global leader
 :PROPERTIES:
-:header-args:elisp: :noweb-ref global-leader
 :CUSTOM_ID: 2ebc323d-4318-4f0d-9f85-924861dab4db
 :END:
 
@@ -833,9 +997,9 @@ Mode/package specific keybinding configs are defined under where the package is 
 
 #+begin_src elisp
   (my/leader
-    "SPC"     '((general-simulate-key "C-<escape>") :wk "Mode leader")
-    "/"       '(comment-dwim                   :wk "comment 󱀢")
-    "s"       '(save-buffer                    :wk "save ")
+    "SPC"     (general-key "C-<escape>")
+    "/"       '(comment-dwim                   :wk "󱀢 comment")
+    "s"       '(save-buffer                    :wk " save")
     "e"       '(dirvish-side                   :wk "󰙅 dirvish-side ")
     "E"       '(dirvish                        :wk "󰙅 dirvish")
     "x"       '(consult-mode-command           :wk "execute")
@@ -856,6 +1020,8 @@ Mode/package specific keybinding configs are defined under where the package is 
     "x"       '(consult-mode-command           :wk "execute")
     )
 #+end_src
+
+#+RESULTS:
 
 #+begin_src elisp
   (my/leader :infix "w" ;; workspaces
@@ -907,6 +1073,8 @@ Mode/package specific keybinding configs are defined under where the package is 
     "g"       '(magit                          :wk " magit")
     )
 #+end_src
+
+#+RESULTS:
 
 #+begin_src elisp
   ;; windows, buffers and tabs(workspaces)
@@ -964,9 +1132,16 @@ Mode/package specific keybinding configs are defined under where the package is 
       new-window))
 #+end_src
 
-*** Local leader
+*** Mode map
 :PROPERTIES:
-:header-args:elisp: :noweb-ref local-leader
+:CUSTOM_ID: 20dbcac9-a7cb-4447-8b96-a490d1637b75
+:END:
+Keybindings defined else where
+
++ [[#4e4b8f79-8616-4cc0-bcc8-2b1a2ca03de2][Org mode]]
++ [[#85c28b3b-dcb0-4dce-9fdf-0fdaee9d66d2][Tempel]]
+*** Mode leader
+:PROPERTIES:
 :CUSTOM_ID: 19d9abad-e3e5-426d-81c5-e281020c3daf
 :END:
 Generally, I define my local leader as follows:
@@ -974,194 +1149,24 @@ Generally, I define my local leader as follows:
 - I do not directly press ~C-<escape>~. Instead, I map ~\~ to ~C-<escape>~ in meow's normal mode.
 - The keybindings are bind to those major mode maps.
 
-** Local Keybindings
-:PROPERTIES:
-:CUSTOM_ID: 20dbcac9-a7cb-4447-8b96-a490d1637b75
-:END:
-Keybindings defined else where
-
-+ [[#4e4b8f79-8616-4cc0-bcc8-2b1a2ca03de2][Org mode Keybinds]]
-** Meow
-:PROPERTIES:
-:CUSTOM_ID: bac687ce-13c4-413c-b92d-7f7df81fa6ff
-:END:
-[[https://github.com/meow-edit/meow][Meow]] is yet another modal editing. Meow's freedom allows my setup to be very weird.
-
-#+begin_src elisp :noweb no-export
-  (use-package meow
-  :custom-face
-    (meow-cheatsheet-command ((t (:height 180 :inherit fixed-pitch))))
-  :config
-   ;cate the behavior of vi's
-    (defun my-meow-append ()
-      "Move to the end of selection, switch to INSERT state."
-      (interactive)
-      (if meow--temp-normal
-             (progn
-               (message "Quit temporary normal mode")
-               (meow--switch-state 'motion))
-      (if (not (region-active-p))
-               (when (and (not (use-region-p))
-                          (< (point) (point-max)))
-                 (forward-char 1))
-       (meow--direction-forward)
-       (meow--cancel-selection))
-       (meow--switch-state 'insert)))
-
-     (advice-add 'meow-append :override #'my-meow-append)
-
-    (defun my-meow-open-below ()
-      "Open a newline below and switch to INSERT state."
-      (interactive)
-      (if meow--temp-normal
-          (progn
-            (message "Quit temporary normal mode")
-            (meow--switch-state 'motion))
-        (meow--switch-state 'insert)
-        ;(goto-char (line-end-position))
-        (move-end-of-line 1)
-        (meow--execute-kbd-macro "RET")))
-     (advice-add 'meow-open-below :override #'my-meow-open-below)
-
-   (setq meow-keypad-self-insert-undefined nil)
-   (setq meow-selection-command-fallback '(
-      (meow-grab . meow-right-expand)
-      (meow-change . meow-change-char)
-      (meow-kill . meow-delete)
-      (meow-cancel-selection . keyboard-quit)
-      (meow-pop-selection . meow-pop-grab)
-      (meow-beacon-change . meow-beacon-change-char)
-      (meow-replace . meow-yank)
-      (meow-reverse . negative-argument)
-    ))
-
-   (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
-   <<meow-normal>>
-   <<meow-motion>>
-   <<meow-keypad>>
-   (meow-global-mode)
-  )
-#+end_src
-*** Meow-normal
-:PROPERTIES:
-:header-args:elisp: :noweb-ref meow-normal
-:CUSTOM_ID: 0bb7f8a0-4c80-4139-bf84-c9944308c64a
-:END:
-
 #+begin_src elisp
-  (meow-normal-define-key
-    '("<escape>" . meow-cancel-selection)
-    '("\\" . "C-<escape>") ;; where I define all my custom major mode binding
-    '("SPC" . my/leader-prefix-cmd) ;; defined latter
-    '("1" . meow-expand-1) '("2" . meow-expand-2)
-    '("3" . meow-expand-3) '("4" . meow-expand-4)
-    '("5" . meow-expand-5) '("6" . meow-expand-6)
-    '("7" . meow-expand-7) '("8" . meow-expand-8)
-    '("9" . meow-expand-9) '("0" . meow-expand-0)
-
-    '("q" . meow-quit) '("Q" . meow-quit)
-       ;'("w" . meow-window) '("W" . meow-window)
-       ;'("e" . meow-) '("E" . meow-e)
-       ;'("r" . meow-) '("R" . meow-e)
-    '("t" . meow-till) '("T" . meow-till-expand)
-
-    '("a" . begin-of-line) '("a" . meow-beginning-of-thing)
-    '("s" . meow) '("s" . meow-bounds-of-thing)
-    '("d" . meow) '("d" . meow-inner-of-thing)
-    '("f" . end-of-line) '("f" . meow-end-of-thing)
-    '("g" . meow-right-expand) '("G" . meow-grab)
-
-    '("z" . meow-undo) '("Z" . meow-undo-in-selection)
-    '("x" . meow-kill) '("X" . meow-clipboard-kill)
-    '("c" . meow-save)
-    '("C-c" . meow-clipboard-save)
-    '("v" . meow-replace) '("V" . meow-yank-pop)
-    '("C-v" . meow-clipboard-yank)
-    '("b". meow-block) '("B" . meow-to-block)
-
-    '("y" . meow-visit)
-    '("u" . meow-change) '("U" . meow-reverse)
-    '("i" . meow-insert) '("I" . meow-open-above)
-    '("o" . meow-append) '("O" . meow-open-below)
-    '("p" . meow-pop-selection)
-    '("[" . meow-beginning-of-thing) '("]" . meow-end-of-thing)
-
-    '("h" . meow-join)  '("H" . meow-join)
-    '("j" . meow-left)  '("J" . meow-left-expand)
-    '("k" . meow-prev)  '("K" . meow-prev-expand)
-    '("l" . meow-next)  '("L" . meow-next-expand)
-    '(";" . meow-right) '(":" . meow-right-expand)
-    '("'" . meow-line) '("\"" . meow-line)
-
-    '("C-j" . "C-<escape> C-j")
-    '("C-k" . "C-<escape> C-k")
-    '("C-l" . "C-<escape> C-l")
-    '("C-;" . "C-<escape> C-;")
-
-    '("n" . meow-search)      '("N" . meow-pop-search)
-    '("m" . meow-mark-word)   '("M" . meow-mark-symbol)
-    '("," . meow-back-word)   '("<" . meow-back-symbol)
-    '("." . meow-next-word)   '(">" . meow-next-symbol)
-    '("/" . meow-reverse)
-
-    '("\"" . fingertip-wrap-double-quote)
-    '("(" . fingertip-wrap-round)
-    '("[" . fingertip-wrap-bracket)
-    '("{" . fingertip-wrap-curly)
-    )
+(defvar my/mode-leader "C-<escape>") ;; the leader for major and minor modes
 #+end_src
-
-*** Meow-motion
-:PROPERTIES:
-:header-args:elisp: :noweb-ref meow-motion
-:CUSTOM_ID: 108e1a69-3e19-4a36-9547-86e7370974af
-:END:
-
-#+begin_src elisp
-  (meow-motion-overwrite-define-key
-   '("l" . meow-next)
-   '("k" . meow-prev)
-   '("SPC" . my/leader-prefix-cmd) ;; defined latter
-   '("<escape>" . ignore)
-  )
-#+end_src
-
-*** Meow-keypad
-:PROPERTIES:
-:header-args:elisp: :noweb-ref meow-keypad
-:CUSTOM_ID: c276b705-4a1d-4da3-aac2-96848e79eb9a
-:END:
-#+begin_src elisp
-  (meow-leader-define-key
-  ;; Use SPC (0-9) for digit arguments.
-   '("1" . meow-digit-argument) '("2" . meow-digit-argument)
-   '("3" . meow-digit-argument) '("4" . meow-digit-argument)
-   '("5" . meow-digit-argument) '("6" . meow-digit-argument)
-   '("7" . meow-digit-argument) '("8" . meow-digit-argument)
-   '("9" . meow-digit-argument) '("0" . meow-digit-argument)
-   '("/" . meow-keypad-describe-key) '("?" . meow-cheatsheet)
-   ;;'("SPC" . config/leader-prefix-cmd)
-  )
-
-#+end_src
-
-#+RESULTS:
-
 ** Transient
 :PROPERTIES:
 :CUSTOM_ID: b7838793-3629-4d7d-88d3-19c1cbefe997
 :END:
 [[https://github.com/yanghaoxie/transient-posframe][Transient-posframe]] display transient popups using a posframe.
-#+begin_src elisp :tangle no
-  (use-package transient-posframe
-  :after transient
-  :disabled
-  :config
-    (setq transient-posframe-min-height 1)
-    (setq transient-posframe-mode t)
-  )
+#+begin_src elisp
+(use-package transient-posframe
+:config
+  (setq transient-posframe-min-height 1)
+  (setq transient-posframe-poshandler
+        'posframe-poshandler-frame-bottom-right-corner)
+  (transient-posframe-mode)
+)
 #+end_src
-** Which-key
+** Which-key.el
 :PROPERTIES:
 :CUSTOM_ID: 1b5d6414-c2e4-41a8-b04d-f150f6883d8e
 :END:
@@ -1188,6 +1193,8 @@ Magit and meow all use transient maps, therefore we let which-key show transient
     (setq which-key-popup-type 'side-window
           which-key-side-window-location 'right
           )
+  :config
+    (set-face-attribute 'which-key-key-face nil :inherit 'fixed-pitch)
     (which-key-mode 1)
   )
 #+end_src
@@ -1202,7 +1209,7 @@ Magit and meow all use transient maps, therefore we let which-key show transient
     (which-key-posframe-mode)
   )
 #+end_src
-** Rime
+** Rime.el
 :PROPERTIES:
 :CUSTOM_ID: c418f945-d240-4dcb-bd38-c656bb9253b8
 :END:
@@ -1340,11 +1347,50 @@ To make it simplier, we'll just define things that only changes how emacs looks,
 :END:
 Fonts in emacs is really a complex system. If you don't treat it with care, you'll definitedly encounter some bugs.
 
-One essential thing about font is pitch. In general, pitch control's whether a font is fixed-widthed or non-fixed-widthed. Currently there're 2 helpful modes that controls font pitch: =mixed-pitch-mode= and =fixed-pitch-mode=.
+One essential thing about font is pitch. In general, pitch control's whether a font is fixed-widthed or non-fixed-widthed. Currently there're 2 helpful packages that controls font pitch: =mixed-pitch-mode= and =fixed-pitch-mode=.
 
-I recommend stick to only one of these modes and does all the font settings based on the mode. For me I choses fixed-pitch-mode. This mode makes certain major mode have fixed-pitch fonts, and left all the other fonts to the default font (which can be set to some non-fixed-pitch fonts)
+I recommend stick to only one of these modes and does all the font settings based on the mode. For me I choses =fixed-pitch-mode=. This mode makes certain major mode have fixed-pitch fonts, and left all the other fonts to the default font (which can be set to some non-fixed-pitch fonts). It has a simplier implementation than mixed-pitch-mode.
+*** Face-remap.el
+Face-remap is a builtin library, where ~face-remap-add-relative~ is defined.
+#+begin_src elisp
+  (use-package face-remap
+  :config
+    (set-face-attribute 'default nil
+      :font "Sarasa Gothic SC Nerd Font"
+      :height 150)
+    (set-face-attribute 'fixed-pitch nil
+      ;:font "Sarasa Fixed SC"
+      :font "RobotoMono Nerd Font Mono"
+      :height 1.0)
+    (set-face-attribute 'variable-pitch nil
+      :font "Sarasa Gothic SC Nerd Font"
+      :height 1.0)
+      ; (set-fontset-font t 'symbol "Noto Sans Symbols 2")
+    (set-face-attribute 'link nil
+      :foreground "#ffcc66" :underline t :bold nil)
 
-*** Fixed-pitch-mode
+    (defun my/use-fixed-pitch ()
+      (interactive)
+      (face-remap-add-relative 'default 'fixed-pitch)
+    )
+    (defun my/use-variable-pitch ()
+      (interactive)
+      (face-remap-add-relative 'default 'variable-pitch)
+    )
+    (dolist (hook '(
+        dired-mode-hook
+        comint-mode-hook
+        magit-mode-hook
+        prog-mode-hook
+        profiler-report-mode-hook
+        conf-mode-hook conf-ts-mode-hook
+        toml-mode-hook toml-ts-mode-hook
+      ))
+      (add-hook hook 'my/use-fixed-pitch))
+  )
+
+#+end_src
+*** COMMENT Fixed-pitch-mode
 :PROPERTIES:
 :CUSTOM_ID: f46177cf-c0b0-4525-8f5b-2e891568e788
 :END:
@@ -1370,7 +1416,15 @@ I recommend stick to only one of these modes and does all the font settings base
     ;; This is a temporary fix for solaire mode
     ;; (set-face-attribute 'solaire-default-face nil
     ;;   :inherit 'fixed-pitch)
-    (fixed-pitch-mode)
+    (setq fixed-pitch-use-extended-default t)
+    (dolist (hook '(
+                    conf-mode-hook
+                    conf-ts-mode-hook
+                    toml-mode-hook
+                    toml-ts-mode-hook
+                    ))
+      (add-to-list 'fixed-pitch-whitelist-hooks hook))
+    (fixed-pitch-enable)
   )
 #+end_src
 *** COMMENT Mixed-pitch-mode
@@ -1511,7 +1565,7 @@ Note that a 'frame' is a window on the desktop, a 'window' is a subwindow of ema
     )
   )
 #+end_src
-*** Mini-frame
+*** COMMENT Mini-frame
 :PROPERTIES:
 :CUSTOM_ID: b80c7c3e-4002-4e2a-a3d2-c6c60f300e8c
 :END:
@@ -1522,9 +1576,7 @@ Note that a 'frame' is a window on the desktop, a 'window' is a subwindow of ema
     (setq mini-frame-detach-on-hide nil)
     ;(setq mini-frame-standalone 't)
     ;(setq mini-frame-resize-min-height 10)
-    (setq mini-frame-ignore-commands
-      (append mini-frame-ignore-commands
-       '(evil-window-split evil-window-vsplit evil-ex)))
+
   )
 #+end_src
 
@@ -1667,6 +1719,119 @@ tweaks to build vertico
   load-path = .
   load-path = extensions
 #+end_src
+**** Vertico-directory
+:PROPERTIES:
+:CUSTOM_ID: 798614c1-afb2-4609-9860-2e35cd563813
+:END:
+
+#+begin_src elisp
+  (use-package vertico-directory
+      :after vertico
+      ;; More convenient directory navigation commands
+      :bind (:map vertico-map
+  )
+      ;; Tidy shadowed file names
+      :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
+#+end_src
+**** Vertico-multiform
+:PROPERTIES:
+:CUSTOM_ID: f094f952-1386-46ce-9af2-12a31a585221
+:END:
+
+Vertico-multiform configures Vertico modes per command or completion category.
+
+#+begin_src elisp
+  (use-package vertico-multiform
+    :after vertico
+    :config (vertico-multiform-mode)
+  )
+#+end_src
+
+**** Vertico-posframe
+:PROPERTIES:
+:CUSTOM_ID: fe331f40-1788-4453-9c14-cace67fdf620
+:END:
+
+[[https://github.com/tumashu/vertico-posframe][Vertico-posframe]] is an vertico extension, which lets vertico use posframe to show its candidate menu.
+See [[* Posframe][Posframe]] for function defintion.
+
+#+begin_src elisp
+(use-package vertico-posframe
+;:disabled
+:after vertico-multiform
+:init
+  (setq vertico-posframe-poshandler
+        'posframe-poshandler-frame-top-center)
+  (setq vertico-count 15
+        vertico-posframe-border-width 3
+        vertico-posframe-width 140
+        vertico-resize nil)
+  (setq vertico-posframe-parameters
+        '((left-fringe . 20)
+          (right-fringe . 20)))
+  (setq vertico-multiform-commands
+        '(
+          (execute-extended-command ; M-x
+           (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
+           (vertico-posframe-width . 120))
+
+          (meow-visit
+           (vertico-posframe-poshandler . posframe-poshandler-window-top-right-corner)
+           (vertico-posframe-width . 50))
+
+          (meow-yank-pop; M-x
+           (vertico-posframe-poshandler . posframe-poshandler-point-window-center)
+           (vertico-posframe-width . 50))
+
+          (find-file
+           (vertico-count . 25)
+           (vertico-posframe-width . 80)
+           (vertico-posframe-poshandler . posframe-poshandler-window-upper-center!))
+
+          (consult-buffer
+           (vertico-count . 25)
+           (vertico-posframe-width . 100)
+           (vertico-posframe-poshandler . posframe-poshandler-window-upper-center!))
+
+          (switch-to-buffer
+           (vertico-count . 25)
+           (vertico-posframe-width . 100)
+           (vertico-posframe-poshandler . posframe-poshandler-window-upper-center!))
+
+          (org-insert-link; C-c C-l
+           (vertico-posframe-poshandler . posframe-poshandler-point-top-left-corner)
+           (vertico-posframe-width . 70))
+
+          (tempel-insert
+           (vertico-posframe-poshandler . posframe-poshandler-point-top-left-corner)
+           (vertico-posframe-width . 70))
+
+          (consult-imenu
+           (vertico-count . 40)
+           (vertico-posframe-poshandler . posframe-poshandler-window-top-right-corner)
+           (vertico-posframe-width . 80))
+
+          (consult-outline
+           (vertico-count . 30)
+           (vertico-posframe-poshandler . posframe-poshandler-window-top-right-corner)
+           (vertico-posframe-width . 40))
+
+          (consult-line
+           (vertico-count . 30)
+           (vertico-posframe-poshandler . posframe-poshandler-frame-top-right-corner)
+           (vertico-posframe-width . 60))
+
+          (t
+           (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
+           (vertico-posframe-width . 120))
+      ))
+
+:config
+      (vertico-multiform-mode 1)
+      (vertico-posframe-mode 1)
+)
+#+end_src
+
 *** Orderless
 :PROPERTIES:
 :CUSTOM_ID: e49ba787-90af-48c5-8153-1a4ed60cf094
@@ -1684,115 +1849,6 @@ Each component can match in any one of several ways: literally, as a regexp, as 
             '(orderless-initialism orderless-prefixes orderless-regexp))
     )
 #+end_src
-*** Vertico-directory
-:PROPERTIES:
-:CUSTOM_ID: 798614c1-afb2-4609-9860-2e35cd563813
-:END:
-
-#+begin_src elisp
-  (use-package vertico-directory
-      :after vertico
-      ;; More convenient directory navigation commands
-      :bind (:map vertico-map
-  )
-      ;; Tidy shadowed file names
-      :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
-#+end_src
-*** Vertico-multiform
-:PROPERTIES:
-:CUSTOM_ID: f094f952-1386-46ce-9af2-12a31a585221
-:END:
-
-Vertico-multiform configures Vertico modes per command or completion category.
-
-#+begin_src elisp
-  (use-package vertico-multiform
-    :after vertico
-    :config (vertico-multiform-mode)
-  )
-#+end_src
-
-*** Vertico-posframe
-:PROPERTIES:
-:CUSTOM_ID: fe331f40-1788-4453-9c14-cace67fdf620
-:END:
-
-[[https://github.com/tumashu/vertico-posframe][Vertico-posframe]] is an vertico extension, which lets vertico use posframe to show its candidate menu.
-See [[* Posframe][Posframe]] for function defintion.
-
-#+begin_src elisp
-  (use-package vertico-posframe
-  ;:disabled
-  :after vertico-multiform
-  :init
-    (setq vertico-posframe-poshandler
-          'posframe-poshandler-frame-top-center)
-    (setq vertico-count 15
-          vertico-posframe-border-width 3
-          vertico-posframe-width 140
-          vertico-resize nil)
-    (setq vertico-posframe-parameters
-          '((left-fringe . 20)
-            (right-fringe . 20)))
-    (setq vertico-multiform-commands
-          '(
-            (execute-extended-command ; M-x
-             (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
-             (vertico-posframe-width . 120))
-
-            (meow-visit
-             (vertico-posframe-poshandler . posframe-poshandler-window-top-right-corner)
-             (vertico-posframe-width . 50))
-
-            (meow-yank-pop; M-x
-             (vertico-posframe-poshandler . posframe-poshandler-point-window-center)
-             (vertico-posframe-width . 50))
-
-            (find-file
-             (vertico-count . 25)
-             (vertico-posframe-width . 80)
-             (vertico-posframe-poshandler . posframe-poshandler-window-upper-center!))
-
-            (consult-buffer
-             (vertico-count . 25)
-             (vertico-posframe-width . 100)
-             (vertico-posframe-poshandler . posframe-poshandler-window-upper-center!))
-
-            (switch-to-buffer
-             (vertico-count . 25)
-             (vertico-posframe-width . 100)
-             (vertico-posframe-poshandler . posframe-poshandler-window-upper-center!))
-
-            (org-insert-link; C-c C-l
-             (vertico-posframe-poshandler . posframe-poshandler-point-top-left-corner)
-             (vertico-posframe-width . 70))
-
-            (consult-imenu
-             (vertico-count . 40)
-             (vertico-posframe-poshandler . posframe-poshandler-window-top-right-corner)
-             (vertico-posframe-width . 80))
-
-            (consult-outline
-             (vertico-count . 30)
-             (vertico-posframe-poshandler . posframe-poshandler-window-top-right-corner)
-             (vertico-posframe-width . 40))
-
-            (consult-line
-             (vertico-count . 30)
-             (vertico-posframe-poshandler . posframe-poshandler-frame-top-right-corner)
-             (vertico-posframe-width . 60))
-
-            (t
-             (vertico-posframe-poshandler . posframe-poshandler-frame-top-center)
-             (vertico-posframe-width . 120))
-        ))
-
-  :config
-        (vertico-multiform-mode 1)
-        (vertico-posframe-mode 1)
-  )
-#+end_src
-
 *** Savehist
 :PROPERTIES:
 :CUSTOM_ID: 949e27b3-decf-49fa-828d-dab2be046ec8
@@ -2299,18 +2355,25 @@ Emacs currently cannot display correpng or svg with alpha channels, when emacs's
 :END:
 [[https://github.com/magit/magit][Magit]] is a VERY powerful git client.
 #+begin_src elisp
-  (use-package magit
-    :defer t
-    :commands (magit-add-section-hook)
-    :hook (magit-mode . solaire-mode) (magit-mode . olivetti-mode)
-    :config
-    (magit-add-section-hook 'magit-status-sections-hook
-          'magit-insert-modules
-          'magit-insert-stashes
-          'append
-          )
-    (setq magit-show-long-lines-warning nil)
+(use-package magit
+  :defer t
+  :commands (magit-add-section-hook)
+  :hook (magit-mode . solaire-mode) (magit-mode . olivetti-mode)
+  :config
+  (magit-add-section-hook 'magit-status-sections-hook
+        'magit-insert-modules
+        'magit-insert-stashes
+        'append
+        )
+  (setq magit-show-long-lines-warning nil)
+  (general-def
+  :keymaps '(magit-mode-map)
+  "n"   'magit-gitignore
+  "p"   'magit-push
+  "P"   'magit-pull
+  "DEL" 'magit-discard
   )
+)
 #+end_src
 
 - tweaks to build magit
@@ -2572,29 +2635,29 @@ All the el files in treemacs are in =src/elisp= and =src/extra=
 :CUSTOM_ID: 6e9e24f1-5d7c-4e11-a8a0-fe7a3307a8d4
 :END:
 #+begin_src elisp
-  (use-package embark
-    :bind
-    (("C-." . embark-act)         ;; pick some comfortable binding
-     ("C-;" . embark-dwim)        ;; good alternative: M-.
-     ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
+(use-package embark
+  ;; :bind
+  ;; (("C-." . embark-act)         ;; pick some comfortable binding
+  ;;  ("C-;" . embark-dwim)        ;; good alternative: M-.
+  ;;  ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
 
-    :init
+  :init
 
-    ;; Optionally replace the key help with a completing-read interface
-    (setq prefix-help-command #'embark-prefix-help-command)
+  ;; Optionally replace the key help with a completing-read interface
+  (setq prefix-help-command #'embark-prefix-help-command)
 
-    ;; Show the Embark target at point via Eldoc.  You may adjust the Eldoc
-    ;; strategy, if you want to see the documentation from multiple providers.
-    (add-hook 'eldoc-documentation-functions #'embark-eldoc-first-target)
-    ;; (setq eldoc-documentation-strategy #'eldoc-documentation-compose-eagerly)
+  ;; Show the Embark target at point via Eldoc.  You may adjust the Eldoc
+  ;; strategy, if you want to see the documentation from multiple providers.
+  (add-hook 'eldoc-documentation-functions #'embark-eldoc-first-target)
+  ;; (setq eldoc-documentation-strategy #'eldoc-documentation-compose-eagerly)
 
-    :config
+:config
 
-    ;; Hide the mode line of the Embark live/completions buffers
-    (add-to-list 'display-buffer-alist
-                 '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
-                   nil
-                   (window-parameters (mode-line-format . none)))))
+  ;; Hide the mode line of the Embark live/completions buffers
+  (add-to-list 'display-buffer-alist
+               '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+                 nil
+                 (window-parameters (mode-line-format . none)))))
 #+end_src
 
 #+begin_src elisp
@@ -2660,19 +2723,19 @@ All the el files in treemacs are in =src/elisp= and =src/extra=
   )
 #+end_src
 
-* Editing
+* Coding
 :PROPERTIES:
-:CUSTOM_ID: 869d2b71-ad29-495f-9686-a7f0681a5f81
+:CUSTOM_ID: da3e4dda-4fd1-4f9a-8c50-b71203fe58bd
 :END:
-
 ** Displays
 :PROPERTIES:
 :CUSTOM_ID: e6d01f82-1e1f-4f68-bd34-2ab7d6ab3b2e
 :END:
-*** Cursor
+*** Pulse
 :PROPERTIES:
 :CUSTOM_ID: 6777738a-7c6e-45bd-95c2-759d714ee9da
 :END:
+
 **** Beacon
 :PROPERTIES:
 :CUSTOM_ID: 8c20fc21-c98e-4ca2-bb4e-728d66b76ad2
@@ -2696,10 +2759,11 @@ Be careful that it's possible to consume a horrible amount of memory with =pulsi
 #+begin_src elisp
   (use-package pulsing-cursor
   :config
-    (setq pulse-delay 0.08
-          pulse-iterations 2)
+    (setq pulse-delay 0.05
+          pulse-iterations 3)
     (setq pulsing-cursor-blinks 20)
-    (set-face-attribute 'pulsing-cursor-overlay-face1 nil :inherit 'cursor)
+    (set-face-attribute 'pulsing-cursor-overlay-face1 nil
+                        :background (face-background 'cursor))
     (pulsing-cursor-mode)
   )
 #+end_src
@@ -2715,7 +2779,7 @@ Goggles highlights the modified region using pulse. Currently the commands undo,
   :config
     (setq-default goggles-pulse t)) ;; set to nil to disable pulsing
 #+end_src
-**** Hl-line
+*** Hl-line
 :PROPERTIES:
 :CUSTOM_ID: 6000d6d5-dec0-4bbf-8496-cfddc6fba15d
 :END:
@@ -2723,8 +2787,18 @@ Goggles highlights the modified region using pulse. Currently the commands undo,
 Highlights the line that the cursor locates.
 #+begin_src elisp
   (use-package hl-line
-  :init
-    (global-hl-line-mode)
+  :config
+    (defun my/read-face-advice (orig-fun &rest args)
+      "Advice function to turn off hl-line-mode before calling describe-face."
+      (if hl-line-mode
+          (progn
+            (hl-line-mode -1)
+            (apply orig-fun args)
+            (hl-line-mode 1)
+            )
+        (apply orig-fun args)))
+    ;; (advice-add 'read-face-name :around #'my/read-face-advice)
+    ;; (global-hl-line-mode)
   )
 #+end_src
 
@@ -2745,12 +2819,6 @@ Highlights the line that the cursor locates.
 :END:
 #+begin_src elisp
   (use-package emacs
-  :custom-face
-        ;; (line-number ((t (
-        ;;    :weight normal :slant normal :foreground "LightSteelBlue4"
-        ;;    :inherit default))))
-        (line-number-current-line ((t (
-            :inherit (hl-line default) :slant normal :foreground "#ffcc66"))))
   :hook (prog-mode . config/toggle-line-number-absolute)
   :config
         (defun config/toggle-line-number-nil ()
@@ -2769,15 +2837,15 @@ Highlights the line that the cursor locates.
             (interactive)
             (setq display-line-numbers 'visual)
         )
-        ;; (config/leader :infix "tl"
-        ;;  ""    '(nil                                :wk "  Line Number ")
-        ;;  "DEL" '(which-key-undo                     :wk "󰕍 Undo key   ")
-        ;;  "n"   '(config/toggle-line-number-nil      :wk "󰅖 Nil        ")
-        ;;  "a"   '(config/toggle-line-number-absolute :wk "󰱇 Absolute   ")
-        ;;  "r"   '(config/toggle-line-number-relative :wk "󰰠 Relative   ")
-        ;;  "v"   '(config/toggle-line-number-visual   :wk " Visual     ")
-        ;;  "h"   '(hl-line-mode                       :wk "󰸱 Hl-line")
-        ;; )
+        (my/leader :infix "tl"
+         ""    '(nil                                :wk "  Line Number ")
+         "DEL" '(which-key-undo                     :wk "󰕍 Undo key   ")
+         "n"   '(config/toggle-line-number-nil      :wk "󰅖 Nil        ")
+         "a"   '(config/toggle-line-number-absolute :wk "󰱇 Absolute   ")
+         "r"   '(config/toggle-line-number-relative :wk "󰰠 Relative   ")
+         "v"   '(config/toggle-line-number-visual   :wk " Visual     ")
+         "h"   '(hl-line-mode                       :wk "󰸱 Hl-line")
+        )
   )
 #+end_src
 
@@ -2790,71 +2858,48 @@ This minor mode sets background color to strings that match color names, useful 
 #+begin_src elisp
 
 #+end_src
-*** Rainbow-Delimiters
+*** COMMENT Ts-fold
 :PROPERTIES:
-:CUSTOM_ID: bf6c1d8c-ac59-4334-a837-1f1fe7a87375
+:CUSTOM_ID: a0b69753-a991-49d7-8625-a93082f06ca6
 :END:
-[[https://github.com/Fanael/rainbow-delimiters][Rainbow-delimiters]] is a "rainbow parentheses"-like mode which highlights
-parentheses, brackets, and braces according to their depth.
 #+begin_src elisp
-  (use-package rainbow-delimiters
-  :hook (prog-mode . rainbow-delimiters-mode)
-  )
+  (use-package ts-fold)
 #+end_src
-*** Highlight-parentheses
-:PROPERTIES:
-:CUSTOM_ID: 9deea56d-45cc-4bcc-8ada-c1cd311412cc
-:END:
+*** Simple-call-tree
 #+begin_src elisp
-  (use-package highlight-parentheses
-  :config
-    (global-highlight-parentheses-mode)
-    )
+(use-package simple-call-tree :defer t)
 #+end_src
-*** Highlight-Indent-Guides
-:PROPERTIES:
-:CUSTOM_ID: 1e3c6c09-61e5-42fa-87d2-5f0d0496d8f0
-:END:
-[[https://github.com/DarthFennec/highlight-indent-guides][Highlight-Indent-Guides]] is a minor mode that highlights indentation levels via font-lock.
+** Keybindings
 #+begin_src elisp
-  (use-package highlight-indent-guides
-  :hook (prog-mode . highlight-indent-guides-mode)
-  :config
-    (setq highlight-indent-guides-method 'bitmap
-          highlight-indent-guides-character 9474
-          highlight-indent-guides-auto-enabled nil
-    )
-    (set-face-attribute 'highlight-indent-guides-character-face nil
-      :foreground "#3b445f")
-    (set-face-attribute 'highlight-indent-guides-top-character-face nil
-      :foreground "#ffcc66")
+(general-def
+:keymaps '(prog-mode-map)
+:wk-full-keys nil
+  "C-<escape>" '(my/prog-cmd :wk "Prog")
+)
 
+(general-def
+:prefix-command 'my/prog-cmd
+:prefix-map 'my/prog-map
+:wk-full-keys nil
+  "C-j" '()
+  "C-k" '(backward-paragraph  :wk " para")
+  "C-l" '(forward-paragraph :wk " para")
+  "C-;" '()
   )
 #+end_src
-
-** Smartparens
-:PROPERTIES:
-:CUSTOM_ID: c5380826-f396-48b3-8983-40cd1317425c
-:END:
-[[https://github.com/Fuco1/smartparens][Smartparens]] is minor mode for Emacs that deals with parens pairs and tries to be smart about it.
-#+begin_src elisp
-  (use-package smartparens
-  :config
-    (smartparens-global-mode)
-  )
-#+end_src
-** Electric-Indent
+** Indent
+*** Electric-Indent
 :PROPERTIES:
 :CUSTOM_ID: e9971fa5-52b4-4f85-93a5-28b0dab46b80
 :END:
 #+begin_src elisp
-  (use-package electric
-  :config
-    (setq-default indent-tabs-mode nil) ;; always indent with spaces
-    (setq electric-pair-mode t) ;; global-minor mode
-  )
+(use-package electric
+:config
+  (setq-default indent-tabs-mode nil) ;; always indent with spaces
+  (setq electric-pair-mode t) ;; global-minor mode
+)
 #+end_src
-** Aggressive-Indent
+*** Aggressive-Indent
 :PROPERTIES:
 :CUSTOM_ID: 4532c3c9-2f73-4ccc-acb4-250156b08309
 :END:
@@ -2868,23 +2913,164 @@ than `electric-indent-mode'.
     (global-aggressive-indent-mode 1)
   )
 #+end_src
-* Coding
+*** Highlight-Indent-Guides
 :PROPERTIES:
-:CUSTOM_ID: da3e4dda-4fd1-4f9a-8c50-b71203fe58bd
+:CUSTOM_ID: 1e3c6c09-61e5-42fa-87d2-5f0d0496d8f0
 :END:
-** Auto-save
-:PROPERTIES:
-:CUSTOM_ID: 1c6aa069-acd3-4f3c-94dd-0890bc30efb4
-:END:
-Auto save saves your buffer after entering idle state.
+[[https://github.com/DarthFennec/highlight-indent-guides][Highlight-Indent-Guides]] is a minor mode that highlights indentation levels via font-lock.
 #+begin_src elisp
-  (use-package auto-save
-  :after lsp-bridge
-  :config
-    (auto-save-enable)
-    (setq auto-save-silent t)   ; quietly save
-    (setq auto-save-delete-trailing-whitespace t)
+(use-package highlight-indent-guides
+:hook (prog-mode . highlight-indent-guides-mode)
+:config
+  (setq highlight-indent-guides-method 'bitmap
+        highlight-indent-guides-character 9474
+        highlight-indent-guides-auto-enabled nil
   )
+  (set-face-attribute 'highlight-indent-guides-character-face nil
+    :foreground "#3b445f")
+  (set-face-attribute 'highlight-indent-guides-top-character-face nil
+    :foreground "#ffcc66")
+
+)
+#+end_src
+** Parens
+*** Smartparens
+:PROPERTIES:
+:CUSTOM_ID: c5380826-f396-48b3-8983-40cd1317425c
+:END:
+[[https://github.com/Fuco1/smartparens][Smartparens]] is minor mode for Emacs that deals with parens pairs and tries to be smart about it.
+#+begin_src elisp
+  (use-package smartparens
+  :config
+    (smartparens-global-mode)
+  )
+#+end_src
+*** Highlight-parentheses
+:PROPERTIES:
+:CUSTOM_ID: 9deea56d-45cc-4bcc-8ada-c1cd311412cc
+:END:
+#+begin_src elisp
+  (use-package highlight-parentheses
+  :config
+    (global-highlight-parentheses-mode)
+    )
+#+end_src
+*** Rainbow-Delimiters
+:PROPERTIES:
+:CUSTOM_ID: bf6c1d8c-ac59-4334-a837-1f1fe7a87375
+:END:
+[[https://github.com/Fanael/rainbow-delimiters][Rainbow-delimiters]] is a "rainbow parentheses"-like mode which highlights
+parentheses, brackets, and braces according to their depth.
+#+begin_src elisp
+  (use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode)
+  )
+#+end_src
+** Snippets
+*** COMMENT YASnippet
+:PROPERTIES:
+:CUSTOM_ID: 628a09cf-6583-401d-97cf-654928938cde
+:END:
+[[https://github.com/joaotavora/yasnippet][YASnippet]] is a template system for Emacs. It allows you to type an abbreviation and automatically expand it into function templates.
+#+begin_src elisp
+  (use-package yasnippet
+    :init
+    (yas-global-mode 1)
+  )
+#+end_src
+
+*** COMMENT AAS
+:PROPERTIES:
+:CUSTOM_ID: aeb49330-f1b3-428a-b6a3-3bbea03913f9
+:END:
+[[https://github.com/ymarco/auto-activating-snippets][AAS (Auto Activating Snippets)]] implements an engine for auto-expanding snippets. It is done by tracking your inputted chars along a tree until you complete a registered key sequence.
+#+begin_src elisp
+  (use-package aas
+    :hook (LaTeX-mode . aas-activate-for-major-mode)
+    :hook (org-mode . aas-activate-for-major-mode)
+    :config
+    (aas-set-snippets 'text-mode
+      ;; expand unconditionally
+      ";o-" "ō"
+      ";i-" "ī"
+      ";a-" "ā"
+      ";u-" "ū"
+      ";e-" "ē")
+    (aas-set-snippets 'latex-mode
+      ;; set condition!
+      :cond #'texmathp ; expand only while in math
+      "supp" "\\supp"
+      "On" "O(n)"
+      "O1" "O(1)"
+      "Olog" "O(\\log n)"
+      "Olon" "O(n \\log n)"
+      ;; Use YAS/Tempel snippets with ease!
+      "amin" '(yas "\\argmin_{$1}") ; YASnippet snippet shorthand form
+      "amax" '(tempel "\\argmax_{" p "}") ; Tempel snippet shorthand form
+      ;; bind to functions!
+      ";ig" #'insert-register
+      ";call-sin"
+      (lambda (angle) ; Get as fancy as you like
+        (interactive "sAngle: ")
+        (insert (format "%s" (sin (string-to-number angle))))))
+    ;; disable snippets by redefining them with a nil expansion
+    (aas-set-snippets 'latex-mode
+      "supp" nil))
+#+end_src
+
+*** Tempel
+:PROPERTIES:
+:CUSTOM_ID: 85c28b3b-dcb0-4dce-9fdf-0fdaee9d66d2
+:END:
+:BACKLINKS:
+[[#20dbcac9-a7cb-4447-8b96-a490d1637b75][Mode map]]
+:END:
+#+begin_src elisp
+(use-package tempel
+  ;; Require trigger prefix before template name when completing.
+  ;; :custom
+  ;; (tempel-trigger-prefix "<")
+
+  :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
+         ("M-*" . tempel-insert))
+  :init
+
+  ;; Setup completion at point
+  (defun tempel-setup-capf ()
+    ;; Add the Tempel Capf to `completion-at-point-functions'.
+    ;; `tempel-expand' only triggers on exact matches. Alternatively use
+    ;; `tempel-complete' if you want to see all matches, but then you
+    ;; should also configure `tempel-trigger-prefix', such that Tempel
+    ;; does not trigger too often when you don't expect it. NOTE: We add
+    ;; `tempel-expand' *before* the main programming mode Capf, such
+    ;; that it will be tried first.
+    (setq-local completion-at-point-functions
+                (cons #'tempel-expand
+                      completion-at-point-functions)))
+
+  (add-hook 'conf-mode-hook 'tempel-setup-capf)
+  (add-hook 'prog-mode-hook 'tempel-setup-capf)
+  (add-hook 'text-mode-hook 'tempel-setup-capf)
+
+  ;; Optionally make the Tempel templates available to Abbrev,
+  ;; either locally or globally. `expand-abbrev' is bound to C-x '.
+  ;; (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
+  ;; (global-tempel-abbrev-mode)
+
+  (my/mode-leader-def
+  :keymaps '(tempel-map)
+    "C-j"  'tempel-previous
+    "C-;"  'tempel-next
+  )
+)
+#+end_src
+
+#+begin_src elisp
+;; Optional: Add tempel-collection.
+;; The package is young and doesn't have comprehensive coverage.
+(use-package tempel-collection
+:after tempel
+)
 #+end_src
 ** LSP-bridge
 :PROPERTIES:
@@ -2892,14 +3078,13 @@ Auto save saves your buffer after entering idle state.
 :END:
 [[https://github.com/manateelazycat/lsp-bridge][lsp-bridge]] builds a high-speed cache between Emacs and the LSP server.
 #+begin_src elisp
-  (use-package lsp-bridge
-  :init
-    (global-lsp-bridge-mode)
-  :config
-    ;(set-face-attributes 'lsp-bridge-alive-mode-line nil
-    ;  :inherit 'variable-pitch
-    ;)
-  )
+(use-package lsp-bridge
+:config
+  (global-lsp-bridge-mode)
+  ;(set-face-attributes 'lsp-bridge-alive-mode-line nil
+  ;  :inherit 'variable-pitch
+  ;)
+)
 #+end_src
 tweaks to build lsp-bridge
 #+begin_src conf
@@ -2917,77 +3102,76 @@ tweaks to build lsp-bridge
 
 fingertip.el is a plugin that provides grammatical edit base on treesit
 #+begin_src elisp
-  (use-package fingertip
-  :config
-    (dolist (hook (list
-          'c-mode-common-hook 'c-mode-hook 'c++-mode-hook
-          'c-ts-mode-hook 'c++-ts-mode-hook
-          'cmake-ts-mode-hook
-          'java-mode-hook
-          'haskell-mode-hook
-          'emacs-lisp-mode-hook
-          'lisp-interaction-mode-hook 'lisp-mode-hook
-          'maxima-mode-hook
-          'ielm-mode-hook
-          'bash-ts-mode-hook 'sh-mode-hook
-          'makefile-gmake-mode-hook
-          'php-mode-hook
-          'python-mode-hook 'python-ts-mode-hook
-          'js-mode-hook
-          'go-mode-hook
-          'qml-mode-hook
-          'jade-mode-hook
-          'css-mode-hook 'css-ts-mode-hook
-          'ruby-mode-hook
-          'coffee-mode-hook
-          'rust-mode-hook 'rust-ts-mode-hook
-          'qmake-mode-hook
-          'lua-mode-hook
-          'swift-mode-hook
-          'web-mode-hook
-          'markdown-mode-hook
-          'llvm-mode-hook
-          'conf-conf-mode-hook 'conf-ts-mode-hook
-          'nim-mode-hook
-          'typescript-mode-hook 'typescript-ts-mode-hook
-          'js-ts-mode-hook 'json-ts-mode-hook
-          ))
-    (add-hook hook #'(lambda () (fingertip-mode 1))))
-    (general-def
-      :keymaps 'fingertip-mode-map
-        "(" 'fingertip-open-round
-        "[" 'fingertip-open-bracket
-        "{" 'fingertip-open-curly
-        ")" 'fingertip-close-round
-        "]" 'fingertip-close-bracket
-        "}" 'fingertip-close-curly
-        "=" 'fingertip-equal
+(use-package fingertip
+:config
+  (dolist (hook (list
+        'c-mode-common-hook 'c-mode-hook 'c++-mode-hook
+        'c-ts-mode-hook 'c++-ts-mode-hook
+        'cmake-ts-mode-hook
+        'java-mode-hook
+        'haskell-mode-hook
+        'emacs-lisp-mode-hook
+        'lisp-interaction-mode-hook 'lisp-mode-hook
+        'maxima-mode-hook
+        'ielm-mode-hook
+        'bash-ts-mode-hook 'sh-mode-hook
+        'makefile-gmake-mode-hook
+        'php-mode-hook
+        'python-mode-hook 'python-ts-mode-hook
+        'js-mode-hook
+        'go-mode-hook
+        'qml-mode-hook
+        'jade-mode-hook
+        'css-mode-hook 'css-ts-mode-hook
+        'ruby-mode-hook
+        'coffee-mode-hook
+        'rust-mode-hook 'rust-ts-mode-hook
+        'qmake-mode-hook
+        'lua-mode-hook
+        'swift-mode-hook
+        'web-mode-hook
+        'markdown-mode-hook
+        'llvm-mode-hook
+        'conf-conf-mode-hook 'conf-ts-mode-hook
+        'nim-mode-hook
+        'typescript-mode-hook 'typescript-ts-mode-hook
+        'js-ts-mode-hook 'json-ts-mode-hook
+        ))
+  (add-hook hook #'(lambda () (fingertip-mode 1))))
+  ;; (general-def
+  ;;   :keymaps 'fingertip-mode-map
+  ;;     "(" 'fingertip-open-round
+  ;;     "[" 'fingertip-open-bracket
+  ;;     "{" 'fingertip-open-curly
+  ;;     ")" 'fingertip-close-round
+  ;;     "]" 'fingertip-close-bracket
+  ;;     "}" 'fingertip-close-curly
+  ;;     "=" 'fingertip-equal
 
-        "%" 'fingertip-match-paren
-        "\"" 'fingertip-double-quote
-        "'" 'fingertip-single-quote
+  ;;     "%" 'fingertip-match-paren
+  ;;     "\"" 'fingertip-double-quote
+  ;;     "'" 'fingertip-single-quote
 
-        "SPC" 'fingertip-space
-        "RET" 'fingertip-newline
+  ;;     "SPC" 'fingertip-space
+  ;;     "RET" 'fingertip-newline
 
-        "M-o" 'fingertip-backward-delete
-        "C-d" 'fingertip-forward-delete
-        "C-k" 'fingertip-kill
+  ;;     "M-o" 'fingertip-backward-delete
+  ;;     "C-d" 'fingertip-forward-delete
+  ;;     "C-k" 'fingertip-kill
 
-        "M-\"" 'fingertip-wrap-double-quote
-        "M-'" 'fingertip-wrap-single-quote
-        "M-[" 'fingertip-wrap-bracket
-        "M-{" 'fingertip-wrap-curly
-        "M-(" 'fingertip-wrap-round
-        "M-)" 'fingertip-unwrap
+  ;;     "M-\"" 'fingertip-wrap-double-quote
+  ;;     "M-'" 'fingertip-wrap-single-quote
+  ;;     "M-[" 'fingertip-wrap-bracket
+  ;;     "M-{" 'fingertip-wrap-curly
+  ;;     "M-(" 'fingertip-wrap-round
+  ;;     "M-)" 'fingertip-unwrap
 
-        "M-p" 'fingertip-jump-right
-        "M-n" 'fingertip-jump-left
-        ;"M-:" 'fingertip-jump-out-pair-and-newline
+  ;;     "M-p" 'fingertip-jump-right
+  ;;     "M-n" 'fingertip-jump-left
+  ;;     ;"M-:" 'fingertip-jump-out-pair-and-newline
 
-        "C-j" 'fingertip-jump-up
-    )
-  )
+  ;;     "C-j" 'fingertip-jump-up )
+)
 #+end_src
 
 ** Treesit
@@ -3014,8 +3198,9 @@ When configuring treesit the following things are worth considering:
       )
     (advice-add 'org-src-get-lang-mode :filter-return #'my/remap-mode)
 
-    ;; a workaround for emacs29 do not come up with elisp-ts-mode
+    ;; a workaround for lack of lang-ts-mode
     (add-hook 'emacs-lisp-mode-hook #'(lambda () (treesit-parser-create 'elisp)))
+    (add-hook 'markdown-mode-hook #'(lambda () (treesit-parser-create 'markdown)))
     (global-treesit-auto-mode))
 #+end_src
 *** Treesitter-context
@@ -3120,117 +3305,31 @@ To enable treesit support for a language, you need to run =M-x treesit-install-l
   (add-hook 'php-mode-hook #'(lambda () (treesit-parser-create 'php)))
   (add-hook 'php-ts-mode-hook #'(lambda () (treesit-parser-create 'php)))
 #+end_src
-** COMMENT Ts-fold
-:PROPERTIES:
-:CUSTOM_ID: a0b69753-a991-49d7-8625-a93082f06ca6
-:END:
-#+begin_src elisp
-  (use-package ts-fold)
-#+end_src
-** YASnippet
-:PROPERTIES:
-:CUSTOM_ID: 628a09cf-6583-401d-97cf-654928938cde
-:END:
-[[https://github.com/joaotavora/yasnippet][YASnippet]] is a template system for Emacs. It allows you to type an abbreviation and automatically expand it into function templates.
-#+begin_src elisp
-  (use-package yasnippet
-    :init
-    (yas-global-mode 1)
-  )
-#+end_src
-
-** COMMENT AAS
-:PROPERTIES:
-:CUSTOM_ID: aeb49330-f1b3-428a-b6a3-3bbea03913f9
-:END:
-[[https://github.com/ymarco/auto-activating-snippets][AAS (Auto Activating Snippets)]] implements an engine for auto-expanding snippets. It is done by tracking your inputted chars along a tree until you complete a registered key sequence.
-#+begin_src elisp
-  (use-package aas
-    :hook (LaTeX-mode . aas-activate-for-major-mode)
-    :hook (org-mode . aas-activate-for-major-mode)
-    :config
-    (aas-set-snippets 'text-mode
-      ;; expand unconditionally
-      ";o-" "ō"
-      ";i-" "ī"
-      ";a-" "ā"
-      ";u-" "ū"
-      ";e-" "ē")
-    (aas-set-snippets 'latex-mode
-      ;; set condition!
-      :cond #'texmathp ; expand only while in math
-      "supp" "\\supp"
-      "On" "O(n)"
-      "O1" "O(1)"
-      "Olog" "O(\\log n)"
-      "Olon" "O(n \\log n)"
-      ;; Use YAS/Tempel snippets with ease!
-      "amin" '(yas "\\argmin_{$1}") ; YASnippet snippet shorthand form
-      "amax" '(tempel "\\argmax_{" p "}") ; Tempel snippet shorthand form
-      ;; bind to functions!
-      ";ig" #'insert-register
-      ";call-sin"
-      (lambda (angle) ; Get as fancy as you like
-        (interactive "sAngle: ")
-        (insert (format "%s" (sin (string-to-number angle))))))
-    ;; disable snippets by redefining them with a nil expansion
-    (aas-set-snippets 'latex-mode
-      "supp" nil))
-#+end_src
-
-** Tempel
-:PROPERTIES:
-:CUSTOM_ID: 85c28b3b-dcb0-4dce-9fdf-0fdaee9d66d2
-:END:
-#+begin_src elisp
-  (use-package tempel
-    ;; Require trigger prefix before template name when completing.
-    ;; :custom
-    ;; (tempel-trigger-prefix "<")
-
-    :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
-           ("M-*" . tempel-insert))
-
-    :init
-
-    ;; Setup completion at point
-    (defun tempel-setup-capf ()
-      ;; Add the Tempel Capf to `completion-at-point-functions'.
-      ;; `tempel-expand' only triggers on exact matches. Alternatively use
-      ;; `tempel-complete' if you want to see all matches, but then you
-      ;; should also configure `tempel-trigger-prefix', such that Tempel
-      ;; does not trigger too often when you don't expect it. NOTE: We add
-      ;; `tempel-expand' *before* the main programming mode Capf, such
-      ;; that it will be tried first.
-      (setq-local completion-at-point-functions
-                  (cons #'tempel-expand
-                        completion-at-point-functions)))
-
-    (add-hook 'conf-mode-hook 'tempel-setup-capf)
-    (add-hook 'prog-mode-hook 'tempel-setup-capf)
-    (add-hook 'text-mode-hook 'tempel-setup-capf)
-
-    ;; Optionally make the Tempel templates available to Abbrev,
-    ;; either locally or globally. `expand-abbrev' is bound to C-x '.
-    ;; (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
-    ;; (global-tempel-abbrev-mode)
-  )
-
-  ;; Optional: Add tempel-collection.
-  ;; The package is young and doesn't have comprehensive coverage.
-  (use-package tempel-collection)
-#+end_src
 ** Copilot
 :PROPERTIES:
 :CUSTOM_ID: 34c3222e-9339-4393-9006-96177fb5ea94
 :END:
 https://github.com/zerolfx/copilot.el
 
+** Auto-save
+:PROPERTIES:
+:CUSTOM_ID: 1c6aa069-acd3-4f3c-94dd-0890bc30efb4
+:END:
+Auto save saves your buffer after entering idle state.
+#+begin_src elisp
+  (use-package auto-save
+  :after lsp-bridge
+  :config
+    (auto-save-enable)
+    (setq auto-save-silent t)   ; quietly save
+    (setq auto-save-delete-trailing-whitespace t)
+  )
+#+end_src
 * Languages
 :PROPERTIES:
 :CUSTOM_ID: 0d2cb490-c0f4-4e42-acfe-55e0ee789fb7
 :END:
-*** Elisp
+** Elisp
 :PROPERTIES:
 :CUSTOM_ID: f998e88f-3234-4f94-a86f-683caaab3483
 :END:
@@ -3240,19 +3339,19 @@ https://github.com/zerolfx/copilot.el
 - highlight-quoted
 - macrostep
 - oversee
-  #+begin_src elisp
-    (setq-default lexical-binding t)
-  #+end_src
-*** LaTeX
+#+begin_src elisp
+(setq-default lexical-binding t)
+#+end_src
+** LaTeX
 :PROPERTIES:
 :CUSTOM_ID: 76c817ec-2dac-425e-b8a3-a04d6946892f
 :END:
-**** AUCTeX
+*** AUCTeX
 :PROPERTIES:
 :CUSTOM_ID: 9543c01b-f1dc-4d85-9056-ce73e2019dbb
 :END:
 #+begin_src elisp
-  (use-package auctex)
+(use-package auctex)
 #+end_src
 
 AucTex needs some tweaks to be built.
@@ -3268,14 +3367,14 @@ To build auctex, =autoconf= should be avaliable on your system.
   build-step = borg-makeinfo
   build-step = borg-update-autoloads
 #+end_src
-**** CDTeX
+*** CDTeX
 :PROPERTIES:
 :CUSTOM_ID: e4c612e7-07a4-47b7-95dd-01a881a715cc
 :END:
 #+begin_src elisp
   (use-package cdlatex)
 #+end_src
-**** LAAS
+*** LAAS
 :PROPERTIES:
 :CUSTOM_ID: 94ce08e7-d4dd-4804-985d-b154934f9442
 :END:
@@ -3287,20 +3386,30 @@ To build auctex, =autoconf= should be avaliable on your system.
   :after ass
   :hook (LaTeX-mode . laas-mode))
 #+end_src
-
-*** Nix
+** Markdown
+#+begin_src elisp
+  (use-package markdown-mode
+  :config
+    (dotimes (i 6)
+      (set-face-attribute (intern (format "markdown-header-face-%d" (1+ i)))
+                          nil
+                          :inherit
+                          (intern (format "outline-%d" (1+ i)))))
+  )
+#+end_src
+** Nix
 :PROPERTIES:
 :CUSTOM_ID: 58e308df-8796-4406-b89b-136adc972ddb
 :END:
 #+begin_src elisp
-  (use-package nix-mode
-  :mode "\\.nix\\'"
-  :config
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     '((nix . t))
-     )
-  )
+(use-package nix-mode
+:mode "\\.nix\\'"
+:config
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((nix . t))
+   )
+)
 #+end_src
 
 #+begin_src elisp
@@ -3308,7 +3417,7 @@ To build auctex, =autoconf= should be avaliable on your system.
   :mode "\\.nix\\'"
   )
 #+end_src
-*** PlantUML
+** PlantUML
 :PROPERTIES:
 :CUSTOM_ID: 060fbe09-da11-47fa-83c1-1492fc4a5295
 :END:
@@ -3317,11 +3426,11 @@ To build auctex, =autoconf= should be avaliable on your system.
   :mode "\\.plantuml\\'"
   )
 #+end_src
-*** Python
+** Python
 :PROPERTIES:
 :CUSTOM_ID: c0695b7a-e139-4c5c-bcd5-d5be5d3fae89
 :END:
-**** Jupyter
+*** Jupyter
 :PROPERTIES:
 :CUSTOM_ID: d67b0864-7efe-4341-baad-cf2a9f2c6345
 :END:
@@ -3330,7 +3439,7 @@ To build auctex, =autoconf= should be avaliable on your system.
   :defer t
     )
 #+end_src
-*** Verilog
+** Verilog
 :PROPERTIES:
 :CUSTOM_ID: 0f43d38a-0d54-441d-ac37-c2c8b4abc1a9
 :END:
@@ -3339,7 +3448,7 @@ To build auctex, =autoconf= should be avaliable on your system.
   :mode "\\.v\\'"
   )
 #+end_src
-*** YAML
+** YAML
 :PROPERTIES:
 :CUSTOM_ID: f38fbcdd-6212-442d-9b43-64bf9823ac6f
 :END:
@@ -3395,32 +3504,32 @@ According to the installation manual of org, we need to make autoloads before co
 
 Change the font size of different org-levels.
 #+begin_src elisp
-  (use-package org
-  :custom-face
-    ;; (org-latex-and-related ((t (:foreground "LightSteelBlue4" :weight bold))))
-    ;; (org-meta-line ((t (:foreground "LightSteelBlue4"))))
-    ;; (org-special-keyword ((t (:foreground "LightSteelBlue4"))))
-    ;; (org-tag ((t (:foreground "LightSteelBlue4" :weight normal))))
-  ;:hook (org-mode . mixed-pitch-mode)
-  :config
-    (set-face-attribute 'org-level-1 nil :height 1.6 )
-    (set-face-attribute 'org-level-2 nil :height 1.4 )
-    (set-face-attribute 'org-level-3 nil :height 1.4 )
-    (set-face-attribute 'org-level-4 nil :height 1.3 )
-    (set-face-attribute 'org-level-5 nil :height 1.2 )
-    (set-face-attribute 'org-level-6 nil :height 1.1 )
-    (set-face-attribute 'org-document-title nil :height 2.5 :bold t)
-    (set-face-attribute 'org-document-info nil :height 1.8 :bold t)
-    (set-face-attribute 'org-document-info-keyword nil
-       :inherit 'org-document-info)
-    (set-face-attribute 'org-block nil
-      :extend t :inherit 'fixed-pitch)
-    (set-face-attribute 'org-block-begin-line nil
-      :height 0.9 :inherit 'default)
-  )
+(use-package org
+:custom-face
+  ;; (org-latex-and-related ((t (:foreground "LightSteelBlue4" :weight bold))))
+  ;; (org-meta-line ((t (:foreground "LightSteelBlue4"))))
+  ;; (org-special-keyword ((t (:foreground "LightSteelBlue4"))))
+  ;; (org-tag ((t (:foreground "LightSteelBlue4" :weight normal))))
+;:hook (org-mode . mixed-pitch-mode)
+:config
+  (set-face-attribute 'outline-1 nil :height 1.6 )
+  (set-face-attribute 'outline-2 nil :height 1.4 )
+  (set-face-attribute 'outline-3 nil :height 1.4 )
+  (set-face-attribute 'outline-4 nil :height 1.3 )
+  (set-face-attribute 'outline-5 nil :height 1.2 )
+  (set-face-attribute 'outline-6 nil :height 1.1 )
+  (set-face-attribute 'org-document-title nil :height 2.5 :bold t)
+  (set-face-attribute 'org-document-info nil :height 1.8 :bold t)
+  (set-face-attribute 'org-document-info-keyword nil
+     :inherit 'org-document-info)
+  (set-face-attribute 'org-block nil
+    :extend t :inherit 'fixed-pitch)
+  (set-face-attribute 'org-block-begin-line nil
+    :background (face-background 'default) :height 0.9 :inherit 'default)
+)
 #+end_src
 
-*** Bullets
+*** Org-modern
 :PROPERTIES:
 :CUSTOM_ID: 02508b8f-6b97-44ed-975a-1ff170f3b1fc
 :END:
@@ -3428,56 +3537,66 @@ Change the font size of different org-levels.
 [[https://github.com/minad/org-modern][Org-modern]] implements a modern style for Org buffers using font locking and text properties. The package styles =headlines=, =keywords=, =tables= and =source blocks=.
 
 #+begin_src elisp
-  (use-package org-modern
-  ;;:hook (org-mode . org-modern-mode)
-  :config
-    (setq org-modern-keyword
-       '(("author" . "◇")
-        ("title" . "◈")
-        ("subtitle" . "◉")
-        ("html" . "󰅱 ")
-        ("results" . "□ results")
-        (t . t)))
-    (setq org-modern-star
-     '("⚀" "⚁" "⚂" "⚃" "⚄" "⚅")
-    )
-    (set-face-attribute 'org-modern-symbol nil :family "Noto Sans Symbols 2")
-  ; '("☰" "☱" "☲" "☳" "☴" "☵" "☶" "☷")
-  ; '("◉" "○" "◈" "◇" "✳")
-    (setq org-modern-list ;; for '+' '-' '*' respectively
-        '((43 . "∙") (45 . "➤") (42 . "✽"))
-    )
-    (setq org-modern-block-fringe nil)
-    (setq org-modern-todo nil)
-    (setq org-modern-block-name '("⇲ " . "⇱ "))
-    (set-face-attribute 'org-modern-block-name nil
-       :inherit 'variable-pitch)
-    (set-face-attribute 'org-meta-line nil
-       :height 0.9)
-    (set-face-attribute 'org-modern-horizontal-rule nil
-        :strike-through (face-foreground 'org-meta-line) :inherit 'org-hide)
-
-    (setq org-modern-table nil)
-    (global-org-modern-mode)
+(use-package org-modern
+;;:hook (org-mode . org-modern-mode)
+:config
+  (setq org-modern-keyword
+     '(("author" . "◇")
+      ("title" . "◈")
+      ("subtitle" . "◉")
+      ("html" . "󰅱 ")
+      ("results" . "results")
+      (t . t)))
+  (setq org-modern-star
+   '("⚀" "⚁" "⚂" "⚃" "⚄" "⚅")
   )
+  (set-face-attribute 'org-modern-symbol nil :family "Noto Sans Symbols 2")
+; '("☰" "☱" "☲" "☳" "☴" "☵" "☶" "☷")
+; '("◉" "○" "◈" "◇" "✳")
+  (setq org-modern-list ;; for '+' '-' '*' respectively
+      '((43 . "∙") (45 . "➤") (42 . "✽"))
+  )
+  (setq org-modern-block-fringe nil)
+  (setq org-modern-todo nil)
+  ;; (setq org-modern-block-name '("⇲ " . "⇱ "))
+  ;; (setq org-modern-block-name '("◻ " . "◻ "))
+  (set-face-attribute 'org-modern-block-name nil
+     :inherit 'variable-pitch)
+  (set-face-attribute 'org-meta-line nil
+     :height 0.9)
+  (set-face-attribute 'org-modern-horizontal-rule nil
+      :strike-through (face-foreground 'org-meta-line) :inherit 'org-hide)
+
+  (setq org-modern-table nil)
+  (global-org-modern-mode)
+)
 #+end_src
 
 [[https://github.com/integral-dw/org-superstar-mode][Org-superstar]] replaces the asterisk before every org-level with ascii symbols.
 Disabled because org-morden is a drop-in replacement.
 
 #+begin_src elisp
-  (use-package org-superstar
-  :defer t
-  ;:hook (org-mode . org-superstar-mode)
-  :init
-    (setq
-      ;;org-superstar-headline-bullets-list '("󰇊" "󰇋" "󰇌" "󰇍" "󰇎" "󰇏")
-      org-superstar-special-todo-items t
-      ;;org-ellipsis "  "
-    )
+(use-package org-superstar
+:defer t
+;:hook (org-mode . org-superstar-mode)
+:init
+  (setq
+    ;;org-superstar-headline-bullets-list '("󰇊" "󰇋" "󰇌" "󰇍" "󰇎" "󰇏")
+    org-superstar-special-todo-items t
+    ;;org-ellipsis "  "
   )
+)
 #+end_src
-
+*** COMMENT Org-modern-indent
+#+begin_src elisp
+(use-package org-modern-indent
+:init
+  ;; override defconst
+  (defconst org-modern-indent-begin (propertize " " 'face 'org-modern-bracket-line))
+  (defconst org-modern-indent-guide (propertize " " 'face 'org-modern-bracket-line))
+  (defconst org-modern-indent-end   (propertize " " 'face 'org-modern-bracket-line))
+)
+#+end_src
 *** Indent lines
 :PROPERTIES:
 :CUSTOM_ID: 49dc8626-3dcf-462b-a153-d0c2ace43dd2
@@ -3487,18 +3606,18 @@ It adds bars to the virtual indentation provided by the built-in package org-ind
 Have drawbacks when using mixed-pitch-mode.
 
 #+begin_src elisp
-  (use-package org-bars
-  :defer t
-  :commands 'org-bars-mode
-  ;:hook (org-mode . org-bars-mode)
-  :config
-    (setq org-bars-color-options '(
-    :desaturate-level-faces 100
-    :darken-level-faces 10
-    ))
-    (setq org-bars-extra-pixels-height 25)
-    (setq org-bars-stars '(:empty "" :invisible "" :visible ""))
-  )
+(use-package org-bars
+:defer t
+:commands 'org-bars-mode
+;:hook (org-mode . org-bars-mode)
+:config
+  (setq org-bars-color-options '(
+  :desaturate-level-faces 100
+  :darken-level-faces 10
+  ))
+  (setq org-bars-extra-pixels-height 25)
+  (setq org-bars-stars '(:empty "" :invisible "" :visible ""))
+)
 #+end_src
 
 [[https://github.com/legalnonsense/org-visual-outline][Org-visual-outline]] does the same as Org-bars-mode. It has two independent packages:
@@ -3506,17 +3625,17 @@ Have drawbacks when using mixed-pitch-mode.
 - Org-visual-indent  :: adds vertical lines to org-indent. =Does better than Org-bars-mode=, as it do not need to set bar's height.
 
 #+begin_src elisp
-  (use-package org-visual-outline
-  ;; :custom-face
-    ;;  (org-visual-indent-blank-pipe-face ((t
-    ;;        (:background "#1f2430" :foreground "#1f2430"
-    ;;     :height 0.1 :width extra-expanded))))
-    ;; (org-visual-indent-pipe-face ((t
-    ;;       (:background "#454d6d" :foreground "#454d6d"
-    ;;    :height 0.1 :width extra-expanded))))
-  :hook (org-mode . org-visual-indent-mode)
-  :after org
-  )
+(use-package org-visual-outline
+;; :custom-face
+  ;;  (org-visual-indent-blank-pipe-face ((t
+  ;;        (:background "#1f2430" :foreground "#1f2430"
+  ;;     :height 0.1 :width extra-expanded))))
+  ;; (org-visual-indent-pipe-face ((t
+  ;;       (:background "#454d6d" :foreground "#454d6d"
+  ;;    :height 0.1 :width extra-expanded))))
+:hook (org-mode . org-visual-indent-mode)
+:after org
+)
 #+end_src
 
 *** valign
@@ -3526,11 +3645,11 @@ Have drawbacks when using mixed-pitch-mode.
 
 This package provides visual alignment for Org Mode, Markdown and table.el tables on GUI Emacs. It can properly align tables containing variable-pitch font, CJK characters and images. Meanwhile, the text-based alignment generated by Org mode (or Markdown mode) is left untouched.
 #+begin_src elisp
-  (use-package valign
-  :hook (org-mode . valign-mode)
-  :config
-    (setq valign-fancy-bar t)
-  )
+(use-package valign
+:hook (org-mode . valign-mode)
+:config
+  (setq valign-fancy-bar t)
+)
 #+end_src
 
 *** Highlight TODO
@@ -3539,10 +3658,10 @@ This package provides visual alignment for Org Mode, Markdown and table.el table
 :END:
 
 #+begin_src elisp
-  (use-package hl-todo
-    :init
-    (hl-todo-mode)
-  )
+(use-package hl-todo
+  :init
+  (hl-todo-mode)
+)
 #+end_src
 
 *** Org-appear
@@ -3551,21 +3670,21 @@ This package provides visual alignment for Org Mode, Markdown and table.el table
 :END:
 [[https://github.com/awth13/org-appearAutomatically][Org-appear]] disaply emphasis markers and links when the cursor is on them.
 #+begin_src elisp
-  (use-package org-appear
-    :hook (org-mode . org-appear-mode)
-    :init
-    (setq org-appear-autoemphasis  t
-          ;; org-appear-autolinks t
-          org-appear-autosubmarkers t
-          org-appear-autoentities t
-          org-appear-autokeywords t
-          ;; org-appear-inside-latex t
-          org-hide-emphasis-markers t
-    )
-
+(use-package org-appear
+  :hook (org-mode . org-appear-mode)
+  :init
+  (setq org-appear-autoemphasis  t
+        ;; org-appear-autolinks t
+        org-appear-autosubmarkers t
+        org-appear-autoentities t
+        org-appear-autokeywords t
+        ;; org-appear-inside-latex t
+        org-hide-emphasis-markers t
   )
+
+)
 #+end_src
-** Keybinds
+** Keybindings
 :PROPERTIES:
 :CUSTOM_ID: 4e4b8f79-8616-4cc0-bcc8-2b1a2ca03de2
 :END:
@@ -3574,43 +3693,66 @@ This package provides visual alignment for Org Mode, Markdown and table.el table
 :END:
 
 #+begin_src elisp
-  (use-package org
-    :config
-    (general-def
-      :keymaps '(org-mode-map)
-      "C-<escape>" '(my/org-cmd :wk "Org")
-      )
-    (general-def
-      :prefix-command 'my/org-cmd
-      :prefix-map 'my/org-map
-      "b"   '(my/org-babel-cmd                 :wk "Babel")
-      "c"   '(org-ctrl-c-ctrl-c                :wk "c dwim")
-      "l"   '(org-insert-link                  :wk "link")
-      "'"   '(org-edit-special                 :wk "edit")
-      ","   '(org-insert-structure-template    :wk "structure")
-      "C-j" '(my/outline-left                  :wk "outline left")
-      "C-k" '(my/outline-up                    :wk "outline up")
-      "C-l" '(my/outline-down                  :wk "outline down")
-      "C-;" '(my/outline-right                 :wk "outline right")
-      "v"   '(org-download-clipboard           :wk "paste image")
-      )
-    (general-def
-      :prefix-command 'my/org-babel-cmd
-      :prefix-map 'my/org-babel-map
-      "t" '(org-babel-tangle                   :wk "tangle")
-      "d" '(org-babel-demarcate-block          :wk "demarcate")
-      )
-    (general-def
-      :keymaps '(org-src-mode-map)
-      "C-<escape>" '(my/org-src-cmd :wk "Org-src")
-      )
-    (general-def
-      :prefix-command 'my/org-src-cmd
-      :prefix-map 'my/org-src-map
-      "'"   'org-edit-src-exit
-      "k"   'org-edit-src-abort
-      )
-    )
+(my/mode-leader-def
+  :keymaps '(org-mode-map)
+  :wk-full-keys nil
+  ;; ""   '(                :wk "")
+  "a"   '(org-attach                       :wk "attach")
+  "b"   '(nil                              :wk "Babel")
+  "c"   '(org-ctrl-c-ctrl-c                :wk "execute")
+  "d"   '(org-deadline                     :wk "deadline")
+  "e"   '(org-edit-special                 :wk "edit")
+  ;; "f"   '(nil                              :wk "")
+  "g"   '(org-goto                         :wk "goto")
+  ;; "h"   '(                                 :wk "")
+  ;; "i"   '(                                 :wk "")
+  "i"   '(org-insert-structure-template    :wk "structure")
+  ;; "j"   '(                                 :wk "")
+  ;; "k"   '(                                 :wk "")
+  "l"   '(org-insert-link                  :wk "link")
+  "m"   '(org-toggle-inline-images         :wk "toggle image")
+  ;; "n"   '(                                 :wk "")
+  ;; "o"   '(                                 :wk "")
+  "p"   '(org-export-dispatch              :wk "export")
+  ;; "q"   '(                                 :wk "")
+  "r"   '(org-fold-reveal                  :wk "reveal")
+  "s"   '(org-schedule                     :wk "schedule")
+  "t"   '(org-todo                         :wk "todo")
+  ;; "u"   '(nil                              :wk "")
+  "v"   '(org-download-clipboard           :wk "paste image")
+  "w"   '(org-refile                       :wk "refile")
+  "x"   '(nil                              :wk "latex")
+  "y"   '(org-evaluate-time-range          :wk "time range")
+  ;; "z"   '(nil                              :wk "")
+  "C-j" '(my/outline-left                  :wk "dwim ")
+  "C-k" '(my/outline-up                    :wk "dwim ")
+  "C-l" '(my/outline-down                  :wk "dwim ")
+  "C-;" '(my/outline-right                 :wk "dwim ")
+  )
+(my/mode-leader-def
+  :keymaps '(org-mode-map)
+  :infix "b"
+  "t" '(org-babel-tangle                   :wk "tangle")
+  "d" '(org-babel-demarcate-block          :wk "demarcate")
+  )
+(my/mode-leader-def
+  :keymaps '(org-mode-map)
+  :infix "x"
+  "c" '(org-latex-preview-clear-cache      :wk "clear")
+  "p" '(org-latex-preview                  :wk "preview")
+  "a" '(org-latex-preview-auto-mode        :wk "auto")
+  "r" '(my/org-latex-preview-reload        :wk "reload")
+  )
+#+end_src
+
+#+begin_src elisp
+(my/mode-leader-def
+  :keymaps '(org-src-mode-map)
+  :wk-full-keys nil
+  "e"   'org-edit-src-exit
+  "k"   'org-edit-src-abort
+  )
+
 #+end_src
 
 *** outline functions
@@ -3619,51 +3761,54 @@ This package provides visual alignment for Org Mode, Markdown and table.el table
 :END:
 #+begin_src elisp
 
-  (defun my/outline-left ()
-    (interactive)
-    (cond ((outline-on-heading-p)
-           (hide-subtree)
-           (outline-up-heading 1)
-           (hide-subtree)
-           (outline-show-children)
-           (outline-show-entry))
-          (t
-           (outline-back-to-heading)
-           ))
-    )
+(defun my/outline-left ()
+  (interactive)
+  (cond ((outline-on-heading-p)
+         (hide-subtree)
+         (outline-up-heading 1)
+         (hide-subtree)
+         (outline-show-children)
+         (outline-show-entry))
+        (t
+         (outline-back-to-heading)
+         ))
+  (recenter 3)
+)
 
-  (defun my/outline-up ()
-    (interactive)
-    (cond ((outline-on-heading-p)
-           (hide-subtree)
-           (outline-backward-same-level 1)
-           (outline-show-children)
-           (outline-show-entry)
-           )
-          (t
-           (org-previous-block 1)))
-  )
+(defun my/outline-up ()
+  (interactive)
+  (cond ((outline-on-heading-p)
+         (hide-subtree)
+         (outline-backward-same-level 1)
+         (outline-show-children)
+         (outline-show-entry)
+         )
+        (t
+         (org-previous-block 1)))
+  (recenter 3)
+)
 
-  (defun my/outline-down ()
-    (interactive)
-    (cond ((outline-on-heading-p)
-           (hide-subtree)
-           (outline-forward-same-level 1)
-           (outline-show-children)
-           (outline-show-entry)
-           )
-          (t
-           (org-next-block 1)))
-    )
+(defun my/outline-down ()
+  (interactive)
+  (cond ((outline-on-heading-p)
+         (hide-subtree)
+         (outline-forward-same-level 1)
+         (outline-show-children)
+         (outline-show-entry)
+         )
+        (t
+         (org-next-block 1)))
+  (recenter 3))
 
-  (defun my/outline-right ()
-    (interactive)
-    (outline-show-children)
-    (outline-show-entry)
-    (if (outline-has-subheading-p)
-        (progn (outline-next-heading)
-               (outline-show-children)
-               (outline-show-entry))))
+(defun my/outline-right ()
+  (interactive)
+  (outline-show-children)
+  (outline-show-entry)
+  (if (outline-has-subheading-p)
+      (progn (outline-next-heading)
+             (outline-show-children)
+             (outline-show-entry)))
+  (recenter 3))
 #+end_src
 
 ** Objects
@@ -3678,44 +3823,68 @@ This package provides visual alignment for Org Mode, Markdown and table.el table
 [[#e59e6985-9ec3-4bea-8bf0-552741c5029d][Treesit-auto]]
 :END:
 #+begin_src elisp
-  (use-package org
-  :init
-    (setq org-babel-load-languages
-          '((emacs-lisp . t)
-            (C . t)
-            (python . t)
-            (jupyter . t)
-            (java . t)
-            ))
-  :config
-    (setq org-src-tab-acts-natively t
-          org-src-preserve-indentation nil
-          org-confirm-babel-evaluate nil
-          org-confirm-elisp-link-function nil
-          org-link-elisp-confirm-function nil
-          )
-    (general-define-key :keymap 'org-src-mode-map
-       "C-c C-c" 'eval-buffer)
-  )
+(use-package org
+:init
+  (setq org-babel-load-languages
+        '(
+          (awk . t)
+          (shell . t)
+          (eshell . t)
+
+          (emacs-lisp . t)
+          (lisp . t)
+          (haskell . t)
+          (clojure . t)
+          (scheme . t)
+          (org . t)
+
+          (C . t)
+          (sql . t)
+          (jupyter . t)
+          (java . t)
+          (lua . t)
+          (js . t)
+
+          (dot . t)
+          (plantuml . t)
+
+          (R . t)
+          (python . t)
+          (octave . t)
+          (matlab . t)
+          (julia . t)
+          ))
+:config
+  (setq org-edit-src-content-indentation 0
+        org-src-tab-acts-natively t
+        org-src-preserve-indentation nil
+        org-src-ask-before-returning-to-edit-buffer nil
+        org-confirm-babel-evaluate nil
+        org-confirm-elisp-link-function nil
+        org-link-elisp-confirm-function nil
+        )
+  (general-define-key :keymap 'org-src-mode-map
+     "C-c C-c" 'eval-buffer)
+)
 #+end_src
 
 [[https://github.com/yilkalargaw/org-auto-tangle][Org-auto-tangle]] Automatically and Asynchronously tangles org files on save.
 Adding the option =#+auto_tangle: t= in an org file to auto-tangle.
 Or setting =org-auto-tangle-default= to t to configure auto-tangle as the default behavior for all org buffers. In this case, it can be disabled for some buffers by adding =#+auto_tangle: nil=.
 #+begin_src elisp
-  (use-package org-auto-tangle
-  :hook (org-mode . org-auto-tangle-mode)
-  )
+(use-package org-auto-tangle
+:hook (org-mode . org-auto-tangle-mode)
+)
 #+end_src
 
 [[https://github.com/astahlman/ob-async][Ob-async]] enables asynchronous execution of org-babel src blocks. Simply add the keyword ~:async~ to the header-args of any org-babel src block and invoke ~ob-async-org-babel-execute-src-block~.
 #+begin_src elisp
-  (use-package ob-async
-  :after org
-  :config
-    ;; below languages may have independent implementation of async
-    (setq ob-async-no-async-languages-alist '("jupyter-python" "jupyter-julia"))
-    )
+(use-package ob-async
+:after org
+:config
+  ;; below languages may have independent implementation of async
+  (setq ob-async-no-async-languages-alist '("jupyter-python" "jupyter-julia"))
+  )
 #+end_src
 *** Table
 :PROPERTIES:
@@ -3730,89 +3899,96 @@ Or setting =org-auto-tangle-default= to t to configure auto-tangle as the defaul
 :END:
 Disable hiding of ~{}~, ~_~ and ~^~, from [[https://emacs-china.org/t/org/26045][this post in emacs china]].
 #+begin_src elisp
-  (use-package org
-  :config
-    (defconst org-match-substring-regexp
-      (concat
-       "\\(\\S-\\)\\([_^]\\)\\("
-       "\\(?:" (org-create-multibrace-regexp "{" "}" org-match-sexp-depth) "\\)"
-       "\\|"
-       "\\(?:" (org-create-multibrace-regexp "(" ")" org-match-sexp-depth) "\\)"
-       "\\|"
-       "\\(?:.\\)"
-       "\\|"
-       "\\(?:\\\\[[:alnum:].,\\]*[[:alnum:]]\\)"
-       "\\)")
-      "The regular expression matching a sub- or superscript.")
+(use-package org
+:config
+  (defconst org-match-substring-regexp
+    (concat
+     "\\(\\S-\\)\\([_^]\\)\\("
+     "\\(?:" (org-create-multibrace-regexp "{" "}" org-match-sexp-depth) "\\)"
+     "\\|"
+     "\\(?:" (org-create-multibrace-regexp "(" ")" org-match-sexp-depth) "\\)"
+     "\\|"
+     "\\(?:.\\)"
+     "\\|"
+     "\\(?:\\\\[[:alnum:].,\\]*[[:alnum:]]\\)"
+     "\\)")
+    "The regular expression matching a sub- or superscript.")
 
-    (defun +org-raise-scripts (limit)
-      "Add raise properties to sub/superscripts."
-      (when (and org-pretty-entities org-pretty-entities-include-sub-superscripts
-                 (re-search-forward org-match-substring-regexp limit t))
-        (let* ((pos (point)) table-p comment-p
-               (mpos (match-beginning 3))
-               (emph-p (get-text-property mpos 'org-emphasis))
-               (link-p (get-text-property mpos 'mouse-face))
-               (keyw-p (eq 'org-special-keyword (get-text-property mpos 'face)))
-               (tex-p (eq 'org-latex-and-related (get-text-property mpos 'face))))
-          (goto-char (line-beginning-position))
-          (setq table-p (looking-at-p org-table-dataline-regexp)
-                comment-p (looking-at-p "^[ \t]*#[ +]"))
-          (goto-char pos)
-          ;; Handle a_b^c
-          (when (member (char-after) '(?_ ?^)) (goto-char (1- pos)))
-          (if (not (or comment-p emph-p link-p keyw-p))
-              (put-text-property (match-beginning 3) (match-end 0)
-                                 'display
-                                 (if (equal (char-after (match-beginning 2)) ?^)
-                                     (nth (if table-p 3 1) org-script-display)
-                                   (nth (if table-p 2 0) org-script-display)))
-            (put-text-property (match-beginning 2) (match-end 3) 'org-emphasis t))
-          t)))
+  (defun +org-raise-scripts (limit)
+    "Add raise properties to sub/superscripts."
+    (when (and org-pretty-entities org-pretty-entities-include-sub-superscripts
+               (re-search-forward org-match-substring-regexp limit t))
+      (let* ((pos (point)) table-p comment-p
+             (mpos (match-beginning 3))
+             (emph-p (get-text-property mpos 'org-emphasis))
+             (link-p (get-text-property mpos 'mouse-face))
+             (keyw-p (eq 'org-special-keyword (get-text-property mpos 'face)))
+             (tex-p (eq 'org-latex-and-related (get-text-property mpos 'face))))
+        (goto-char (line-beginning-position))
+        (setq table-p (looking-at-p org-table-dataline-regexp)
+              comment-p (looking-at-p "^[ \t]*#[ +]"))
+        (goto-char pos)
+        ;; Handle a_b^c
+        (when (member (char-after) '(?_ ?^)) (goto-char (1- pos)))
+        (if (not (or comment-p emph-p link-p keyw-p))
+            (put-text-property (match-beginning 3) (match-end 0)
+                               'display
+                               (if (equal (char-after (match-beginning 2)) ?^)
+                                   (nth (if table-p 3 1) org-script-display)
+                                 (nth (if table-p 2 0) org-script-display)))
+          (put-text-property (match-beginning 2) (match-end 3) 'org-emphasis t))
+        t)))
 
-    (advice-add #'org-raise-scripts :override #'+org-raise-scripts)
-  )
+  (advice-add #'org-raise-scripts :override #'+org-raise-scripts)
+)
 #+end_src
 
 Org-entities-user
 #+begin_src elisp
-  (use-package org
-  :config
-    (setq org-entities-user
-          '(("vdash" "\\vdash" t "⊢" "⊢" "⊢" "⊢")
-            ("vDash" "\\vDash" t "⊨" "⊨" "⊨" "⊨")
-            ("Vdash" "\\Vdash" t "⊩" "⊩" "⊩" "⊩")
-            ("Vvdash" "\\Vvdash" t "⊪" "⊪" "⊪" "⊪")
-            ("nvdash" "\\nvdash" t "⊬" "⊬" "⊬" "⊬")
-            ("nvDash" "\\nvDash" t "⊭" "⊭" "⊭" "⊭")
-            ("nVdash" "\\nVdash" t "⊮" "⊮" "⊮" "⊮")
-            ("nVDash" "\\nVDash" t "⊯" "⊯" "⊯" "⊯")
-            ("subseteq" "\\subseteq" t "⊆" "⊆" "⊆" "⊆")
-            ("supseteq" "\\supseteq" t "⊇" "⊇" "⊇" "⊇")
-            ("subsetneq" "\\subsetneq" t "⊊" "⊊" "⊊" "⊊")
-            ("supsetneq" "\\supsetneq" t "⊋" "⊋" "⊋" "⊋")
-            ("nsubseteq" "\\nsubseteq" t "⊈" "⊈" "⊈" "⊈")
-            ("nsupseteq" "\\nsupseteq" t "⊉" "⊉" "⊉" "⊉")
-            ("nsubseteqq" "\\nsubseteqq" t "⊈" "⊈" "⊈" "⊈")
-            ("nsupseteqq" "\\nsupseteqq" t "⊉" "⊉" "⊉" "⊉")
-            ("subsetneqq" "\\subsetneqq" t "⊊" "⊊" "⊊" "⊊")
-            ("supsetneqq" "\\supsetneqq" t "⊋" "⊋" "⊋" "⊋")
-            ("nsubset" "\\nsubset" t "⊄" "⊄" "⊄" "⊄")
-            ("nsupset" "\\nsupset" t "⊅" "⊅" "⊅" "⊅")
-            ("nsubseteq" "\\nsubseteq" t "⊈" "⊈" "⊈" "⊈")
-            ("nsupseteq" "\\nsupseteq" t "⊉" "⊉" "⊉" "⊉")))
-    )
+(use-package org
+:config
+  (setq org-entities-user
+        '(("vdash" "\\vdash" t "⊢" "⊢" "⊢" "⊢")
+          ("vDash" "\\vDash" t "⊨" "⊨" "⊨" "⊨")
+          ("Vdash" "\\Vdash" t "⊩" "⊩" "⊩" "⊩")
+          ("Vvdash" "\\Vvdash" t "⊪" "⊪" "⊪" "⊪")
+          ("nvdash" "\\nvdash" t "⊬" "⊬" "⊬" "⊬")
+          ("nvDash" "\\nvDash" t "⊭" "⊭" "⊭" "⊭")
+          ("nVdash" "\\nVdash" t "⊮" "⊮" "⊮" "⊮")
+          ("nVDash" "\\nVDash" t "⊯" "⊯" "⊯" "⊯")
+          ("subseteq" "\\subseteq" t "⊆" "⊆" "⊆" "⊆")
+          ("supseteq" "\\supseteq" t "⊇" "⊇" "⊇" "⊇")
+          ("subsetneq" "\\subsetneq" t "⊊" "⊊" "⊊" "⊊")
+          ("supsetneq" "\\supsetneq" t "⊋" "⊋" "⊋" "⊋")
+          ("nsubseteq" "\\nsubseteq" t "⊈" "⊈" "⊈" "⊈")
+          ("nsupseteq" "\\nsupseteq" t "⊉" "⊉" "⊉" "⊉")
+          ("nsubseteqq" "\\nsubseteqq" t "⊈" "⊈" "⊈" "⊈")
+          ("nsupseteqq" "\\nsupseteqq" t "⊉" "⊉" "⊉" "⊉")
+          ("subsetneqq" "\\subsetneqq" t "⊊" "⊊" "⊊" "⊊")
+          ("supsetneqq" "\\supsetneqq" t "⊋" "⊋" "⊋" "⊋")
+          ("nsubset" "\\nsubset" t "⊄" "⊄" "⊄" "⊄")
+          ("nsupset" "\\nsupset" t "⊅" "⊅" "⊅" "⊅")
+          ("nsubseteq" "\\nsubseteq" t "⊈" "⊈" "⊈" "⊈")
+          ("nsupseteq" "\\nsupseteq" t "⊉" "⊉" "⊉" "⊉")))
+  )
 
 #+end_src
 
 Org Latex Preview configs. This makes the preview looks nicer.
 #+begin_src elisp
-  (use-package org
-  :init
-    (setq org-latex-preview-numbered t)
-    (plist-put org-latex-preview-options :zoom 1.25)
-    (let ((pos (assoc 'dvisvgm org-latex-preview-process-alist)))
-      (plist-put (cdr pos) :image-converter '("dvisvgm --page=1- --optimize --clipjoin --relative --no-fonts --bbox=preview -o %B-%%9p.svg %f"))))
+(use-package org
+:config
+  (setq org-latex-preview-numbered t)
+  (plist-put org-latex-preview-options :zoom 1.25)
+  (let ((pos (assoc 'dvisvgm org-latex-preview-process-alist)))
+    (plist-put (cdr pos) :image-converter '("dvisvgm --page=1- --optimize --clipjoin --relative --no-fonts --bbox=preview -o %B-%%9p.svg %f")))
+
+  (defun my/org-latex-preview-reload ()
+    (interactive)
+    (call-interactively 'org-latex-preview-clear-cache)
+    (org-latex-preview)
+    )
+)
 #+end_src
 ** Images
 :PROPERTIES:
@@ -3823,9 +3999,10 @@ Org Latex Preview configs. This makes the preview looks nicer.
 :CUSTOM_ID: b138609f-c760-4068-8e5b-b794d75f45dd
 :END:
 #+begin_src elisp
-  (use-package org-download
-    :after org
-  )
+(use-package org-download
+:defer t
+:after org
+)
 #+end_src
 *** PlantUML
 :PROPERTIES:
@@ -3833,62 +4010,62 @@ Org Latex Preview configs. This makes the preview looks nicer.
 :END:
 
 #+begin_src elisp
-  (use-package plantuml-mode
-    :defer t
-    :mode ("\\.plantuml\\'" . plantuml-mode)
-    :init
-    ;; enable plantuml babel support
-    (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
-    (org-babel-do-load-languages 'org-babel-load-languages
-                                 (append org-babel-load-languages
-                                         '((plantuml . t))))
-    :config
-    (setq org-plantuml-exec-mode 'plantuml)
-    (setq org-plantuml-executable-path "plantuml")
-    (setq plantuml-executable-path "plantuml")
-    (setq plantuml-default-exec-mode 'executable)
-    ;; set default babel header arguments
-    (setq org-babel-default-header-args:plantuml
-          '((:exports . "results")
-            (:results . "file")
-            ))
-  )
+(use-package plantuml-mode
+  :defer t
+  :mode ("\\.plantuml\\'" . plantuml-mode)
+  :init
+  ;; enable plantuml babel support
+  (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
+  (org-babel-do-load-languages 'org-babel-load-languages
+                               (append org-babel-load-languages
+                                       '((plantuml . t))))
+  :config
+  (setq org-plantuml-exec-mode 'plantuml)
+  (setq org-plantuml-executable-path "plantuml")
+  (setq plantuml-executable-path "plantuml")
+  (setq plantuml-default-exec-mode 'executable)
+  ;; set default babel header arguments
+  (setq org-babel-default-header-args:plantuml
+        '((:exports . "results")
+          (:results . "file")
+          ))
+)
 #+end_src
 ** Org-capture
 :PROPERTIES:
 :CUSTOM_ID: 836fc7e8-d50b-4e42-b4f3-f77de9c5da44
 :END:
 #+begin_src elisp
-  (use-package org-capture
-  :after org
-  :bind (("C-c c" . org-capture))
-  :init
-    (setq org-directory "~/Org")
-  :config
-    ;; if file path is not absolute
-    ;; it is treated as relative path to org-directory
-    (defun org-hugo-new-subtree-post-capture-template ()
-      "Returns `org-capture' template string for new Hugo post.
-       See `org-capture-templates' for more information."
-      (let* ((title (read-from-minibuffer "Post Title: "))
-         (fname (org-hugo-slug title)))
-      (mapconcat #'identity
-          `(,(concat "* TODO " title) ":PROPERTIES:"
-            ,(concat ":EXPORT_FILE_NAME: " fname) ":END:" "%?\n")
-            ;Place the cursor here finally
-          "\n")))
-    (setq org-capture-templates (append org-capture-templates '(
-      ("j" "Journal" entry
-        (file+datetree "journal.org")
-        "* %U - %?\n")
-      ("i" "Inbox" entry
-        (file "inbox.org")
-        "* %U - %? %^g\n")
-         '("h" "Hugo post" entry
-        (file+olp "capture.org" "Notes")
-        (function org-hugo-new-subtree-post-capture-template))
-    )))
-  )
+(use-package org-capture
+:after org
+:bind (("C-c c" . org-capture))
+:init
+  (setq org-directory "~/Org")
+:config
+  ;; if file path is not absolute
+  ;; it is treated as relative path to org-directory
+  (defun org-hugo-new-subtree-post-capture-template ()
+    "Returns `org-capture' template string for new Hugo post.
+     See `org-capture-templates' for more information."
+    (let* ((title (read-from-minibuffer "Post Title: "))
+       (fname (org-hugo-slug title)))
+    (mapconcat #'identity
+        `(,(concat "* TODO " title) ":PROPERTIES:"
+          ,(concat ":EXPORT_FILE_NAME: " fname) ":END:" "%?\n")
+          ;Place the cursor here finally
+        "\n")))
+  (setq org-capture-templates (append org-capture-templates '(
+    ("j" "Journal" entry
+      (file+datetree "journal.org")
+      "* %U - %?\n")
+    ("i" "Inbox" entry
+      (file "inbox.org")
+      "* %U - %? %^g\n")
+       '("h" "Hugo post" entry
+      (file+olp "capture.org" "Notes")
+      (function org-hugo-new-subtree-post-capture-template))
+  )))
+)
 #+end_src
 
 ** Links
@@ -3904,27 +4081,27 @@ I'm using two plugins that handles backlink. =Org-super-links= handles inserting
 :CUSTOM_ID: 4bc8824b-c721-4ad5-a3c3-995d3539929e
 :END:
 #+begin_src elisp
-  (use-package org
-  :config
-    (defun org-add-custom-id ()
-      "Add CUSTOM_ID property to current heading, skip if already have"
-      (interactive)
-      (let ((custom-id (org-entry-get nil "CUSTOM_ID")))
-        (unless custom-id
-          (org-set-property "CUSTOM_ID" (org-id-new))))
-      )
+(use-package org
+:config
+  (defun org-add-custom-id ()
+    "Add CUSTOM_ID property to current heading, skip if already have"
+    (interactive)
+    (let ((custom-id (org-entry-get nil "CUSTOM_ID")))
+      (unless custom-id
+        (org-set-property "CUSTOM_ID" (org-id-new))))
+    )
 
-    (defun org-add-custom-id-to-all-headings ()
-      "Add CUSTOM_ID properties to headings without a CUSTOM_ID property in current Org buffer."
-      (interactive)
-      (org-map-entries
-       (lambda ()
-         (let ((custom-id (org-entry-get nil "CUSTOM_ID")))
-           (unless custom-id
-             (org-set-property "CUSTOM_ID" (org-id-new)))))
-       nil 'file)
-      )
-  )
+  (defun org-add-custom-id-to-all-headings ()
+    "Add CUSTOM_ID properties to headings without a CUSTOM_ID property in current Org buffer."
+    (interactive)
+    (org-map-entries
+     (lambda ()
+       (let ((custom-id (org-entry-get nil "CUSTOM_ID")))
+         (unless custom-id
+           (org-set-property "CUSTOM_ID" (org-id-new)))))
+     nil 'file)
+    )
+)
 #+end_src
 *** Org-super-links
 :PROPERTIES:
@@ -3935,22 +4112,22 @@ Org super links handles backlink inside the current file. When inserting link to
 I think this is what makes Org's tree-style structure more complete. A tree style structure is efficient in dividing a big object into many smaller ones. But it's possible that two children share something in common, but do not belong to the same parent. In this case backlinks does the job.
 
 #+begin_src elisp
-  (use-package org-super-links
-  :after org
-  :config
+(use-package org-super-links
+:after org
+:config
 
-    (defun my/org-insert-backlink ()
-      "insert backlink using consult-org-heading in current org file"
-      (interactive)
-      (let ((target-position
-             (save-excursion (consult-org-heading) (point) )))
-        (org-super-links--insert-link
-         (set-marker (make-marker) target-position)))
-      (recenter)
-      )
-    (setq org-super-links-search-function 'my/org-insert-backlink)
-    (setq org-super-links-backlink-prefix nil)
-  )
+  (defun my/org-insert-backlink ()
+    "insert backlink using consult-org-heading in current org file"
+    (interactive)
+    (let ((target-position
+           (save-excursion (consult-org-heading) (point) )))
+      (org-super-links--insert-link
+       (set-marker (make-marker) target-position)))
+    (recenter)
+    )
+  (setq org-super-links-search-function 'my/org-insert-backlink)
+  (setq org-super-links-backlink-prefix nil)
+)
 #+end_src
 
 *** Org-roam
@@ -3958,49 +4135,49 @@ I think this is what makes Org's tree-style structure more complete. A tree styl
 :CUSTOM_ID: 7838a97c-8f2d-4cff-aade-54943c58d820
 :END:
 #+begin_src elisp
-  (use-package org-roam
-  :after org
-  :defer t
-  :init
-    (setq org-roam-directory (file-truename "~/roam"))
-    (setq org-roam-v2-ack t)
-    (setq org-roam-capture-templates '(
-       ("d" "default" plain "%?"
-         :target (file+head
-           "%<%Y%m%d%H>-${slug}.org"
-           "#+title: ${title}\n#+filetags: \n")
-         :unnarrowed t)
-       ("b" "book notes" plain "%?"
-         :target (file+head
-           "book/book%<%Y%m%d%H>-${slug}.org"
-           "#+title: ${title}\n#+filetags: :bookreading: \n\n")
-         :unnarrowed t)
-       ("c" "company" plain "%?"
-         :target (file+head
-           "company/company%<%Y%m%d%H>-${slug}.org"
-           "#+title: ${title}\n#filetags: :compnay: \n\n")
-         :unnarrowed t)
-       ("i" "industry" plain "%?"
-         :target (file+head
-           "industry/industry%<%Y%m%d%H>-${slug}.org"
-           "#+title:${slug}\n#+filetags: :industry: \n\n")
-         :unnarrowed t)
-       ("m" "marketing" plain "%?"
-         :target (file+head
-           "marketing/marketing%<%Y%m%d%H%M%S>-${slug}.org"
-           "#+title: ${title}\n#+filetags: :marketing: \n\n")
-         :unnarrowed t)
-       ("p" "project" plain "%?"
-         :target (file+head
-           "project/project%<%Y%m%d%H>-${slug}.org"
-           "#+title: ${title}\n#+filetags: :project: \n\n - tag ::")
-         :unnarrowed t)
-       ("r" "reference" plain "%?"
-         :target (file+head
-           "<%Y%m%d%H>-${slug}.org"
-           "#+title: {$title}\n%filetags: reference \n\n -tag ::")
-         :unarrowed t)))
-  )
+(use-package org-roam
+:after org
+:init
+  (setq org-roam-directory (file-truename "~/roam"))
+  (org-roam-db-autosync-mode)
+  (setq org-roam-v2-ack t)
+  (setq org-roam-capture-templates '(
+     ("d" "default" plain "%?"
+       :target (file+head
+         "%<%Y%m%d%H>-${slug}.org"
+         "#+title: ${title}\n#+filetags: \n")
+       :unnarrowed t)
+     ("b" "book notes" plain "%?"
+       :target (file+head
+         "book/book%<%Y%m%d%H>-${slug}.org"
+         "#+title: ${title}\n#+filetags: :bookreading: \n\n")
+       :unnarrowed t)
+     ("c" "coMpany" plain "%?"
+       :target (file+head
+         "company/company%<%Y%m%d%H>-${slug}.org"
+         "#+title: ${title}\n#filetags: :compnay: \n\n")
+       :unnarrowed t)
+     ("i" "industry" plain "%?"
+       :target (file+head
+         "industry/industry%<%Y%m%d%H>-${slug}.org"
+         "#+title:${slug}\n#+filetags: :industry: \n\n")
+       :unnarrowed t)
+     ("m" "marketing" plain "%?"
+       :target (file+head
+         "marketing/marketing%<%Y%m%d%H%M%S>-${slug}.org"
+         "#+title: ${title}\n#+filetags: :marketing: \n\n")
+       :unnarrowed t)
+     ("p" "project" plain "%?"
+       :target (file+head
+         "project/project%<%Y%m%d%H>-${slug}.org"
+         "#+title: ${title}\n#+filetags: :project: \n\n - tag ::")
+       :unnarrowed t)
+     ("r" "reference" plain "%?"
+       :target (file+head
+         "<%Y%m%d%H>-${slug}.org"
+         "#+title: {$title}\n%filetags: reference \n\n -tag ::")
+       :unarrowed t)))
+)
 #+end_src
 
 ** Agenda
@@ -4012,107 +4189,107 @@ I think this is what makes Org's tree-style structure more complete. A tree styl
 :CUSTOM_ID: b1789eb6-0fc0-4c1b-aa1c-c88d219383ec
 :END:
 #+begin_src elisp
-  (use-package org
-  :config
-  (setq org-todo-keywords '(
-       (sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
-       (sequence "WAIT(w@/!)" "HOLD(h@/!)" "|" "CNCL(c@/!)")
-       (sequence "SOMEDAY")
-  ))
-  (setq org-todo-state-tags-triggers
-     '(("CNCL" ("CNCL" . t))
-       ("WAIT" ("WAIT" . t))
-       ("HOLD" ("WAIT") ("HOLD" . t))
-       (done ("WAIT") ("HOLD"))
-       ("TODO" ("WAIT") ("CNCL") ("HOLD"))
-       ("NEXT" ("WAIT") ("CNCL") ("HOLD"))
-       ("DONE" ("WAIT") ("CNCL") ("HOLD"))))
-  )
+(use-package org
+:config
+(setq org-todo-keywords '(
+     (sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+     (sequence "WAIT(w@/!)" "HOLD(h@/!)" "|" "CNCL(c@/!)")
+     (sequence "SOMEDAY")
+))
+(setq org-todo-state-tags-triggers
+   '(("CNCL" ("CNCL" . t))
+     ("WAIT" ("WAIT" . t))
+     ("HOLD" ("WAIT") ("HOLD" . t))
+     (done ("WAIT") ("HOLD"))
+     ("TODO" ("WAIT") ("CNCL") ("HOLD"))
+     ("NEXT" ("WAIT") ("CNCL") ("HOLD"))
+     ("DONE" ("WAIT") ("CNCL") ("HOLD"))))
+)
 
-  ;;selecting keys from the fast todo selection key menu
-  (setq org-use-fast-todo-selection t
-        org-enforce-todo-dependencies t
-        org-log-done 'time
-  )
+;;selecting keys from the fast todo selection key menu
+(setq org-use-fast-todo-selection t
+      org-enforce-todo-dependencies t
+      org-log-done 'time
+)
 #+end_src
 *** Org-agenda
 :PROPERTIES:
 :CUSTOM_ID: 15adfec6-d92c-44db-b3cd-717f54af5a84
 :END:
 #+begin_src elisp :tangle no
-  (use-package org-agenda
-  :after org
-  :hook
-    (org-agenda-mode . solaire-mode)
-    (org-agenda-mode . olivetti-mode)
-  :bind
-    ("<f12>" . org-agenda)
-  :config
-    (setq org-agenda-span 'day)
-    (setq org-agenda-files '("~/Org"))
-    (let ((org-agenda-custom-commands '(
-      ("u" "Super view" (
-        (agenda "" (
-          (org-agenda-span 1)
+(use-package org-agenda
+:after org
+:hook
+  (org-agenda-mode . solaire-mode)
+  (org-agenda-mode . olivetti-mode)
+:bind
+  ("<f12>" . org-agenda)
+:config
+  (setq org-agenda-span 'day)
+  (setq org-agenda-files '("~/Org"))
+  (let ((org-agenda-custom-commands '(
+    ("u" "Super view" (
+      (agenda "" (
+        (org-agenda-span 1)
+        (org-super-agenda-groups '(
+          (:name "Today"
+           :tag ("bday" "ann" "hols" "cal" "today")
+           :time-grid t
+           :todo ("WIP")
+           :deadline today)
+          (:name "Perso"
+           :tag "perso")
+          (:name "Overdue"
+           :deadline past)
+          (:name "Reschedule"
+           :scheduled past)
+          (:name "Due Soon"
+           :deadline future)
+          )))
+      )
+      (tags (concat "w" (format-time-string "%V"))
+        ( (org-agenda-overriding-header
+            (concat "ToDos Week " (format-time-string "%V")))
           (org-super-agenda-groups '(
-            (:name "Today"
-             :tag ("bday" "ann" "hols" "cal" "today")
-             :time-grid t
-             :todo ("WIP")
-             :deadline today)
-            (:name "Perso"
-             :tag "perso")
-            (:name "Overdue"
-             :deadline past)
-            (:name "Reschedule"
-             :scheduled past)
-            (:name "Due Soon"
-             :deadline future)
-            )))
+             (:discard (:deadline t))
+             (:name "Perso" :tag "perso")
+             (:name "Loka"  :tag "loka")
+             (:name "Ping"  :tag "ping")
+          ))
         )
-        (tags (concat "w" (format-time-string "%V"))
-          ( (org-agenda-overriding-header
-              (concat "ToDos Week " (format-time-string "%V")))
-            (org-super-agenda-groups '(
-               (:discard (:deadline t))
-               (:name "Perso" :tag "perso")
-               (:name "Loka"  :tag "loka")
-               (:name "Ping"  :tag "ping")
-            ))
-          )
-        )
-     )))))
-    (org-agenda nil "u"))
+      )
+   )))))
+  (org-agenda nil "u"))
 
-  )
+)
 #+end_src
 *** Org-super-agenda
 :PROPERTIES:
 :CUSTOM_ID: 4e9b6e7a-a7fd-4f03-8450-47ce16ff8316
 :END:
 #+begin_src elisp
-  (use-package org-super-agenda
-  :after org-agenda
-  :config
-    (org-super-agenda-mode)
-    (setq org-super-agenda-groups '(
-      (:name "Today"
-       :time-grid t
-       :scheduled today)
-      (:name "Due today"
-             :deadline today)
-      (:name "Important"
-       :priority "A")
-      (:name "Overdue"
-       :deadline past)
-      (:name "Due soon"
-       :deadline future)
-      (:name "Waiting"
-       :todo "WAIT")
-      (:name "Someday"
-       :todo "SOMEDAY")
-    ))
-  )
+(use-package org-super-agenda
+:after org-agenda
+:config
+  (org-super-agenda-mode)
+  (setq org-super-agenda-groups '(
+    (:name "Today"
+     :time-grid t
+     :scheduled today)
+    (:name "Due today"
+           :deadline today)
+    (:name "Important"
+     :priority "A")
+    (:name "Overdue"
+     :deadline past)
+    (:name "Due soon"
+     :deadline future)
+    (:name "Waiting"
+     :todo "WAIT")
+    (:name "Someday"
+     :todo "SOMEDAY")
+  ))
+)
 #+end_src
 *** Calendar
 :PROPERTIES:
@@ -4120,13 +4297,13 @@ I think this is what makes Org's tree-style structure more complete. A tree styl
 :END:
 
 #+begin_src elisp
-  (use-package calendar
-  :hook
-    (calendar-mode . olivetti-mode)
-    (calendar-mode . solaire-mode)
-  :config
-    (setq calendar-date-style 'iso)
-  )
+(use-package calendar
+:hook
+  (calendar-mode . olivetti-mode)
+  (calendar-mode . solaire-mode)
+:config
+  (setq calendar-date-style 'iso)
+)
 #+end_src
 
 *** GTD
@@ -4134,33 +4311,33 @@ I think this is what makes Org's tree-style structure more complete. A tree styl
 :CUSTOM_ID: a5273f17-b61f-40de-afde-898a739c0673
 :END:
 #+begin_src elisp
-  (use-package org-gtd
-  :after org
-  :init
-    (setq org-gtd-update-ack "3.0.0")
-  :config
-  ;; where org-gtd will put its files.
-  (setq org-gtd-directory "~/gtd/")
-  ;; package: https://github.com/Malabarba/org-agenda-property
-  ;; this is so you can see who an item was delegated to in the agenda
-  (setq org-agenda-property-list '("DELEGATED_TO"))
-  ;; I think this makes the agenda easier to read
-  (setq org-agenda-property-position 'next-line)
-  ;; package: https://www.nongnu.org/org-edna-el/
-  ;; org-edna is used to make sure that when a project task gets DONE,
-  ;; the next TODO is automatically changed to NEXT.
-  (setq org-edna-use-inheritance t)
-  (org-edna-load)
-  :bind
-  (("C-c d c" . org-gtd-capture) ;; add item to inbox
-   ("C-c d a" . org-agenda-list) ;; see what's on your plate today
-   ("C-c d p" . org-gtd-process-inbox) ;; process entire inbox
-   ("C-c d n" . org-gtd-show-all-next) ;; see all NEXT items
-   ;; see projects that don't have a NEXT item
-   ("C-c d s" . org-gtd-show-stuck-projects)
-   ;; the keybinding to hit when you're done editing an item in the
-   ;; processing phase
-   ("C-c d f" . org-gtd-clarify-finalize)))
+(use-package org-gtd
+:after org
+:init
+  (setq org-gtd-update-ack "3.0.0")
+:config
+;; where org-gtd will put its files.
+(setq org-gtd-directory "~/gtd/")
+;; package: https://github.com/Malabarba/org-agenda-property
+;; this is so you can see who an item was delegated to in the agenda
+(setq org-agenda-property-list '("DELEGATED_TO"))
+;; I think this makes the agenda easier to read
+(setq org-agenda-property-position 'next-line)
+;; package: https://www.nongnu.org/org-edna-el/
+;; org-edna is used to make sure that when a project task gets DONE,
+;; the next TODO is automatically changed to NEXT.
+(setq org-edna-use-inheritance t)
+(org-edna-load)
+:bind
+(("C-c d c" . org-gtd-capture) ;; add item to inbox
+ ("C-c d a" . org-agenda-list) ;; see what's on your plate today
+ ("C-c d p" . org-gtd-process-inbox) ;; process entire inbox
+ ("C-c d n" . org-gtd-show-all-next) ;; see all NEXT items
+ ;; see projects that don't have a NEXT item
+ ("C-c d s" . org-gtd-show-stuck-projects)
+ ;; the keybinding to hit when you're done editing an item in the
+ ;; processing phase
+ ("C-c d f" . org-gtd-clarify-finalize)))
 #+end_src
 
 ** COMMENT LaTeX
@@ -4175,94 +4352,94 @@ I think this is what makes Org's tree-style structure more complete. A tree styl
 
 Code under :config is taken from https://emacs-china.org/t/org-mode-latex-mode/22490
 #+begin_src elisp
-  (use-package org-fragtog
-  :defer t
-  :config
-      ;; Vertically align LaTeX preview in org mode
-      (defun my-org-latex-preview-advice (beg end &rest _args)
-      (let* ((ov (car (overlays-at (/ (+ beg end) 2) t)))
-        (img (cdr (overlay-get ov 'display)))
-        (new-img (plist-put img :ascent 95)))
-    (overlay-put ov 'display (cons 'image new-img))))
-      (advice-add 'org--make-preview-overlay
-      :after #'my-org-latex-preview-advice)
+(use-package org-fragtog
+:defer t
+:config
+    ;; Vertically align LaTeX preview in org mode
+    (defun my-org-latex-preview-advice (beg end &rest _args)
+    (let* ((ov (car (overlays-at (/ (+ beg end) 2) t)))
+      (img (cdr (overlay-get ov 'display)))
+      (new-img (plist-put img :ascent 95)))
+  (overlay-put ov 'display (cons 'image new-img))))
+    (advice-add 'org--make-preview-overlay
+    :after #'my-org-latex-preview-advice)
 
-      ;; from: https://kitchingroup.cheme.cmu.edu/blog/2016/11/06/
-      ;; Justifying-LaTeX-preview-fragments-in-org-mode/
-      ;; specify the justification you want
-      (plist-put org-format-latex-options :justify 'right)
+    ;; from: https://kitchingroup.cheme.cmu.edu/blog/2016/11/06/
+    ;; Justifying-LaTeX-preview-fragments-in-org-mode/
+    ;; specify the justification you want
+    (plist-put org-format-latex-options :justify 'right)
 
-      (defun eli/org-justify-fragment-overlay (beg end image imagetype)
-      (let* ((position (plist-get org-format-latex-options :justify))
-        (img (create-image image 'svg t))
-        (ov (car (overlays-at (/ (+ beg end) 2) t)))
-        (width (car (image-display-size (overlay-get ov 'display))))
-        offset)
-    (cond
-    ((and (eq 'center position)
-        (= beg (line-beginning-position)))
-    (setq offset (floor (- (/ fill-column 2)
-          (/ width 2))))
-    (if (< offset 0)
-        (setq offset 0))
-    (overlay-put ov 'before-string (make-string offset ? )))
-    ((and (eq 'right position)
-        (= beg (line-beginning-position)))
-    (setq offset (floor (- fill-column
-          width)))
-    (if (< offset 0)
-        (setq offset 0))
-    (overlay-put ov 'before-string (make-string offset ? ))))))
-      (advice-add 'org--make-preview-overlay
-      :after 'eli/org-justify-fragment-overlay)
+    (defun eli/org-justify-fragment-overlay (beg end image imagetype)
+    (let* ((position (plist-get org-format-latex-options :justify))
+      (img (create-image image 'svg t))
+      (ov (car (overlays-at (/ (+ beg end) 2) t)))
+      (width (car (image-display-size (overlay-get ov 'display))))
+      offset)
+  (cond
+  ((and (eq 'center position)
+      (= beg (line-beginning-position)))
+  (setq offset (floor (- (/ fill-column 2)
+        (/ width 2))))
+  (if (< offset 0)
+      (setq offset 0))
+  (overlay-put ov 'before-string (make-string offset ? )))
+  ((and (eq 'right position)
+      (= beg (line-beginning-position)))
+  (setq offset (floor (- fill-column
+        width)))
+  (if (< offset 0)
+      (setq offset 0))
+  (overlay-put ov 'before-string (make-string offset ? ))))))
+    (advice-add 'org--make-preview-overlay
+    :after 'eli/org-justify-fragment-overlay)
 
-      ;; from: https://kitchingroup.cheme.cmu.edu/blog/2016/11/07/
-      ;; Better-equation-numbering-in-LaTeX-fragments-in-org-mode/
-      (defun org-renumber-environment (orig-func &rest args)
-      (let ((results '())
-        (counter -1)
-        (numberp))
-    (setq results (cl-loop for (begin .  env) in
-        (org-element-map (org-element-parse-buffer)
-      'latex-environment
-      (lambda (env)
-      (cons
-          (org-element-property :begin env)
-          (org-element-property :value env))))
-        collect
-        (cond
-      ((and (string-match "\\\\begin{equation}" env)
-          (not (string-match "\\\\tag{" env)))
-      (cl-incf counter)
-      (cons begin counter))
-      ((and (string-match "\\\\begin{align}" env)
-          (string-match "\\\\notag" env))
-      (cl-incf counter)
-      (cons begin counter))
-      ((string-match "\\\\begin{align}" env)
-      (prog2
-          (cl-incf counter)
-          (cons begin counter)
-      (with-temp-buffer
-          (insert env)
-          (goto-char (point-min))
-          ;; \\ is used for a new line. Each one leads
-          ;; to a number
-          (cl-incf counter (count-matches "\\\\$"))
-          ;; unless there are nonumbers.
-          (goto-char (point-min))
-          (cl-decf counter
-            (count-matches "\\nonumber")))))
-      (t
-      (cons begin nil)))))
-    (when (setq numberp (cdr (assoc (point) results)))
-    (setf (car args)
-      (concat
-      (format "\\setcounter{equation}{%s}\n" numberp)
-      (car args)))))
-      (apply orig-func args))
-      (advice-add 'org-create-formula-image :around #'org-renumber-environment)
-  )
+    ;; from: https://kitchingroup.cheme.cmu.edu/blog/2016/11/07/
+    ;; Better-equation-numbering-in-LaTeX-fragments-in-org-mode/
+    (defun org-renumber-environment (orig-func &rest args)
+    (let ((results '())
+      (counter -1)
+      (numberp))
+  (setq results (cl-loop for (begin .  env) in
+      (org-element-map (org-element-parse-buffer)
+    'latex-environment
+    (lambda (env)
+    (cons
+        (org-element-property :begin env)
+        (org-element-property :value env))))
+      collect
+      (cond
+    ((and (string-match "\\\\begin{equation}" env)
+        (not (string-match "\\\\tag{" env)))
+    (cl-incf counter)
+    (cons begin counter))
+    ((and (string-match "\\\\begin{align}" env)
+        (string-match "\\\\notag" env))
+    (cl-incf counter)
+    (cons begin counter))
+    ((string-match "\\\\begin{align}" env)
+    (prog2
+        (cl-incf counter)
+        (cons begin counter)
+    (with-temp-buffer
+        (insert env)
+        (goto-char (point-min))
+        ;; \\ is used for a new line. Each one leads
+        ;; to a number
+        (cl-incf counter (count-matches "\\\\$"))
+        ;; unless there are nonumbers.
+        (goto-char (point-min))
+        (cl-decf counter
+          (count-matches "\\nonumber")))))
+    (t
+    (cons begin nil)))))
+  (when (setq numberp (cdr (assoc (point) results)))
+  (setf (car args)
+    (concat
+    (format "\\setcounter{equation}{%s}\n" numberp)
+    (car args)))))
+    (apply orig-func args))
+    (advice-add 'org-create-formula-image :around #'org-renumber-environment)
+)
 #+end_src
 
 ** Export
@@ -4274,25 +4451,25 @@ Code under :config is taken from https://emacs-china.org/t/org-mode-latex-mode/2
 :CUSTOM_ID: bded0258-b949-405e-a9b8-cdf3a0962244
 :END:
 #+begin_src elisp
-  (use-package ox
-  :after org
-  :defer t
-  :config
-    (setq
-      org-export-with-toc t
-            org-export-with-tags 'not-in-toc
-            org-export-with-drawers nil
-            org-export-with-priority t
-            org-export-with-footnotes t
-            org-export-with-smart-quotes t
-            org-export-with-section-numbers t
-            org-export-with-sub-superscripts '{}
-      org-export-use-babel t
-            org-export-headline-levels 9
-            org-export-coding-system 'utf-8
-            org-export-with-broken-links 'mark
-    )
+(use-package ox
+:after org
+:defer t
+:config
+  (setq
+    org-export-with-toc t
+          org-export-with-tags 'not-in-toc
+          org-export-with-drawers nil
+          org-export-with-priority t
+          org-export-with-footnotes t
+          org-export-with-smart-quotes t
+          org-export-with-section-numbers t
+          org-export-with-sub-superscripts '{}
+    org-export-use-babel t
+          org-export-headline-levels 9
+          org-export-coding-system 'utf-8
+          org-export-with-broken-links 'mark
   )
+)
 #+end_src
 *** HTML
 :PROPERTIES:
@@ -4300,31 +4477,31 @@ Code under :config is taken from https://emacs-china.org/t/org-mode-latex-mode/2
 :END:
 
 #+begin_src elisp
-  (use-package ox-html
-    :defer t
-    :after ox
-    :config
-    (setq org-html-doctype "html5"
-            org-html-html5-fancy t
-            org-html-checkbox-type 'unicode
-            org-html-validation-link nil))
+(use-package ox-html
+  :defer t
+  :after ox
+  :config
+  (setq org-html-doctype "html5"
+          org-html-html5-fancy t
+          org-html-checkbox-type 'unicode
+          org-html-validation-link nil))
 #+end_src
 
 #+begin_src elisp
-  (use-package htmlize
-    :defer t
-    :config
-    (setq htmlize-pre-style t
-            htmlize-output-type 'inline-css))
+(use-package htmlize
+  :defer t
+  :config
+  (setq htmlize-pre-style t
+          htmlize-output-type 'inline-css))
 #+end_src
 **** grip-mode
 :PROPERTIES:
 :CUSTOM_ID: 13feb49e-8ea5-4a09-8179-9ccc0b8f4bb4
 :END:
 #+begin_src elisp
-  (use-package grip-mode
-  :after org
-  )
+(use-package grip-mode
+:after org
+)
 #+end_src
 
 *** PDF
@@ -4343,56 +4520,56 @@ There're 3 common ways to export org into PDF.
 :CUSTOM_ID: 1762c60b-bc06-4d1f-8bcc-9394e0191f99
 :END:
 #+begin_src elisp
-  (use-package ox-latex
-  :defer t
-  :after ox
-  :config
-  ;; 使用xelatex，配合当前org文件最开始的配置来正常输出中文
-    ;; 这类笔记基本不可能是全英文，所以就安心用xelatex算了
-    (setq org-latex-pdf-process '("xelatex -file-line-error -interaction nonstopmode %f"
-                                  "bibtex %b"
-                                  "xelatex -file-line-error -interaction nonstopmode %f"
-                                  "xelatex -file-line-error -interaction nonstopmode %f"))
+(use-package ox-latex
+:defer t
+:after ox
+:config
+;; 使用xelatex，配合当前org文件最开始的配置来正常输出中文
+  ;; 这类笔记基本不可能是全英文，所以就安心用xelatex算了
+  (setq org-latex-pdf-process '("xelatex -file-line-error -interaction nonstopmode %f"
+                                "bibtex %b"
+                                "xelatex -file-line-error -interaction nonstopmode %f"
+                                "xelatex -file-line-error -interaction nonstopmode %f"))
 
-    ;; 生成PDF后清理辅助文件
-    ;; https://answer-id.com/53623039
-    (setq org-latex-logfiles-extensions
-      (quote ("lof" "lot" "tex~" "tex" "aux"
-        "idx" "log" "out" "toc" "nav"
-        "snm" "vrb" "dvi" "fdb_latexmk"
-        "blg" "brf" "fls" "entoc" "ps"
-        "spl" "bbl" "xdv")))
+  ;; 生成PDF后清理辅助文件
+  ;; https://answer-id.com/53623039
+  (setq org-latex-logfiles-extensions
+    (quote ("lof" "lot" "tex~" "tex" "aux"
+      "idx" "log" "out" "toc" "nav"
+      "snm" "vrb" "dvi" "fdb_latexmk"
+      "blg" "brf" "fls" "entoc" "ps"
+      "spl" "bbl" "xdv")))
 
-    ;; 图片默认宽度
-    (setq org-image-actual-width '(300))
+  ;; 图片默认宽度
+  (setq org-image-actual-width '(300))
 
-    (setq org-export-with-sub-superscripts nil)
+  (setq org-export-with-sub-superscripts nil)
 
-    ;; 不要自动创建备份文件
-    (setq make-backup-files nil)
-    (setq org-latex-listings t)
-    (add-to-list
-     'org-latex-classes
-     '("elegantpaper"
-       "\\documentclass[lang=cn]{elegantpaper}
-  [NO-DEFAULT-PACKAGES]
-  [PACKAGES]
-  [EXTRA]"
-       ("\\section{%s}" . "\\section*{%s}")
-       ("\\subsection{%s}" . "\\subsection*{%s}")
-       ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-       ("\\paragraph{%s}" . "\\paragraph*{%s}")
-       ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-    )
+  ;; 不要自动创建备份文件
+  (setq make-backup-files nil)
+  (setq org-latex-listings t)
+  (add-to-list
+   'org-latex-classes
+   '("elegantpaper"
+     "\\documentclass[lang=cn]{elegantpaper}
+[NO-DEFAULT-PACKAGES]
+[PACKAGES]
+[EXTRA]"
+     ("\\section{%s}" . "\\section*{%s}")
+     ("\\subsection{%s}" . "\\subsection*{%s}")
+     ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+     ("\\paragraph{%s}" . "\\paragraph*{%s}")
+     ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+  )
 #+end_src
 *** Ipynb
 :PROPERTIES:
 :CUSTOM_ID: ba439797-96a3-4563-8de2-3a3b02e6493b
 :END:
 #+begin_src elisp
-  (use-package ox-ipynb
-  :after ox
-    )
+(use-package ox-ipynb
+:after ox
+  )
 #+end_src
 *** Slides
 :PROPERTIES:
@@ -4407,17 +4584,17 @@ cd reveal.js && npm install
 #+end_src
 
 #+begin_src elisp
-  (use-package ox-reveal
-  :defer t
-  :after ox
-  :config
-    (setq org-reveal-hlevel 1
-            org-reveal-theme "moon"
-            org-reveal-mathjax t
-            org-reveal-ignore-speaker-notes t
-            org-reveal-title-slide "<h1><font size=\"8\">%t</font></h1><h2><font size=\"6\">%s</font></h2><p><font size=\"5\">%a</font><br/><font size=\"5\">%d</font></p>"
-            org-reveal-plugins '(markdown zoom notes search)
-            org-reveal-klipsify-src 'on))
+(use-package ox-reveal
+:defer t
+:after ox
+:config
+  (setq org-reveal-hlevel 1
+          org-reveal-theme "moon"
+          org-reveal-mathjax t
+          org-reveal-ignore-speaker-notes t
+          org-reveal-title-slide "<h1><font size=\"8\">%t</font></h1><h2><font size=\"6\">%s</font></h2><p><font size=\"5\">%a</font><br/><font size=\"5\">%d</font></p>"
+          org-reveal-plugins '(markdown zoom notes search)
+          org-reveal-klipsify-src 'on))
 #+end_src
 *** Markdown
 :PROPERTIES:
@@ -4425,10 +4602,10 @@ cd reveal.js && npm install
 :END:
 Use [[https://github.com/larstvei/ox-gfm][ox-gfm]] to generate github-style markdown file.
 #+begin_src elisp
-  (use-package ox-gfm
-  :defer t
-  :after ox
-  )
+(use-package ox-gfm
+:defer t
+:after ox
+)
 #+end_src
 *** MS-Office
 :PROPERTIES:
@@ -4436,14 +4613,14 @@ Use [[https://github.com/larstvei/ox-gfm][ox-gfm]] to generate github-style mark
 :END:
 Use ox-pandoc to generate MS-Office files like word and ppt.
 #+begin_src elisp
-  (use-package ox-pandoc
-  :defer t
-  :after ox
-  :config
-    (setq org-pandoc-format-extensions
-          '(markdown_github+pipe_tables+raw_html)
-    )
+(use-package ox-pandoc
+:defer t
+:after ox
+:config
+  (setq org-pandoc-format-extensions
+        '(markdown_github+pipe_tables+raw_html)
   )
+)
 #+end_src
 
 *** Static HTML
@@ -4451,9 +4628,9 @@ Use ox-pandoc to generate MS-Office files like word and ppt.
 :CUSTOM_ID: 176c8d06-3d2f-4a27-8861-44967b922b3c
 :END:
 #+begin_src elisp
-  (use-package ox-publish
-  :defer t
-  )
+(use-package ox-publish
+:defer t
+)
 #+end_src
 *** Hugo
 :PROPERTIES:
@@ -4469,22 +4646,22 @@ General steps to publish a blog using hugo in emacs includes:
 
 [[https://github.com/kaushalmodi/ox-hugo][ox-hugo]] is an Org exporter backend that exports Org to Hugo-compatible Markdown and also generates the front-matter (in TOML or YAML format).
 #+begin_src elisp
-  (use-package ox-hugo
-  :after ox
-  :commands (org-hugo-export-as-md org-hugo-export-to-md)
-  :init
-    (setq org-hugo-base-dir "~/Blog"
-          org-hugo-front-matter-format "yaml"
-    )
+(use-package ox-hugo
+:after ox
+:commands (org-hugo-export-as-md org-hugo-export-to-md)
+:init
+  (setq org-hugo-base-dir "~/Blog"
+        org-hugo-front-matter-format "yaml"
   )
+)
 #+end_src
 
 Easy-hugo
 
 #+begin_src elisp
-  (use-package easy-hugo
-  :defer t
-  )
+(use-package easy-hugo
+:defer t
+)
 #+end_src
 
 ** Org-transclusion
@@ -4500,9 +4677,9 @@ Easy-hugo
 :CUSTOM_ID: 763733ef-e1a9-4b5e-a30f-f5bb468b11ba
 :END:
 #+begin_src elisp
-  (use-package telega
-  :defer t
-  )
+(use-package telega
+:defer t
+)
 #+end_src
 ** PDF-Tools
 :PROPERTIES:
@@ -4512,73 +4689,73 @@ PDF-tools is a replacement for DocView for PDF files.
 The rendering is performed by poppler.
 Run =M-x pdf-tools-install= to install libraries needed.
 #+begin_src elisp
-  (use-package pdf-tools
-  ;; manually update
-  ;; after each update we have to call:
-  ;; Install pdf-tools but don't ask or raise error (otherwise daemon mode will wait for input)
-  ;; (pdf-tools-install t t t)
-  :magic ("%PDF" . pdf-view-mode)
-  :mode (("\\.pdf\\'" . pdf-view-mode))
-  :hook ((pdf-view-mode . pdf-view-init))
-  :bind (:map pdf-view-mode-map
-         ("C-s" . isearch-forward)
-         ("M-w" . pdf-view-kill-ring-save)
-         ("M-p" . print-pdf))
-  :config
-  (defun pdf-view-init ()
-    "Initialize pdf-tools view like enabline TOC functions or use dark theme at night."
+(use-package pdf-tools
+;; manually update
+;; after each update we have to call:
+;; Install pdf-tools but don't ask or raise error (otherwise daemon mode will wait for input)
+;; (pdf-tools-install t t t)
+:magic ("%PDF" . pdf-view-mode)
+:mode (("\\.pdf\\'" . pdf-view-mode))
+:hook ((pdf-view-mode . pdf-view-init))
+:bind (:map pdf-view-mode-map
+       ("C-s" . isearch-forward)
+       ("M-w" . pdf-view-kill-ring-save)
+       ("M-p" . print-pdf))
+:config
+(defun pdf-view-init ()
+  "Initialize pdf-tools view like enabline TOC functions or use dark theme at night."
 
-    ;; Use dark theme when opening PDFs at night time
-    (let ((hour (string-to-number (format-time-string "%H"))))
-      (when (or (< hour 5) (< 20 hour))
-        (pdf-view-midnight-minor-mode)))
+  ;; Use dark theme when opening PDFs at night time
+  (let ((hour (string-to-number (format-time-string "%H"))))
+    (when (or (< hour 5) (< 20 hour))
+      (pdf-view-midnight-minor-mode)))
 
-    ;; Enable pdf-tools minor mode to have features like TOC extraction by pressing `o'.
-    (pdf-tools-enable-minor-modes)
+  ;; Enable pdf-tools minor mode to have features like TOC extraction by pressing `o'.
+  (pdf-tools-enable-minor-modes)
 
-    ;; Disable while-line-or-region to free keybindings.
-    (whole-line-or-region-local-mode -1))
+  ;; Disable while-line-or-region to free keybindings.
+  (whole-line-or-region-local-mode -1))
 
-  ;; Use `gtklp' or `hp-print' to print as it has better cups support
-  (setq print-pdf-command "hp-print")
-  (defun print-pdf (&optional pdf)
-    "Print PDF using external program defined in `print-pdf-command'."
-    (interactive "P")
-    (start-process-shell-command
-     print-pdf-command nil (concat print-pdf-command " " (shell-quote-argument (or pdf (buffer-file-name))))))
+;; Use `gtklp' or `hp-print' to print as it has better cups support
+(setq print-pdf-command "hp-print")
+(defun print-pdf (&optional pdf)
+  "Print PDF using external program defined in `print-pdf-command'."
+  (interactive "P")
+  (start-process-shell-command
+   print-pdf-command nil (concat print-pdf-command " " (shell-quote-argument (or pdf (buffer-file-name))))))
 
-  ;; more fine-grained zooming; +/- 10% instead of default 25%
-  (setq pdf-view-resize-factor 1.1)
-  ;; Always use midnight-mode and almost same color as default font.
-  ;; Just slightly brighter background to see the page boarders
-  (setq pdf-view-midnight-colors '("#c6c6c6" . "#363636")))
+;; more fine-grained zooming; +/- 10% instead of default 25%
+(setq pdf-view-resize-factor 1.1)
+;; Always use midnight-mode and almost same color as default font.
+;; Just slightly brighter background to see the page boarders
+(setq pdf-view-midnight-colors '("#c6c6c6" . "#363636")))
 #+end_src
 ** Elfeed
 :PROPERTIES:
 :CUSTOM_ID: eac8de6e-d1e9-45d9-a516-67b98f113c4b
 :END:
 #+begin_src elisp
-  (use-package elfeed
-  :defer t
-  :config
-    (setq elfeed-feeds '(
-        ("http://nullprogram.com/feed/" blog emacs)
-        "http://www.50ply.com/atom.xml"  ; no autotagging
-        ("http://nedroid.com/feed/" webcomic)
-      )
+(use-package elfeed
+:defer t
+:config
+  (setq elfeed-feeds '(
+      ("http://nullprogram.com/feed/" blog emacs)
+      "http://www.50ply.com/atom.xml"  ; no autotagging
+      ("http://nedroid.com/feed/" webcomic)
     )
   )
+)
 #+end_src
 ** Mu4e
 :PROPERTIES:
 :CUSTOM_ID: ddda3958-7467-41d3-91b4-516eef5fbd18
 :END:
 #+begin_src conf
-  [submodule "mu4e"]
-    build-step = ./autogen.sh
-    build-step = make -C mu4e > /dev/null
-    build-step = borg-update-autoloads
-    load-path = build/mu4e
+[submodule "mu4e"]
+  build-step = ./autogen.sh
+  build-step = make -C mu4e > /dev/null
+  build-step = borg-update-autoloads
+  load-path = build/mu4e
 #+end_src
 ** Eaf
 :PROPERTIES:
@@ -4587,24 +4764,24 @@ Run =M-x pdf-tools-install= to install libraries needed.
 
 [[https://github.com/emacs-eaf/emacs-application-framework][EAF]] is an extensible framework that revolutionizes the graphical capabilities of Emacs.
 #+begin_src elisp
-  (use-package eaf
-  :disabled
-  :custom
-    ; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
-    (eaf-browser-continue-where-left-off t)
-    (eaf-browser-enable-adblocker t)
-    (browse-url-browser-function 'eaf-open-browser)
-  :config
-    (defalias 'browse-web #'eaf-open-browser)
-    ;; (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
-    ;; (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
-    ;; (eaf-bind-key take_photo "p" eaf-camera-keybinding)
-    ;; (eaf-bind-key nil "M-q" eaf-browser-keybinding)
-    (setq confirm-kill-processes nil)
-  ) ;; unbind, see more in the Wiki
+(use-package eaf
+:disabled
+:custom
+  ; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
+  (eaf-browser-continue-where-left-off t)
+  (eaf-browser-enable-adblocker t)
+  (browse-url-browser-function 'eaf-open-browser)
+:config
+  (defalias 'browse-web #'eaf-open-browser)
+  ;; (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
+  ;; (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
+  ;; (eaf-bind-key take_photo "p" eaf-camera-keybinding)
+  ;; (eaf-bind-key nil "M-q" eaf-browser-keybinding)
+  (setq confirm-kill-processes nil)
+) ;; unbind, see more in the Wiki
 
-  ;(use-package eaf-browser)
-  ;(use-package eaf-pdf-viewer)
+;(use-package eaf-browser)
+;(use-package eaf-pdf-viewer)
 #+end_src
 tweaks to build eaf
 #+begin_src conf
@@ -4622,11 +4799,11 @@ tweaks to build eaf
 :CUSTOM_ID: 5964883d-f883-4ec2-b064-87501622ab3a
 :END:
 #+begin_src elisp
-  (add-hook 'tetris-mode-hook
-    (defun config/tetris-center ()
-      (config/window-center 76)
-    )
+(add-hook 'tetris-mode-hook
+  (defun config/tetris-center ()
+    (config/window-center 76)
   )
+)
 #+end_src
 
 *** 2048
@@ -4634,11 +4811,11 @@ tweaks to build eaf
 :CUSTOM_ID: 781bdb48-691a-4d65-a575-ab1f236620c7
 :END:
 #+begin_src elisp
-  (add-hook '2048-mode-hook
-    (defun config/2048-center ()
-      (config/window-center 35)
-    )
+(add-hook '2048-mode-hook
+  (defun config/2048-center ()
+    (config/window-center 35)
   )
+)
 #+end_src
 
 ** Emacs-Everywhere
@@ -4654,27 +4831,27 @@ Takes emacs-everywhere with you, all over your system
 :CUSTOM_ID: c3fad58e-8bd1-4896-973b-615c5fb3107c
 :END:
 #+begin_src elisp
-  (progn ;     startup
-    (message "Loading %s...done (%fs)" user-init-file
-             (float-time (time-subtract (current-time)
-                                        before-user-init-time)))
-    (add-hook 'after-init-hook
-              (lambda ()
-                (message
-                 "Loading %s...done (%fs) [after-init]" user-init-file
-                 (float-time (time-subtract (current-time)
-                                            before-user-init-time))))
-              t))
+(progn ;     startup
+  (message "Loading %s...done (%fs)" user-init-file
+           (float-time (time-subtract (current-time)
+                                      before-user-init-time)))
+  (add-hook 'after-init-hook
+            (lambda ()
+              (message
+               "Loading %s...done (%fs) [after-init]" user-init-file
+               (float-time (time-subtract (current-time)
+                                          before-user-init-time))))
+            t))
 
-  (progn ;     personalize
-    (let ((file (expand-file-name (concat (user-real-login-name) ".el")
-                                  user-emacs-directory)))
-      (when (file-exists-p file)
-        (load file))))
-  ;; Local Variables:
-  ;; indent-tabs-mode: nil
-  ;; End:
-  ;;; init.el ends here
+(progn ;     personalize
+  (let ((file (expand-file-name (concat (user-real-login-name) ".el")
+                                user-emacs-directory)))
+    (when (file-exists-p file)
+      (load file))))
+;; Local Variables:
+;; indent-tabs-mode: nil
+;; End:
+;;; init.el ends here
 #+end_src
 
 *
