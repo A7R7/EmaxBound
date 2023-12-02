@@ -378,7 +378,10 @@ The [[https://github.com/emacsmirror/gcmh][Garbage Collector Magic Hack]] enforc
   (gcmh-mode 1)
   )
 #+end_src
-
+** No-littering
+#+begin_src elisp
+(use-package no-littering)
+#+end_src
 ** Libraries
 :PROPERTIES:
 :CUSTOM_ID: 47db424a-224f-4ff7-b29d-86ff149fbda6
@@ -1051,30 +1054,27 @@ I generally do not use meow's keypad, because meow's keypad highly relies on van
     )
 #+end_src
 
-#+RESULTS:
-
 #+begin_src elisp
-  ;; Borg
-  (my/leader :infix "B"
-    ""        '(nil                            :wk " Borg")
-    "a"       '(borg-assimilate                :wk "󱧕 assimilate ")
-    "A"       '(borg-activate                  :wk " activate")
-    "b"       '(borg-build                     :wk "󱇝 build")
-    "c"       '(borg-clone                     :wk " clone")
-    "r"       '(borg-remove                    :wk "󱧖 remove")
-    )
-  ;; toggle
-  (my/leader :infix "t"
-    ""        '(nil                            :wk " Toggle")
-    )
-  ;; Git
-  (my/leader :infix "g"
-    ""        '(nil                            :wk " Git")
-    "g"       '(magit                          :wk " magit")
-    )
+;; Borg
+(my/leader :infix "B"
+  ""        '(nil                            :wk " Borg")
+  "a"       '(borg-assimilate                :wk "󱧕 assimilate ")
+  "A"       '(borg-activate                  :wk " activate")
+  "b"       '(borg-build                     :wk "󱇝 build")
+  "c"       '(borg-clone                     :wk " clone")
+  "r"       '(borg-remove                    :wk "󱧖 remove")
+  )
+;; toggle
+(my/leader :infix "t"
+  ""        '(nil                            :wk " Toggle")
+  "p"       '(profiler-cpu-start             :wk " profile")
+  )
+;; Git
+(my/leader :infix "g"
+  ""        '(nil                            :wk " Git")
+  "g"       '(magit                          :wk " magit")
+  )
 #+end_src
-
-#+RESULTS:
 
 #+begin_src elisp
   ;; windows, buffers and tabs(workspaces)
@@ -2727,6 +2727,24 @@ All the el files in treemacs are in =src/elisp= and =src/extra=
 :PROPERTIES:
 :CUSTOM_ID: da3e4dda-4fd1-4f9a-8c50-b71203fe58bd
 :END:
+** Keybindings
+#+begin_src elisp
+(general-def
+:keymaps '(prog-mode-map)
+:wk-full-keys nil
+  "C-<escape>" '(my/prog-cmd :wk "Prog")
+)
+
+(general-def
+:prefix-command 'my/prog-cmd
+:prefix-map 'my/prog-map
+:wk-full-keys nil
+  "C-j" '()
+  "C-k" '(backward-paragraph  :wk " para")
+  "C-l" '(forward-paragraph :wk " para")
+  "C-;" '()
+  )
+#+end_src
 ** Displays
 :PROPERTIES:
 :CUSTOM_ID: e6d01f82-1e1f-4f68-bd34-2ab7d6ab3b2e
@@ -2869,24 +2887,6 @@ This minor mode sets background color to strings that match color names, useful 
 #+begin_src elisp
 (use-package simple-call-tree :defer t)
 #+end_src
-** Keybindings
-#+begin_src elisp
-(general-def
-:keymaps '(prog-mode-map)
-:wk-full-keys nil
-  "C-<escape>" '(my/prog-cmd :wk "Prog")
-)
-
-(general-def
-:prefix-command 'my/prog-cmd
-:prefix-map 'my/prog-map
-:wk-full-keys nil
-  "C-j" '()
-  "C-k" '(backward-paragraph  :wk " para")
-  "C-l" '(forward-paragraph :wk " para")
-  "C-;" '()
-  )
-#+end_src
 ** Indent
 *** Electric-Indent
 :PROPERTIES:
@@ -2922,7 +2922,7 @@ than `electric-indent-mode'.
 (use-package highlight-indent-guides
 :hook (prog-mode . highlight-indent-guides-mode)
 :config
-  (setq highlight-indent-guides-method 'bitmap
+  (setq highlight-indent-guides-method 'character
         highlight-indent-guides-character 9474
         highlight-indent-guides-auto-enabled nil
   )
@@ -2933,12 +2933,20 @@ than `electric-indent-mode'.
 
 )
 #+end_src
+*** COMMENT Indent-bars
+#+begin_src elisp
+(use-package indent-bars
+  :custom
+  (indent-bars-no-descend-string t)
+  :hook ((progn-mode) . indent-bars-mode)
+)
+#+end_src
 ** Parens
 *** Smartparens
 :PROPERTIES:
 :CUSTOM_ID: c5380826-f396-48b3-8983-40cd1317425c
 :END:
-[[https://github.com/Fuco1/smartparens][Smartparens]] is minor mode for Emacs that deals with parens pairs and tries to be smart about it.
+[[https://github.com/Fuco1/smartparens][Smartparens]] is minor mode for Emacs that deals with parens pairs and tries to be smart about it. It insert pair of parens.
 #+begin_src elisp
   (use-package smartparens
   :config
@@ -2950,10 +2958,13 @@ than `electric-indent-mode'.
 :CUSTOM_ID: 9deea56d-45cc-4bcc-8ada-c1cd311412cc
 :END:
 #+begin_src elisp
-  (use-package highlight-parentheses
-  :config
-    (global-highlight-parentheses-mode)
-    )
+(use-package highlight-parentheses
+:init
+  (show-paren-mode 0)
+:config
+  (setq highlight-parentheses-highlight-adjacent 1)
+  (global-highlight-parentheses-mode)
+  )
 #+end_src
 *** Rainbow-Delimiters
 :PROPERTIES:
@@ -3761,6 +3772,7 @@ This package provides visual alignment for Org Mode, Markdown and table.el table
 :END:
 #+begin_src elisp
 
+(defvar my/recenter 6)
 (defun my/outline-left ()
   (interactive)
   (cond ((outline-on-heading-p)
@@ -3772,7 +3784,7 @@ This package provides visual alignment for Org Mode, Markdown and table.el table
         (t
          (outline-back-to-heading)
          ))
-  (recenter 3)
+  (recenter my/recenter)
 )
 
 (defun my/outline-up ()
@@ -3785,7 +3797,7 @@ This package provides visual alignment for Org Mode, Markdown and table.el table
          )
         (t
          (org-previous-block 1)))
-  (recenter 3)
+  (recenter my/recenter)
 )
 
 (defun my/outline-down ()
@@ -3798,7 +3810,7 @@ This package provides visual alignment for Org Mode, Markdown and table.el table
          )
         (t
          (org-next-block 1)))
-  (recenter 3))
+  (recenter my/recenter))
 
 (defun my/outline-right ()
   (interactive)
@@ -3808,7 +3820,7 @@ This package provides visual alignment for Org Mode, Markdown and table.el table
       (progn (outline-next-heading)
              (outline-show-children)
              (outline-show-entry)))
-  (recenter 3))
+  (recenter my/recenter))
 #+end_src
 
 ** Objects

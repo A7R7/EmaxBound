@@ -83,6 +83,8 @@
   (gcmh-mode 1)
   )
 
+(use-package no-littering)
+
 (use-package dash
   :config (global-dash-fontify-mode))
 
@@ -517,6 +519,7 @@
 ;; toggle
 (my/leader :infix "t"
   ""        '(nil                            :wk " Toggle")
+  "p"       '(profiler-cpu-start             :wk " profile")
   )
 ;; Git
 (my/leader :infix "g"
@@ -1376,6 +1379,24 @@
 )
 ;; Holo-layer:1 ends here
 
+;; [[file:config.org::*Keybindings][Keybindings:1]]
+(general-def
+:keymaps '(prog-mode-map)
+:wk-full-keys nil
+  "C-<escape>" '(my/prog-cmd :wk "Prog")
+)
+
+(general-def
+:prefix-command 'my/prog-cmd
+:prefix-map 'my/prog-map
+:wk-full-keys nil
+  "C-j" '()
+  "C-k" '(backward-paragraph  :wk " para")
+  "C-l" '(forward-paragraph :wk " para")
+  "C-;" '()
+  )
+;; Keybindings:1 ends here
+
 ;; [[file:config.org::*Beacon][Beacon:1]]
 (use-package beacon
 :defer t
@@ -1466,24 +1487,6 @@
 (use-package simple-call-tree :defer t)
 ;; Simple-call-tree:1 ends here
 
-;; [[file:config.org::*Keybindings][Keybindings:1]]
-(general-def
-:keymaps '(prog-mode-map)
-:wk-full-keys nil
-  "C-<escape>" '(my/prog-cmd :wk "Prog")
-)
-
-(general-def
-:prefix-command 'my/prog-cmd
-:prefix-map 'my/prog-map
-:wk-full-keys nil
-  "C-j" '()
-  "C-k" '(backward-paragraph  :wk " para")
-  "C-l" '(forward-paragraph :wk " para")
-  "C-;" '()
-  )
-;; Keybindings:1 ends here
-
 ;; [[file:config.org::*Electric-Indent][Electric-Indent:1]]
 (use-package electric
 :config
@@ -1504,7 +1507,7 @@
 (use-package highlight-indent-guides
 :hook (prog-mode . highlight-indent-guides-mode)
 :config
-  (setq highlight-indent-guides-method 'bitmap
+  (setq highlight-indent-guides-method 'character
         highlight-indent-guides-character 9474
         highlight-indent-guides-auto-enabled nil
   )
@@ -1525,7 +1528,10 @@
 
 ;; [[file:config.org::*Highlight-parentheses][Highlight-parentheses:1]]
 (use-package highlight-parentheses
+:init
+  (show-paren-mode 0)
 :config
+  (setq highlight-parentheses-highlight-adjacent 1)
   (global-highlight-parentheses-mode)
   )
 ;; Highlight-parentheses:1 ends here
@@ -1983,6 +1989,7 @@
 ;; Keybindings:2 ends here
 
 ;; [[file:config.org::*outline functions][outline functions:1]]
+(defvar my/recenter 6)
 (defun my/outline-left ()
   (interactive)
   (cond ((outline-on-heading-p)
@@ -1994,7 +2001,7 @@
         (t
          (outline-back-to-heading)
          ))
-  (recenter 3)
+  (recenter my/recenter)
 )
 
 (defun my/outline-up ()
@@ -2007,7 +2014,7 @@
          )
         (t
          (org-previous-block 1)))
-  (recenter 3)
+  (recenter my/recenter)
 )
 
 (defun my/outline-down ()
@@ -2020,7 +2027,7 @@
          )
         (t
          (org-next-block 1)))
-  (recenter 3))
+  (recenter my/recenter))
 
 (defun my/outline-right ()
   (interactive)
@@ -2030,7 +2037,7 @@
       (progn (outline-next-heading)
              (outline-show-children)
              (outline-show-entry)))
-  (recenter 3))
+  (recenter my/recenter))
 ;; outline functions:1 ends here
 
 ;; [[file:config.org::*Src block][Src block:1]]

@@ -192,6 +192,9 @@
 [submodule "helpful"]
 	path = lib/helpful
 	url = https://github.com/Wilfred/helpful
+[submodule "highlight-defined"]
+	path = lib/highlight-defined
+	url = https://github.com/Fanael/highlight-defined
 [submodule "highlight-indent-guides"]
 	path = lib/highlight-indent-guides
 	url = https://github.com/DarthFennec/highlight-indent-guides
@@ -216,6 +219,9 @@
 [submodule "imenu-list"]
 	path = lib/imenu-list
 	url = https://github.com/bmag/imenu-list
+[submodule "indent-bars"]
+	path = lib/indent-bars
+	url = git@github.com:jdtsmith/indent-bars.git
 [submodule "info+"]
 	path = lib/info+
 	url = git@github.com:emacsmirror/info-plus.git
@@ -279,6 +285,9 @@
 [submodule "mixed-pitch"]
 	path = lib/mixed-pitch
 	url = https://gitlab.com/jabranham/mixed-pitch
+[submodule "mode-minder"]
+	path = lib/mode-minder
+	url = git@github.com:jdtsmith/mode-minder.git
 [submodule "nano-modeline"]
 	path = lib/nano-modeline
 	url = https://github.com/rougier/nano-modeline
