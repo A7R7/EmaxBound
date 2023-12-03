@@ -113,7 +113,7 @@
 	url = https://github.com/seagle0128/doom-modeline
 [submodule "doom-themes"]
 	path = lib/doom-themes
-	url = https://github.com/doomemacs/themes
+	url = git@github.com:A7R7/themes.git
 [submodule "eaf"]
 	path = lib/eaf
 	url = https://github.com/emacs-eaf/emacs-application-framework
@@ -206,7 +206,7 @@
 	url = https://github.com/tarsius/hl-todo
 [submodule "holo-layer"]
 	path = lib/holo-layer
-	url = https://github.com/manateelazycat/holo-layer
+	url = git@github.com:A7R7/holo-layer.git
 [submodule "ht"]
 	path = lib/ht
 	url = https://github.com/Wilfred/ht.el
@@ -383,7 +383,7 @@
 	url = https://github.com/nullman/emacs-org-visibility
 [submodule "org-visual-outline"]
 	path = lib/org-visual-outline
-	url = https://github.com/legalnonsense/org-visual-outline
+	url = git@github.com:A7R7/org-visual-outline.git
 [submodule "orgtbl-aggregate"]
 	path = lib/orgtbl-aggregate
 	url = https://github.com/tbanel/orgaggregate
@@ -444,7 +444,7 @@
 	url = https://github.com/bbatsov/projectile
 [submodule "pulsing-cursor"]
 	path = lib/pulsing-cursor
-	url = git@github.com:jasonjckn/pulsing-cursor.git
+	url = git@github.com:A7R7/pulsing-cursor.git
 [submodule "queue"]
 	path = lib/queue
 	url = git@github.com:emacsmirror/queue.git
@@ -510,7 +510,7 @@
 	url = https://github.com/zevlg/telega.el
 [submodule "tempel"]
 	path = lib/tempel
-	url = https://github.com/minad/tempel
+	url = git@github.com:A7R7/tempel-collection.git
 [submodule "tempel-collection"]
 	path = lib/tempel-collection
 	url = https://github.com/Crandel/tempel-collection
