@@ -54,7 +54,7 @@
 	url = git@github.com:Malabarba/beacon.git
 [submodule "blink-search"]
 	path = lib/blink-search
-	url = git@github.com:manateelazycat/blink-search.git.git
+	url = git@github.com:manateelazycat/blink-search.git
 [submodule "borg"]
 	path = lib/borg
 	url = git@github.com:emacscollective/borg.git
@@ -162,10 +162,10 @@
 	url = git@github.com:rejeep/f.el.git
 [submodule "fingertip"]
 	path = lib/fingertip
-	url = git@github.com:manateelazycat/fingertip.git.git
+	url = git@github.com:manateelazycat/fingertip.git
 [submodule "fixed-pitch-mode"]
 	path = lib/fixed-pitch-mode
-	url = git@github.com:cstby/fixed-pitch-mode.git.git
+	url = git@github.com:cstby/fixed-pitch-mode.git
 [submodule "gcmh"]
 	path = lib/gcmh
 	url = https://gitlab.com/koral/gcmh
@@ -240,7 +240,7 @@
 	url = git@github.com:emacs-jupyter/jupyter.git
 [submodule "key-echo"]
 	path = lib/key-echo
-	url = git@github.com:manateelazycat/key-echo.git.git
+	url = git@github.com:manateelazycat/key-echo.git
 [submodule "kv"]
 	path = lib/kv
 	url = git@github.com:nicferrier/emacs-kv.git
@@ -303,7 +303,7 @@
 	url = git@github.com:emacscollective/no-littering.git
 [submodule "notibox"]
 	path = lib/notibox
-	url = git@github.com:MitchMarq42/notibox.el.git.git
+	url = git@github.com:MitchMarq42/notibox.el.git
 [submodule "ob-async"]
 	path = lib/ob-async
 	url = git@github.com:astahlman/ob-async.git
@@ -330,7 +330,7 @@
 	url = git@github.com:yilkalargaw/org-auto-tangle.git
 [submodule "org-bars"]
 	path = lib/org-bars
-	url = git@github.com:tonyaldon/org-bars.git.git
+	url = git@github.com:tonyaldon/org-bars.git
 [submodule "org-download"]
 	path = lib/org-download
 	url = git@github.com:abo-abo/org-download.git
@@ -580,7 +580,7 @@
 	url = git@github.com:justbur/emacs-which-key.git
 [submodule "which-key-posframe"]
 	path = lib/which-key-posframe
-	url = git@github.com:emacsorphanage/which-key-posframe.git
+	url = git@github.com:A7R7/which-key-posframe.git
 [submodule "with-editor"]
 	path = lib/with-editor
 	url = git@github.com:magit/with-editor.git
