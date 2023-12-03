@@ -249,7 +249,7 @@
 	url = git@github.com:nicferrier/emacs-kv.git
 [submodule "laas"]
 	path = lib/laas
-	url = git@github.com:tecosaur/LaTeX-auto-activating-snippets.git
+	url = git@github.com:A7R7/LaTeX-auto-activating-snippets.git
 [submodule "leaf"]
 	path = lib/leaf
 	url = git@github.com:conao3/leaf.el.git
