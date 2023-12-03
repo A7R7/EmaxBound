@@ -4,9 +4,6 @@
 [submodule "2048-game"]
 	path = lib/2048-game
 	url = git@github.com:emacsmirror/2048-game.git
-[submodule "a7r7-laas"]
-	path = lib/a7r7-laas
-	url = git@github.com:A7R7/LaTeX-auto-activating-snippets.git.git
 [submodule "aas"]
 	path = lib/aas
 	url = git@github.com:ymarco/auto-activating-snippets.git
