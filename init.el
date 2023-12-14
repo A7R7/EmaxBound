@@ -26,12 +26,12 @@
         long-line-threshold 1000
         large-hscroll-threshold 1000
         syntax-wholeline-max 1000)
-  (setq global-auto-revert-mode 1)
   (setq use-dialog-box nil)
   (setq confirm-kill-emacs 'y-or-n-p)
   (put 'downcase-region 'disabled nil)
   (put 'upcase-region 'disabled nil)
   )
+(global-auto-revert-mode)
 
 (use-package borg
 :init
@@ -41,6 +41,8 @@
   (borg-initialize)
   (switch-to-buffer "*Messages*")
 )
+
+
 
 (use-package auto-compile
 :config
@@ -251,21 +253,7 @@
 ;; Make ESC quit prompts
 ;; (global-set-key ([kbd] "<escape>") 'keyboard-escape-quit)
 
-(use-package general
-:config
-  (defvar my/mode-leader "C-<escape>")
-
-  (defmacro my/key (&optional key)
-    `(general-key
-         (if ,key
-             (concat ,my/mode-leader " " ,key)
-           ,my/mode-leader)))
-
-  (general-create-definer my/mode-leader-def
-    :prefix my/mode-leader
-  )
-
-)
+(use-package general)
 ;; General.el:1 ends here
 
 ;; [[file:config.org::*Meow.el][Meow.el:1]]
@@ -273,7 +261,7 @@
 :custom-face
   (meow-cheatsheet-command ((t (:height 180 :inherit fixed-pitch))))
 :config
- ;cate the behavior of vi's
+  ;cate the behavior of vi's
   (defun my-meow-append ()
     "Move to the end of selection, switch to INSERT state."
     (interactive)
@@ -321,6 +309,21 @@
 )
 ;; Meow.el:1 ends here
 
+;; [[file:config.org::*Mode leader][Mode leader:1]]
+(defvar my/mode-leader "C-<escape>")
+
+(defmacro my/key (&optional key)
+  `(general-key
+       (if ,key
+           (concat ,my/mode-leader " " ,key)
+         ,my/mode-leader)))
+
+(general-create-definer my/mode-leader-def
+  :prefix my/mode-leader
+  :wk-full-keys nil
+)
+;; Mode leader:1 ends here
+
 ;; [[file:config.org::*Meow-normal][Meow-normal:1]]
 (meow-normal-define-key
   '("<escape>" . meow-cancel-selection)
@@ -334,7 +337,7 @@
 
   '("q" . meow-quit) '("Q" . meow-quit)
      ;'("w" . meow-window) '("W" . meow-window)
-     ;'("e" . meow-) '("E" . meow-e)
+  '("e" . embark-dwim) '("E" . embark-act)
      ;'("r" . meow-) '("R" . meow-e)
   '("t" . meow-till) '("T" . meow-till-expand)
 
@@ -386,8 +389,10 @@
 
 ;; [[file:config.org::*Meow-motion][Meow-motion:1]]
 (meow-motion-overwrite-define-key
- '("l" . meow-next)
+ '("j" . meow-left)
  '("k" . meow-prev)
+ '("l" . meow-next)
+ '(";" . meow-right)
  '("SPC" . my/leader-prefix-cmd) ;; defined latter
  '("<escape>" . ignore)
 )
@@ -406,7 +411,7 @@
 )
 ;; Meow-keypad:1 ends here
 
-;; [[file:config.org::*Global map & Meow-insert][Global map & Meow-insert:1]]
+;; [[file:config.org::*Meow-insert][Meow-insert:1]]
 (general-def
 :keymaps '(global-map)
   "C-v"       '(clipboard-yank              :wk "paste")
@@ -428,45 +433,54 @@
   "M-,"       '(sort-tab-select-prev-tab    :wk " Tab L ")
   "M-."       '(sort-tab-select-next-tab    :wk " Tab R ")
 )
-
-(general-def
-:keymaps '(vertico-map)
-  "C-l"       '(vertico-next                  :wk "")
-  "C-k"       '(vertico-previous              :wk "")
-  "C-j"       '(vertico-directory-delete-word :wk "")
-  "C-;"       '(vertico-directory-enter       :wk "")
-  "C-,"       '(vertico-previous-group        :wk "")
-  "C-."       '(vertico-next-group            :wk "")
-  "RET"       'vertico-directory-enter
-  "DEL"       'vertico-directory-delete-char
-  "M-DEL"     'vertico-directory-delete-word
-)
-;; Global map & Meow-insert:1 ends here
+;; Meow-insert:1 ends here
 
 ;; [[file:config.org::*Global leader][Global leader:1]]
 (general-create-definer my/leader
-  :prefix-command 'my/leader-prefix-cmd
-  :prefix-map 'my/leader-prefix-map
-  :wk-full-keys nil
-  "DEL"     '(which-key-undo                 :wk "󰕍 undo")
-  )
+:prefix-command 'my/leader-prefix-cmd
+:prefix-map 'my/leader-prefix-map
+:wk-full-keys nil
+  "DEL"     '(which-key-undo                 :wk "undo-key")
+)
 ;; Global leader:1 ends here
 
 ;; [[file:config.org::*Global leader][Global leader:2]]
 (my/leader
-  "SPC"     (general-key "C-<escape>")
+  "SPC"     (my/key)
   "/"       '(comment-dwim                   :wk "󱀢 comment")
+  "c"       '(nil                            :wk "consult")
+  "d"       '(dirvish-side                   :wk "󰙅 dirvish-side ")
+  "D"       '(dirvish                        :wk "󰙅 dirvish")
+  "r"       '(nil                            :wk "run")
   "s"       '(save-buffer                    :wk " save")
-  "e"       '(dirvish-side                   :wk "󰙅 dirvish-side ")
-  "E"       '(dirvish                        :wk "󰙅 dirvish")
-  "x"       '(consult-mode-command           :wk "execute")
-  "z"       '(vundo                          :wk "visual undo")
+  "t"       '(nil                            :wk "toggle")
+  "w"       '(nil                            :wk "workspace")
+  "x"       '(consult-mode-command           :wk " execute")
+  "z"       '(vundo                          :wk "󰕌 visual undo")
 )
 ;; Global leader:2 ends here
 
 ;; [[file:config.org::*Global leader][Global leader:3]]
+(my/leader :infix "r"
+  "b"      '(nil                             :wk "borg")
+  "e"      '(elfeed                          :wk " elfeed")
+  "t"      '(telega                          :wk " telega")
+)
+;; Global leader:3 ends here
+
+;; [[file:config.org::*Global leader][Global leader:4]]
+;; Borg
+(my/leader :infix "rb"
+  "a"       '(borg-assimilate                :wk "󱧕 assimilate ")
+  "b"       '(borg-build                     :wk "󱇝 build")
+  "c"       '(borg-clone                     :wk " clone")
+  "d"       '(borg-remove                    :wk "󱧖 delete")
+  "r"       '(borg-activate                  :wk " run")
+  )
+;; Global leader:4 ends here
+
+;; [[file:config.org::*Global leader][Global leader:5]]
 (my/leader :infix "c"
-  ""        '(nil                            :wk " Consult")
   "l"       '(consult-line                   :wk "line")
   "L"       '(consult-line-multi             :wk "line multi")
   "o"       '(consult-outline                :wk "outline")
@@ -476,11 +490,10 @@
   "m"       '(consult-mark                   :wk "mark")
   "x"       '(consult-mode-command           :wk "execute")
   )
-;; Global leader:3 ends here
+;; Global leader:5 ends here
 
-;; [[file:config.org::*Global leader][Global leader:4]]
+;; [[file:config.org::*Global leader][Global leader:6]]
 (my/leader :infix "w" ;; workspaces
-  ""        '(nil                            :wk " Workspace")
   "\\"      '(tab-new                        :wk "tab 󰏌")
   "|"       '(tab-close                      :wk "tab 󰅖")
   "["       '(tab-previous                   :wk "tab ")
@@ -504,31 +517,24 @@
   "L"       '(split-window-above             :wk "split ")
   ":"       '(split-window-left              :wk "split ")
   )
-;; Global leader:4 ends here
+;; Global leader:6 ends here
 
-;; [[file:config.org::*Global leader][Global leader:5]]
-;; Borg
-(my/leader :infix "B"
-  ""        '(nil                            :wk " Borg")
-  "a"       '(borg-assimilate                :wk "󱧕 assimilate ")
-  "A"       '(borg-activate                  :wk " activate")
-  "b"       '(borg-build                     :wk "󱇝 build")
-  "c"       '(borg-clone                     :wk " clone")
-  "r"       '(borg-remove                    :wk "󱧖 remove")
-  )
+;; [[file:config.org::*Global leader][Global leader:7]]
 ;; toggle
 (my/leader :infix "t"
-  ""        '(nil                            :wk " Toggle")
   "p"       '(profiler-cpu-start             :wk " profile")
   )
+;; Global leader:7 ends here
+
+;; [[file:config.org::*Global leader][Global leader:8]]
 ;; Git
 (my/leader :infix "g"
   ""        '(nil                            :wk " Git")
   "g"       '(magit                          :wk " magit")
   )
-;; Global leader:5 ends here
+;; Global leader:8 ends here
 
-;; [[file:config.org::*Global leader][Global leader:6]]
+;; [[file:config.org::*Global leader][Global leader:9]]
 ;; windows, buffers and tabs(workspaces)
 ;; these are copied from emacs source code
 (defun split-window-left (&optional size window-to-split)
@@ -582,11 +588,7 @@
       (when quit-restore
         (set-window-parameter new-window 'quit-restore quit-restore)))
     new-window))
-;; Global leader:6 ends here
-
-;; [[file:config.org::*Mode leader][Mode leader:1]]
-(defvar my/mode-leader "C-<escape>") ;; the leader for major and minor modes
-;; Mode leader:1 ends here
+;; Global leader:9 ends here
 
 ;; [[file:config.org::*Transient][Transient:1]]
 (use-package transient-posframe
@@ -601,23 +603,32 @@
 ;; [[file:config.org::*Which-key.el][Which-key.el:1]]
 (use-package which-key
 :init
-  (setq which-key-sort-order 'which-key-key-order ;; default
-        which-key-sort-uppercase-first nil
-        ;; which-key-add-column-padding 1
-        which-key-max-display-columns nil
-        which-key-min-display-lines 10
-        which-key-idle-delay 0.01 ; the first idle
-        which-key-idle-secondary-delay 0.01 ; set to 0 will cause some problems
-        which-key-max-description-length 25 ;
-        which-key-allow-imprecise-window-fit t ; reduce delay
-        which-key-separator " " ; yeah I don't like the arrow icon
-        which-key-show-early-on-C-h t
-        which-key-show-transient-maps t
-        which-key-frame-max-height 60
-        )
-  (setq which-key-popup-type 'side-window
-        which-key-side-window-location 'right
-        )
+  ;; contents
+  (setq which-key-sort-order 'which-key-key-order)
+  (setq which-key-sort-uppercase-first nil)
+  ;; delays
+  (setq which-key-idle-delay 0.01) ; the first idle
+  (setq which-key-idle-secondary-delay 0.01) ; set to 0 will cause some problems
+  (setq which-key-show-early-on-C-h t)
+  ;; arrangements
+  (setq which-key-max-display-columns nil)
+  (setq which-key-max-description-length 25) ;
+  (setq which-key-allow-imprecise-window-fit t) ; reduce delay
+  (setq which-key-show-transient-maps t)
+  (setq which-key-frame-max-height 60)
+  ;; window
+  (setq which-key-popup-type 'side-window)
+  (setq which-key-side-window-location 'right)
+  ;; characters
+  (setq which-key-prefix-prefix "󰜄 ")
+  (setq which-key-separator " ") ; yeah I don't like the arrow
+  ;; (dolist (replace
+  ;;          '((("SPC" . nil) . ("󱁐" . nil))
+  ;;            (("TAB" . nil) . ("󰌒" . nil))
+  ;;            (("RET" . nil) . ("󰌑" . nil))
+  ;;            (("DEL" . nil) . ("󰭜" . nil))
+  ;;            ))
+  ;;   (add-to-list 'which-key-replacement-alist replace))
 :config
   (set-face-attribute 'which-key-key-face nil :inherit 'fixed-pitch)
   (which-key-mode 1)
@@ -630,6 +641,8 @@
 :config
   (setq which-key-posframe-poshandler
         'posframe-poshandler-frame-bottom-right-corner)
+  (setq which-key-max-display-columns 1)
+  (setq which-key-min-display-lines 1)
   (which-key-posframe-mode)
 )
 ;; Which-key.el:2 ends here
@@ -656,22 +669,39 @@
 (use-package face-remap
 :config
   (set-face-attribute 'default nil
-    :font "Sarasa Gothic SC Nerd Font"
+    ;; :font "Sarasa Gothic SC Nerd Font"
+    :font "IBM Plex Sans"
+    ;; :font "IBM Plex Serif"
     :height 150)
   (set-face-attribute 'fixed-pitch nil
-    ;:font "Sarasa Fixed SC"
-    :font "RobotoMono Nerd Font Mono"
+    ;: :font "Sarasa Fixed SC"
+    ;; :font "RobotoMono Nerd Font Mono"
+    ;; :font "CommitMono Nerd Font Mono"
+    :font "IBM Plex Mono Text"
+    ;; :font "Monaspace Neon"
+    :height 1.0)
+  (set-face-attribute 'fixed-pitch-serif nil
+    ;; :font "Sarasa Gothic SC Nerd Font"
+    :font "IBM Plex Mono Text"
+    ;; :font "IBM Plex Serif"
     :height 1.0)
   (set-face-attribute 'variable-pitch nil
-    :font "Sarasa Gothic SC Nerd Font"
+    ;; :font "Sarasa Gothic SC Nerd Font"
+    :font "IBM Plex Serif"
     :height 1.0)
-    ; (set-fontset-font t 'symbol "Noto Sans Symbols 2")
-  (set-face-attribute 'link nil
-    :foreground "#ffcc66" :underline t :bold nil)
+
+  ;; patches nerd font
+  (set-fontset-font t 'han "Source Han Serif SC")
+  (set-fontset-font t 'symbol "Noto Sans Symbols")
+  (set-fontset-font t 'nil "Noto Emoji")
+  (set-fontset-font t 'nil "Symbols Nerd Font")
+
+  (set-face-attribute 'link nil :underline t :bold nil)
 
   (defun my/use-fixed-pitch ()
     (interactive)
     (face-remap-add-relative 'default 'fixed-pitch)
+    (turn-off-solaire-mode)
   )
   (defun my/use-variable-pitch ()
     (interactive)
@@ -696,6 +726,18 @@
 (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
 (global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
 ;; Zooming In/Out:1 ends here
+
+;; [[file:config.org::*Line Space][Line Space:1]]
+(defun my/toggle-line-spacing ()
+  "Toggle line spacing between no extra space to extra half line height.
+URL `http://xahlee.info/emacs/emacs/emacs_toggle_line_spacing.html'
+Version 2017-06-02"
+  (interactive)
+  (if line-spacing
+      (setq line-spacing nil)
+    (setq line-spacing 0.5))
+  (redraw-frame (selected-frame)))
+;; Line Space:1 ends here
 
 ;; [[file:config.org::*All-the-icons][All-the-icons:1]]
 (use-package all-the-icons
@@ -771,6 +813,7 @@
 
 ;; [[file:config.org::*Olivetti][Olivetti:1]]
 (use-package olivetti
+:defer nil
 :hook (org-mode . olivetti-mode)
       (Custom-mode . olivetti-mode)
       (help-mode . olivetti-mode)
@@ -794,33 +837,13 @@
 )
 ;; Olivetti:1 ends here
 
-;; [[file:config.org::*Vertical][Vertical:1]]
-(use-package topspace
-:init (global-topspace-mode)
-:config
-;; Zen mode, the hack is from
-;; https://github.com/trevorpogue/topspace/issues/17#issuecomment-1637004205
-  (defun zen-mode-bodge ()
-    (let ((ov (make-overlay 1 1 nil t t)))
-      (overlay-put ov 'priority 9999999)
-      (overlay-put ov 'before-string (propertize "    1 " 'face 'line-number))
-      (overlay-put ov 'zen--remove-from-buffer-tag t))
-    (let ((ov (make-overlay 1 2)))
-      (overlay-put ov 'display-line-numbers-disable t)
-      (overlay-put ov 'zen--remove-from-buffer-tag t)))
-
-  (defun zen-mode-clear ()
-    (remove-overlays 1 2 'zen--remove-from-buffer-tag t))
-
-  ;; install hooks
-  ;; (advice-add 'topspace--enable :after #'zen-mode-bodge)
-  ;; (advice-add 'topspace--disable :after #'zen-mode-clear)
-)
-;; Vertical:1 ends here
+;; [[file:config.org::*Visual-fill-column][Visual-fill-column:1]]
+(setq-default visual-fill-column-center-text t)
+;; Visual-fill-column:1 ends here
 
 ;; [[file:config.org::*Vertico][Vertico:1]]
 (use-package vertico
-  :init
+:init
   ;; Different scroll margin
   (setq vertico-scroll-margin 1)
   ;; Show more candidates
@@ -832,6 +855,19 @@
   ;; use Vertico as an in-buffer completion UI
   (setq completion-in-region-function 'consult-completion-in-region)
   (vertico-mode 1)
+:config
+  (general-def
+    :keymaps '(vertico-map)
+    "C-l"       '(vertico-next                  :wk "")
+    "C-k"       '(vertico-previous              :wk "")
+    "C-j"       '(vertico-directory-delete-word :wk "")
+    "C-;"       '(vertico-directory-enter       :wk "")
+    "C-,"       '(vertico-previous-group        :wk "")
+    "C-."       '(vertico-next-group            :wk "")
+    "RET"       'vertico-directory-enter
+    "DEL"       'vertico-directory-delete-char
+    "M-DEL"     'vertico-directory-delete-word
+  )
 )
 ;; Vertico:1 ends here
 
@@ -1121,7 +1157,9 @@
 :init
       (setq
           doom-modeline-height 37
-          doom-modeline-enable-word-count t)
+          doom-modeline-enable-word-count t
+          doom-modeline-modal nil
+          )
       (doom-modeline-mode 1)
 :config
       (set-face-attribute 'doom-modeline t
@@ -1161,7 +1199,7 @@
       dashboard-set-file-icons t
       initial-buffer-choice (lambda () (get-buffer-create "*scratch*"))
       dashboard-startup-banner ;; use custom image as banner
-      (concat user-emacs-directory "assets/EmaxBound.webp")
+      (concat user-emacs-directory "assets/EmaxBound.xpm")
       dashboard-items
       '((recents . 5)
         (agenda . 5 )
@@ -1201,39 +1239,72 @@
 
 ;; [[file:config.org::*Magit][Magit:1]]
 (use-package magit
-  :defer t
-  :commands (magit-add-section-hook)
-  :hook (magit-mode . solaire-mode) (magit-mode . olivetti-mode)
-  :config
+:defer t
+:commands (magit-add-section-hook)
+:hook (magit-mode . solaire-mode) (magit-mode . olivetti-mode)
+:config
   (magit-add-section-hook 'magit-status-sections-hook
         'magit-insert-modules
         'magit-insert-stashes
         'append
         )
   (setq magit-show-long-lines-warning nil)
+  (set-face-attribute 'magit-hash nil :inherit 'fixed-pitch)
+  (set-face-attribute 'magit-diff-removed-highlight nil :inherit 'fixed-pitch)
+  (set-face-attribute 'magit-diff-context-highlight nil :inherit 'fixed-pitch)
+  (set-face-attribute 'magit-diff-added-highlight nil :inherit 'fixed-pitch)
+
   (general-def
   :keymaps '(magit-mode-map)
-  "n"   'magit-gitignore
-  "p"   'magit-push
-  "P"   'magit-pull
-  "DEL" 'magit-discard
+    "n"   'magit-gitignore
+    "p"   'magit-push
+    "P"   'magit-pull
+    "DEL" 'magit-discard
   )
 )
 ;; Magit:1 ends here
 
-;; [[file:config.org::*Diff][Diff:1]]
+;; [[file:config.org::*Diff-hl][Diff-hl:1]]
 (use-package diff-hl
 :custom-face
   (diff-hl-change ((t (:background "#2c5f72" :foreground "#77a8d9"))))
   (diff-hl-delete ((t (:background "#844953" :foreground "#f27983"))))
   (diff-hl-insert ((t (:background "#5E734A" :foreground "#a6cc70"))))
-:config
+:init
   (setq diff-hl-draw-borders nil)
-  (global-diff-hl-mode)
-  ;(diff-hl-margin-mode)
+:config
+  ;(global-diff-hl-mode)
   (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
+  (add-hook 'prog-mode-hook #'diff-hl-mode)
+  (add-hook 'conf-mode-hook #'diff-hl-mode)
+  (add-hook 'dired-mode-hook #'diff-hl-dired-mode)
+
+
+  (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
+  (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)
+  ;; Highlight on-the-fly
+  (diff-hl-flydiff-mode 1)
+  (unless (display-graphic-p)
+    ;; Fall back to the display margin since the fringe is unavailable in tty
+    (diff-hl-margin-mode 1)
+    ;; Avoid restoring `diff-hl-margin-mode'
+    (with-eval-after-load 'desktop
+      (add-to-list 'desktop-minor-mode-table
+                   '(diff-hl-margin-mode nil))))
 )
-;; Diff:1 ends here
+;; Diff-hl:1 ends here
+
+;; [[file:config.org::*Diredfl][Diredfl:1]]
+(use-package diredfl
+:after dired
+:hook
+  ((dired-mode . diredfl-mode)
+   ;; highlight parent and directory preview as well
+   (dirvish-directory-view-mode . diredfl-mode))
+:config
+  (set-face-attribute 'diredfl-dir-name nil :bold t)
+)
+;; Diredfl:1 ends here
 
 ;; [[file:config.org::*Dirvish][Dirvish:1]]
 (use-package dirvish
@@ -1269,6 +1340,8 @@
     "q"      '(dirvish-quit              :wk "quit")
     "j"      '(dired-up-directory        :wk "up-dir")
     ";"      '(dired-find-file           :wk "open/toggle")
+    "C-b"    '(dired-up-directory        :wk "up-dir")
+    "C-f"    '(dired-find-file           :wk "open/toggle")
     "a"      '(dirvish-quick-access      :wk "access")
     "c"      '(dired-do-copy             :wk "copy")
     "u"      '(dired-do-rename           :wk "rename")
@@ -1300,17 +1373,6 @@
   (dirvish-override-dired-mode)
 )
 ;; Dirvish:1 ends here
-
-;; [[file:config.org::*Diredfl][Diredfl:1]]
-(use-package diredfl
-:hook
-  ((dired-mode . diredfl-mode)
-   ;; highlight parent and directory preview as well
-   (dirvish-directory-view-mode . diredfl-mode))
-:config
-  (set-face-attribute 'diredfl-dir-name nil :bold t)
-)
-;; Diredfl:1 ends here
 
 ;; [[file:config.org::*Embark][Embark:1]]
 (use-package embark
@@ -1442,14 +1504,19 @@
 ;; Hl-line:1 ends here
 
 ;; [[file:config.org::*Whitespace mode][Whitespace mode:1]]
-;; (config/leader :infix "t"
-;;   "SPC"  '(whitespace-mode  :wk "󰡭 Show Space")
-;; )
+(use-package whitespace
+:config
+  (setq whitespace-line-column 1000) ;; do not want line to be highlighted
+)
+  ;; (config/leader :infix "t"
+  ;;   "SPC"  '(whitespace-mode  :wk "󰡭 Show Space")
+  ;; )
 ;; Whitespace mode:1 ends here
 
 ;; [[file:config.org::*Line Number][Line Number:1]]
 (use-package emacs
 :hook (prog-mode . config/toggle-line-number-absolute)
+:init (setq display-line-numbers-width 4)
 :config
       (defun config/toggle-line-number-nil ()
           (interactive)
@@ -1510,7 +1577,9 @@
   (setq highlight-indent-guides-method 'character
         highlight-indent-guides-character 9474
         highlight-indent-guides-auto-enabled nil
+        highlight-indent-guides-responsive nil
   )
+
   (set-face-attribute 'highlight-indent-guides-character-face nil
     :foreground "#3b445f")
   (set-face-attribute 'highlight-indent-guides-top-character-face nil
@@ -1531,7 +1600,10 @@
 :init
   (show-paren-mode 0)
 :config
-  (setq highlight-parentheses-highlight-adjacent 1)
+  (setq highlight-parentheses-highlight-adjacent 1
+        highlight-parentheses-attributes '((:box (:line-width (-1 . -1))))
+        highlight-parentheses-colors nil
+        highlight-parentheses-delay 0.03)
   (global-highlight-parentheses-mode)
   )
 ;; Highlight-parentheses:1 ends here
@@ -1673,29 +1745,101 @@
 )
 ;; Fingertip:1 ends here
 
-;; [[file:config.org::*Treesit-auto][Treesit-auto:1]]
-(use-package treesit-auto
-:config
-
-  (defun my/remap-mode (mode)
-    "A hack to make org-src-get-lang-mode respect major-mode-remap-alist"
-    (treesit-auto--set-major-remap)
-    (alist-get mode major-mode-remap-alist mode)
-    )
-  (advice-add 'org-src-get-lang-mode :filter-return #'my/remap-mode)
-
-  ;; a workaround for lack of lang-ts-mode
-  (add-hook 'emacs-lisp-mode-hook #'(lambda () (treesit-parser-create 'elisp)))
-  (add-hook 'markdown-mode-hook #'(lambda () (treesit-parser-create 'markdown)))
-  (global-treesit-auto-mode))
-;; Treesit-auto:1 ends here
-
 ;; [[file:config.org::*Treesitter-context][Treesitter-context:1]]
 (use-package treesitter-context
 :config
   (add-hook 'python-ts-mode-hook #'treesitter-context-mode)
   )
 ;; Treesitter-context:1 ends here
+
+;; [[file:config.org::*Lazycat's method][Lazycat's method:1]]
+(use-package treesit
+:commands (treesit-install-language-grammar
+           config/treesit-install-all-languages)
+:init
+  (setq treesit-language-source-alist
+    '((bash . ("https://github.com/tree-sitter/tree-sitter-bash"))
+      (c . ("https://github.com/tree-sitter/tree-sitter-c"))
+      (cpp . ("https://github.com/tree-sitter/tree-sitter-cpp"))
+      (css . ("https://github.com/tree-sitter/tree-sitter-css"))
+      (cmake . ("https://github.com/uyha/tree-sitter-cmake"))
+      (common-lisp . ("https://github.com/theHamsta/tree-sitter-commonlisp"))
+      (csharp . ("https://github.com/tree-sitter/tree-sitter-c-sharp.git"))
+      (dockerfile . ("https://github.com/camdencheek/tree-sitter-dockerfile"))
+      (elisp . ("https://github.com/Wilfred/tree-sitter-elisp"))
+      (go . ("https://github.com/tree-sitter/tree-sitter-go"))
+      (gomod . ("https://github.com/camdencheek/tree-sitter-go-mod.git"))
+      (html . ("https://github.com/tree-sitter/tree-sitter-html"))
+      (java . ("https://github.com/tree-sitter/tree-sitter-java.git"))
+      (javascript . ("https://github.com/tree-sitter/tree-sitter-javascript"))
+      (json . ("https://github.com/tree-sitter/tree-sitter-json"))
+      (lua . ("https://github.com/Azganoth/tree-sitter-lua"))
+      (make . ("https://github.com/alemuller/tree-sitter-make"))
+      (markdown . ("https://github.com/MDeiml/tree-sitter-markdown" nil
+        "tree-sitter-markdown/src"))
+      (nix . ("https://github.com/nix-community/tree-sitter-nix.git"))
+      (ocaml . ("https://github.com/tree-sitter/tree-sitter-ocaml" nil "ocaml/src"))
+      (org . ("https://github.com/milisims/tree-sitter-org"))
+      (python . ("https://github.com/tree-sitter/tree-sitter-python"))
+      (php . ("https://github.com/tree-sitter/tree-sitter-php"))
+      (typescript . ("https://github.com/tree-sitter/tree-sitter-typescript" nil
+          "typescript/src"))
+      (tsx . ("https://github.com/tree-sitter/tree-sitter-typescript" nil
+          "tsx/src"))
+      (ruby . ("https://github.com/tree-sitter/tree-sitter-ruby"))
+      (rust . ("https://github.com/tree-sitter/tree-sitter-rust"))
+      (sql . ("https://github.com/m-novikov/tree-sitter-sql"))
+      (vue . ("https://github.com/merico-dev/tree-sitter-vue"))
+      (yaml . ("https://github.com/ikatyang/tree-sitter-yaml"))
+      (toml . ("https://github.com/tree-sitter/tree-sitter-toml"))
+      (zig . ("https://github.com/GrayJack/tree-sitter-zig"))))
+:config
+(defun config/treesit-install-all-languages ()
+  "Install all languages specified by `treesit-language-source-alist'."
+  (interactive)
+  (let ((languages (mapcar 'car treesit-language-source-alist)))
+    (dolist (lang languages)
+      (treesit-install-language-grammar lang)
+      (message "`%s' parser was installed." lang)
+      (sit-for 0.75)))))
+;; stolen from lazycat
+(setq major-mode-remap-alist
+      '((c-mode          . c-ts-mode)
+        (c++-mode        . c++-ts-mode)
+        (cmake-mode      . cmake-ts-mode)
+        (conf-toml-mode  . toml-ts-mode)
+        (css-mode        . css-ts-mode)
+        (js-mode         . js-ts-mode)
+        (js-json-mode    . json-ts-mode)
+        (nix-mode        . nix-ts-mode)
+        (python-mode     . python-ts-mode)
+        (sh-mode         . bash-ts-mode)
+        (typescript-mode . typescript-ts-mode)
+        (rust-mode       . rust-ts-mode)
+        ))
+
+(add-hook 'markdown-mode-hook #'(lambda ()
+          (treesit-parser-create 'markdown)))
+
+(add-hook 'web-mode-hook #'(lambda ()
+           (let ((file-name (buffer-file-name)))
+             (when file-name
+               (treesit-parser-create
+          (pcase (file-name-extension file-name)
+            ("vue" 'vue)
+            ("html" 'html)
+            ("php" 'php))))
+             )))
+
+(add-hook 'emacs-lisp-mode-hook #'(lambda () (treesit-parser-create 'elisp)))
+(add-hook 'ielm-mode-hook #'(lambda () (treesit-parser-create 'elisp)))
+(add-hook 'json-mode-hook #'(lambda () (treesit-parser-create 'json)))
+(add-hook 'go-mode-hook #'(lambda () (treesit-parser-create 'go)))
+(add-hook 'java-mode-hook #'(lambda () (treesit-parser-create 'java)))
+(add-hook 'java-ts-mode-hook #'(lambda () (treesit-parser-create 'java)))
+(add-hook 'php-mode-hook #'(lambda () (treesit-parser-create 'php)))
+(add-hook 'php-ts-mode-hook #'(lambda () (treesit-parser-create 'php)))
+;; Lazycat's method:1 ends here
 
 ;; [[file:config.org::*Auto-save][Auto-save:1]]
 (use-package auto-save
@@ -1710,6 +1854,12 @@
 ;; [[file:config.org::*Elisp][Elisp:1]]
 (setq-default lexical-binding t)
 ;; Elisp:1 ends here
+
+;; [[file:config.org::*Lisp][Lisp:1]]
+(use-package lisp-mode
+:mode "\\.yuck\\'"
+)
+;; Lisp:1 ends here
 
 ;; [[file:config.org::*AUCTeX][AUCTeX:1]]
 (use-package auctex)
@@ -1800,8 +1950,8 @@
   ;; (org-tag ((t (:foreground "LightSteelBlue4" :weight normal))))
 ;:hook (org-mode . mixed-pitch-mode)
 :config
-  (set-face-attribute 'outline-1 nil :height 1.6 )
-  (set-face-attribute 'outline-2 nil :height 1.4 )
+  (set-face-attribute 'outline-1 nil :height 1.8 )
+  (set-face-attribute 'outline-2 nil :height 1.6 )
   (set-face-attribute 'outline-3 nil :height 1.4 )
   (set-face-attribute 'outline-4 nil :height 1.3 )
   (set-face-attribute 'outline-5 nil :height 1.2 )
@@ -1829,9 +1979,11 @@
       ("results" . "results")
       (t . t)))
   (setq org-modern-star
-   '("⚀" "⚁" "⚂" "⚃" "⚄" "⚅")
+   ;;'("⚀" "⚁" "⚂" "⚃" "⚄" "⚅")
+   '("󱅊" "󱅋" "󱅌" "󱅍" "󱅎" "󱅏")
+   ;; '("󰇊" "󰇋" "󰇌" "󰇍" "󰇎" "󰇏")
   )
-  (set-face-attribute 'org-modern-symbol nil :family "Noto Sans Symbols 2")
+  ;; (set-face-attribute 'org-modern-symbol nil :family "Noto Sans Symbols 2")
 ; '("☰" "☱" "☲" "☳" "☴" "☵" "☶" "☷")
 ; '("◉" "○" "◈" "◇" "✳")
   (setq org-modern-list ;; for '+' '-' '*' respectively
@@ -1839,8 +1991,15 @@
   )
   (setq org-modern-block-fringe nil)
   (setq org-modern-todo nil)
-  ;; (setq org-modern-block-name '("⇲ " . "⇱ "))
-  ;; (setq org-modern-block-name '("◻ " . "◻ "))
+  ;; (setq org-modern-block-name )
+  (setq org-modern-block-name
+        '("⇲ " . "⇱ ")
+        ;; '("◻ " . "◻ ")
+        ;; '("" . "")
+        ;; '("󰨔" . "󰨔")
+        ;; '("󰨓" . "󰨓")
+        ;; '("󰝤 " . "󰝤 ") ; nf-md-square
+        )
   (set-face-attribute 'org-modern-block-name nil
      :inherit 'variable-pitch)
   (set-face-attribute 'org-meta-line nil
@@ -1927,10 +2086,15 @@
 ;; Org-appear:1 ends here
 
 ;; [[file:config.org::*Keybindings][Keybindings:1]]
+(setq org-return-follows-link t)
+;; Keybindings:1 ends here
+
+;; [[file:config.org::*Keybindings][Keybindings:2]]
 (my/mode-leader-def
+  :prefix-command 'my/org-cmd
+  :prefix-map 'my/org-map
   :keymaps '(org-mode-map)
-  :wk-full-keys nil
-  ;; ""   '(                :wk "")
+  ""    '(nil                              :wk "org-mode")
   "a"   '(org-attach                       :wk "attach")
   "b"   '(nil                              :wk "Babel")
   "c"   '(org-ctrl-c-ctrl-c                :wk "execute")
@@ -1963,6 +2127,9 @@
   "C-l" '(my/outline-down                  :wk "dwim ")
   "C-;" '(my/outline-right                 :wk "dwim ")
   )
+;; Keybindings:2 ends here
+
+;; [[file:config.org::*Keybindings][Keybindings:3]]
 (my/mode-leader-def
   :keymaps '(org-mode-map)
   :infix "b"
@@ -1977,16 +2144,16 @@
   "a" '(org-latex-preview-auto-mode        :wk "auto")
   "r" '(my/org-latex-preview-reload        :wk "reload")
   )
-;; Keybindings:1 ends here
+;; Keybindings:3 ends here
 
-;; [[file:config.org::*Keybindings][Keybindings:2]]
+;; [[file:config.org::*Keybindings][Keybindings:4]]
 (my/mode-leader-def
   :keymaps '(org-src-mode-map)
   :wk-full-keys nil
   "e"   'org-edit-src-exit
   "k"   'org-edit-src-abort
   )
-;; Keybindings:2 ends here
+;; Keybindings:4 ends here
 
 ;; [[file:config.org::*outline functions][outline functions:1]]
 (defvar my/recenter 6)
@@ -2226,7 +2393,7 @@
 :after org
 :bind (("C-c c" . org-capture))
 :init
-  (setq org-directory "~/Org")
+  (setq org-directory "~/org")
 :config
   ;; if file path is not absolute
   ;; it is treated as relative path to org-directory
@@ -2247,9 +2414,9 @@
     ("i" "Inbox" entry
       (file "inbox.org")
       "* %U - %? %^g\n")
-       '("h" "Hugo post" entry
-      (file+olp "capture.org" "Notes")
-      (function org-hugo-new-subtree-post-capture-template))
+    ("h" "Hugo post" entry
+     (file+olp "capture.org" "Notes")
+     (function org-hugo-new-subtree-post-capture-template))
   )))
 )
 ;; Org-capture:1 ends here
@@ -2530,6 +2697,7 @@
 
 ;; [[file:config.org::*Ipynb][Ipynb:1]]
 (use-package ox-ipynb
+:defer t
 :after ox
   )
 ;; Ipynb:1 ends here
@@ -2591,9 +2759,148 @@
 
 ;; [[file:config.org::*Telega][Telega:1]]
 (use-package telega
-:defer t
-)
+  :defer t
+  :hook (telega-chat-mode .
+                          (lambda ()
+                            (visual-fill-column-mode 0)
+                            (config/window-center 102)
+                            (solaire-mode -1)
+                            ))
+  :init
+  (setq telega-server-libs-prefix "~/.nix-profile")
+  (setq telega-avatar-workaround-gaps-for '(return t)) ;; solves broken avatar
+  (setq telega-emoji-use-images nil) ;; or emoji will look monochrome and broken
+  (setq ;; telega-root
+   ;; telega-root-default-view-function 'telega-view-folders
+   telega-root-keep-cursor 'track
+   telega-root-buffer-name "*Telega Root*"
+   telega-root-fill-column 70 ; fill-column
+   telega-symbol-folder "  ")
+  (setq telega-symbol-forum (nerd-icons-mdicon "nf-md-format_list_text"))
+  (setq telega-brackets
+        `(((chat (type private))
+           ,(concat " "
+             (nerd-icons-mdicon "nf-md-account"
+                                :face '(:foreground "#86dffd" :height 0.7))
+             " ") " ")
+          ((chat (type bot))
+           ,(concat " "
+             (nerd-icons-mdicon "nf-md-robot"
+                                :face '(:foreground "#86dffd" :height 0.7))
+             " ") " ")
+          ((chat (type basicgroup))
+           ,(concat " "
+             (nerd-icons-mdicon "nf-md-account_multiple"
+                                :face '(:foreground "#70bcff" :height 0.7))
+             " ") " ")
+          ((chat (type supergroup))
+           ,(concat " "
+             (nerd-icons-mdicon "nf-md-account_multiple"
+                                :face '(:foreground "#70bcff" :height 0.7))
+             " ") " ")
+          ((chat (type channel))
+           ,(concat " "
+             (nerd-icons-faicon "nf-fa-feed"
+                                :face '(:foreground "#ffa95f" :height 0.7))
+             " ") " ")
+          ((user (return t))
+           ,(concat " "
+             (nerd-icons-mdicon "nf-md-account"
+                                :face '(:foreground "#86dffd" :height 0.7))
+             " ") " ")
+          ((return t)
+           ,(concat " "
+             (nerd-icons-faicon "nf-fa-question_circle"
+                                :face '(:foreground "#ff0000" :height 0.7))
+             " ") " "))
+        )
+  (general-def
+    :keymaps '(telega-msg-button-map)
+    "SPC" nil
+    "l"   nil
+    "C"   'telega-msg-copy-link
+    )
+
+  )
 ;; Telega:1 ends here
+
+;; [[file:config.org::*Elfeed][Elfeed:1]]
+(use-package elfeed
+:defer t
+:hook
+  (elfeed-search-mode .
+    (lambda () (config/window-center 110) (solaire-mode -1)))
+  (elfeed-show-mode .
+    (lambda () (config/window-center 114) (solaire-mode -1)))
+:config
+  (defun nerd-icon-for-tags (tags)
+    "Generate Nerd Font icon based on tags.
+  Returns default if no match."
+    (cond
+     ((member "youtube" tags)
+      (nerd-icons-faicon "nf-fa-youtube_play" :face '(:foreground "#FF0200")))
+     ((member "instagram" tags)
+      (nerd-icons-faicon "nf-fa-instagram" :face '(:foreground "#FF00B9")))
+     ((member "emacs" tags)
+      (nerd-icons-sucicon "nf-custom-emacs" :face '(:foreground "#9A5BBE")))
+     ((member "github" tags)
+      (nerd-icons-faicon "nf-fa-github"))
+     ((member "zhihu" tags)
+      (nerd-icons-mdicon "nf-md-alpha_z_box" :face '(:foreground "#1772F6")))
+     ((member "bilibili" tags)
+      (nerd-icons-mdicon "nf-md-alpha_b_box" :face '(:foreground "#FB7299")))
+     (t
+      (nerd-icons-faicon "nf-fae-feedly" :face '(:foreground "#2AB24C")))))
+
+  (defun my/elfeed-search-print-entry--better-default (entry)
+    "Print ENTRY to the buffer."
+    (let* ((date (elfeed-search-format-date (elfeed-entry-date entry)))
+           (date-width (car (cdr elfeed-search-date-format)))
+           (title (concat (or (elfeed-meta entry :title)
+                              (elfeed-entry-title entry) "")
+                          ;; NOTE: insert " " for overlay to swallow
+                          " "))
+           (title-faces (elfeed-search--faces (elfeed-entry-tags entry)))
+           (feed (elfeed-entry-feed entry))
+           (feed-title (when feed (or (elfeed-meta feed :title) (elfeed-feed-title feed))))
+           (tags (mapcar #'symbol-name (delq 'unread (elfeed-entry-tags entry))))
+           (tags-str (mapconcat (lambda (s) (propertize s 'face 'elfeed-search-tag-face)) tags ","))
+           (title-width (- (frame-width)
+                           ;; (window-width (get-buffer-window (elfeed-search-buffer) t))
+                           date-width elfeed-search-trailing-width))
+           (title-column (elfeed-format-column
+                          title (elfeed-clamp
+                                 elfeed-search-title-min-width
+                                 title-width
+                                 elfeed-search-title-max-width) :left))
+
+
+           ;; Title/Feed ALIGNMENT
+           (align-to-feed-pixel (+ 2 date-width
+                                   (max elfeed-search-title-min-width
+                                        (min title-width elfeed-search-title-max-width)))))
+      (insert (propertize date 'face 'elfeed-search-date-face) "  ")
+      (insert (propertize title-column 'face title-faces 'kbd-help title))
+      (put-text-property (1- (point)) (point) 'display `(space :align-to ,align-to-feed-pixel))
+      ;; (when feed-title (insert " " (propertize feed-title 'face 'elfeed-search-feed-face) " "))
+      (when feed-title
+        (insert " " (concat (nerd-icon-for-tags tags) " ")
+                (propertize feed-title 'face 'elfeed-search-feed-face) " "))
+      (when tags (insert "(" tags-str ")"))))
+
+  (setq  elfeed-search-print-entry-function
+         #'my/elfeed-search-print-entry--better-default)
+)
+;; Elfeed:1 ends here
+
+;; [[file:config.org::*Elfeed-org][Elfeed-org:1]]
+(use-package elfeed-org
+:after elfeed
+:init
+  (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org"))
+  (elfeed-org)
+)
+;; Elfeed-org:1 ends here
 
 ;; [[file:config.org::*PDF-Tools][PDF-Tools:1]]
 (use-package pdf-tools
@@ -2638,18 +2945,10 @@
 (setq pdf-view-midnight-colors '("#c6c6c6" . "#363636")))
 ;; PDF-Tools:1 ends here
 
-;; [[file:config.org::*Elfeed][Elfeed:1]]
-(use-package elfeed
-:defer t
-:config
-  (setq elfeed-feeds '(
-      ("http://nullprogram.com/feed/" blog emacs)
-      "http://www.50ply.com/atom.xml"  ; no autotagging
-      ("http://nedroid.com/feed/" webcomic)
-    )
-  )
-)
-;; Elfeed:1 ends here
+;; [[file:config.org::*Nov][Nov:1]]
+(use-package nov
+:defer t)
+;; Nov:1 ends here
 
 ;; [[file:config.org::*Eaf][Eaf:1]]
 (use-package eaf
@@ -2673,19 +2972,11 @@
 ;; Eaf:1 ends here
 
 ;; [[file:config.org::*Tetris][Tetris:1]]
-(add-hook 'tetris-mode-hook
-  (defun config/tetris-center ()
-    (config/window-center 76)
-  )
-)
+(add-hook 'tetris-mode-hook (lambda () (config/window-center 76)))
 ;; Tetris:1 ends here
 
 ;; [[file:config.org::*2048][2048:1]]
-(add-hook '2048-mode-hook
-  (defun config/2048-center ()
-    (config/window-center 35)
-  )
-)
+(add-hook '2048-mode-hook (lambda () (config/window-center 35)))
 ;; 2048:1 ends here
 
 ;; [[file:config.org::*Emacs-Everywhere][Emacs-Everywhere:1]]

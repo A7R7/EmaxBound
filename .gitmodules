@@ -22,6 +22,9 @@
 [submodule "all-the-icons-completion"]
 	path = lib/all-the-icons-completion
 	url = git@github.com:iyefrat/all-the-icons-completion.git
+[submodule "all-the-icons-dired"]
+	path = lib/all-the-icons-dired
+	url = https://github.com/wyuenho/all-the-icons-dired
 [submodule "anaphora"]
 	path = lib/anaphora
 	url = git@github.com:rolandwalker/anaphora.git
@@ -115,18 +118,36 @@
 [submodule "easy-hugo"]
 	path = lib/easy-hugo
 	url = git@github.com:masasam/emacs-easy-hugo.git
+[submodule "eat"]
+	path = lib/eat
+	url = git@codeberg.org:akib/emacs-eat.git
 [submodule "edit-indirect"]
 	path = lib/edit-indirect
 	url = git@github.com:Fanael/edit-indirect.git
 [submodule "elfeed"]
 	path = lib/elfeed
 	url = git@github.com:skeeto/elfeed.git
+[submodule "elfeed-autotag"]
+	path = lib/elfeed-autotag
+	url = https://github.com/paulelms/elfeed-autotag
+[submodule "elfeed-goodies"]
+	path = lib/elfeed-goodies
+	url = https://github.com/jeetelongname/elfeed-goodies
+[submodule "elfeed-org"]
+	path = lib/elfeed-org
+	url = https://github.com/remyhonig/elfeed-org
+[submodule "elfeed-protocol"]
+	path = lib/elfeed-protocol
+	url = https://github.com/fasheng/elfeed-protocol
 [submodule "elisp-def"]
 	path = lib/elisp-def
 	url = git@github.com:Wilfred/elisp-def.git
 [submodule "elisp-refs"]
 	path = lib/elisp-refs
 	url = git@github.com:Wilfred/elisp-refs.git
+[submodule "elvish-mode"]
+	path = lib/elvish-mode
+	url = https://github.com/ALSchwalm/elvish-mode
 [submodule "emacs-everywhere"]
 	path = lib/emacs-everywhere
 	url = git@github.com:tecosaur/emacs-everywhere.git
@@ -163,9 +184,15 @@
 [submodule "fingertip"]
 	path = lib/fingertip
 	url = git@github.com:manateelazycat/fingertip.git
+[submodule "fish-mode"]
+	path = lib/fish-mode
+	url = https://github.com/wwwjfy/emacs-fish
 [submodule "fixed-pitch-mode"]
 	path = lib/fixed-pitch-mode
 	url = git@github.com:cstby/fixed-pitch-mode.git
+[submodule "flx-rs"]
+	path = lib/flx-rs
+	url = https://github.com/jcs-elpa/flx-rs
 [submodule "gcmh"]
 	path = lib/gcmh
 	url = https://gitlab.com/koral/gcmh
@@ -202,6 +229,9 @@
 [submodule "holo-layer"]
 	path = lib/holo-layer
 	url = git@github.com:A7R7/holo-layer.git
+[submodule "hotfuzz"]
+	path = lib/hotfuzz
+	url = git@github.com:axelf4/hotfuzz.git
 [submodule "ht"]
 	path = lib/ht
 	url = git@github.com:Wilfred/ht.el.git
@@ -250,6 +280,11 @@
 [submodule "leaf"]
 	path = lib/leaf
 	url = git@github.com:conao3/leaf.el.git
+[submodule "lib/tempel"]
+	url = git@github.com:minad/tempel.git
+[submodule "link-hint"]
+	path = lib/link-hint
+	url = https://github.com/noctuid/link-hint.el
 [submodule "llama"]
 	path = lib/llama
 	url = git@github.com:emacsmirror/llama.git
@@ -304,9 +339,15 @@
 [submodule "notibox"]
 	path = lib/notibox
 	url = git@github.com:MitchMarq42/notibox.el.git
+[submodule "nov"]
+	path = lib/nov
+	url = https://depp.brause.cc/nov.el.git
 [submodule "ob-async"]
 	path = lib/ob-async
 	url = git@github.com:astahlman/ob-async.git
+[submodule "ob-elvish"]
+	path = lib/ob-elvish
+	url = https://github.com/zzamboni/ob-elvish
 [submodule "ob-nix"]
 	path = lib/ob-nix
 	url = git@github.com:emacsmirror/ob-nix.git
@@ -369,7 +410,7 @@
 	url = git@github.com:alphapapa/org-super-agenda.git
 [submodule "org-super-links"]
 	path = lib/org-super-links
-	url = git@github.com:toshism/org-super-links.git
+	url = git@github.com:A7R7/org-super-links.git
 [submodule "org-superstar"]
 	path = lib/org-superstar
 	url = git@github.com:integral-dw/org-superstar-mode.git
@@ -413,9 +454,6 @@
 [submodule "persp-mode"]
 	path = lib/persp-mode
 	url = git@github.com:Bad-ptr/persp-mode.el.git
-[submodule "perspective"]
-	path = lib/perspective
-	url = git@github.com:nex3/perspective-el.git
 [submodule "pfuture"]
 	path = lib/pfuture
 	url = git@github.com:Alexander-Miller/pfuture.git
@@ -425,6 +463,9 @@
 [submodule "popper"]
 	path = lib/popper
 	url = git@github.com:karthink/popper.git
+[submodule "popwin"]
+	path = lib/popwin
+	url = https://github.com/emacsorphanage/popwin
 [submodule "posframe"]
 	path = lib/posframe
 	url = git@github.com:tumashu/posframe.git
@@ -505,10 +546,10 @@
 	url = git@github.com:zevlg/telega.el.git
 [submodule "tempel"]
 	path = lib/tempel
-	url = git@github.com:A7R7/tempel-collection.git
+	url = git@github.com:minad/tempel.git
 [submodule "tempel-collection"]
 	path = lib/tempel-collection
-	url = git@github.com:Crandel/tempel-collection.git
+	url = git@github.com:A7R7/tempel-collection.git
 [submodule "toggle-one-window"]
 	path = lib/toggle-one-window
 	url = git@github.com:manateelazycat/toggle-one-window.git

@@ -176,6 +176,7 @@ When start emacs with =--debug-init=, the =init-file-debug= condition is meet, a
   (setq use-package-verbose t
         use-package-expand-minimally nil
         use-package-compute-statistics t
+        use-package-minimum-reported-time 0.001
         ;;debug-on-error t
   )
   ;; (setq use-package-verbose nil
@@ -265,12 +266,12 @@ Set some defaults of emacs
         long-line-threshold 1000
         large-hscroll-threshold 1000
         syntax-wholeline-max 1000)
-  (setq global-auto-revert-mode 1)
   (setq use-dialog-box nil)
   (setq confirm-kill-emacs 'y-or-n-p)
   (put 'downcase-region 'disabled nil)
   (put 'upcase-region 'disabled nil)
   )
+(global-auto-revert-mode)
 #+end_src
 ** Borg
 :PROPERTIES:
@@ -294,6 +295,57 @@ And then we switch to the message buffer in an attempt to make the loading proce
     (switch-to-buffer "*Messages*")
   )
 #+end_src
+
+#+begin_src elisp
+
+#+end_src
+** COMMENT Borg-nix-shell
+This is copied from [[https://github.com/thblt/borg-nix-shell][borg-nix-shell]]
+#+begin_src elisp
+(defvar borg-nix-shell-build-use-pure-shell
+  t
+  "Determine if nix-shells should be pure.")
+
+(defun borg-nix-shell-borg-get (drone key &optional all)
+  "A reimplementation of `borg-get' for consistency.
+
+This function has consistent behavior regardless of the way Borg behaves"
+  (let ((ret (borg-get drone key all)))
+    (if all
+        ret
+      (if (listp ret)
+          ret
+        (list ret)))))
+
+(defun borg-nix-shell-build-command (drone)
+  "Return a format string for wrapping a build-step in a nix-shell.
+
+The nix-shell is started with the file at
+submodules.DRONE.build-nix-shell-file or the packages at
+submodules.DRONE.build-nix-shell-packages.  If none of this is
+provided, and the package has no default.nix, it is run with the
+-p argument.  If there's a default.nix or shell.nix, no extra
+arguments are added."
+  (if (borg-nix-shell-borg-get drone "build-nix-shell-disable")
+      nil
+    (concat "nix-shell "
+            (when borg-nix-shell-build-use-pure-shell "--pure ")
+            "--run %S "
+            (if (car (borg-nix-shell-borg-get drone "build-nix-shell-file"))
+                (car (borg-nix-shell-borg-get drone "build-nix-shell-file"))
+              (unless (or (file-exists-p
+                           (expand-file-name "shell.nix" (borg-worktree drone)))
+                          (file-exists-p
+                           (expand-file-name "default.nix" (borg-worktree drone))))
+                (concat "-p " (car
+                               (borg-nix-shell-borg-get drone
+                                                        "build-nix-shell-packages"))))))))
+
+(setq borg-build-shell-command 'borg-nix-shell-build-command)
+#+end_src
+
+#+RESULTS:
+: borg-nix-shell-build-command
 
 ** Auto-Compile
 :PROPERTIES:
@@ -760,21 +812,7 @@ Then in =Keybindings=, define keybindings.
 ;; Make ESC quit prompts
 ;; (global-set-key ([kbd] "<escape>") 'keyboard-escape-quit)
 
-(use-package general
-:config
-  (defvar my/mode-leader "C-<escape>")
-
-  (defmacro my/key (&optional key)
-    `(general-key
-         (if ,key
-             (concat ,my/mode-leader " " ,key)
-           ,my/mode-leader)))
-
-  (general-create-definer my/mode-leader-def
-    :prefix my/mode-leader
-  )
-
-)
+(use-package general)
 #+end_src
 ** Meow.el
 :PROPERTIES:
@@ -787,7 +825,7 @@ Then in =Keybindings=, define keybindings.
 :custom-face
   (meow-cheatsheet-command ((t (:height 180 :inherit fixed-pitch))))
 :config
- ;cate the behavior of vi's
+  ;cate the behavior of vi's
   (defun my-meow-append ()
     "Move to the end of selection, switch to INSERT state."
     (interactive)
@@ -834,7 +872,37 @@ Then in =Keybindings=, define keybindings.
  (meow-global-mode)
 )
 #+end_src
-** Keybindings
+** Mode-map
+:PROPERTIES:
+:CUSTOM_ID: 20dbcac9-a7cb-4447-8b96-a490d1637b75
+:END:
+Keybindings defined somewhere else...
++ [[#36fd11bc-3a4e-4f96-ad85-5c1d6991e7c4][Vertico]]
++ [[#4e4b8f79-8616-4cc0-bcc8-2b1a2ca03de2][Org mode]]
++ [[#85c28b3b-dcb0-4dce-9fdf-0fdaee9d66d2][Tempel]]
+*** Mode leader
+:PROPERTIES:
+:CUSTOM_ID: 19d9abad-e3e5-426d-81c5-e281020c3daf
+:END:
+Generally, I define my local leader as follows:
+- Let ~C-<escape>~ be the local leader. The convention is to use ~C-c~, but I make ~C-c~ save to system clipboard ~;)~
+- I do not directly press ~C-<escape>~. Instead, I translate ~\~ to ~C-<escape>~ in meow's normal mode.
+- The keybindings are bind to those major mode maps.
+#+begin_src elisp
+(defvar my/mode-leader "C-<escape>")
+
+(defmacro my/key (&optional key)
+  `(general-key
+       (if ,key
+           (concat ,my/mode-leader " " ,key)
+         ,my/mode-leader)))
+
+(general-create-definer my/mode-leader-def
+  :prefix my/mode-leader
+  :wk-full-keys nil
+)
+#+end_src
+** Global-map
 *** Meow-normal
 :PROPERTIES:
 :CUSTOM_ID: 0bb7f8a0-4c80-4139-bf84-c9944308c64a
@@ -853,7 +921,7 @@ Then in =Keybindings=, define keybindings.
 
   '("q" . meow-quit) '("Q" . meow-quit)
      ;'("w" . meow-window) '("W" . meow-window)
-     ;'("e" . meow-) '("E" . meow-e)
+  '("e" . embark-dwim) '("E" . embark-act)
      ;'("r" . meow-) '("R" . meow-e)
   '("t" . meow-till) '("T" . meow-till-expand)
 
@@ -912,8 +980,10 @@ Then in =Keybindings=, define keybindings.
 
 #+begin_src elisp
 (meow-motion-overwrite-define-key
- '("l" . meow-next)
+ '("j" . meow-left)
  '("k" . meow-prev)
+ '("l" . meow-next)
+ '(";" . meow-right)
  '("SPC" . my/leader-prefix-cmd) ;; defined latter
  '("<escape>" . ignore)
 )
@@ -940,7 +1010,7 @@ I generally do not use meow's keypad, because meow's keypad highly relies on van
 
 #+RESULTS:
 
-*** Global map & Meow-insert
+*** Meow-insert
 :PROPERTIES:
 :CUSTOM_ID: f764a901-b07e-4d34-97e0-158cbfc8d519
 :END:
@@ -968,18 +1038,6 @@ I generally do not use meow's keypad, because meow's keypad highly relies on van
   "M-."       '(sort-tab-select-next-tab    :wk " Tab R ")
 )
 
-(general-def
-:keymaps '(vertico-map)
-  "C-l"       '(vertico-next                  :wk "")
-  "C-k"       '(vertico-previous              :wk "")
-  "C-j"       '(vertico-directory-delete-word :wk "")
-  "C-;"       '(vertico-directory-enter       :wk "")
-  "C-,"       '(vertico-previous-group        :wk "")
-  "C-."       '(vertico-next-group            :wk "")
-  "RET"       'vertico-directory-enter
-  "DEL"       'vertico-directory-delete-char
-  "M-DEL"     'vertico-directory-delete-word
-)
 #+end_src
 
 #+RESULTS:
@@ -990,45 +1048,64 @@ I generally do not use meow's keypad, because meow's keypad highly relies on van
 :END:
 
 #+begin_src elisp
-  (general-create-definer my/leader
-    :prefix-command 'my/leader-prefix-cmd
-    :prefix-map 'my/leader-prefix-map
-    :wk-full-keys nil
-    "DEL"     '(which-key-undo                 :wk "󰕍 undo")
-    )
+(general-create-definer my/leader
+:prefix-command 'my/leader-prefix-cmd
+:prefix-map 'my/leader-prefix-map
+:wk-full-keys nil
+  "DEL"     '(which-key-undo                 :wk "undo-key")
+)
 #+end_src
 
 #+begin_src elisp
-  (my/leader
-    "SPC"     (general-key "C-<escape>")
-    "/"       '(comment-dwim                   :wk "󱀢 comment")
-    "s"       '(save-buffer                    :wk " save")
-    "e"       '(dirvish-side                   :wk "󰙅 dirvish-side ")
-    "E"       '(dirvish                        :wk "󰙅 dirvish")
-    "x"       '(consult-mode-command           :wk "execute")
-    "z"       '(vundo                          :wk "visual undo")
+(my/leader
+  "SPC"     (my/key)
+  "/"       '(comment-dwim                   :wk "󱀢 comment")
+  "c"       '(nil                            :wk "consult")
+  "d"       '(dirvish-side                   :wk "󰙅 dirvish-side ")
+  "D"       '(dirvish                        :wk "󰙅 dirvish")
+  "r"       '(nil                            :wk "run")
+  "s"       '(save-buffer                    :wk " save")
+  "t"       '(nil                            :wk "toggle")
+  "w"       '(nil                            :wk "workspace")
+  "x"       '(consult-mode-command           :wk " execute")
+  "z"       '(vundo                          :wk "󰕌 visual undo")
+)
+#+end_src
+
+#+begin_src elisp
+(my/leader :infix "r"
+  "b"      '(nil                             :wk "borg")
+  "e"      '(elfeed                          :wk " elfeed")
+  "t"      '(telega                          :wk " telega")
+)
+#+end_src
+
+#+begin_src elisp
+;; Borg
+(my/leader :infix "rb"
+  "a"       '(borg-assimilate                :wk "󱧕 assimilate ")
+  "b"       '(borg-build                     :wk "󱇝 build")
+  "c"       '(borg-clone                     :wk " clone")
+  "d"       '(borg-remove                    :wk "󱧖 delete")
+  "r"       '(borg-activate                  :wk " run")
   )
 #+end_src
 
 #+begin_src elisp
-  (my/leader :infix "c"
-    ""        '(nil                            :wk " Consult")
-    "l"       '(consult-line                   :wk "line")
-    "L"       '(consult-line-multi             :wk "line multi")
-    "o"       '(consult-outline                :wk "outline")
-    "i"       '(consult-imenu                  :wk "imenu")
-    "I"       '(consult-imenu-multi            :wk "imenu multi")
-    "r"       '(consult-ripgrep                :wk "ripgrep")
-    "m"       '(consult-mark                   :wk "mark")
-    "x"       '(consult-mode-command           :wk "execute")
-    )
+(my/leader :infix "c"
+  "l"       '(consult-line                   :wk "line")
+  "L"       '(consult-line-multi             :wk "line multi")
+  "o"       '(consult-outline                :wk "outline")
+  "i"       '(consult-imenu                  :wk "imenu")
+  "I"       '(consult-imenu-multi            :wk "imenu multi")
+  "r"       '(consult-ripgrep                :wk "ripgrep")
+  "m"       '(consult-mark                   :wk "mark")
+  "x"       '(consult-mode-command           :wk "execute")
+  )
 #+end_src
-
-#+RESULTS:
 
 #+begin_src elisp
   (my/leader :infix "w" ;; workspaces
-    ""        '(nil                            :wk " Workspace")
     "\\"      '(tab-new                        :wk "tab 󰏌")
     "|"       '(tab-close                      :wk "tab 󰅖")
     "["       '(tab-previous                   :wk "tab ")
@@ -1054,21 +1131,15 @@ I generally do not use meow's keypad, because meow's keypad highly relies on van
     )
 #+end_src
 
+
 #+begin_src elisp
-;; Borg
-(my/leader :infix "B"
-  ""        '(nil                            :wk " Borg")
-  "a"       '(borg-assimilate                :wk "󱧕 assimilate ")
-  "A"       '(borg-activate                  :wk " activate")
-  "b"       '(borg-build                     :wk "󱇝 build")
-  "c"       '(borg-clone                     :wk " clone")
-  "r"       '(borg-remove                    :wk "󱧖 remove")
-  )
 ;; toggle
 (my/leader :infix "t"
-  ""        '(nil                            :wk " Toggle")
   "p"       '(profiler-cpu-start             :wk " profile")
   )
+#+end_src
+
+#+begin_src elisp
 ;; Git
 (my/leader :infix "g"
   ""        '(nil                            :wk " Git")
@@ -1132,26 +1203,6 @@ I generally do not use meow's keypad, because meow's keypad highly relies on van
       new-window))
 #+end_src
 
-*** Mode map
-:PROPERTIES:
-:CUSTOM_ID: 20dbcac9-a7cb-4447-8b96-a490d1637b75
-:END:
-Keybindings defined else where
-
-+ [[#4e4b8f79-8616-4cc0-bcc8-2b1a2ca03de2][Org mode]]
-+ [[#85c28b3b-dcb0-4dce-9fdf-0fdaee9d66d2][Tempel]]
-*** Mode leader
-:PROPERTIES:
-:CUSTOM_ID: 19d9abad-e3e5-426d-81c5-e281020c3daf
-:END:
-Generally, I define my local leader as follows:
-- Let ~C-<escape>~ be the local leader. The convention is to use ~C-c~, but I make ~C-c~ save to system clipboard ;)
-- I do not directly press ~C-<escape>~. Instead, I map ~\~ to ~C-<escape>~ in meow's normal mode.
-- The keybindings are bind to those major mode maps.
-
-#+begin_src elisp
-(defvar my/mode-leader "C-<escape>") ;; the leader for major and minor modes
-#+end_src
 ** Transient
 :PROPERTIES:
 :CUSTOM_ID: b7838793-3629-4d7d-88d3-19c1cbefe997
@@ -1174,40 +1225,53 @@ Generally, I define my local leader as follows:
 
 Magit and meow all use transient maps, therefore we let which-key show transient maps.
 #+begin_src elisp
-  (use-package which-key
-  :init
-    (setq which-key-sort-order 'which-key-key-order ;; default
-          which-key-sort-uppercase-first nil
-          ;; which-key-add-column-padding 1
-          which-key-max-display-columns nil
-          which-key-min-display-lines 10
-          which-key-idle-delay 0.01 ; the first idle
-          which-key-idle-secondary-delay 0.01 ; set to 0 will cause some problems
-          which-key-max-description-length 25 ;
-          which-key-allow-imprecise-window-fit t ; reduce delay
-          which-key-separator " " ; yeah I don't like the arrow icon
-          which-key-show-early-on-C-h t
-          which-key-show-transient-maps t
-          which-key-frame-max-height 60
-          )
-    (setq which-key-popup-type 'side-window
-          which-key-side-window-location 'right
-          )
-  :config
-    (set-face-attribute 'which-key-key-face nil :inherit 'fixed-pitch)
-    (which-key-mode 1)
-  )
+(use-package which-key
+:init
+  ;; contents
+  (setq which-key-sort-order 'which-key-key-order)
+  (setq which-key-sort-uppercase-first nil)
+  ;; delays
+  (setq which-key-idle-delay 0.01) ; the first idle
+  (setq which-key-idle-secondary-delay 0.01) ; set to 0 will cause some problems
+  (setq which-key-show-early-on-C-h t)
+  ;; arrangements
+  (setq which-key-max-display-columns nil)
+  (setq which-key-max-description-length 25) ;
+  (setq which-key-allow-imprecise-window-fit t) ; reduce delay
+  (setq which-key-show-transient-maps t)
+  (setq which-key-frame-max-height 60)
+  ;; window
+  (setq which-key-popup-type 'side-window)
+  (setq which-key-side-window-location 'right)
+  ;; characters
+  (setq which-key-prefix-prefix "󰜄 ")
+  (setq which-key-separator " ") ; yeah I don't like the arrow
+  ;; (dolist (replace
+  ;;          '((("SPC" . nil) . ("󱁐" . nil))
+  ;;            (("TAB" . nil) . ("󰌒" . nil))
+  ;;            (("RET" . nil) . ("󰌑" . nil))
+  ;;            (("DEL" . nil) . ("󰭜" . nil))
+  ;;            ))
+  ;;   (add-to-list 'which-key-replacement-alist replace))
+:config
+  (set-face-attribute 'which-key-key-face nil :inherit 'fixed-pitch)
+  (which-key-mode 1)
+)
 #+end_src
 
-[[https://github.com/yanghaoxie/which-key-posframe][Which-key-posframe]] use posframe to show which-key popup. Currently which key still have problems showing things correctly. I may fix them someday :(
+[[https://github.com/yanghaoxie/which-key-posframe][Which-key-posframe]] use posframe to show which-key popup.
+# Currently which key still have problems showing things correctly. I may fix them someday :(
+Here I tried to make which-key act like the one in helix editor. It pops up instantly at the right bottom of the editor, and displays one column vertically.
 #+begin_src elisp
-  (use-package which-key-posframe
-  :after which-key
-  :config
-    (setq which-key-posframe-poshandler
-          'posframe-poshandler-frame-bottom-right-corner)
-    (which-key-posframe-mode)
-  )
+(use-package which-key-posframe
+:after which-key
+:config
+  (setq which-key-posframe-poshandler
+        'posframe-poshandler-frame-bottom-right-corner)
+  (setq which-key-max-display-columns 1)
+  (setq which-key-min-display-lines 1)
+  (which-key-posframe-mode)
+)
 #+end_src
 ** Rime.el
 :PROPERTIES:
@@ -1350,44 +1414,62 @@ Fonts in emacs is really a complex system. If you don't treat it with care, you'
 One essential thing about font is pitch. In general, pitch control's whether a font is fixed-widthed or non-fixed-widthed. Currently there're 2 helpful packages that controls font pitch: =mixed-pitch-mode= and =fixed-pitch-mode=.
 
 I recommend stick to only one of these modes and does all the font settings based on the mode. For me I choses =fixed-pitch-mode=. This mode makes certain major mode have fixed-pitch fonts, and left all the other fonts to the default font (which can be set to some non-fixed-pitch fonts). It has a simplier implementation than mixed-pitch-mode.
+
 *** Face-remap.el
 Face-remap is a builtin library, where ~face-remap-add-relative~ is defined.
 #+begin_src elisp
-  (use-package face-remap
-  :config
-    (set-face-attribute 'default nil
-      :font "Sarasa Gothic SC Nerd Font"
-      :height 150)
-    (set-face-attribute 'fixed-pitch nil
-      ;:font "Sarasa Fixed SC"
-      :font "RobotoMono Nerd Font Mono"
-      :height 1.0)
-    (set-face-attribute 'variable-pitch nil
-      :font "Sarasa Gothic SC Nerd Font"
-      :height 1.0)
-      ; (set-fontset-font t 'symbol "Noto Sans Symbols 2")
-    (set-face-attribute 'link nil
-      :foreground "#ffcc66" :underline t :bold nil)
+(use-package face-remap
+:config
+  (set-face-attribute 'default nil
+    ;; :font "Sarasa Gothic SC Nerd Font"
+    :font "IBM Plex Sans"
+    ;; :font "IBM Plex Serif"
+    :height 150)
+  (set-face-attribute 'fixed-pitch nil
+    ;: :font "Sarasa Fixed SC"
+    ;; :font "RobotoMono Nerd Font Mono"
+    ;; :font "CommitMono Nerd Font Mono"
+    :font "IBM Plex Mono Text"
+    ;; :font "Monaspace Neon"
+    :height 1.0)
+  (set-face-attribute 'fixed-pitch-serif nil
+    ;; :font "Sarasa Gothic SC Nerd Font"
+    :font "IBM Plex Mono Text"
+    ;; :font "IBM Plex Serif"
+    :height 1.0)
+  (set-face-attribute 'variable-pitch nil
+    ;; :font "Sarasa Gothic SC Nerd Font"
+    :font "IBM Plex Serif"
+    :height 1.0)
 
-    (defun my/use-fixed-pitch ()
-      (interactive)
-      (face-remap-add-relative 'default 'fixed-pitch)
-    )
-    (defun my/use-variable-pitch ()
-      (interactive)
-      (face-remap-add-relative 'default 'variable-pitch)
-    )
-    (dolist (hook '(
-        dired-mode-hook
-        comint-mode-hook
-        magit-mode-hook
-        prog-mode-hook
-        profiler-report-mode-hook
-        conf-mode-hook conf-ts-mode-hook
-        toml-mode-hook toml-ts-mode-hook
-      ))
-      (add-hook hook 'my/use-fixed-pitch))
+  ;; patches nerd font
+  (set-fontset-font t 'han "Source Han Serif SC")
+  (set-fontset-font t 'symbol "Noto Sans Symbols")
+  (set-fontset-font t 'nil "Noto Emoji")
+  (set-fontset-font t 'nil "Symbols Nerd Font")
+
+  (set-face-attribute 'link nil :underline t :bold nil)
+
+  (defun my/use-fixed-pitch ()
+    (interactive)
+    (face-remap-add-relative 'default 'fixed-pitch)
+    (turn-off-solaire-mode)
   )
+  (defun my/use-variable-pitch ()
+    (interactive)
+    (face-remap-add-relative 'default 'variable-pitch)
+  )
+  (dolist (hook '(
+      dired-mode-hook
+      comint-mode-hook
+      magit-mode-hook
+      prog-mode-hook
+      profiler-report-mode-hook
+      conf-mode-hook conf-ts-mode-hook
+      toml-mode-hook toml-ts-mode-hook
+    ))
+    (add-hook hook 'my/use-fixed-pitch))
+)
 
 #+end_src
 *** COMMENT Fixed-pitch-mode
@@ -1432,11 +1514,16 @@ Face-remap is a builtin library, where ~face-remap-add-relative~ is defined.
 :CUSTOM_ID: 692c7608-bd4e-4acb-affd-b9e639cd7d28
 :END:
 #+begin_src elisp
-  (use-package mixed-pitch-mode
-  :defer t
-  :config
-    (setq  mixed-pitch-set-height t)
-  )
+(use-package mixed-pitch-mode
+:defer t
+:custom
+  '(mixed-pitch-fixed-pitch-faces
+   '(diff-added diff-context diff-file-header diff-function diff-header diff-hunk-header diff-removed font-latex-math-face font-latex-sedate-face font-latex-warning-face font-latex-sectioning-5-face font-lock-builtin-face font-lock-comment-delimiter-face font-lock-constant-face font-lock-doc-face font-lock-function-name-face font-lock-keyword-face font-lock-negation-char-face font-lock-preprocessor-face font-lock-regexp-grouping-backslash font-lock-regexp-grouping-construct font-lock-string-face font-lock-type-face font-lock-variable-name-face line-number line-number-current-line line-number-major-tick line-number-minor-tick markdown-code-face markdown-gfm-checkbox-face markdown-inline-code-face markdown-language-info-face markdown-language-keyword-face markdown-math-face message-header-name message-header-to message-header-cc message-header-newsgroups message-header-xheader message-header-subject message-header-other mu4e-header-key-face mu4e-header-value-face mu4e-link-face mu4e-contact-face mu4e-compose-separator-face mu4e-compose-header-face org-block org-document-info-keyword org-code org-indent org-latex-and-related org-checkbox org-formula org-meta-line org-special-keyword org-table org-verbatim widget-field org-modern-label))
+ '(mixed-pitch-set-height nil)
+
+:config
+  (setq  mixed-pitch-set-height t)
+)
 #+end_src
 
 *** Zooming In/Out
@@ -1450,6 +1537,19 @@ You can use the bindings CTRL plus =/- for zooming in/out.  You can also use CTR
 (global-set-key (kbd "C--") 'text-scale-decrease)
 (global-set-key (kbd "<C-wheel-down>") 'text-scale-decrease)
 (global-set-key (kbd "<C-wheel-up>") 'text-scale-increase)
+#+end_src
+
+*** Line Space
+#+begin_src elisp
+(defun my/toggle-line-spacing ()
+  "Toggle line spacing between no extra space to extra half line height.
+URL `http://xahlee.info/emacs/emacs/emacs_toggle_line_spacing.html'
+Version 2017-06-02"
+  (interactive)
+  (if line-spacing
+      (setq line-spacing nil)
+    (setq line-spacing 0.5))
+  (redraw-frame (selected-frame)))
 #+end_src
 *** Icons
 :PROPERTIES:
@@ -1516,12 +1616,12 @@ Run [[elisp:nerd-icons-install-fonts][M-x nerd-icons-install-fonts]] to install 
 :END:
 [[https://github.com/hlissner/emacs-solaire-mode][Solaire-mode]] makes certain buffers grossly incandescent. Useful to distinguish the main  buffers from others.
 #+begin_src elisp
-  (use-package solaire-mode
-  :defer t
-  :init (solaire-global-mode)
-  :config
-    (add-hook 'org-src-mode-hook 'turn-off-solaire-mode)
-  )
+(use-package solaire-mode
+:defer t
+:init (solaire-global-mode)
+:config
+  (add-hook 'org-src-mode-hook 'turn-off-solaire-mode)
+)
 #+end_src
 
 ** Frames
@@ -1614,43 +1714,46 @@ But currently we only use olivetti mode.
     Note that for pages with variable-pitch fonts,
     =olivetti-body-width= should be set smaller for it to look good.
 #+begin_src elisp
-  (use-package olivetti
-  :hook (org-mode . olivetti-mode)
-        (Custom-mode . olivetti-mode)
-        (help-mode . olivetti-mode)
-        ;(dashboard-mode . olivetti-mode)
-        (dashboard-mode . variable-pitch-mode)
-        (olivetti-mode . visual-line-mode)
-  :init
-        (setq-default fill-column 100)
-  :config
-        ;If nil (the default), use the value of fill-column + 2.
-        (setq olivetti-body-width nil olivetti-style 'fancy)
-        ;; (set-face-attribute 'olivetti-fringe nil :background "#171B24")
-        (defun config/window-center (width)
-            (interactive)
-            (setq fill-column width)
-            (olivetti-mode)
-        )
-        ;; (config/leader
-        ;;  "tc"  '(olivetti-mode     :wk "󰉠 Center")
-        ;; )
-  )
+(use-package olivetti
+:defer nil
+:hook (org-mode . olivetti-mode)
+      (Custom-mode . olivetti-mode)
+      (help-mode . olivetti-mode)
+      ;(dashboard-mode . olivetti-mode)
+      (dashboard-mode . variable-pitch-mode)
+      (olivetti-mode . visual-line-mode)
+:init
+      (setq-default fill-column 100)
+:config
+      ;If nil (the default), use the value of fill-column + 2.
+      (setq olivetti-body-width nil olivetti-style 'fancy)
+      ;; (set-face-attribute 'olivetti-fringe nil :background "#171B24")
+      (defun config/window-center (width)
+          (interactive)
+          (setq fill-column width)
+          (olivetti-mode)
+      )
+      ;; (config/leader
+      ;;  "tc"  '(olivetti-mode     :wk "󰉠 Center")
+      ;; )
+)
 #+end_src
 
 **** Visual-fill-column
 :PROPERTIES:
 :CUSTOM_ID: 9c1ae6c1-0ace-460f-a92d-dd922c0a0f22
 :END:
-
-    [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]]
+ [[https://github.com/joostkremers/visual-fill-column][visual-fill-column]]
+#+begin_src elisp
+(setq-default visual-fill-column-center-text t)
+#+end_src
 
 **** Writeroom-mode
 :PROPERTIES:
 :CUSTOM_ID: 7ab32bc9-054e-495f-b946-aa235cfe3357
 :END:
 
-*** Vertical
+*** COMMENT Vertical
 :PROPERTIES:
 :CUSTOM_ID: deee099a-b78e-4c82-a662-4a796f2736d5
 :END:
@@ -1695,23 +1798,39 @@ Therefore I grouped them together.
 :PROPERTIES:
 :CUSTOM_ID: 36fd11bc-3a4e-4f96-ad85-5c1d6991e7c4
 :END:
+:BACKLINKS:
+[[#20dbcac9-a7cb-4447-8b96-a490d1637b75][Mode map]]
+:END:
 [[https://github.com/minad/vertico#extensions][Vertico]] provides a performant and minimalistic vertical completion UI based on the default completion system.
 
 #+begin_src elisp
-  (use-package vertico
-    :init
-    ;; Different scroll margin
-    (setq vertico-scroll-margin 1)
-    ;; Show more candidates
-    (setq vertico-count 20)
-    ;; Grow and shrink the Vertico minibuffer
-    (setq vertico-resize nil)
-    ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
-    (setq vertico-cycle t)
-    ;; use Vertico as an in-buffer completion UI
-    (setq completion-in-region-function 'consult-completion-in-region)
-    (vertico-mode 1)
+(use-package vertico
+:init
+  ;; Different scroll margin
+  (setq vertico-scroll-margin 1)
+  ;; Show more candidates
+  (setq vertico-count 20)
+  ;; Grow and shrink the Vertico minibuffer
+  (setq vertico-resize nil)
+  ;; Optionally enable cycling for `vertico-next' and `vertico-previous'.
+  (setq vertico-cycle t)
+  ;; use Vertico as an in-buffer completion UI
+  (setq completion-in-region-function 'consult-completion-in-region)
+  (vertico-mode 1)
+:config
+  (general-def
+    :keymaps '(vertico-map)
+    "C-l"       '(vertico-next                  :wk "")
+    "C-k"       '(vertico-previous              :wk "")
+    "C-j"       '(vertico-directory-delete-word :wk "")
+    "C-;"       '(vertico-directory-enter       :wk "")
+    "C-,"       '(vertico-previous-group        :wk "")
+    "C-."       '(vertico-next-group            :wk "")
+    "RET"       'vertico-directory-enter
+    "DEL"       'vertico-directory-delete-char
+    "M-DEL"     'vertico-directory-delete-word
   )
+)
 #+end_src
 tweaks to build vertico
 #+begin_src conf
@@ -1832,7 +1951,8 @@ See [[* Posframe][Posframe]] for function defintion.
 )
 #+end_src
 
-*** Orderless
+*** Completion
+**** Orderless
 :PROPERTIES:
 :CUSTOM_ID: e49ba787-90af-48c5-8153-1a4ed60cf094
 :END:
@@ -1848,6 +1968,19 @@ Each component can match in any one of several ways: literally, as a regexp, as 
     (setq orderless-matching-styles
             '(orderless-initialism orderless-prefixes orderless-regexp))
     )
+#+end_src
+
+**** COMMENT flx-rs + fussy
+#+begin_src elisp
+(use-package flx-rs
+:config
+  (advice-add 'flx-score :override #'flx-rs-score))
+#+end_src
+**** COMMENT Hotfuzz
+#+begin_src elisp
+(use-package hotfuzz
+:init
+  (setq completion-styles '(hotfuzz)))
 #+end_src
 *** Savehist
 :PROPERTIES:
@@ -2187,24 +2320,26 @@ Code stolen from [[https://emacs-china.org/t/27-1-tab-line-mode/20514][Emacs Chi
 [[https://github.com/seagle0128/doom-modeline][Doom-modeline]] is a very attractive and rich (yet still minimal) mode line configuration for Emacs.  The default configuration is quite good but you can check out the [[https://github.com/seagle0128/doom-modeline#customize][configuration options]] for more things you can enable or disable.
 
 #+begin_src elisp
-  (use-package doom-modeline
-  :init
-        (setq
-            doom-modeline-height 37
-            doom-modeline-enable-word-count t)
-        (doom-modeline-mode 1)
-  :config
-        (set-face-attribute 'doom-modeline t
-            :inherit 'variable-pitch)
-    ;; let modeline show on the header, not bottom
-    (defun move-up-modeline ()
-      (interactive)
-      (progn
-        (setq-default header-line-format mode-line-format)
-        (setq-default mode-line-format nil)
-      ))
-    (move-up-modeline)
-  )
+(use-package doom-modeline
+:init
+      (setq
+          doom-modeline-height 37
+          doom-modeline-enable-word-count t
+          doom-modeline-modal nil
+          )
+      (doom-modeline-mode 1)
+:config
+      (set-face-attribute 'doom-modeline t
+          :inherit 'variable-pitch)
+  ;; let modeline show on the header, not bottom
+  (defun move-up-modeline ()
+    (interactive)
+    (progn
+      (setq-default header-line-format mode-line-format)
+      (setq-default mode-line-format nil)
+    ))
+  (move-up-modeline)
+)
 #+end_src
 
 *NOTE1*: [[Nerd-icons]] are necessary. Run [[elisp:nerd-icons-install-fonts][M-x nerd-icons-install-fonts]] to install the resource fonts.
@@ -2288,7 +2423,7 @@ Emacs currently cannot display correpng or svg with alpha channels, when emacs's
         dashboard-set-file-icons t
         initial-buffer-choice (lambda () (get-buffer-create "*scratch*"))
         dashboard-startup-banner ;; use custom image as banner
-        (concat user-emacs-directory "assets/EmaxBound.webp")
+        (concat user-emacs-directory "assets/EmaxBound.xpm")
         dashboard-items
         '((recents . 5)
           (agenda . 5 )
@@ -2356,22 +2491,27 @@ Emacs currently cannot display correpng or svg with alpha channels, when emacs's
 [[https://github.com/magit/magit][Magit]] is a VERY powerful git client.
 #+begin_src elisp
 (use-package magit
-  :defer t
-  :commands (magit-add-section-hook)
-  :hook (magit-mode . solaire-mode) (magit-mode . olivetti-mode)
-  :config
+:defer t
+:commands (magit-add-section-hook)
+:hook (magit-mode . solaire-mode) (magit-mode . olivetti-mode)
+:config
   (magit-add-section-hook 'magit-status-sections-hook
         'magit-insert-modules
         'magit-insert-stashes
         'append
         )
   (setq magit-show-long-lines-warning nil)
+  (set-face-attribute 'magit-hash nil :inherit 'fixed-pitch)
+  (set-face-attribute 'magit-diff-removed-highlight nil :inherit 'fixed-pitch)
+  (set-face-attribute 'magit-diff-context-highlight nil :inherit 'fixed-pitch)
+  (set-face-attribute 'magit-diff-added-highlight nil :inherit 'fixed-pitch)
+
   (general-def
   :keymaps '(magit-mode-map)
-  "n"   'magit-gitignore
-  "p"   'magit-push
-  "P"   'magit-pull
-  "DEL" 'magit-discard
+    "n"   'magit-gitignore
+    "p"   'magit-push
+    "P"   'magit-pull
+    "DEL" 'magit-discard
   )
 )
 #+end_src
@@ -2381,30 +2521,78 @@ Emacs currently cannot display correpng or svg with alpha channels, when emacs's
 [submodule "magit"]
   no-byte-compile = lisp/magit-libgit.el
 #+end_src
-*** Diff
+*** Diff-hl
 :PROPERTIES:
 :CUSTOM_ID: a7e7f5b2-64ce-4430-95a4-9ee10af93f9b
 :END:
 
 Diff highlight highlights the fringe of lines that have been edited.
 #+begin_src elisp
-  (use-package diff-hl
-  :custom-face
-    (diff-hl-change ((t (:background "#2c5f72" :foreground "#77a8d9"))))
-    (diff-hl-delete ((t (:background "#844953" :foreground "#f27983"))))
-    (diff-hl-insert ((t (:background "#5E734A" :foreground "#a6cc70"))))
-  :config
-    (setq diff-hl-draw-borders nil)
-    (global-diff-hl-mode)
-    ;(diff-hl-margin-mode)
-    (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
-  )
+(use-package diff-hl
+:custom-face
+  (diff-hl-change ((t (:background "#2c5f72" :foreground "#77a8d9"))))
+  (diff-hl-delete ((t (:background "#844953" :foreground "#f27983"))))
+  (diff-hl-insert ((t (:background "#5E734A" :foreground "#a6cc70"))))
+:init
+  (setq diff-hl-draw-borders nil)
+:config
+  ;(global-diff-hl-mode)
+  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh t)
+  (add-hook 'prog-mode-hook #'diff-hl-mode)
+  (add-hook 'conf-mode-hook #'diff-hl-mode)
+  (add-hook 'dired-mode-hook #'diff-hl-dired-mode)
+
+
+  (add-hook 'magit-pre-refresh-hook #'diff-hl-magit-pre-refresh)
+  (add-hook 'magit-post-refresh-hook #'diff-hl-magit-post-refresh)
+  ;; Highlight on-the-fly
+  (diff-hl-flydiff-mode 1)
+  (unless (display-graphic-p)
+    ;; Fall back to the display margin since the fringe is unavailable in tty
+    (diff-hl-margin-mode 1)
+    ;; Avoid restoring `diff-hl-margin-mode'
+    (with-eval-after-load 'desktop
+      (add-to-list 'desktop-minor-mode-table
+                   '(diff-hl-margin-mode nil))))
+)
 #+end_src
 
-** File-manager
+** Dired
 :PROPERTIES:
 :CUSTOM_ID: 206f2252-10b8-49ed-bba3-f70dc0eb3b8d
 :END:
+*** Dired
+*** Diredfl
+:PROPERTIES:
+:CUSTOM_ID: af5fc17a-95de-4c3f-a1af-85b005311873
+:END:
+[[https://github.com/purcell/diredfl][Diredfl]] defines extra font lock rules to make dired more colorful.
+#+begin_src elisp
+  (use-package diredfl
+  :after dired
+  :hook
+    ((dired-mode . diredfl-mode)
+     ;; highlight parent and directory preview as well
+     (dirvish-directory-view-mode . diredfl-mode))
+  :config
+    (set-face-attribute 'diredfl-dir-name nil :bold t)
+  )
+#+end_src
+
+Tweaks to build dirvish. Load dirvish and its extensions.
+#+begin_src conf
+[submodule "dirvish"]
+  load-path = .
+  load-path = extensions
+#+end_src
+*** COMMENT Dired-all-the-icons
+
+#+begin_src elisp
+(use-package all-the-icons-dired
+  :hook (dired-mode . all-the-icons-dired-mode)
+)
+#+end_src
+
 *** Dirvish
 :PROPERTIES:
 :CUSTOM_ID: 4a83db9a-d850-49a5-9d00-84010319e6f6
@@ -2445,6 +2633,8 @@ Dirvish is a dropin replacement for dired. It looks and feels like ranger.
       "q"      '(dirvish-quit              :wk "quit")
       "j"      '(dired-up-directory        :wk "up-dir")
       ";"      '(dired-find-file           :wk "open/toggle")
+      "C-b"    '(dired-up-directory        :wk "up-dir")
+      "C-f"    '(dired-find-file           :wk "open/toggle")
       "a"      '(dirvish-quick-access      :wk "access")
       "c"      '(dired-do-copy             :wk "copy")
       "u"      '(dired-do-rename           :wk "rename")
@@ -2475,29 +2665,6 @@ Dirvish is a dropin replacement for dired. It looks and feels like ranger.
     ;; )
     (dirvish-override-dired-mode)
   )
-#+end_src
-
-*** Diredfl
-:PROPERTIES:
-:CUSTOM_ID: af5fc17a-95de-4c3f-a1af-85b005311873
-:END:
-[[https://github.com/purcell/diredfl][Diredfl]] defines extra font lock rules to make dired more colorful.
-#+begin_src elisp
-  (use-package diredfl
-  :hook
-    ((dired-mode . diredfl-mode)
-     ;; highlight parent and directory preview as well
-     (dirvish-directory-view-mode . diredfl-mode))
-  :config
-    (set-face-attribute 'diredfl-dir-name nil :bold t)
-  )
-#+end_src
-
-Tweaks to build dirvish. Load dirvish and its extensions.
-#+begin_src conf
-[submodule "dirvish"]
-  load-path = .
-  load-path = extensions
 #+end_src
 
 *** COMMENT Treemacs
@@ -2827,6 +2994,10 @@ Highlights the line that the cursor locates.
 
 [[https://www.emacswiki.org/emacs/WhiteSpace][Whitespace mode]] is a built in mode of emacs that visualizes whitespaces, tab symbols, indentations and related stuffs.
 #+begin_src elisp
+(use-package whitespace
+:config
+  (setq whitespace-line-column 1000) ;; do not want line to be highlighted
+)
   ;; (config/leader :infix "t"
   ;;   "SPC"  '(whitespace-mode  :wk "󰡭 Show Space")
   ;; )
@@ -2836,35 +3007,36 @@ Highlights the line that the cursor locates.
 :CUSTOM_ID: 438334d9-53c1-4a75-bd5a-90ee0fd26cc9
 :END:
 #+begin_src elisp
-  (use-package emacs
-  :hook (prog-mode . config/toggle-line-number-absolute)
-  :config
-        (defun config/toggle-line-number-nil ()
-            (interactive)
-            (setq display-line-numbers nil)
-        )
-        (defun config/toggle-line-number-absolute ()
-            (interactive)
-            (setq display-line-numbers t)
-        )
-        (defun config/toggle-line-number-relative ()
-            (interactive)
-            (setq display-line-numbers 'relative)
-        )
-        (defun config/toggle-line-number-visual ()
-            (interactive)
-            (setq display-line-numbers 'visual)
-        )
-        (my/leader :infix "tl"
-         ""    '(nil                                :wk "  Line Number ")
-         "DEL" '(which-key-undo                     :wk "󰕍 Undo key   ")
-         "n"   '(config/toggle-line-number-nil      :wk "󰅖 Nil        ")
-         "a"   '(config/toggle-line-number-absolute :wk "󰱇 Absolute   ")
-         "r"   '(config/toggle-line-number-relative :wk "󰰠 Relative   ")
-         "v"   '(config/toggle-line-number-visual   :wk " Visual     ")
-         "h"   '(hl-line-mode                       :wk "󰸱 Hl-line")
-        )
-  )
+(use-package emacs
+:hook (prog-mode . config/toggle-line-number-absolute)
+:init (setq display-line-numbers-width 4)
+:config
+      (defun config/toggle-line-number-nil ()
+          (interactive)
+          (setq display-line-numbers nil)
+      )
+      (defun config/toggle-line-number-absolute ()
+          (interactive)
+          (setq display-line-numbers t)
+      )
+      (defun config/toggle-line-number-relative ()
+          (interactive)
+          (setq display-line-numbers 'relative)
+      )
+      (defun config/toggle-line-number-visual ()
+          (interactive)
+          (setq display-line-numbers 'visual)
+      )
+      (my/leader :infix "tl"
+       ""    '(nil                                :wk "  Line Number ")
+       "DEL" '(which-key-undo                     :wk "󰕍 Undo key   ")
+       "n"   '(config/toggle-line-number-nil      :wk "󰅖 Nil        ")
+       "a"   '(config/toggle-line-number-absolute :wk "󰱇 Absolute   ")
+       "r"   '(config/toggle-line-number-relative :wk "󰰠 Relative   ")
+       "v"   '(config/toggle-line-number-visual   :wk " Visual     ")
+       "h"   '(hl-line-mode                       :wk "󰸱 Hl-line")
+      )
+)
 #+end_src
 
 *** Rainbow-mode
@@ -2925,7 +3097,9 @@ than `electric-indent-mode'.
   (setq highlight-indent-guides-method 'character
         highlight-indent-guides-character 9474
         highlight-indent-guides-auto-enabled nil
+        highlight-indent-guides-responsive nil
   )
+
   (set-face-attribute 'highlight-indent-guides-character-face nil
     :foreground "#3b445f")
   (set-face-attribute 'highlight-indent-guides-top-character-face nil
@@ -2936,9 +3110,12 @@ than `electric-indent-mode'.
 *** COMMENT Indent-bars
 #+begin_src elisp
 (use-package indent-bars
-  :custom
+:custom
   (indent-bars-no-descend-string t)
-  :hook ((progn-mode) . indent-bars-mode)
+  (indent-bars-color-by-depth '(:palette ("LightSteelBlue4")))
+  (indent-bars-pattern ".")
+  (indent-bars-width-frac 0.1)
+:hook ((progn-mode) . indent-bars-mode)
 )
 #+end_src
 ** Parens
@@ -2962,7 +3139,10 @@ than `electric-indent-mode'.
 :init
   (show-paren-mode 0)
 :config
-  (setq highlight-parentheses-highlight-adjacent 1)
+  (setq highlight-parentheses-highlight-adjacent 1
+        highlight-parentheses-attributes '((:box (:line-width (-1 . -1))))
+        highlight-parentheses-colors nil
+        highlight-parentheses-delay 0.03)
   (global-highlight-parentheses-mode)
   )
 #+end_src
@@ -3189,7 +3369,7 @@ fingertip.el is a plugin that provides grammatical edit base on treesit
 :PROPERTIES:
 :CUSTOM_ID: b631d5dd-1e0a-4499-b2b1-7275666b5f1f
 :END:
-*** Treesit-auto
+*** COMMENT Treesit-auto
 :PROPERTIES:
 :CUSTOM_ID: e59e6985-9ec3-4bea-8bf0-552741c5029d
 :END:
@@ -3222,7 +3402,7 @@ When configuring treesit the following things are worth considering:
     (add-hook 'python-ts-mode-hook #'treesitter-context-mode)
     )
 #+end_src
-*** COMMENT Lazycat's method
+*** Lazycat's method
 :PROPERTIES:
 :CUSTOM_ID: ad854d70-6c48-4e35-8fb6-0591ba5e5c20
 :END:
@@ -3353,6 +3533,12 @@ Auto save saves your buffer after entering idle state.
 #+begin_src elisp
 (setq-default lexical-binding t)
 #+end_src
+** Lisp
+#+begin_src elisp
+(use-package lisp-mode
+:mode "\\.yuck\\'"
+)
+#+end_src
 ** LaTeX
 :PROPERTIES:
 :CUSTOM_ID: 76c817ec-2dac-425e-b8a3-a04d6946892f
@@ -3371,7 +3557,7 @@ To build auctex, =autoconf= should be avaliable on your system.
 [submodule "auctex"]
   load-path = .
   build-step = ./autogen.sh
-  build-step = ./configure --with-lispdir=~/.emacs.d/lib/auctex --with-texmf-dir=~/texmf
+  build-step = ./configure --with-lispdir="$HOME"/.emacs.d/lib/auctex --with-texmf-dir="$HOME"/texmf
   build-step = make
   build-step = make doc
   build-step = borg-maketexi
@@ -3523,8 +3709,8 @@ Change the font size of different org-levels.
   ;; (org-tag ((t (:foreground "LightSteelBlue4" :weight normal))))
 ;:hook (org-mode . mixed-pitch-mode)
 :config
-  (set-face-attribute 'outline-1 nil :height 1.6 )
-  (set-face-attribute 'outline-2 nil :height 1.4 )
+  (set-face-attribute 'outline-1 nil :height 1.8 )
+  (set-face-attribute 'outline-2 nil :height 1.6 )
   (set-face-attribute 'outline-3 nil :height 1.4 )
   (set-face-attribute 'outline-4 nil :height 1.3 )
   (set-face-attribute 'outline-5 nil :height 1.2 )
@@ -3559,9 +3745,11 @@ Change the font size of different org-levels.
       ("results" . "results")
       (t . t)))
   (setq org-modern-star
-   '("⚀" "⚁" "⚂" "⚃" "⚄" "⚅")
+   ;;'("⚀" "⚁" "⚂" "⚃" "⚄" "⚅")
+   '("󱅊" "󱅋" "󱅌" "󱅍" "󱅎" "󱅏")
+   ;; '("󰇊" "󰇋" "󰇌" "󰇍" "󰇎" "󰇏")
   )
-  (set-face-attribute 'org-modern-symbol nil :family "Noto Sans Symbols 2")
+  ;; (set-face-attribute 'org-modern-symbol nil :family "Noto Sans Symbols 2")
 ; '("☰" "☱" "☲" "☳" "☴" "☵" "☶" "☷")
 ; '("◉" "○" "◈" "◇" "✳")
   (setq org-modern-list ;; for '+' '-' '*' respectively
@@ -3569,8 +3757,15 @@ Change the font size of different org-levels.
   )
   (setq org-modern-block-fringe nil)
   (setq org-modern-todo nil)
-  ;; (setq org-modern-block-name '("⇲ " . "⇱ "))
-  ;; (setq org-modern-block-name '("◻ " . "◻ "))
+  ;; (setq org-modern-block-name )
+  (setq org-modern-block-name
+        '("⇲ " . "⇱ ")
+        ;; '("◻ " . "◻ ")
+        ;; '("" . "")
+        ;; '("󰨔" . "󰨔")
+        ;; '("󰨓" . "󰨓")
+        ;; '("󰝤 " . "󰝤 ") ; nf-md-square
+        )
   (set-face-attribute 'org-modern-block-name nil
      :inherit 'variable-pitch)
   (set-face-attribute 'org-meta-line nil
@@ -3702,12 +3897,15 @@ This package provides visual alignment for Org Mode, Markdown and table.el table
 :BACKLINKS:
 [[#20dbcac9-a7cb-4447-8b96-a490d1637b75][Local Keybindings]]
 :END:
-
+#+begin_src elisp
+(setq org-return-follows-link t)
+#+end_src
 #+begin_src elisp
 (my/mode-leader-def
+  :prefix-command 'my/org-cmd
+  :prefix-map 'my/org-map
   :keymaps '(org-mode-map)
-  :wk-full-keys nil
-  ;; ""   '(                :wk "")
+  ""    '(nil                              :wk "org-mode")
   "a"   '(org-attach                       :wk "attach")
   "b"   '(nil                              :wk "Babel")
   "c"   '(org-ctrl-c-ctrl-c                :wk "execute")
@@ -3740,6 +3938,9 @@ This package provides visual alignment for Org Mode, Markdown and table.el table
   "C-l" '(my/outline-down                  :wk "dwim ")
   "C-;" '(my/outline-right                 :wk "dwim ")
   )
+#+end_src
+
+#+begin_src elisp
 (my/mode-leader-def
   :keymaps '(org-mode-map)
   :infix "b"
@@ -4052,7 +4253,7 @@ Org Latex Preview configs. This makes the preview looks nicer.
 :after org
 :bind (("C-c c" . org-capture))
 :init
-  (setq org-directory "~/Org")
+  (setq org-directory "~/org")
 :config
   ;; if file path is not absolute
   ;; it is treated as relative path to org-directory
@@ -4073,9 +4274,9 @@ Org Latex Preview configs. This makes the preview looks nicer.
     ("i" "Inbox" entry
       (file "inbox.org")
       "* %U - %? %^g\n")
-       '("h" "Hugo post" entry
-      (file+olp "capture.org" "Notes")
-      (function org-hugo-new-subtree-post-capture-template))
+    ("h" "Hugo post" entry
+     (file+olp "capture.org" "Notes")
+     (function org-hugo-new-subtree-post-capture-template))
   )))
 )
 #+end_src
@@ -4580,6 +4781,7 @@ There're 3 common ways to export org into PDF.
 :END:
 #+begin_src elisp
 (use-package ox-ipynb
+:defer t
 :after ox
   )
 #+end_src
@@ -4688,9 +4890,184 @@ Easy-hugo
 :PROPERTIES:
 :CUSTOM_ID: 763733ef-e1a9-4b5e-a30f-f5bb468b11ba
 :END:
+Telegram inside emacs!
 #+begin_src elisp
 (use-package telega
+  :defer t
+  :hook (telega-chat-mode .
+                          (lambda ()
+                            (visual-fill-column-mode 0)
+                            (config/window-center 102)
+                            (solaire-mode -1)
+                            ))
+  :init
+  (setq telega-server-libs-prefix "~/.nix-profile")
+  (setq telega-avatar-workaround-gaps-for '(return t)) ;; solves broken avatar
+  (setq telega-emoji-use-images nil) ;; or emoji will look monochrome and broken
+  (setq ;; telega-root
+   ;; telega-root-default-view-function 'telega-view-folders
+   telega-root-keep-cursor 'track
+   telega-root-buffer-name "*Telega Root*"
+   telega-root-fill-column 70 ; fill-column
+   telega-symbol-folder "  ")
+  (setq telega-symbol-forum (nerd-icons-mdicon "nf-md-format_list_text"))
+  (setq telega-brackets
+        `(((chat (type private))
+           ,(concat " "
+             (nerd-icons-mdicon "nf-md-account"
+                                :face '(:foreground "#86dffd" :height 0.7))
+             " ") " ")
+          ((chat (type bot))
+           ,(concat " "
+             (nerd-icons-mdicon "nf-md-robot"
+                                :face '(:foreground "#86dffd" :height 0.7))
+             " ") " ")
+          ((chat (type basicgroup))
+           ,(concat " "
+             (nerd-icons-mdicon "nf-md-account_multiple"
+                                :face '(:foreground "#70bcff" :height 0.7))
+             " ") " ")
+          ((chat (type supergroup))
+           ,(concat " "
+             (nerd-icons-mdicon "nf-md-account_multiple"
+                                :face '(:foreground "#70bcff" :height 0.7))
+             " ") " ")
+          ((chat (type channel))
+           ,(concat " "
+             (nerd-icons-faicon "nf-fa-feed"
+                                :face '(:foreground "#ffa95f" :height 0.7))
+             " ") " ")
+          ((user (return t))
+           ,(concat " "
+             (nerd-icons-mdicon "nf-md-account"
+                                :face '(:foreground "#86dffd" :height 0.7))
+             " ") " ")
+          ((return t)
+           ,(concat " "
+             (nerd-icons-faicon "nf-fa-question_circle"
+                                :face '(:foreground "#ff0000" :height 0.7))
+             " ") " "))
+        )
+  (general-def
+    :keymaps '(telega-msg-button-map)
+    "SPC" nil
+    "l"   nil
+    "C"   'telega-msg-copy-link
+    )
+
+  )
+#+end_src
+
+#+begin_src conf
+[submodule "telega"]
+  ;; build-nix-shell-packages = tdlib
+  build-step = make server
+  build-step = make autoloads
+  build-step = borg-update-autoloads
+  build-step = borg-compile
+  build-step = borg-maketexi
+  build-step = borg-makeinfo
+#+end_src
+** Elfeed
+:PROPERTIES:
+:CUSTOM_ID: eac8de6e-d1e9-45d9-a516-67b98f113c4b
+:END:
+Elfeed is emacs's built-in rss reader.
+
+The following config adds nerd icons, copied from [[https://emacs-china.org/t/elfeed-nerd-icons/26125][Emacs China]].
+#+begin_src elisp
+(use-package elfeed
 :defer t
+:hook
+  (elfeed-search-mode .
+    (lambda () (config/window-center 110) (solaire-mode -1)))
+  (elfeed-show-mode .
+    (lambda () (config/window-center 114) (solaire-mode -1)))
+:config
+  (defun nerd-icon-for-tags (tags)
+    "Generate Nerd Font icon based on tags.
+  Returns default if no match."
+    (cond
+     ((member "youtube" tags)
+      (nerd-icons-faicon "nf-fa-youtube_play" :face '(:foreground "#FF0200")))
+     ((member "instagram" tags)
+      (nerd-icons-faicon "nf-fa-instagram" :face '(:foreground "#FF00B9")))
+     ((member "emacs" tags)
+      (nerd-icons-sucicon "nf-custom-emacs" :face '(:foreground "#9A5BBE")))
+     ((member "github" tags)
+      (nerd-icons-faicon "nf-fa-github"))
+     ((member "zhihu" tags)
+      (nerd-icons-mdicon "nf-md-alpha_z_box" :face '(:foreground "#1772F6")))
+     ((member "bilibili" tags)
+      (nerd-icons-mdicon "nf-md-alpha_b_box" :face '(:foreground "#FB7299")))
+     (t
+      (nerd-icons-faicon "nf-fae-feedly" :face '(:foreground "#2AB24C")))))
+
+  (defun my/elfeed-search-print-entry--better-default (entry)
+    "Print ENTRY to the buffer."
+    (let* ((date (elfeed-search-format-date (elfeed-entry-date entry)))
+           (date-width (car (cdr elfeed-search-date-format)))
+           (title (concat (or (elfeed-meta entry :title)
+                              (elfeed-entry-title entry) "")
+                          ;; NOTE: insert " " for overlay to swallow
+                          " "))
+           (title-faces (elfeed-search--faces (elfeed-entry-tags entry)))
+           (feed (elfeed-entry-feed entry))
+           (feed-title (when feed (or (elfeed-meta feed :title) (elfeed-feed-title feed))))
+           (tags (mapcar #'symbol-name (delq 'unread (elfeed-entry-tags entry))))
+           (tags-str (mapconcat (lambda (s) (propertize s 'face 'elfeed-search-tag-face)) tags ","))
+           (title-width (- (frame-width)
+                           ;; (window-width (get-buffer-window (elfeed-search-buffer) t))
+                           date-width elfeed-search-trailing-width))
+           (title-column (elfeed-format-column
+                          title (elfeed-clamp
+                                 elfeed-search-title-min-width
+                                 title-width
+                                 elfeed-search-title-max-width) :left))
+
+
+           ;; Title/Feed ALIGNMENT
+           (align-to-feed-pixel (+ 2 date-width
+                                   (max elfeed-search-title-min-width
+                                        (min title-width elfeed-search-title-max-width)))))
+      (insert (propertize date 'face 'elfeed-search-date-face) "  ")
+      (insert (propertize title-column 'face title-faces 'kbd-help title))
+      (put-text-property (1- (point)) (point) 'display `(space :align-to ,align-to-feed-pixel))
+      ;; (when feed-title (insert " " (propertize feed-title 'face 'elfeed-search-feed-face) " "))
+      (when feed-title
+        (insert " " (concat (nerd-icon-for-tags tags) " ")
+                (propertize feed-title 'face 'elfeed-search-feed-face) " "))
+      (when tags (insert "(" tags-str ")"))))
+
+  (setq  elfeed-search-print-entry-function
+         #'my/elfeed-search-print-entry--better-default)
+)
+#+end_src
+*** COMMENT Elfeed-goodies
+#+begin_src elisp
+(use-package elfeed-goodies
+  :hook (after-init . elfeed-goodies/setup)
+  :config
+  ;; set elfeed show entry switch function
+  (setq elfeed-show-entry-switch #'elfeed-goodies/switch-pane) ; switch-to-buffer, pop-to-buffer
+  )
+#+end_src
+*** Elfeed-org
+#+begin_src elisp
+(use-package elfeed-org
+:after elfeed
+:init
+  (setq rmh-elfeed-org-files (list "~/.emacs.d/elfeed.org"))
+  (elfeed-org)
+)
+#+end_src
+*** COMMENT Elfeed-autotag
+#+begin_src elisp
+(use-package elfeed-autotag
+:after elfeed
+:config
+  (setq elfeed-autotag-files '("~/.emacs.d/elfeed.org"))
+  (elfeed-autotag)
 )
 #+end_src
 ** PDF-Tools
@@ -4742,21 +5119,11 @@ Run =M-x pdf-tools-install= to install libraries needed.
 ;; Just slightly brighter background to see the page boarders
 (setq pdf-view-midnight-colors '("#c6c6c6" . "#363636")))
 #+end_src
-** Elfeed
-:PROPERTIES:
-:CUSTOM_ID: eac8de6e-d1e9-45d9-a516-67b98f113c4b
-:END:
+** Nov
+nov.el provides a major mode for reading EPUB documents.
 #+begin_src elisp
-(use-package elfeed
-:defer t
-:config
-  (setq elfeed-feeds '(
-      ("http://nullprogram.com/feed/" blog emacs)
-      "http://www.50ply.com/atom.xml"  ; no autotagging
-      ("http://nedroid.com/feed/" webcomic)
-    )
-  )
-)
+(use-package nov
+:defer t)
 #+end_src
 ** Mu4e
 :PROPERTIES:
@@ -4811,11 +5178,7 @@ tweaks to build eaf
 :CUSTOM_ID: 5964883d-f883-4ec2-b064-87501622ab3a
 :END:
 #+begin_src elisp
-(add-hook 'tetris-mode-hook
-  (defun config/tetris-center ()
-    (config/window-center 76)
-  )
-)
+(add-hook 'tetris-mode-hook (lambda () (config/window-center 76)))
 #+end_src
 
 *** 2048
@@ -4823,11 +5186,7 @@ tweaks to build eaf
 :CUSTOM_ID: 781bdb48-691a-4d65-a575-ab1f236620c7
 :END:
 #+begin_src elisp
-(add-hook '2048-mode-hook
-  (defun config/2048-center ()
-    (config/window-center 35)
-  )
-)
+(add-hook '2048-mode-hook (lambda () (config/window-center 35)))
 #+end_src
 
 ** Emacs-Everywhere
@@ -4872,5 +5231,12 @@ Takes emacs-everywhere with you, all over your system
 :CUSTOM_ID: 89a426af-df86-4d55-aac2-160919674c22
 :END:
 This subtree is used to execute some elisps to test.
- #+begin_src elisp :results value
- #+end_src
+#+begin_src elisp :results value
+
+#+end_src
+* TODO Plugins
+** Org-denote
+** Completion
+*** flx-rs + fussy
+*** hotfuzz
+***

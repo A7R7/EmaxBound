@@ -30,6 +30,7 @@
   (setq use-package-verbose t
         use-package-expand-minimally nil
         use-package-compute-statistics t
+        use-package-minimum-reported-time 0.001
         ;;debug-on-error t
   )
   ;; (setq use-package-verbose nil

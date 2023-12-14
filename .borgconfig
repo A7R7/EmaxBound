@@ -25,7 +25,7 @@ no-byte-compile = emacsql-pg.el
 [submodule "auctex"]
   load-path = .
   build-step = ./autogen.sh
-  build-step = ./configure --with-lispdir=~/.emacs.d/lib/auctex --with-texmf-dir=~/texmf
+  build-step = ./configure --with-lispdir="$HOME"/.emacs.d/lib/auctex --with-texmf-dir="$HOME"/texmf
   build-step = make
   build-step = make doc
   build-step = borg-maketexi
@@ -34,6 +34,15 @@ no-byte-compile = emacsql-pg.el
 
 [submodule "org"]
   load-path = lisp
+  build-step = make autoloads
+  build-step = borg-update-autoloads
+  build-step = borg-compile
+  build-step = borg-maketexi
+  build-step = borg-makeinfo
+
+[submodule "telega"]
+  ;; build-nix-shell-packages = tdlib
+  build-step = make server
   build-step = make autoloads
   build-step = borg-update-autoloads
   build-step = borg-compile
