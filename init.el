@@ -465,6 +465,8 @@
   "b"      '(nil                             :wk "borg")
   "e"      '(elfeed                          :wk " elfeed")
   "t"      '(telega                          :wk " telega")
+  "p"      '(profiler-start                  :wk " profiler")
+  "P"      '(profiler-stop                   :wk "profiler stop")
 )
 ;; Global leader:3 ends here
 
@@ -522,14 +524,24 @@
 ;; [[file:config.org::*Global leader][Global leader:7]]
 ;; toggle
 (my/leader :infix "t"
-  "p"       '(profiler-cpu-start             :wk " profile")
+  "o"       '(olivetti-mode                  :wk "󰼭 olivetti")
+  "l"       '(nil                            :wk " line Number ")
+  )
+
+(my/leader :infix "tl"
+  "DEL" '(which-key-undo                     :wk "󰕍 Undo key   ")
+  "n"   '(config/toggle-line-number-nil      :wk "󰅖 Nil        ")
+  "a"   '(config/toggle-line-number-absolute :wk "󰱇 Absolute   ")
+  "r"   '(config/toggle-line-number-relative :wk "󰰠 Relative   ")
+  "v"   '(config/toggle-line-number-visual   :wk " Visual     ")
+  "h"   '(hl-line-mode                       :wk "󰸱 Hl-line")
   )
 ;; Global leader:7 ends here
 
 ;; [[file:config.org::*Global leader][Global leader:8]]
 ;; Git
 (my/leader :infix "g"
-  ""        '(nil                            :wk " Git")
+  ""        '(nil                            :wk "git")
   "g"       '(magit                          :wk " magit")
   )
 ;; Global leader:8 ends here
@@ -1156,7 +1168,7 @@ Version 2017-06-02"
 (use-package doom-modeline
 :init
       (setq
-          doom-modeline-height 37
+          ;; doom-modeline-height 37
           doom-modeline-enable-word-count t
           doom-modeline-modal nil
           )
@@ -1241,13 +1253,13 @@ Version 2017-06-02"
 (use-package magit
 :defer t
 :commands (magit-add-section-hook)
-:hook (magit-mode . solaire-mode) (magit-mode . olivetti-mode)
+;; :hook (magit-mode . olivetti-mode)
 :config
   (magit-add-section-hook 'magit-status-sections-hook
-        'magit-insert-modules
-        'magit-insert-stashes
-        'append
-        )
+                          'magit-insert-modules
+                          'magit-insert-stashes
+                          'append
+                          )
   (setq magit-show-long-lines-warning nil)
   (set-face-attribute 'magit-hash nil :inherit 'fixed-pitch)
   (set-face-attribute 'magit-diff-removed-highlight nil :inherit 'fixed-pitch)
@@ -1338,6 +1350,7 @@ Version 2017-06-02"
 
   (general-def dirvish-mode-map
     "q"      '(dirvish-quit              :wk "quit")
+    "TAB"    '(dirvish-toggle-subtree    :wk "subtree toggle")
     "j"      '(dired-up-directory        :wk "up-dir")
     ";"      '(dired-find-file           :wk "open/toggle")
     "C-b"    '(dired-up-directory        :wk "up-dir")
@@ -1345,7 +1358,7 @@ Version 2017-06-02"
     "a"      '(dirvish-quick-access      :wk "access")
     "c"      '(dired-do-copy             :wk "copy")
     "u"      '(dired-do-rename           :wk "rename")
-  )
+    )
   ;; (nmap dirvish-mode-map
   ;;    "?"      '(dirvish-dispatch          :wk "Dispatch")
   ;;    "TAB"    '(dirvish-subtree-toggle    :wk "Subtre-toggle")
@@ -1429,7 +1442,7 @@ Version 2017-06-02"
 
 ;; [[file:config.org::*Holo-layer][Holo-layer:1]]
 (use-package holo-layer
-:defer t
+:commands holo-layer-enable
 :if (memq window-system '(pgtk mac ns))
 :config
   (setq holo-layer-enable-cursor-animation 1
@@ -1533,15 +1546,6 @@ Version 2017-06-02"
       (defun config/toggle-line-number-visual ()
           (interactive)
           (setq display-line-numbers 'visual)
-      )
-      (my/leader :infix "tl"
-       ""    '(nil                                :wk "  Line Number ")
-       "DEL" '(which-key-undo                     :wk "󰕍 Undo key   ")
-       "n"   '(config/toggle-line-number-nil      :wk "󰅖 Nil        ")
-       "a"   '(config/toggle-line-number-absolute :wk "󰱇 Absolute   ")
-       "r"   '(config/toggle-line-number-relative :wk "󰰠 Relative   ")
-       "v"   '(config/toggle-line-number-visual   :wk " Visual     ")
-       "h"   '(hl-line-mode                       :wk "󰸱 Hl-line")
       )
 )
 ;; Line Number:1 ends here
@@ -1664,6 +1668,8 @@ Version 2017-06-02"
 
 ;; [[file:config.org::*LSP-bridge][LSP-bridge:1]]
 (use-package lsp-bridge
+:init
+  (setq lsp-bridge-java-lsp-server "jdt-language-server")
 :config
   (global-lsp-bridge-mode)
   ;(set-face-attributes 'lsp-bridge-alive-mode-line nil
@@ -1817,6 +1823,7 @@ Version 2017-06-02"
         (typescript-mode . typescript-ts-mode)
         (rust-mode       . rust-ts-mode)
         ))
+  ;; (advice-add 'org-src-get-lang-mode :filter-return #'my/remap-mode)
 
 (add-hook 'markdown-mode-hook #'(lambda ()
           (treesit-parser-create 'markdown)))
@@ -1914,6 +1921,12 @@ Version 2017-06-02"
 :defer t
   )
 ;; Jupyter:1 ends here
+
+;; [[file:config.org::*Rust][Rust:1]]
+(use-package ron-mode
+:mode "\\.ron\\'"
+)
+;; Rust:1 ends here
 
 ;; [[file:config.org::*Verilog][Verilog:1]]
 (use-package verilog-mode
@@ -2424,7 +2437,7 @@ Version 2017-06-02"
 ;; [[file:config.org::*Custom-ID][Custom-ID:1]]
 (use-package org
 :config
-  (defun org-add-custom-id ()
+  (defun my/org-add-custom-id ()
     "Add CUSTOM_ID property to current heading, skip if already have"
     (interactive)
     (let ((custom-id (org-entry-get nil "CUSTOM_ID")))
@@ -2432,7 +2445,7 @@ Version 2017-06-02"
         (org-set-property "CUSTOM_ID" (org-id-new))))
     )
 
-  (defun org-add-custom-id-to-all-headings ()
+  (defun my/org-add-custom-id-to-all-headings ()
     "Add CUSTOM_ID properties to headings without a CUSTOM_ID property in current Org buffer."
     (interactive)
     (org-map-entries

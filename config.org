@@ -1077,6 +1077,8 @@ I generally do not use meow's keypad, because meow's keypad highly relies on van
   "b"      '(nil                             :wk "borg")
   "e"      '(elfeed                          :wk " elfeed")
   "t"      '(telega                          :wk " telega")
+  "p"      '(profiler-start                  :wk " profiler")
+  "P"      '(profiler-stop                   :wk "profiler stop")
 )
 #+end_src
 
@@ -1135,14 +1137,25 @@ I generally do not use meow's keypad, because meow's keypad highly relies on van
 #+begin_src elisp
 ;; toggle
 (my/leader :infix "t"
-  "p"       '(profiler-cpu-start             :wk " profile")
+  "o"       '(olivetti-mode                  :wk "󰼭 olivetti")
+  "l"       '(nil                            :wk " line Number ")
   )
+
+(my/leader :infix "tl"
+  "DEL" '(which-key-undo                     :wk "󰕍 Undo key   ")
+  "n"   '(config/toggle-line-number-nil      :wk "󰅖 Nil        ")
+  "a"   '(config/toggle-line-number-absolute :wk "󰱇 Absolute   ")
+  "r"   '(config/toggle-line-number-relative :wk "󰰠 Relative   ")
+  "v"   '(config/toggle-line-number-visual   :wk " Visual     ")
+  "h"   '(hl-line-mode                       :wk "󰸱 Hl-line")
+  )
+
 #+end_src
 
 #+begin_src elisp
 ;; Git
 (my/leader :infix "g"
-  ""        '(nil                            :wk " Git")
+  ""        '(nil                            :wk "git")
   "g"       '(magit                          :wk " magit")
   )
 #+end_src
@@ -2323,7 +2336,7 @@ Code stolen from [[https://emacs-china.org/t/27-1-tab-line-mode/20514][Emacs Chi
 (use-package doom-modeline
 :init
       (setq
-          doom-modeline-height 37
+          ;; doom-modeline-height 37
           doom-modeline-enable-word-count t
           doom-modeline-modal nil
           )
@@ -2493,13 +2506,13 @@ Emacs currently cannot display correpng or svg with alpha channels, when emacs's
 (use-package magit
 :defer t
 :commands (magit-add-section-hook)
-:hook (magit-mode . solaire-mode) (magit-mode . olivetti-mode)
+;; :hook (magit-mode . olivetti-mode)
 :config
   (magit-add-section-hook 'magit-status-sections-hook
-        'magit-insert-modules
-        'magit-insert-stashes
-        'append
-        )
+                          'magit-insert-modules
+                          'magit-insert-stashes
+                          'append
+                          )
   (setq magit-show-long-lines-warning nil)
   (set-face-attribute 'magit-hash nil :inherit 'fixed-pitch)
   (set-face-attribute 'magit-diff-removed-highlight nil :inherit 'fixed-pitch)
@@ -2600,71 +2613,72 @@ Tweaks to build dirvish. Load dirvish and its extensions.
 Dirvish is a dropin replacement for dired. It looks and feels like ranger.
 
 #+begin_src elisp
-  (use-package dirvish
-  :after dired
-  :custom
-    (dirvish-quick-access-entries ;`setq' won't work for custom
-      '(("h" "~/"                          "Home")
-        ("d" "~/Downloads/"                "Downloads")
-        ("m" "/mnt/"                       "Drives")
-        ("t" "~/.local/share/Trash/files/" "TrashCan"))
-    )
-  :config
-    (dirvish-define-preview exa (file)
-    "Use `exa' to generate directory preview."
-    :require ("exa") ; tell Dirvish to check if we have the executable
-    (when (file-directory-p file) ; we only interest in directories here
-        `(shell . ("exa" "-al" "--color=always" "--icons"
-            "--group-directories-first" ,file))))
-
-    (add-to-list 'dirvish-preview-dispatchers 'exa)
-    ;; (dirvish-peek-mode) ; Preview files in minibuffer
-    ;; (dirvish-side-follow-mode) ; similar to `treemacs-follow-mode'
-    (setq dirvish-path-separators (list "  " "  " "  "))
-    (setq dirvish-mode-line-format
-        '(:left (sort symlink) :right (omit yank index)))
-    (setq dirvish-attributes
-        '(all-the-icons file-time file-size collapse subtree-state vc-state git-msg))
-    (setq delete-by-moving-to-trash t)
-    (setq dired-listing-switches
-        "-l --almost-all --human-readable --group-directories-first --no-group")
-
-    (general-def dirvish-mode-map
-      "q"      '(dirvish-quit              :wk "quit")
-      "j"      '(dired-up-directory        :wk "up-dir")
-      ";"      '(dired-find-file           :wk "open/toggle")
-      "C-b"    '(dired-up-directory        :wk "up-dir")
-      "C-f"    '(dired-find-file           :wk "open/toggle")
-      "a"      '(dirvish-quick-access      :wk "access")
-      "c"      '(dired-do-copy             :wk "copy")
-      "u"      '(dired-do-rename           :wk "rename")
-    )
-    ;; (nmap dirvish-mode-map
-    ;;    "?"      '(dirvish-dispatch          :wk "Dispatch")
-    ;;    "TAB"    '(dirvish-subtree-toggle    :wk "Subtre-toggle")
-    ;;    "q"      '(dirvish-quit              :wk "Quit")
-    ;;    "h"      '(dired-up-directory        :wk "Up-dir")
-    ;;    "l"      '(dired-find-file           :wk "Open/Toggle")
-    ;;    "a"      '(dirvish-quick-access      :wk "Access")
-    ;;    "f"      '(dirvish-file-info-menu    :wk "File Info Menu")
-    ;;    "y"      '(dirvish-yank-menu         :wk "Yank Menu")
-    ;;    "N"      '(dirvish-narrow            :wk "Narrow")
-    ;;    ;         `dired-view-file'
-    ;;    "v"      '(dirvish-vc-menu           :wk "View-file")
-    ;;    ;         `dired-sort-toggle-or-edit'
-    ;;    "s"      '(dirvish-quicksort         :wk "Quick-sort")
-
-    ;;    "M-f"    '(dirvish-history-go-forward  :wk "History-forward")
-    ;;    "M-b"    '(dirvish-history-go-backward :wk "History-back")
-    ;;    "M-l"    '(dirvish-ls-switches-menu    :wk "ls Switch Menu")
-    ;;    "M-m"    '(dirvish-mark-menu           :wk "Mark Menu")
-    ;;    "M-t"    '(dirvish-layout-toggle       :wk "Layout-toggle")
-    ;;    "M-s"    '(dirvish-setup-menu          :wk "Setup-Menu")
-    ;;    "M-e"    '(dirvish-emerge-menu         :wk "Emerge-Menu")
-    ;;    "M-j"    '(dirvish-fd-jump             :wk "fd-jump")
-    ;; )
-    (dirvish-override-dired-mode)
+(use-package dirvish
+:after dired
+:custom
+  (dirvish-quick-access-entries ;`setq' won't work for custom
+    '(("h" "~/"                          "Home")
+      ("d" "~/Downloads/"                "Downloads")
+      ("m" "/mnt/"                       "Drives")
+      ("t" "~/.local/share/Trash/files/" "TrashCan"))
   )
+:config
+  (dirvish-define-preview exa (file)
+  "Use `exa' to generate directory preview."
+  :require ("exa") ; tell Dirvish to check if we have the executable
+  (when (file-directory-p file) ; we only interest in directories here
+      `(shell . ("exa" "-al" "--color=always" "--icons"
+          "--group-directories-first" ,file))))
+
+  (add-to-list 'dirvish-preview-dispatchers 'exa)
+  ;; (dirvish-peek-mode) ; Preview files in minibuffer
+  ;; (dirvish-side-follow-mode) ; similar to `treemacs-follow-mode'
+  (setq dirvish-path-separators (list "  " "  " "  "))
+  (setq dirvish-mode-line-format
+      '(:left (sort symlink) :right (omit yank index)))
+  (setq dirvish-attributes
+      '(all-the-icons file-time file-size collapse subtree-state vc-state git-msg))
+  (setq delete-by-moving-to-trash t)
+  (setq dired-listing-switches
+      "-l --almost-all --human-readable --group-directories-first --no-group")
+
+  (general-def dirvish-mode-map
+    "q"      '(dirvish-quit              :wk "quit")
+    "TAB"    '(dirvish-toggle-subtree    :wk "subtree toggle")
+    "j"      '(dired-up-directory        :wk "up-dir")
+    ";"      '(dired-find-file           :wk "open/toggle")
+    "C-b"    '(dired-up-directory        :wk "up-dir")
+    "C-f"    '(dired-find-file           :wk "open/toggle")
+    "a"      '(dirvish-quick-access      :wk "access")
+    "c"      '(dired-do-copy             :wk "copy")
+    "u"      '(dired-do-rename           :wk "rename")
+    )
+  ;; (nmap dirvish-mode-map
+  ;;    "?"      '(dirvish-dispatch          :wk "Dispatch")
+  ;;    "TAB"    '(dirvish-subtree-toggle    :wk "Subtre-toggle")
+  ;;    "q"      '(dirvish-quit              :wk "Quit")
+  ;;    "h"      '(dired-up-directory        :wk "Up-dir")
+  ;;    "l"      '(dired-find-file           :wk "Open/Toggle")
+  ;;    "a"      '(dirvish-quick-access      :wk "Access")
+  ;;    "f"      '(dirvish-file-info-menu    :wk "File Info Menu")
+  ;;    "y"      '(dirvish-yank-menu         :wk "Yank Menu")
+  ;;    "N"      '(dirvish-narrow            :wk "Narrow")
+  ;;    ;         `dired-view-file'
+  ;;    "v"      '(dirvish-vc-menu           :wk "View-file")
+  ;;    ;         `dired-sort-toggle-or-edit'
+  ;;    "s"      '(dirvish-quicksort         :wk "Quick-sort")
+
+  ;;    "M-f"    '(dirvish-history-go-forward  :wk "History-forward")
+  ;;    "M-b"    '(dirvish-history-go-backward :wk "History-back")
+  ;;    "M-l"    '(dirvish-ls-switches-menu    :wk "ls Switch Menu")
+  ;;    "M-m"    '(dirvish-mark-menu           :wk "Mark Menu")
+  ;;    "M-t"    '(dirvish-layout-toggle       :wk "Layout-toggle")
+  ;;    "M-s"    '(dirvish-setup-menu          :wk "Setup-Menu")
+  ;;    "M-e"    '(dirvish-emerge-menu         :wk "Emerge-Menu")
+  ;;    "M-j"    '(dirvish-fd-jump             :wk "fd-jump")
+  ;; )
+  (dirvish-override-dired-mode)
+)
 #+end_src
 
 *** COMMENT Treemacs
@@ -2878,7 +2892,7 @@ All the el files in treemacs are in =src/elisp= and =src/extra=
 [[https://github.com/manateelazycat/holo-layer][Holo-layer]] is developed based on PyQt, aiming to significantly enhance the visual experience of Emacs.
 #+begin_src elisp
   (use-package holo-layer
-  :defer t
+  :commands holo-layer-enable
   :if (memq window-system '(pgtk mac ns))
   :config
     (setq holo-layer-enable-cursor-animation 1
@@ -3026,15 +3040,6 @@ Highlights the line that the cursor locates.
       (defun config/toggle-line-number-visual ()
           (interactive)
           (setq display-line-numbers 'visual)
-      )
-      (my/leader :infix "tl"
-       ""    '(nil                                :wk "  Line Number ")
-       "DEL" '(which-key-undo                     :wk "󰕍 Undo key   ")
-       "n"   '(config/toggle-line-number-nil      :wk "󰅖 Nil        ")
-       "a"   '(config/toggle-line-number-absolute :wk "󰱇 Absolute   ")
-       "r"   '(config/toggle-line-number-relative :wk "󰰠 Relative   ")
-       "v"   '(config/toggle-line-number-visual   :wk " Visual     ")
-       "h"   '(hl-line-mode                       :wk "󰸱 Hl-line")
       )
 )
 #+end_src
@@ -3270,6 +3275,8 @@ parentheses, brackets, and braces according to their depth.
 [[https://github.com/manateelazycat/lsp-bridge][lsp-bridge]] builds a high-speed cache between Emacs and the LSP server.
 #+begin_src elisp
 (use-package lsp-bridge
+:init
+  (setq lsp-bridge-java-lsp-server "jdt-language-server")
 :config
   (global-lsp-bridge-mode)
   ;(set-face-attributes 'lsp-bridge-alive-mode-line nil
@@ -3280,7 +3287,8 @@ parentheses, brackets, and braces according to their depth.
 tweaks to build lsp-bridge
 #+begin_src conf
 [submodule "lsp-bridge"]
-  build-step = borg-update-autoloads
+  load-path = .
+  load-path = acm
 #+end_src
 
 ** Fingertip
@@ -3383,7 +3391,7 @@ When configuring treesit the following things are worth considering:
   :config
 
     (defun my/remap-mode (mode)
-      "A hack to make org-src-get-lang-mode respect major-mode-remap-alist"
+      "make org-src-get-lang-mode respect major-mode-remap-alist"
       (treesit-auto--set-major-remap)
       (alist-get mode major-mode-remap-alist mode)
       )
@@ -3409,92 +3417,93 @@ When configuring treesit the following things are worth considering:
 You can find the addresses of language parsers at [[https://tree-sitter.github.io/tree-sitter/][treesitter's official doc]].
 To enable treesit support for a language, you need to run =M-x treesit-install-language-grammar= and select the language. This will clone the language's tree-sitter repo and build it (requires system =cc=).
 #+begin_src elisp
-  (use-package treesit
-  :commands (treesit-install-language-grammar
-             config/treesit-install-all-languages)
-  :init
-    (setq treesit-language-source-alist
-      '((bash . ("https://github.com/tree-sitter/tree-sitter-bash"))
-        (c . ("https://github.com/tree-sitter/tree-sitter-c"))
-        (cpp . ("https://github.com/tree-sitter/tree-sitter-cpp"))
-        (css . ("https://github.com/tree-sitter/tree-sitter-css"))
-        (cmake . ("https://github.com/uyha/tree-sitter-cmake"))
-        (common-lisp . ("https://github.com/theHamsta/tree-sitter-commonlisp"))
-        (csharp . ("https://github.com/tree-sitter/tree-sitter-c-sharp.git"))
-        (dockerfile . ("https://github.com/camdencheek/tree-sitter-dockerfile"))
-        (elisp . ("https://github.com/Wilfred/tree-sitter-elisp"))
-        (go . ("https://github.com/tree-sitter/tree-sitter-go"))
-        (gomod . ("https://github.com/camdencheek/tree-sitter-go-mod.git"))
-        (html . ("https://github.com/tree-sitter/tree-sitter-html"))
-        (java . ("https://github.com/tree-sitter/tree-sitter-java.git"))
-        (javascript . ("https://github.com/tree-sitter/tree-sitter-javascript"))
-        (json . ("https://github.com/tree-sitter/tree-sitter-json"))
-        (lua . ("https://github.com/Azganoth/tree-sitter-lua"))
-        (make . ("https://github.com/alemuller/tree-sitter-make"))
-        (markdown . ("https://github.com/MDeiml/tree-sitter-markdown" nil
-          "tree-sitter-markdown/src"))
-        (nix . ("https://github.com/nix-community/tree-sitter-nix.git"))
-        (ocaml . ("https://github.com/tree-sitter/tree-sitter-ocaml" nil "ocaml/src"))
-        (org . ("https://github.com/milisims/tree-sitter-org"))
-        (python . ("https://github.com/tree-sitter/tree-sitter-python"))
-        (php . ("https://github.com/tree-sitter/tree-sitter-php"))
-        (typescript . ("https://github.com/tree-sitter/tree-sitter-typescript" nil
-            "typescript/src"))
-        (tsx . ("https://github.com/tree-sitter/tree-sitter-typescript" nil
-            "tsx/src"))
-        (ruby . ("https://github.com/tree-sitter/tree-sitter-ruby"))
-        (rust . ("https://github.com/tree-sitter/tree-sitter-rust"))
-        (sql . ("https://github.com/m-novikov/tree-sitter-sql"))
-        (vue . ("https://github.com/merico-dev/tree-sitter-vue"))
-        (yaml . ("https://github.com/ikatyang/tree-sitter-yaml"))
-        (toml . ("https://github.com/tree-sitter/tree-sitter-toml"))
-        (zig . ("https://github.com/GrayJack/tree-sitter-zig"))))
-  :config
-  (defun config/treesit-install-all-languages ()
-    "Install all languages specified by `treesit-language-source-alist'."
-    (interactive)
-    (let ((languages (mapcar 'car treesit-language-source-alist)))
-      (dolist (lang languages)
-        (treesit-install-language-grammar lang)
-        (message "`%s' parser was installed." lang)
-        (sit-for 0.75)))))
-  ;; stolen from lazycat
-  (setq major-mode-remap-alist
-        '((c-mode          . c-ts-mode)
-          (c++-mode        . c++-ts-mode)
-          (cmake-mode      . cmake-ts-mode)
-          (conf-toml-mode  . toml-ts-mode)
-          (css-mode        . css-ts-mode)
-          (js-mode         . js-ts-mode)
-          (js-json-mode    . json-ts-mode)
-          (nix-mode        . nix-ts-mode)
-          (python-mode     . python-ts-mode)
-          (sh-mode         . bash-ts-mode)
-          (typescript-mode . typescript-ts-mode)
-          (rust-mode       . rust-ts-mode)
-          ))
+(use-package treesit
+:commands (treesit-install-language-grammar
+           config/treesit-install-all-languages)
+:init
+  (setq treesit-language-source-alist
+    '((bash . ("https://github.com/tree-sitter/tree-sitter-bash"))
+      (c . ("https://github.com/tree-sitter/tree-sitter-c"))
+      (cpp . ("https://github.com/tree-sitter/tree-sitter-cpp"))
+      (css . ("https://github.com/tree-sitter/tree-sitter-css"))
+      (cmake . ("https://github.com/uyha/tree-sitter-cmake"))
+      (common-lisp . ("https://github.com/theHamsta/tree-sitter-commonlisp"))
+      (csharp . ("https://github.com/tree-sitter/tree-sitter-c-sharp.git"))
+      (dockerfile . ("https://github.com/camdencheek/tree-sitter-dockerfile"))
+      (elisp . ("https://github.com/Wilfred/tree-sitter-elisp"))
+      (go . ("https://github.com/tree-sitter/tree-sitter-go"))
+      (gomod . ("https://github.com/camdencheek/tree-sitter-go-mod.git"))
+      (html . ("https://github.com/tree-sitter/tree-sitter-html"))
+      (java . ("https://github.com/tree-sitter/tree-sitter-java.git"))
+      (javascript . ("https://github.com/tree-sitter/tree-sitter-javascript"))
+      (json . ("https://github.com/tree-sitter/tree-sitter-json"))
+      (lua . ("https://github.com/Azganoth/tree-sitter-lua"))
+      (make . ("https://github.com/alemuller/tree-sitter-make"))
+      (markdown . ("https://github.com/MDeiml/tree-sitter-markdown" nil
+        "tree-sitter-markdown/src"))
+      (nix . ("https://github.com/nix-community/tree-sitter-nix.git"))
+      (ocaml . ("https://github.com/tree-sitter/tree-sitter-ocaml" nil "ocaml/src"))
+      (org . ("https://github.com/milisims/tree-sitter-org"))
+      (python . ("https://github.com/tree-sitter/tree-sitter-python"))
+      (php . ("https://github.com/tree-sitter/tree-sitter-php"))
+      (typescript . ("https://github.com/tree-sitter/tree-sitter-typescript" nil
+          "typescript/src"))
+      (tsx . ("https://github.com/tree-sitter/tree-sitter-typescript" nil
+          "tsx/src"))
+      (ruby . ("https://github.com/tree-sitter/tree-sitter-ruby"))
+      (rust . ("https://github.com/tree-sitter/tree-sitter-rust"))
+      (sql . ("https://github.com/m-novikov/tree-sitter-sql"))
+      (vue . ("https://github.com/merico-dev/tree-sitter-vue"))
+      (yaml . ("https://github.com/ikatyang/tree-sitter-yaml"))
+      (toml . ("https://github.com/tree-sitter/tree-sitter-toml"))
+      (zig . ("https://github.com/GrayJack/tree-sitter-zig"))))
+:config
+(defun config/treesit-install-all-languages ()
+  "Install all languages specified by `treesit-language-source-alist'."
+  (interactive)
+  (let ((languages (mapcar 'car treesit-language-source-alist)))
+    (dolist (lang languages)
+      (treesit-install-language-grammar lang)
+      (message "`%s' parser was installed." lang)
+      (sit-for 0.75)))))
+;; stolen from lazycat
+(setq major-mode-remap-alist
+      '((c-mode          . c-ts-mode)
+        (c++-mode        . c++-ts-mode)
+        (cmake-mode      . cmake-ts-mode)
+        (conf-toml-mode  . toml-ts-mode)
+        (css-mode        . css-ts-mode)
+        (js-mode         . js-ts-mode)
+        (js-json-mode    . json-ts-mode)
+        (nix-mode        . nix-ts-mode)
+        (python-mode     . python-ts-mode)
+        (sh-mode         . bash-ts-mode)
+        (typescript-mode . typescript-ts-mode)
+        (rust-mode       . rust-ts-mode)
+        ))
+  ;; (advice-add 'org-src-get-lang-mode :filter-return #'my/remap-mode)
 
-  (add-hook 'markdown-mode-hook #'(lambda ()
-            (treesit-parser-create 'markdown)))
+(add-hook 'markdown-mode-hook #'(lambda ()
+          (treesit-parser-create 'markdown)))
 
-  (add-hook 'web-mode-hook #'(lambda ()
-             (let ((file-name (buffer-file-name)))
-               (when file-name
-                 (treesit-parser-create
-            (pcase (file-name-extension file-name)
-              ("vue" 'vue)
-              ("html" 'html)
-              ("php" 'php))))
-               )))
+(add-hook 'web-mode-hook #'(lambda ()
+           (let ((file-name (buffer-file-name)))
+             (when file-name
+               (treesit-parser-create
+          (pcase (file-name-extension file-name)
+            ("vue" 'vue)
+            ("html" 'html)
+            ("php" 'php))))
+             )))
 
-  (add-hook 'emacs-lisp-mode-hook #'(lambda () (treesit-parser-create 'elisp)))
-  (add-hook 'ielm-mode-hook #'(lambda () (treesit-parser-create 'elisp)))
-  (add-hook 'json-mode-hook #'(lambda () (treesit-parser-create 'json)))
-  (add-hook 'go-mode-hook #'(lambda () (treesit-parser-create 'go)))
-  (add-hook 'java-mode-hook #'(lambda () (treesit-parser-create 'java)))
-  (add-hook 'java-ts-mode-hook #'(lambda () (treesit-parser-create 'java)))
-  (add-hook 'php-mode-hook #'(lambda () (treesit-parser-create 'php)))
-  (add-hook 'php-ts-mode-hook #'(lambda () (treesit-parser-create 'php)))
+(add-hook 'emacs-lisp-mode-hook #'(lambda () (treesit-parser-create 'elisp)))
+(add-hook 'ielm-mode-hook #'(lambda () (treesit-parser-create 'elisp)))
+(add-hook 'json-mode-hook #'(lambda () (treesit-parser-create 'json)))
+(add-hook 'go-mode-hook #'(lambda () (treesit-parser-create 'go)))
+(add-hook 'java-mode-hook #'(lambda () (treesit-parser-create 'java)))
+(add-hook 'java-ts-mode-hook #'(lambda () (treesit-parser-create 'java)))
+(add-hook 'php-mode-hook #'(lambda () (treesit-parser-create 'php)))
+(add-hook 'php-ts-mode-hook #'(lambda () (treesit-parser-create 'php)))
 #+end_src
 ** Copilot
 :PROPERTIES:
@@ -3635,6 +3644,13 @@ To build auctex, =autoconf= should be avaliable on your system.
   (use-package jupyter
   :defer t
     )
+#+end_src
+** Rust
+Rusty object notation mode
+#+begin_src elisp
+(use-package ron-mode
+:mode "\\.ron\\'"
+)
 #+end_src
 ** Verilog
 :PROPERTIES:
@@ -4296,7 +4312,7 @@ I'm using two plugins that handles backlink. =Org-super-links= handles inserting
 #+begin_src elisp
 (use-package org
 :config
-  (defun org-add-custom-id ()
+  (defun my/org-add-custom-id ()
     "Add CUSTOM_ID property to current heading, skip if already have"
     (interactive)
     (let ((custom-id (org-entry-get nil "CUSTOM_ID")))
@@ -4304,7 +4320,7 @@ I'm using two plugins that handles backlink. =Org-super-links= handles inserting
         (org-set-property "CUSTOM_ID" (org-id-new))))
     )
 
-  (defun org-add-custom-id-to-all-headings ()
+  (defun my/org-add-custom-id-to-all-headings ()
     "Add CUSTOM_ID properties to headings without a CUSTOM_ID property in current Org buffer."
     (interactive)
     (org-map-entries
@@ -5234,9 +5250,12 @@ This subtree is used to execute some elisps to test.
 #+begin_src elisp :results value
 
 #+end_src
-* TODO Plugins
+* TODO
 ** Org-denote
 ** Completion
 *** flx-rs + fussy
 *** hotfuzz
-***
+** Align variable pitch
+*** Transient maps
+*** Dired
+** Elfeed add filter group

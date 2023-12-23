@@ -20,7 +20,8 @@ no-byte-compile = emacsql-pg.el
   load-path = extensions
 
 [submodule "lsp-bridge"]
-  build-step = borg-update-autoloads
+  load-path = .
+  load-path = acm
 
 [submodule "auctex"]
   load-path = .

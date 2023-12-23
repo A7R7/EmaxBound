@@ -22,9 +22,6 @@
 [submodule "all-the-icons-completion"]
 	path = lib/all-the-icons-completion
 	url = git@github.com:iyefrat/all-the-icons-completion.git
-[submodule "all-the-icons-dired"]
-	path = lib/all-the-icons-dired
-	url = https://github.com/wyuenho/all-the-icons-dired
 [submodule "anaphora"]
 	path = lib/anaphora
 	url = git@github.com:rolandwalker/anaphora.git
@@ -538,6 +535,9 @@
 [submodule "sublime-themes"]
 	path = lib/sublime-themes
 	url = git@github.com:owainlewis/emacs-color-themes.git
+[submodule "sudoku"]
+	path = lib/sudoku
+	url = https://github.com/zevlg/sudoku.el
 [submodule "tablist"]
 	path = lib/tablist
 	url = git@github.com:emacsorphanage/tablist.git
@@ -646,3 +646,6 @@
 [submodule "zoxide"]
 	path = lib/zoxide
 	url = https://gitlab.com/Vonfry/zoxide.el
+[submodule "ron-mode"]
+	path = lib/ron-mode
+	url = git@github.com:emacsmirror/ron-mode.git
